@@ -1,0 +1,37 @@
+## --- .NET / C# Visual Studio / Rider Ignore Rules ---
+
+# Build results (Сборка)
+[Bb]in/
+[Oo]bj/
+out/
+log/
+logs/
+
+# User-specific files (Файлы настроек юзера)
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+
+# Visual Studio / VS Code / Rider cache & temp files (Кэш и настройки IDE)
+.vs/
+.idea/
+*.DotSettings.user
+*.patch
+*.dyn
+
+# Environment & Local Secrets (Локальные конфигурации и пароли)
+appsettings.Secrets.json
+appsettings.Local.json
+*.env
+
+# Windows system temp files (Мусор ОС)
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Test Results (Результаты прогона тестов)
+TestResults/
+*.trx
+*.coverage

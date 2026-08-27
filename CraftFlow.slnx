@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/CraftFlow.Api/CraftFlow.Api.csproj" />
+    <Project Path="src/CraftFlow.SharedKernel/CraftFlow.SharedKernel.csproj" />
+    <Project Path="src/CraftFlow.Wpf/CraftFlow.Wpf.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/CraftFlow.ArchitectureTests/CraftFlow.ArchitectureTests.csproj" />
+    <Project Path="tests/CraftFlow.IntegrationTests/CraftFlow.IntegrationTests.csproj" />
+    <Project Path="tests/CraftFlow.UnitTests/CraftFlow.UnitTests.csproj" />
+  </Folder>
+</Solution>
