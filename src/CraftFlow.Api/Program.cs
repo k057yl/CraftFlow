@@ -1,5 +1,6 @@
 using CraftFlow.Api;
 using CraftFlow.Api.Modules.Catalog;
+using CraftFlow.Api.Modules.Inventory;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Эндпоинты модулей
 app.MapCatalogEndpoints();
+app.MapInventoryEndpoints();
 
 app.Run();

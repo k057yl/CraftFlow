@@ -3,29 +3,44 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Windows;
 using System.Windows.Media;
+using CraftFlow.SharedKernel.Constants;
 
 namespace CraftFlow.Wpf;
 
 public partial class MainWindow : Window
 {
+    private const string API_BASE_URL = "http://localhost:5109/";
+    private const string TENANT_HEADER_KEY = "X-Tenant-Id";
+    private const string DEFAULT_TENANT_ID = "00000000-0000-0000-0000-000000000001";
+
+    private const string ENDPOINT_UOM = "api/catalog/units-of-measure";
+    private const string ENDPOINT_RAW_MATERIALS = "api/catalog/raw-materials";
+    private const string ENDPOINT_PRODUCTS = "api/catalog/products";
+    private const string ENDPOINT_RECIPES = "api/catalog/recipes";
+    private const string ENDPOINT_WAREHOUSES = "api/inventory/warehouses";
+    private const string ENDPOINT_STOCK_LOTS = "api/inventory/stock-lots";
+
     private readonly HttpClient _httpClient = new()
     {
-        BaseAddress = new Uri("http://localhost:5109/")
+        BaseAddress = new Uri(API_BASE_URL)
     };
 
     public ObservableCollection<LookupItem> UnitsOfMeasure { get; } = [];
     public ObservableCollection<LookupItem> RawMaterials { get; } = [];
     public ObservableCollection<LookupItem> Products { get; } = [];
+    public ObservableCollection<LookupItem> Warehouses { get; } = [];
 
     public MainWindow()
     {
         InitializeComponent();
-        _httpClient.DefaultRequestHeaders.Add("X-Tenant-Id", "00000000-0000-0000-0000-000000000001");
+        _httpClient.DefaultRequestHeaders.Add(TENANT_HEADER_KEY, DEFAULT_TENANT_ID);
 
         RawUomComboBox.ItemsSource = UnitsOfMeasure;
         ProductUomComboBox.ItemsSource = UnitsOfMeasure;
         RecipeProductComboBox.ItemsSource = Products;
         RecipeRawMaterialComboBox.ItemsSource = RawMaterials;
+        StockWarehouseComboBox.ItemsSource = Warehouses;
+        StockRawMaterialComboBox.ItemsSource = RawMaterials;
 
         Loaded += async (s, e) => await LoadDataAsync();
     }
@@ -34,29 +49,33 @@ public partial class MainWindow : Window
     {
         try
         {
-            var uoms = await _httpClient.GetFromJsonAsync<List<LookupDto>>("api/catalog/units-of-measure");
+            var uoms = await _httpClient.GetFromJsonAsync<List<LookupDto>>(ENDPOINT_UOM);
             UnitsOfMeasure.Clear();
             uoms?.ForEach(u => UnitsOfMeasure.Add(new LookupItem(u.Id, $"{u.Name} ({u.Code})")));
 
-            var raw = await _httpClient.GetFromJsonAsync<List<LookupDto>>("api/catalog/raw-materials");
+            var raw = await _httpClient.GetFromJsonAsync<List<LookupDto>>(ENDPOINT_RAW_MATERIALS);
             RawMaterials.Clear();
             raw?.ForEach(r => RawMaterials.Add(new LookupItem(r.Id, r.Name)));
 
-            var prods = await _httpClient.GetFromJsonAsync<List<LookupDto>>("api/catalog/products");
+            var prods = await _httpClient.GetFromJsonAsync<List<LookupDto>>(ENDPOINT_PRODUCTS);
             Products.Clear();
             prods?.ForEach(p => Products.Add(new LookupItem(p.Id, p.Name)));
 
-            SetStatus("Данные загружены из базы Postgres.", Brushes.Green);
+            var warehouses = await _httpClient.GetFromJsonAsync<List<LookupDto>>(ENDPOINT_WAREHOUSES);
+            Warehouses.Clear();
+            warehouses?.ForEach(w => Warehouses.Add(new LookupItem(w.Id, w.Name)));
+
+            SetStatus(ErrorCodes.UiMessages.DATA_LOADED_SUCCESS, Brushes.Green);
         }
         catch (Exception ex)
         {
-            SetStatus($"Ошибка загрузки данных: {ex.Message}", Brushes.Red);
+            SetStatus($"{ErrorCodes.UiMessages.DATA_LOAD_ERROR}: {ex.Message}", Brushes.Red);
         }
     }
 
     private async void CreateUom_Click(object sender, RoutedEventArgs e)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/catalog/units-of-measure", new
+        var response = await _httpClient.PostAsJsonAsync(ENDPOINT_UOM, new
         {
             Name = UomNameTextBox.Text,
             Code = UomCodeTextBox.Text
@@ -64,8 +83,12 @@ public partial class MainWindow : Window
 
         if (response.IsSuccessStatusCode)
         {
-            SetStatus("ЕИ создана!", Brushes.Green);
+            SetStatus(ErrorCodes.UiMessages.UOM_CREATED_SUCCESS, Brushes.Green);
             await LoadDataAsync();
+        }
+        else
+        {
+            SetStatus($"{ErrorCodes.UiMessages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
         }
     }
 
@@ -73,7 +96,7 @@ public partial class MainWindow : Window
     {
         if (RawUomComboBox.SelectedValue is not Guid uomId) return;
 
-        var response = await _httpClient.PostAsJsonAsync("api/catalog/raw-materials", new
+        var response = await _httpClient.PostAsJsonAsync(ENDPOINT_RAW_MATERIALS, new
         {
             Name = RawMaterialNameTextBox.Text,
             UnitOfMeasureId = uomId
@@ -81,8 +104,12 @@ public partial class MainWindow : Window
 
         if (response.IsSuccessStatusCode)
         {
-            SetStatus("Сырье создано!", Brushes.Green);
+            SetStatus(ErrorCodes.UiMessages.RAW_MATERIAL_CREATED_SUCCESS, Brushes.Green);
             await LoadDataAsync();
+        }
+        else
+        {
+            SetStatus($"{ErrorCodes.UiMessages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
         }
     }
 
@@ -90,7 +117,7 @@ public partial class MainWindow : Window
     {
         if (ProductUomComboBox.SelectedValue is not Guid uomId) return;
 
-        var response = await _httpClient.PostAsJsonAsync("api/catalog/products", new
+        var response = await _httpClient.PostAsJsonAsync(ENDPOINT_PRODUCTS, new
         {
             Name = ProductNameTextBox.Text,
             UnitOfMeasureId = uomId
@@ -98,8 +125,12 @@ public partial class MainWindow : Window
 
         if (response.IsSuccessStatusCode)
         {
-            SetStatus("Продукт создан!", Brushes.Green);
+            SetStatus(ErrorCodes.UiMessages.PRODUCT_CREATED_SUCCESS, Brushes.Green);
             await LoadDataAsync();
+        }
+        else
+        {
+            SetStatus($"{ErrorCodes.UiMessages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
         }
     }
 
@@ -110,11 +141,11 @@ public partial class MainWindow : Window
             !decimal.TryParse(RecipeOutputQuantityTextBox.Text, out var targetOutput) ||
             !decimal.TryParse(RecipeIngredientQuantityTextBox.Text, out var ingredientQty))
         {
-            SetStatus("Проверь выбранный продукт, сырье и числовые поля!", Brushes.Red);
+            SetStatus(ErrorCodes.UiMessages.INVALID_INPUT_FIELDS, Brushes.Red);
             return;
         }
 
-        var response = await _httpClient.PostAsJsonAsync("api/catalog/recipes", new
+        var response = await _httpClient.PostAsJsonAsync(ENDPOINT_RECIPES, new
         {
             ProductId = productId,
             Name = RecipeNameTextBox.Text,
@@ -128,11 +159,59 @@ public partial class MainWindow : Window
         if (response.IsSuccessStatusCode)
         {
             var recipeId = await response.Content.ReadFromJsonAsync<Guid>();
-            SetStatus($"Рецепт успешно создан! ID: {recipeId}", Brushes.Green);
+            SetStatus($"{ErrorCodes.UiMessages.RECIPE_CREATED_SUCCESS} ID: {recipeId}", Brushes.Green);
         }
         else
         {
-            SetStatus($"Ошибка API: {response.StatusCode}", Brushes.Red);
+            SetStatus($"{ErrorCodes.UiMessages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+        }
+    }
+
+    private async void CreateWarehouse_Click(object sender, RoutedEventArgs e)
+    {
+        var response = await _httpClient.PostAsJsonAsync(ENDPOINT_WAREHOUSES, new
+        {
+            Name = WarehouseNameTextBox.Text,
+            Address = WarehouseAddressTextBox.Text
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            SetStatus(ErrorCodes.UiMessages.WAREHOUSE_CREATED_SUCCESS, Brushes.Green);
+            await LoadDataAsync();
+        }
+        else
+        {
+            SetStatus($"{ErrorCodes.UiMessages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+        }
+    }
+
+    private async void AddStockLot_Click(object sender, RoutedEventArgs e)
+    {
+        if (StockWarehouseComboBox.SelectedValue is not Guid warehouseId ||
+            StockRawMaterialComboBox.SelectedValue is not Guid rawId ||
+            !decimal.TryParse(StockQuantityTextBox.Text, out var quantity))
+        {
+            SetStatus(ErrorCodes.UiMessages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
+
+        var response = await _httpClient.PostAsJsonAsync(ENDPOINT_STOCK_LOTS, new
+        {
+            WarehouseId = warehouseId,
+            ItemId = rawId,
+            Quantity = quantity,
+            BatchNumber = StockBatchTextBox.Text
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            var lotId = await response.Content.ReadFromJsonAsync<Guid>();
+            SetStatus($"{ErrorCodes.UiMessages.STOCK_LOT_CREATED_SUCCESS} ID: {lotId}", Brushes.Green);
+        }
+        else
+        {
+            SetStatus($"{ErrorCodes.UiMessages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
         }
     }
 

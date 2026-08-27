@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Modules.Catalog.Domain;
+using CraftFlow.Api.Modules.Inventory.Domain;
 using CraftFlow.SharedKernel.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,8 @@ public class AppDbContext : DbContext
     public DbSet<Product> Products => Set<Product>();
     public DbSet<Recipe> Recipes => Set<Recipe>();
     public DbSet<RecipeIngredient> RecipeIngredients => Set<RecipeIngredient>();
+    public DbSet<Warehouse> Warehouses => Set<Warehouse>();
+    public DbSet<StockLot> StockLots => Set<StockLot>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
