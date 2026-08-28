@@ -1,71 +1,98 @@
 ﻿<Page x:Class="CraftFlow.Wpf.Pages.CatalogPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
       Title="CatalogPage">
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
         <StackPanel>
-            <TextBlock Text="CATALOG MANAGEMENT" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+            <TextBlock Text="{loc:Loc TITLE_CATALOG}" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
 
-            <GroupBox Header="1. UNITS OF MEASURE" Margin="0,0,0,10" Padding="8">
+            <!-- 1. Единицы измерения -->
+            <GroupBox Header="{loc:Loc HEADER_UOM}" Margin="0,0,0,10" Padding="8">
                 <StackPanel>
-                    <Grid>
+                    <Grid Margin="0,0,0,5">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                            <TextBlock Text="UOM_NAME:"/>
+                            <TextBlock Text="{loc:Loc UOM_NAME}"/>
                             <TextBox x:Name="UomNameTextBox" Text="Kilogram"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                            <TextBlock Text="UOM_CODE:"/>
+                            <TextBlock Text="{loc:Loc UOM_CODE}"/>
                             <TextBox x:Name="UomCodeTextBox" Text="kg"/>
                         </StackPanel>
                     </Grid>
-                    <Button Content="CREATE UOM" Click="CreateUom_Click" Margin="0,8,0,0" Height="25"/>
+                    <Button Content="{loc:Loc CREATE_UOM}" Click="CreateUom_Click" Height="25" Margin="0,5,0,0"/>
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="2. RAW MATERIALS" Margin="0,0,0,10" Padding="8">
+            <!-- 2. Сырье -->
+            <GroupBox Header="{loc:Loc HEADER_RAW_MATERIALS}" Margin="0,0,0,10" Padding="8">
                 <StackPanel>
-                    <TextBlock Text="RAW_MATERIAL_NAME:"/>
+                    <TextBlock Text="{loc:Loc RAW_MATERIAL_NAME}"/>
                     <TextBox x:Name="RawMaterialNameTextBox" Text="Milk 3.6%" Margin="0,0,0,5"/>
-                    <TextBlock Text="SELECT UOM:"/>
+
+                    <TextBlock Text="{loc:Loc SELECT_UOM}"/>
                     <ComboBox x:Name="RawUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-                    <Button Content="CREATE RAW MATERIAL" Click="CreateRawMaterial_Click" Height="25"/>
+
+                    <Button Content="{loc:Loc CREATE_RAW_MATERIAL}" Click="CreateRawMaterial_Click" Height="25" Margin="0,5,0,0"/>
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="3. PRODUCTS" Margin="0,0,0,10" Padding="8">
+            <!-- 3. Готовая продукция -->
+            <GroupBox Header="{loc:Loc HEADER_PRODUCTS}" Margin="0,0,0,10" Padding="8">
                 <StackPanel>
-                    <TextBlock Text="PRODUCT_NAME:"/>
+                    <TextBlock Text="{loc:Loc PRODUCT_NAME}"/>
                     <TextBox x:Name="ProductNameTextBox" Text="Gouda Cheese" Margin="0,0,0,5"/>
-                    <TextBlock Text="SELECT UOM:"/>
+
+                    <TextBlock Text="{loc:Loc SELECT_UOM}"/>
                     <ComboBox x:Name="ProductUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-                    <Button Content="CREATE PRODUCT" Click="CreateProduct_Click" Height="25"/>
+
+                    <Button Content="{loc:Loc CREATE_PRODUCT}" Click="CreateProduct_Click" Height="25" Margin="0,5,0,0"/>
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="4. RECIPES" Margin="0,0,0,10" Padding="8">
+            <!-- 4. Технологические Рецепты -->
+            <GroupBox Header="{loc:Loc HEADER_RECIPES}" Margin="0,0,0,10" Padding="8">
                 <StackPanel>
-                    <TextBlock Text="RECIPE_NAME:"/>
+                    <TextBlock Text="{loc:Loc RECIPE_NAME}"/>
                     <TextBox x:Name="RecipeNameTextBox" Text="Classic Gouda Recipe" Margin="0,0,0,5"/>
-                    <TextBlock Text="SELECT PRODUCT:"/>
+
+                    <TextBlock Text="{loc:Loc SELECT_PRODUCT}"/>
                     <ComboBox x:Name="RecipeProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-                    <TextBlock Text="TARGET OUTPUT QUANTITY:"/>
-                    <TextBox x:Name="RecipeOutputQuantityTextBox" Text="10" Margin="0,0,0,5"/>
 
-                    <Border BorderBrush="Gray" BorderThickness="1" Padding="5" Margin="0,5,0,5">
+                    <TextBlock Text="{loc:Loc TARGET_OUTPUT_QUANTITY}"/>
+                    <!-- БАЗОВЫЙ ВЫХОД ТЕПЕРЬ СТРОГО = 1 КГ/Л -->
+                    <TextBox x:Name="RecipeOutputQuantityTextBox" Text="1" Margin="0,0,0,5"/>
+
+                    <GroupBox Header="{loc:Loc INGREDIENT_SECTION}" Margin="0,5,0,5" Padding="5">
                         <StackPanel>
-                            <TextBlock Text="INGREDIENT SECTION" FontWeight="Bold"/>
-                            <TextBlock Text="SELECT RAW MATERIAL:"/>
-                            <ComboBox x:Name="RecipeRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-                            <TextBlock Text="INGREDIENT QUANTITY:"/>
-                            <TextBox x:Name="RecipeIngredientQuantityTextBox" Text="100" Margin="0,0,0,5"/>
-                        </StackPanel>
-                    </Border>
+                            <!-- Выбор сырья и добавление нескольких ингредиентов -->
+                            <Grid Margin="0,0,0,5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                                    <TextBlock Text="{loc:Loc SELECT_RAW_MATERIAL}"/>
+                                    <ComboBox x:Name="RecipeRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id"/>
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="0,0,5,0">
+                                    <TextBlock Text="{loc:Loc INGREDIENT_QUANTITY}"/>
+                                    <TextBox x:Name="RecipeIngredientQuantityTextBox" Text="10"/>
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="+" Click="AddIngredient_Click" Width="30" Height="23" VerticalAlignment="Bottom"/>
+                            </Grid>
 
-                    <Button Content="CREATE RECIPE" Click="CreateRecipe_Click" Height="25"/>
+                            <!-- Список добавленных ингредиентов (Молоко, Соль, Фермент) -->
+                            <ListBox x:Name="AddedIngredientsListBox" Height="80" DisplayMemberPath="DisplayInfo" Margin="0,5,0,0"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <Button Content="{loc:Loc CREATE_RECIPE}" Click="CreateRecipe_Click" Height="25" Margin="0,5,0,0"/>
                 </StackPanel>
             </GroupBox>
 

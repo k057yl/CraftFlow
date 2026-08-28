@@ -1,11 +1,11 @@
-﻿using System.Collections.ObjectModel;
-using System.Net.Http.Json;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Services;
+using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using CraftFlow.SharedKernel.Constants;
-using CraftFlow.Wpf.Models;
-using CraftFlow.Wpf.Services;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -46,55 +46,67 @@ public partial class InventoryPage : Page
 
     private async void CreateWarehouse_Click(object sender, RoutedEventArgs e)
     {
-        var response = await ApiService.Instance.PostAsync(Endpoints.WAREHOUSES, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.WAREHOUSES, new
         {
             Name = WarehouseNameTextBox.Text,
             Address = WarehouseAddressTextBox.Text
         });
 
-        if (response.IsSuccessStatusCode)
+        if (isSuccess)
         {
             SetStatus(UiConstants.Messages.WAREHOUSE_CREATED_SUCCESS, Brushes.Green);
             await LoadDataAsync();
         }
         else
         {
-            SetStatus($"{UiConstants.Messages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+            SetStatus(contentOrError, Brushes.Red);
         }
     }
 
     private async void AddStockLot_Click(object sender, RoutedEventArgs e)
     {
-        if (StockWarehouseComboBox.SelectedValue is not Guid warehouseId ||
-            StockRawMaterialComboBox.SelectedValue is not Guid rawId ||
-            !decimal.TryParse(StockQuantityTextBox.Text, out var quantity))
+        var selectedWarehouse = StockWarehouseComboBox.SelectedItem as LookupItem;
+        var selectedRawMaterial = StockRawMaterialComboBox.SelectedItem as LookupItem;
+
+        if (selectedWarehouse == null || selectedRawMaterial == null)
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
             return;
         }
 
-        var response = await ApiService.Instance.PostAsync(Endpoints.STOCK_LOTS, new
+        var rawQuantityText = StockQuantityTextBox.Text.Replace(',', '.');
+        var rawPriceText = StockUnitPriceTextBox.Text.Replace(',', '.');
+
+        if (!decimal.TryParse(rawQuantityText, NumberStyles.Any, CultureInfo.InvariantCulture, out var quantity) ||
+            !decimal.TryParse(rawPriceText, NumberStyles.Any, CultureInfo.InvariantCulture, out var unitPrice))
         {
-            WarehouseId = warehouseId,
-            ItemId = rawId,
+            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
+
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.STOCK_LOTS, new
+        {
+            WarehouseId = selectedWarehouse.Id,
+            ItemId = selectedRawMaterial.Id,
             Quantity = quantity,
+            UnitPrice = unitPrice,
             BatchNumber = StockBatchTextBox.Text
         });
 
-        if (response.IsSuccessStatusCode)
+        if (isSuccess)
         {
-            var lotId = await response.Content.ReadFromJsonAsync<Guid>();
-            SetStatus($"{UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS} ID: {lotId}", Brushes.Green);
+            SetStatus($"{UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS} ID: {contentOrError}", Brushes.Green);
+            await LoadDataAsync();
         }
         else
         {
-            SetStatus($"{UiConstants.Messages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+            SetStatus(contentOrError, Brushes.Red);
         }
     }
 
     private void SetStatus(string msg, Brush color)
     {
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = msg;
+        StatusTextBlock.Text = LocalizationService.Get(msg);
     }
 }

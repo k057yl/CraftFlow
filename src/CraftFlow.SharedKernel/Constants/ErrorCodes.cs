@@ -22,6 +22,7 @@ public static class ErrorCodes
     public static class Inventory
     {
         public const string STOCK_LOT_NEGATIVE_QUANTITY = "INVENTORY.STOCK_LOT_NEGATIVE_QUANTITY";
+        public const string UNIT_LOT_NEGATIVE_QUANTITY = "INVENTORY.UNIT_LOT_NEGATIVE_QUANTITY";
         public const string WAREHOUSE_NOT_FOUND = "INVENTORY.WAREHOUSE_NOT_FOUND";
         public const string WAREHOUSE_NAME_REQUIRED = "INVENTORY.WAREHOUSE_NAME_REQUIRED";
         public const string ITEM_NOT_FOUND = "INVENTORY.ITEM_NOT_FOUND";

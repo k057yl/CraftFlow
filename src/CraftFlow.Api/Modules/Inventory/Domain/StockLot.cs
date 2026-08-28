@@ -9,14 +9,18 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
         public Guid WarehouseId { get; private set; }
         public Guid ItemId { get; private set; }
         public decimal Quantity { get; private set; }
+        public decimal UnitPrice { get; private set; }
         public string? BatchNumber { get; private set; }
 
         private StockLot() { }
 
-        public static StockLot Create(Guid warehouseId, Guid itemId, decimal initialQuantity, string? batchNumber = null)
+        public static StockLot Create(Guid warehouseId, Guid itemId, decimal initialQuantity, decimal unitPrice, string? batchNumber = null)
         {
             if (initialQuantity < 0)
                 throw new ArgumentException(ErrorCodes.Inventory.STOCK_LOT_NEGATIVE_QUANTITY);
+
+            if (unitPrice < 0)
+                throw new ArgumentException(ErrorCodes.Inventory.UNIT_LOT_NEGATIVE_QUANTITY);
 
             return new StockLot
             {
@@ -24,6 +28,7 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
                 WarehouseId = warehouseId,
                 ItemId = itemId,
                 Quantity = initialQuantity,
+                UnitPrice = unitPrice,
                 BatchNumber = batchNumber
             };
         }

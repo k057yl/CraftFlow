@@ -1,34 +1,30 @@
 ﻿<Page x:Class="CraftFlow.Wpf.Pages.AuthPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
       Title="AuthPage">
-    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
-        <StackPanel Width="400" HorizontalAlignment="Left">
-            <TextBlock Text="AUTHENTICATION &amp; JWT" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
-
-            <GroupBox Header="USER AUTHENTICATION" Padding="15">
-                <StackPanel>
-                    <TextBlock Text="FULL_NAME:"/>
-                    <TextBox x:Name="AuthNameTextBox" Text="Главный Сыровар" Margin="0,0,0,10"/>
-
-                    <TextBlock Text="EMAIL:"/>
-                    <TextBox x:Name="AuthEmailTextBox" Text="cheesemaker@craftflow.io" Margin="0,0,0,10"/>
-
-                    <TextBlock Text="PASSWORD:"/>
-                    <TextBox x:Name="AuthPasswordTextBox" Text="secret123" Margin="0,0,0,10"/>
-
-                    <Grid Margin="0,10,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Content="REGISTER" Click="Register_Click" Height="30" Margin="0,0,5,0"/>
-                        <Button Grid.Column="1" Content="LOGIN &amp; USE TOKEN" Click="Login_Click" Height="30" Margin="5,0,0,0"/>
-                    </Grid>
-                </StackPanel>
-            </GroupBox>
-
-            <TextBlock x:Name="StatusTextBlock" Text="READY" Foreground="Blue" FontWeight="Bold" Margin="0,15,0,0" TextWrapping="Wrap"/>
-        </StackPanel>
-    </ScrollViewer>
+	<ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+		<StackPanel Width="400" HorizontalAlignment="Left">
+			<TextBlock Text="{loc:Loc TITLE_AUTH}" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+			<GroupBox Header="{loc:Loc USER_AUTHENTICATION}" Padding="15">
+				<StackPanel>
+					<TextBlock Text="{loc:Loc FULL_NAME}"/>
+					<TextBox x:Name="AuthNameTextBox" Text="Главный Сыровар" Margin="0,0,0,10"/>
+					<TextBlock Text="{loc:Loc EMAIL}"/>
+					<TextBox x:Name="AuthEmailTextBox" Text="cheesemaker@craftflow.io" Margin="0,0,0,10"/>
+					<TextBlock Text="{loc:Loc PASSWORD}"/>
+					<TextBox x:Name="AuthPasswordTextBox" Text="secret123" Margin="0,0,0,10"/>
+					<Grid Margin="0,10,0,0">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="*"/>
+							<ColumnDefinition Width="*"/>
+						</Grid.ColumnDefinitions>
+						<Button Grid.Column="0" Content="{loc:Loc REGISTER}" Click="Register_Click" Height="30" Margin="0,0,5,0"/>
+						<Button Grid.Column="1" Content="{loc:Loc LOGIN_USE_TOKEN}" Click="Login_Click" Height="30" Margin="5,0,0,0"/>
+					</Grid>
+				</StackPanel>
+			</GroupBox>
+			<TextBlock x:Name="StatusTextBlock" Text="READY" Foreground="Blue" FontWeight="Bold" Margin="0,15,0,0" TextWrapping="Wrap"/>
+		</StackPanel>
+	</ScrollViewer>
 </Page>

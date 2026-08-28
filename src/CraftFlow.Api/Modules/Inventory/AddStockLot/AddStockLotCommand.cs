@@ -7,6 +7,7 @@ namespace CraftFlow.Api.Modules.Inventory.AddStockLot
         Guid WarehouseId,
         Guid ItemId,
         decimal Quantity,
-        string? BatchNumber
+        decimal UnitPrice,
+        string? BatchNumber = null
     ) : IRequest<Result<Guid>>;
 }

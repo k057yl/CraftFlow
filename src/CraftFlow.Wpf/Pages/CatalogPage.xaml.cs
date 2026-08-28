@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Net.Http.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -9,11 +8,19 @@ using CraftFlow.Wpf.Services;
 
 namespace CraftFlow.Wpf.Pages;
 
+public record IngredientItemDto(Guid RawMaterialId, string Name, decimal Quantity)
+{
+    public string DisplayInfo => $"{Name} — {Quantity}";
+}
+
 public partial class CatalogPage : Page
 {
     public ObservableCollection<LookupItem> UnitsOfMeasure { get; } = [];
     public ObservableCollection<LookupItem> RawMaterials { get; } = [];
     public ObservableCollection<LookupItem> Products { get; } = [];
+
+    // Временный список ингредиентов для рецепта
+    private readonly ObservableCollection<IngredientItemDto> _selectedIngredients = [];
 
     public CatalogPage()
     {
@@ -23,6 +30,7 @@ public partial class CatalogPage : Page
         ProductUomComboBox.ItemsSource = UnitsOfMeasure;
         RecipeProductComboBox.ItemsSource = Products;
         RecipeRawMaterialComboBox.ItemsSource = RawMaterials;
+        AddedIngredientsListBox.ItemsSource = _selectedIngredients;
 
         Loaded += async (s, e) => await LoadDataAsync();
     }
@@ -51,103 +59,120 @@ public partial class CatalogPage : Page
         }
     }
 
+    private void AddIngredient_Click(object sender, RoutedEventArgs e)
+    {
+        if (RecipeRawMaterialComboBox.SelectedItem is LookupItem rawItem &&
+            decimal.TryParse(RecipeIngredientQuantityTextBox.Text, out var qty) && qty > 0)
+        {
+            _selectedIngredients.Add(new IngredientItemDto(rawItem.Id, rawItem.Name, qty));
+        }
+    }
+
     private async void CreateUom_Click(object sender, RoutedEventArgs e)
     {
-        var response = await ApiService.Instance.PostAsync(Endpoints.UOM, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.UOM, new
         {
             Name = UomNameTextBox.Text,
             Code = UomCodeTextBox.Text
         });
 
-        if (response.IsSuccessStatusCode)
+        if (isSuccess)
         {
             SetStatus(UiConstants.Messages.UOM_CREATED_SUCCESS, Brushes.Green);
             await LoadDataAsync();
         }
         else
         {
-            SetStatus($"{UiConstants.Messages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+            SetStatus(contentOrError, Brushes.Red);
         }
     }
 
     private async void CreateRawMaterial_Click(object sender, RoutedEventArgs e)
     {
-        if (RawUomComboBox.SelectedValue is not Guid uomId) return;
+        if (RawUomComboBox.SelectedValue is not Guid uomId)
+        {
+            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
 
-        var response = await ApiService.Instance.PostAsync(Endpoints.RAW_MATERIALS, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.RAW_MATERIALS, new
         {
             Name = RawMaterialNameTextBox.Text,
             UnitOfMeasureId = uomId
         });
 
-        if (response.IsSuccessStatusCode)
+        if (isSuccess)
         {
             SetStatus(UiConstants.Messages.RAW_MATERIAL_CREATED_SUCCESS, Brushes.Green);
             await LoadDataAsync();
         }
         else
         {
-            SetStatus($"{UiConstants.Messages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+            SetStatus(contentOrError, Brushes.Red);
         }
     }
 
     private async void CreateProduct_Click(object sender, RoutedEventArgs e)
     {
-        if (ProductUomComboBox.SelectedValue is not Guid uomId) return;
+        if (ProductUomComboBox.SelectedValue is not Guid uomId)
+        {
+            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
 
-        var response = await ApiService.Instance.PostAsync(Endpoints.PRODUCTS, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.PRODUCTS, new
         {
             Name = ProductNameTextBox.Text,
             UnitOfMeasureId = uomId
         });
 
-        if (response.IsSuccessStatusCode)
+        if (isSuccess)
         {
             SetStatus(UiConstants.Messages.PRODUCT_CREATED_SUCCESS, Brushes.Green);
             await LoadDataAsync();
         }
         else
         {
-            SetStatus($"{UiConstants.Messages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+            SetStatus(contentOrError, Brushes.Red);
         }
     }
 
     private async void CreateRecipe_Click(object sender, RoutedEventArgs e)
     {
         if (RecipeProductComboBox.SelectedValue is not Guid productId ||
-            RecipeRawMaterialComboBox.SelectedValue is not Guid rawId ||
             !decimal.TryParse(RecipeOutputQuantityTextBox.Text, out var targetOutput) ||
-            !decimal.TryParse(RecipeIngredientQuantityTextBox.Text, out var ingredientQty))
+            _selectedIngredients.Count == 0)
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
             return;
         }
 
-        var response = await ApiService.Instance.PostAsync(Endpoints.RECIPES, new
+        var ingredientsPayload = _selectedIngredients
+            .Select(i => new { RawMaterialId = i.RawMaterialId, Quantity = i.Quantity })
+            .ToArray();
+
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.RECIPES, new
         {
             ProductId = productId,
             Name = RecipeNameTextBox.Text,
             TargetOutputQuantity = targetOutput,
-            Ingredients = new[]
-            {
-                new { RawMaterialId = rawId, Quantity = ingredientQty }
-            }
+            Ingredients = ingredientsPayload
         });
 
-        if (response.IsSuccessStatusCode)
+        if (isSuccess)
         {
-            var recipeId = await response.Content.ReadFromJsonAsync<Guid>();
-            SetStatus($"{UiConstants.Messages.RECIPE_CREATED_SUCCESS} ID: {recipeId}", Brushes.Green);
+            SetStatus($"{UiConstants.Messages.RECIPE_CREATED_SUCCESS} ID: {contentOrError}", Brushes.Green);
+            _selectedIngredients.Clear();
         }
         else
         {
-            SetStatus($"{UiConstants.Messages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+            SetStatus(contentOrError, Brushes.Red);
         }
     }
 
     private void SetStatus(string msg, Brush color)
     {
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = msg;
+        StatusTextBlock.Text = LocalizationService.Get(msg);
     }
 }

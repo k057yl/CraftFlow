@@ -15,6 +15,7 @@ namespace CraftFlow.Api.Modules.Production.Domain
         public BatchStatus Status { get; private set; }
         public DateTime StartedAt { get; private set; }
         public DateTime? CompletedAt { get; private set; }
+        public Guid DestinationWarehouseId { get; private set; }
 
         private ProductionBatch() { }
 
@@ -22,8 +23,9 @@ namespace CraftFlow.Api.Modules.Production.Domain
             Guid recipeId,
             Guid targetProductId,
             Guid warehouseId,
+            Guid destinationWarehouseId,
             decimal plannedOutputQuantity)
-        {
+            {
             if (plannedOutputQuantity <= 0)
                 throw new ArgumentException(ErrorCodes.Catalog.RECIPE_INVALID_TARGET_OUTPUT);
 
@@ -33,6 +35,7 @@ namespace CraftFlow.Api.Modules.Production.Domain
                 RecipeId = recipeId,
                 TargetProductId = targetProductId,
                 WarehouseId = warehouseId,
+                DestinationWarehouseId = destinationWarehouseId,
                 PlannedOutputQuantity = plannedOutputQuantity,
                 ActualOutputQuantity = 0,
                 Status = BatchStatus.Draft,

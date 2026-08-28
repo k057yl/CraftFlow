@@ -62,6 +62,6 @@ public partial class AuditPage : Page
     private void SetStatus(string msg, Brush color)
     {
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = msg;
+        StatusTextBlock.Text = LocalizationService.Get(msg);
     }
 }

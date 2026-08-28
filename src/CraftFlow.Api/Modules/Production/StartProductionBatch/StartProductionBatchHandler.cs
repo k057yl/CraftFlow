@@ -59,6 +59,7 @@ namespace CraftFlow.Api.Modules.Production.StartProductionBatch
                 request.RecipeId,
                 recipe.ProductId,
                 request.WarehouseId,
+                request.DestinationWarehouseId != Guid.Empty ? request.DestinationWarehouseId : request.WarehouseId,
                 request.PlannedOutputQuantity
             );
 

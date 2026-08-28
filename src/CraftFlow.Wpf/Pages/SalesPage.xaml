@@ -1,50 +1,98 @@
 ﻿<Page x:Class="CraftFlow.Wpf.Pages.SalesPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
       Title="SalesPage">
     <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
         <StackPanel>
-            <TextBlock Text="SALES &amp; ORDERS MANAGEMENT" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+            <TextBlock Text="{loc:Loc SHIP_SALES_ORDER}" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
 
-            <!-- 1. Покупатели -->
-            <GroupBox Header="1. CUSTOMERS" Margin="0,0,0,10" Padding="8">
+            <!-- 1. Клиенты -->
+            <GroupBox Header="{loc:Loc HEADER_CUSTOMERS}" Margin="0,0,0,10" Padding="8">
                 <StackPanel>
-                    <TextBlock Text="CUSTOMER_NAME:"/>
+                    <TextBlock Text="{loc:Loc CUSTOMER_NAME}"/>
                     <TextBox x:Name="CustomerNameTextBox" Text="Ресторан Густо" Margin="0,0,0,5"/>
-                    <TextBlock Text="CUSTOMER_PHONE:"/>
+                    <TextBlock Text="{loc:Loc CUSTOMER_PHONE}"/>
                     <TextBox x:Name="CustomerPhoneTextBox" Text="+380991112233" Margin="0,0,0,5"/>
-                    <Button Content="CREATE CUSTOMER" Click="CreateCustomer_Click" Height="25"/>
+                    <Button Content="{loc:Loc CREATE_CUSTOMER}" Click="CreateCustomer_Click" Height="25"/>
                 </StackPanel>
             </GroupBox>
 
-            <!-- 2. Продажа и Отгрузка -->
-            <GroupBox Header="2. SHIP SALES ORDER" Margin="0,0,0,10" Padding="8">
+            <!-- 2. Оформление Заказа -->
+            <GroupBox Header="{loc:Loc HEADER_SHIP_ORDER}" Margin="0,0,0,10" Padding="8">
                 <StackPanel>
-                    <TextBlock Text="SELECT_CUSTOMER:"/>
+                    <TextBlock Text="{loc:Loc SELECT_CUSTOMER}"/>
                     <ComboBox x:Name="OrderCustomerComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
 
-                    <TextBlock Text="SELECT_WAREHOUSE:"/>
-                    <ComboBox x:Name="OrderWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
+                    <TextBlock Text="{loc:Loc SELECT_WAREHOUSE_FINISHED}"/>
+                    <ComboBox x:Name="OrderWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5" SelectionChanged="OrderWarehouse_SelectionChanged"/>
 
-                    <TextBlock Text="SELECT_PRODUCT:"/>
-                    <ComboBox x:Name="OrderProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
+                    <TextBlock Text="{loc:Loc SELECT_PRODUCT}"/>
+                    <ComboBox x:Name="OrderProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5" SelectionChanged="OrderProduct_SelectionChanged"/>
 
-                    <Grid Margin="0,0,0,5">
+                    <!-- Информационная плашка: Остаток и Себестоимость -->
+                    <Grid Margin="0,5,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                            <TextBlock Text="QUANTITY:"/>
-                            <TextBox x:Name="OrderQuantityTextBox" Text="5"/>
+
+                        <StackPanel Grid.Column="0" Orientation="Horizontal">
+                            <TextBlock Text="{loc:Loc AVAILABLE_STOCK}" Foreground="Gray" Margin="0,0,5,0"/>
+                            <TextBlock x:Name="ProductStockTextBlock" Text="0.00" FontWeight="Bold" Foreground="DarkBlue"/>
                         </StackPanel>
-                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                            <TextBlock Text="UNIT_PRICE:"/>
-                            <TextBox x:Name="OrderPriceTextBox" Text="450"/>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <TextBlock Text="Себестоимость 1 кг: " Foreground="Gray" Margin="0,0,5,0"/>
+                            <TextBlock x:Name="ProductCostTextBlock" Text="$0.00" FontWeight="Bold" Foreground="DarkGreen"/>
                         </StackPanel>
                     </Grid>
 
-                    <Button Content="SHIP ORDER" Click="ShipOrder_Click" Height="25" Margin="0,5,0,0"/>
+                    <!-- Количество, Базовая цена, Скидка -->
+                    <Grid Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                            <TextBlock Text="{loc:Loc QUANTITY}"/>
+                            <TextBox x:Name="OrderQuantityTextBox" Text="5" TextChanged="CalculationInputs_Changed"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Margin="2,0,2,0">
+                            <TextBlock Text="Базовая цена ($):"/>
+                            <TextBox x:Name="OrderBasePriceTextBox" Text="450.00" TextChanged="CalculationInputs_Changed"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Margin="5,0,0,0">
+                            <TextBlock Text="Скидка (%):"/>
+                            <TextBox x:Name="OrderDiscountTextBox" Text="0" TextChanged="CalculationInputs_Changed"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Финальный расчет цены и общей суммы -->
+                    <Border Background="#F4F6F8" Padding="10" Margin="0,5,0,10" CornerRadius="4">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="Цена со скидкой за ед.:" Foreground="Gray" FontSize="11"/>
+                                <TextBlock x:Name="FinalUnitPriceTextBlock" Text="$450.00" FontWeight="Bold" FontSize="14"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                                <TextBlock Text="ИТОГО К ОПЛАТЕ:" Foreground="Gray" FontSize="11"/>
+                                <TextBlock x:Name="TotalOrderSumTextBlock" Text="$2,250.00" FontWeight="Bold" FontSize="16" Foreground="DarkBlue"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <Button Content="{loc:Loc SHIP_ORDER}" Click="ShipOrder_Click" Height="28" FontWeight="Bold" Margin="0,5,0,0"/>
                 </StackPanel>
             </GroupBox>
 

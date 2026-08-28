@@ -30,6 +30,7 @@ namespace CraftFlow.Api.Modules.Inventory.AddStockLot
                 request.WarehouseId,
                 request.ItemId,
                 request.Quantity,
+                request.UnitPrice,
                 request.BatchNumber
             );
 

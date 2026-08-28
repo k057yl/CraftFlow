@@ -1,0 +1,179 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+		<xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+		<xsd:element name="root" msdata:IsDataSet="true">
+			<xsd:complexType>
+				<xsd:choice maxOccurs="unbounded">
+					<xsd:element name="metadata">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" />
+							</xsd:sequence>
+							<xsd:attribute name="name" use="required" type="xsd:string" />
+							<xsd:attribute name="type" type="xsd:string" />
+							<xsd:attribute name="mimetype" type="xsd:string" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="assembly">
+						<xsd:complexType>
+							<xsd:attribute name="alias" type="xsd:string" />
+							<xsd:attribute name="name" type="xsd:string" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="data">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+								<xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+							<xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+							<xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+							<xsd:attribute ref="xml:space" />
+						</xsd:complexType>
+					</xsd:element>
+					<xsd:element name="resheader">
+						<xsd:complexType>
+							<xsd:sequence>
+								<xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+							</xsd:sequence>
+							<xsd:attribute name="name" type="xsd:string" use="required" />
+						</xsd:complexType>
+					</xsd:element>
+				</xsd:choice>
+			</xsd:complexType>
+		</xsd:element>
+	</xsd:schema>
+	<resheader name="resmimetype">
+		<value>text/microsoft-resx</value>
+	</resheader>
+	<resheader name="version">
+		<value>2.0</value>
+	</resheader>
+	<resheader name="reader">
+		<value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+	<resheader name="writer">
+		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+	</resheader>
+
+	<!-- Titles & Headers -->
+	<data name="TITLE_CATALOG" xml:space="preserve"><value>УПРАВЛІННЯ КАТАЛОГОМ</value></data>
+	<data name="TITLE_INVENTORY" xml:space="preserve"><value>УПРАВЛІННЯ СКЛАДОМ</value></data>
+	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>УПРАВЛІННЯ ВИРОБНИЦТВОМ</value></data>
+	<data name="TITLE_SALES" xml:space="preserve"><value>ПРОДАЖІ ТА ЗАМОВЛЕННЯ</value></data>
+	<data name="TITLE_AUTH" xml:space="preserve"><value>АУТЕНТИФІКАЦІЯ ТА JWT</value></data>
+	<data name="TITLE_DASHBOARD" xml:space="preserve"><value>ДАШБОРД СИСТЕМИ</value></data>
+	<data name="SYSTEM_AUDIT_LOGS" xml:space="preserve"><value>Журнал аудиту системи</value></data>
+	<data name="SYSTEM_DASHBOARD_OVERVIEW" xml:space="preserve"><value>ОГЛЯД СИСТЕМИ (ДАШБОРД)</value></data>
+
+	<!-- Navigation -->
+	<data name="NAV_DASHBOARD" xml:space="preserve"><value>📊 ДАШБОРД</value></data>
+	<data name="NAV_CATALOG" xml:space="preserve"><value>📦 КАТАЛОГ</value></data>
+	<data name="NAV_INVENTORY" xml:space="preserve"><value>🏭 СКЛАД</value></data>
+	<data name="NAV_PRODUCTION" xml:space="preserve"><value>🧀 ВИРОБНИЦТВО</value></data>
+	<data name="NAV_SALES" xml:space="preserve"><value>💰 ПРОДАЖІ ТА ЗАМОВЛЕННЯ</value></data>
+	<data name="NAV_AUTH" xml:space="preserve"><value>🔐 АВТОРИЗАЦІЯ</value></data>
+	<data name="NAV_AUDIT" xml:space="preserve"><value>📜 ЖУРНАЛ АУДИТУ</value></data>
+
+	<!-- GroupBox Headers -->
+	<data name="HEADER_UOM" xml:space="preserve"><value>1. ОДИНИЦІ ВИМІРУ</value></data>
+	<data name="HEADER_RAW_MATERIALS" xml:space="preserve"><value>2. СИРОВИНА ТА ІНГРЕДІЄНТИ</value></data>
+	<data name="HEADER_PRODUCTS" xml:space="preserve"><value>3. ГОТОВА ПРОДУКЦІЯ</value></data>
+	<data name="HEADER_RECIPES" xml:space="preserve"><value>4. ТЕХНОЛОГІЧНІ РЕЦЕПТИ</value></data>
+	<data name="HEADER_CUSTOMERS" xml:space="preserve"><value>1. КЛІЄНТИ ТА ПОКУПЦІ</value></data>
+	<data name="HEADER_SHIP_ORDER" xml:space="preserve"><value>2. ОФОРМЛЕННЯ ТА ВІДВАНТАЖЕННЯ</value></data>
+	<data name="PRODUCTION_BATCHES_START" xml:space="preserve"><value>1. ЗАПУСК ВАРКИ</value></data>
+	<data name="COMPLETE_PRODUCTION_BATCH_HEADER" xml:space="preserve"><value>2. ЗАВЕРШЕННЯ ВАРКИ</value></data>
+	<data name="BATCH_COST_ANALYSIS" xml:space="preserve"><value>3. АНАЛІЗ СОБІВАРТОСТІ</value></data>
+	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>1. СКЛАДИ</value></data>
+	<data name="STOCK_LOTS_HEADER" xml:space="preserve"><value>2. ПРИЙНЯТТЯ СИРОВИНИ</value></data>
+	<data name="USER_AUTHENTICATION" xml:space="preserve"><value>АУТЕНТИФІКАЦІЯ КОРИСТУВАЧА</value></data>
+
+	<!-- Buttons & Actions -->
+	<data name="REFRESH_LOGS" xml:space="preserve"><value>Оновити</value></data>
+	<data name="EXPORT_CSV" xml:space="preserve"><value>Експорт CSV</value></data>
+	<data name="CREATE_UOM" xml:space="preserve"><value>Створити Од. Вим.</value></data>
+	<data name="CREATE_RAW_MATERIAL" xml:space="preserve"><value>Додати Сировину</value></data>
+	<data name="CREATE_PRODUCT" xml:space="preserve"><value>Створити Продукт</value></data>
+	<data name="CREATE_RECIPE" xml:space="preserve"><value>Зберегти Рецепт</value></data>
+	<data name="CREATE_WAREHOUSE" xml:space="preserve"><value>Створити Склад</value></data>
+	<data name="ADD_STOCK_LOT" xml:space="preserve"><value>Прийняти Партію</value></data>
+	<data name="START_PRODUCTION_BATCH" xml:space="preserve"><value>Запустити Варку</value></data>
+	<data name="COMPLETE_PRODUCTION_BATCH" xml:space="preserve"><value>Завершити Варку</value></data>
+	<data name="CALCULATE_BATCH_COST" xml:space="preserve"><value>Розрахувати Собівартість</value></data>
+	<data name="CREATE_CUSTOMER" xml:space="preserve"><value>Створити Клієнта</value></data>
+	<data name="SHIP_ORDER" xml:space="preserve"><value>Відвантажити Замовлення</value></data>
+	<data name="SHIP_SALES_ORDER" xml:space="preserve"><value>Відвантаження Замовлення</value></data>
+	<data name="REGISTER" xml:space="preserve"><value>Реєстрація</value></data>
+	<data name="LOGIN_USE_TOKEN" xml:space="preserve"><value>Увійти та Отримати Токен</value></data>
+
+	<!-- Input Labels -->
+	<data name="UOM_NAME" xml:space="preserve"><value>Назва Од. Вим.:</value></data>
+	<data name="UOM_CODE" xml:space="preserve"><value>Код Од. Вим.:</value></data>
+	<data name="RAW_MATERIAL_NAME" xml:space="preserve"><value>Назва Сировини:</value></data>
+	<data name="PRODUCT_NAME" xml:space="preserve"><value>Назва Продукту:</value></data>
+	<data name="RECIPE_NAME" xml:space="preserve"><value>Назва Рецепту:</value></data>
+	<data name="SELECT_UOM" xml:space="preserve"><value>Оберіть Од. Вим.:</value></data>
+	<data name="SELECT_PRODUCT" xml:space="preserve"><value>Оберіть Продукт:</value></data>
+	<data name="SELECT_RAW_MATERIAL" xml:space="preserve"><value>Оберіть Сировину:</value></data>
+	<data name="TARGET_OUTPUT_QUANTITY" xml:space="preserve"><value>Запланований Вихід:</value></data>
+	<data name="INGREDIENT_SECTION" xml:space="preserve"><value>СКЛАД РЕЦЕПТУ</value></data>
+	<data name="INGREDIENT_QUANTITY" xml:space="preserve"><value>Кількість Інгредієнта:</value></data>
+	<data name="WAREHOUSE_NAME" xml:space="preserve"><value>Назва Складу:</value></data>
+	<data name="WAREHOUSE_ADDRESS" xml:space="preserve"><value>Адреса Складу:</value></data>
+	<data name="BATCH_NUMBER" xml:space="preserve"><value>Номер Партії:</value></data>
+	<data name="SELECT_RECIPE" xml:space="preserve"><value>Оберіть Рецепт:</value></data>
+	<data name="SELECT_ACTIVE_BATCH" xml:space="preserve"><value>Оберіть Активну Варку:</value></data>
+	<data name="PLANNED_OUTPUT_QUANTITY" xml:space="preserve"><value>Запланований Об'єм:</value></data>
+	<data name="ACTUAL_OUTPUT_QUANTITY" xml:space="preserve"><value>Фактичний Вихід:</value></data>
+	<data name="TOTAL_RAW_MATERIAL_COST" xml:space="preserve"><value>ЗАГАЛЬНА ВАРТІСТЬ СИРОВИНИ:</value></data>
+	<data name="UNIT_COST_PER_UNIT" xml:space="preserve"><value>СОБІВАРТІСТЬ ОДИНИЦІ:</value></data>
+	<data name="CUSTOMER_NAME" xml:space="preserve"><value>Ім'я Клієнта:</value></data>
+	<data name="CUSTOMER_PHONE" xml:space="preserve"><value>Телефон:</value></data>
+	<data name="SELECT_CUSTOMER" xml:space="preserve"><value>Оберіть Клієнта:</value></data>
+	<data name="SELECT_WAREHOUSE" xml:space="preserve"><value>Оберіть Склад:</value></data>
+	<data name="QUANTITY" xml:space="preserve"><value>Кількість:</value></data>
+	<data name="UNIT_PRICE" xml:space="preserve"><value>Ціна за Од.:</value></data>
+	<data name="FULL_NAME" xml:space="preserve"><value>Повне Ім'я:</value></data>
+	<data name="EMAIL" xml:space="preserve"><value>Email:</value></data>
+	<data name="PASSWORD" xml:space="preserve"><value>Пароль:</value></data>
+	<data name="LOT_QUANTITY" xml:space="preserve"><value>Кількість партії:</value></data>
+	<data name="PRODUCTS_RECIPES" xml:space="preserve"><value>ПРОДУКТИ / РЕЦЕПТИ</value></data>
+	<data name="ACTIVE_BATCHES" xml:space="preserve"><value>АКТИВНІ ВАРКИ</value></data>
+	<data name="CUSTOMERS" xml:space="preserve"><value>КЛІЄНТИ</value></data>
+	<data name="TOTAL_STOCK_QTY" xml:space="preserve"><value>ЗАГАЛЬНИЙ ЗАЛИШОК НА СКЛАДІ</value></data>
+	<data name="TOTAL_REVENUE" xml:space="preserve"><value>ЗАГАЛЬНА ВИРУЧКА</value></data>
+	<data name="TOTAL_SALES_REVENUE" xml:space="preserve"><value>ЗАГАЛЬНА ВИРУЧКА</value></data>
+
+	<!-- DataGrid Columns -->
+	<data name="COL_ENTITY_NAME" xml:space="preserve"><value>Сутність</value></data>
+	<data name="COL_ACTION" xml:space="preserve"><value>Дія</value></data>
+	<data name="COL_DETAILS" xml:space="preserve"><value>Деталі</value></data>
+	<data name="COL_CREATED_AT" xml:space="preserve"><value>Дата / Час (UTC)</value></data>
+
+	<!-- UI & API Messages -->
+	<data name="UI_DATA_LOADED_SUCCESS" xml:space="preserve"><value>Дані успішно завантажено</value></data>
+	<data name="UI_DATA_LOAD_ERROR" xml:space="preserve"><value>Помилка завантаження даних</value></data>
+	<data name="UI_INVALID_INPUT_FIELDS" xml:space="preserve"><value>Заповніть усі обов'язкові поля!</value></data>
+	<data name="UI_EXPORT_SUCCESS" xml:space="preserve"><value>Звіт успішно вивантажено</value></data>
+	<data name="UI_UOM_CREATED_SUCCESS" xml:space="preserve"><value>Одиницю виміру створено</value></data>
+	<data name="UI_RAW_MATERIAL_CREATED_SUCCESS" xml:space="preserve"><value>Сировину успішно додано</value></data>
+	<data name="UI_PRODUCT_CREATED_SUCCESS" xml:space="preserve"><value>Продукт успішно створено</value></data>
+	<data name="UI_RECIPE_CREATED_SUCCESS" xml:space="preserve"><value>Рецепт успішно збережено</value></data>
+	<data name="UI_WAREHOUSE_CREATED_SUCCESS" xml:space="preserve"><value>Склад успішно створено</value></data>
+	<data name="UI_STOCK_LOT_CREATED_SUCCESS" xml:space="preserve"><value>Партію сировини прийнято на склад</value></data>
+	<data name="UI_BATCH_STARTED_SUCCESS" xml:space="preserve"><value>Варку успішно запущено!</value></data>
+	<data name="UI_BATCH_COMPLETED_SUCCESS" xml:space="preserve"><value>Варку завершено! Продукція на складі.</value></data>
+	<data name="UI_CUSTOMER_CREATED_SUCCESS" xml:space="preserve"><value>Клієнта успішно додано</value></data>
+	<data name="UI_ORDER_SHIPPED_SUCCESS" xml:space="preserve"><value>Замовлення успішно відвантажено!</value></data>
+	<data name="UI_REGISTER_SUCCESS" xml:space="preserve"><value>Користувача зареєстровано</value></data>
+	<data name="UI_LOGIN_SUCCESS" xml:space="preserve"><value>Успішний вхід у систему</value></data>
+	<data name="UI_BATCH_COST_CALCULATED" xml:space="preserve"><value>Собівартість розраховано</value></data>
+	<data name="SALES_INSUFFICIENT_PRODUCT_STOCK" xml:space="preserve"><value>Недостатньо товару на складі!</value></data>
+	<data name="PRODUCTION_INSUFFICIENT_RAW_MATERIAL" xml:space="preserve"><value>Недостатньо сировини для варки!</value></data>
+	<data name="PRODUCTION_BATCH_NOT_FOUND" xml:space="preserve"><value>Партію виробництва не знайдено</value></data>
+	<data name="GENERAL_NOT_FOUND" xml:space="preserve"><value>Запитуваний ресурс не знайдено</value></data>
+</root>

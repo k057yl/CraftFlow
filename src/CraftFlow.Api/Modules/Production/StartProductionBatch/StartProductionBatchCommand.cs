@@ -6,6 +6,7 @@ namespace CraftFlow.Api.Modules.Production.StartProductionBatch
     public record StartProductionBatchCommand(
         Guid RecipeId,
         Guid WarehouseId,
-        decimal PlannedOutputQuantity
+        decimal PlannedOutputQuantity,
+        Guid DestinationWarehouseId = default
     ) : IRequest<Result<Guid>>;
 }

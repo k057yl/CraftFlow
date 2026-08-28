@@ -19,7 +19,7 @@ public partial class AuthPage : Page
 
     private async void Register_Click(object sender, RoutedEventArgs e)
     {
-        var response = await ApiService.Instance.PostAsync(Endpoints.REGISTER, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.REGISTER, new
         {
             TenantId = Guid.Parse(DEFAULT_TENANT_ID),
             Email = AuthEmailTextBox.Text,
@@ -27,13 +27,13 @@ public partial class AuthPage : Page
             FullName = AuthNameTextBox.Text
         });
 
-        if (response.IsSuccessStatusCode)
+        if (isSuccess)
         {
             SetStatus(UiConstants.Messages.REGISTER_SUCCESS, Brushes.Green);
         }
         else
         {
-            SetStatus($"{UiConstants.Messages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+            SetStatus(contentOrError, Brushes.Red);
         }
     }
 
@@ -56,13 +56,14 @@ public partial class AuthPage : Page
         }
         else
         {
-            SetStatus($"{UiConstants.Messages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+            var rawError = await response.Content.ReadAsStringAsync();
+            SetStatus(rawError.Trim('"').Trim(), Brushes.Red);
         }
     }
 
     private void SetStatus(string msg, Brush color)
     {
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = msg;
+        StatusTextBlock.Text = LocalizationService.Get(msg);
     }
 }
