@@ -3,6 +3,7 @@ using System;
 using CraftFlow.Api.Common.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CraftFlow.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260828040332_AddProductionModule")]
+    partial class AddProductionModule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -140,37 +143,6 @@ namespace CraftFlow.Api.Migrations
                     b.ToTable("UnitsOfMeasure");
                 });
 
-            modelBuilder.Entity("CraftFlow.Api.Modules.Identity.Domain.User", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Email")
-                        .IsUnique();
-
-                    b.ToTable("users", (string)null);
-                });
-
             modelBuilder.Entity("CraftFlow.Api.Modules.Inventory.Domain.StockLot", b =>
                 {
                     b.Property<Guid>("Id")
@@ -262,80 +234,6 @@ namespace CraftFlow.Api.Migrations
                     b.ToTable("production_batches", (string)null);
                 });
 
-            modelBuilder.Entity("CraftFlow.Api.Modules.Sales.Domain.Customer", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("Phone")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("customers", (string)null);
-                });
-
-            modelBuilder.Entity("CraftFlow.Api.Modules.Sales.Domain.SalesOrder", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
-
-                    b.Property<Guid>("WarehouseId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("sales_orders", (string)null);
-                });
-
-            modelBuilder.Entity("CraftFlow.Api.Modules.Sales.Domain.SalesOrderItem", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric");
-
-                    b.Property<Guid>("SalesOrderId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("UnitPrice")
-                        .HasColumnType("numeric");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SalesOrderId");
-
-                    b.ToTable("SalesOrderItem");
-                });
-
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.Recipe", b =>
                 {
                     b.HasOne("CraftFlow.Api.Modules.Catalog.Domain.Product", null)
@@ -355,23 +253,9 @@ namespace CraftFlow.Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CraftFlow.Api.Modules.Sales.Domain.SalesOrderItem", b =>
-                {
-                    b.HasOne("CraftFlow.Api.Modules.Sales.Domain.SalesOrder", null)
-                        .WithMany("Items")
-                        .HasForeignKey("SalesOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.Recipe", b =>
                 {
                     b.Navigation("Ingredients");
-                });
-
-            modelBuilder.Entity("CraftFlow.Api.Modules.Sales.Domain.SalesOrder", b =>
-                {
-                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

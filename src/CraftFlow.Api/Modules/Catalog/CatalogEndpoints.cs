@@ -4,6 +4,7 @@ using CraftFlow.Api.Modules.Catalog.CreateRecipe;
 using CraftFlow.Api.Modules.Catalog.CreateUnitOfMeasure;
 using CraftFlow.Api.Modules.Catalog.GetProducts;
 using CraftFlow.Api.Modules.Catalog.GetRawMaterials;
+using CraftFlow.Api.Modules.Catalog.GetRecipes;
 using CraftFlow.Api.Modules.Catalog.GetUnitsOfMeasure;
 using MediatR;
 
@@ -57,6 +58,12 @@ public static class CatalogEndpoints
         group.MapGet("/products", async (ISender sender) =>
         {
             var result = await sender.Send(new GetProductsQuery());
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapGet("/recipes", async (ISender sender) =>
+        {
+            var result = await sender.Send(new GetRecipesQuery());
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
     }

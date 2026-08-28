@@ -19,6 +19,16 @@ public partial class MainWindow : Window
     private const string ENDPOINT_RECIPES = "api/catalog/recipes";
     private const string ENDPOINT_WAREHOUSES = "api/inventory/warehouses";
     private const string ENDPOINT_STOCK_LOTS = "api/inventory/stock-lots";
+    private const string ENDPOINT_BATCHES = "api/production/batches/start";
+    private const string ENDPOINT_ACTIVE_BATCHES = "api/production/batches/active";
+    private const string ENDPOINT_COMPLETE_BATCH = "api/production/batches/complete";
+    private const string ENDPOINT_CUSTOMERS = "api/sales/customers";
+    private const string ENDPOINT_SHIP_ORDER = "api/sales/orders/ship";
+    private const string ENDPOINT_DASHBOARD = "api/analytics/dashboard";
+    private const string ENDPOINT_REGISTER = "api/identity/register";
+    private const string ENDPOINT_LOGIN = "api/identity/login";
+
+    private string? _jwtToken;
 
     private readonly HttpClient _httpClient = new()
     {
@@ -29,6 +39,9 @@ public partial class MainWindow : Window
     public ObservableCollection<LookupItem> RawMaterials { get; } = [];
     public ObservableCollection<LookupItem> Products { get; } = [];
     public ObservableCollection<LookupItem> Warehouses { get; } = [];
+    public ObservableCollection<LookupItem> Recipes { get; } = [];
+    public ObservableCollection<LookupItem> ActiveBatches { get; } = [];
+    public ObservableCollection<LookupItem> Customers { get; } = [];
 
     public MainWindow()
     {
@@ -41,6 +54,12 @@ public partial class MainWindow : Window
         RecipeRawMaterialComboBox.ItemsSource = RawMaterials;
         StockWarehouseComboBox.ItemsSource = Warehouses;
         StockRawMaterialComboBox.ItemsSource = RawMaterials;
+        BatchWarehouseComboBox.ItemsSource = Warehouses;
+        BatchRecipeComboBox.ItemsSource = Recipes;
+        ActiveBatchComboBox.ItemsSource = ActiveBatches;
+        OrderCustomerComboBox.ItemsSource = Customers;
+        OrderWarehouseComboBox.ItemsSource = Warehouses;
+        OrderProductComboBox.ItemsSource = Products;
 
         Loaded += async (s, e) => await LoadDataAsync();
     }
@@ -64,6 +83,28 @@ public partial class MainWindow : Window
             var warehouses = await _httpClient.GetFromJsonAsync<List<LookupDto>>(ENDPOINT_WAREHOUSES);
             Warehouses.Clear();
             warehouses?.ForEach(w => Warehouses.Add(new LookupItem(w.Id, w.Name)));
+
+            var recipes = await _httpClient.GetFromJsonAsync<List<LookupDto>>(ENDPOINT_RECIPES);
+            Recipes.Clear();
+            recipes?.ForEach(r => Recipes.Add(new LookupItem(r.Id, r.Name)));
+
+            var activeBatches = await _httpClient.GetFromJsonAsync<List<LookupDto>>(ENDPOINT_ACTIVE_BATCHES);
+            ActiveBatches.Clear();
+            activeBatches?.ForEach(b => ActiveBatches.Add(new LookupItem(b.Id, b.Name)));
+
+            var customers = await _httpClient.GetFromJsonAsync<List<LookupDto>>(ENDPOINT_CUSTOMERS);
+            Customers.Clear();
+            customers?.ForEach(c => Customers.Add(new LookupItem(c.Id, c.Name)));
+
+            var summary = await _httpClient.GetFromJsonAsync<DashboardSummaryDto>(ENDPOINT_DASHBOARD);
+            if (summary != null)
+            {
+                ProductsCountTextBlock.Text = $"{summary.TotalProducts} / {summary.TotalRecipes}";
+                ActiveBatchesTextBlock.Text = summary.ActiveBatchesCount.ToString();
+                CustomersCountTextBlock.Text = summary.TotalCustomers.ToString();
+                TotalStockTextBlock.Text = summary.TotalStockQuantity.ToString("F2");
+                TotalRevenueTextBlock.Text = $"${summary.TotalSalesRevenue:F2}";
+            }
 
             SetStatus(ErrorCodes.UiMessages.DATA_LOADED_SUCCESS, Brushes.Green);
         }
@@ -215,6 +256,162 @@ public partial class MainWindow : Window
         }
     }
 
+    private async void StartBatch_Click(object sender, RoutedEventArgs e)
+    {
+        if (BatchRecipeComboBox.SelectedValue is not Guid recipeId ||
+            BatchWarehouseComboBox.SelectedValue is not Guid warehouseId ||
+            !decimal.TryParse(BatchQuantityTextBox.Text, out var plannedQuantity))
+        {
+            SetStatus(ErrorCodes.UiMessages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
+
+        var response = await _httpClient.PostAsJsonAsync(ENDPOINT_BATCHES, new
+        {
+            RecipeId = recipeId,
+            WarehouseId = warehouseId,
+            PlannedOutputQuantity = plannedQuantity
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            var batchId = await response.Content.ReadFromJsonAsync<Guid>();
+            SetStatus($"{ErrorCodes.UiMessages.STOCK_LOT_CREATED_SUCCESS} BATCH_ID: {batchId}", Brushes.Green);
+            await LoadDataAsync();
+        }
+        else
+        {
+            SetStatus($"{ErrorCodes.UiMessages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+        }
+    }
+
+    private async void CompleteBatch_Click(object sender, RoutedEventArgs e)
+    {
+        if (ActiveBatchComboBox.SelectedValue is not Guid batchId ||
+            !decimal.TryParse(ActualOutputQuantityTextBox.Text, out var actualOutput))
+        {
+            SetStatus(ErrorCodes.UiMessages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
+
+        var response = await _httpClient.PostAsJsonAsync(ENDPOINT_COMPLETE_BATCH, new
+        {
+            BatchId = batchId,
+            ActualOutputQuantity = actualOutput
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            SetStatus(ErrorCodes.UiMessages.STOCK_LOT_CREATED_SUCCESS, Brushes.Green);
+            await LoadDataAsync();
+        }
+        else
+        {
+            SetStatus($"{ErrorCodes.UiMessages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+        }
+    }
+
+    private async void CreateCustomer_Click(object sender, RoutedEventArgs e)
+    {
+        var response = await _httpClient.PostAsJsonAsync(ENDPOINT_CUSTOMERS, new
+        {
+            Name = CustomerNameTextBox.Text,
+            Phone = CustomerPhoneTextBox.Text
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            SetStatus(ErrorCodes.UiMessages.STOCK_LOT_CREATED_SUCCESS, Brushes.Green);
+            await LoadDataAsync();
+        }
+        else
+        {
+            SetStatus($"{ErrorCodes.UiMessages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+        }
+    }
+
+    private async void ShipOrder_Click(object sender, RoutedEventArgs e)
+    {
+        if (OrderCustomerComboBox.SelectedValue is not Guid customerId ||
+            OrderWarehouseComboBox.SelectedValue is not Guid warehouseId ||
+            OrderProductComboBox.SelectedValue is not Guid productId ||
+            !decimal.TryParse(OrderQuantityTextBox.Text, out var quantity) ||
+            !decimal.TryParse(OrderPriceTextBox.Text, out var price))
+        {
+            SetStatus(ErrorCodes.UiMessages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
+
+        var response = await _httpClient.PostAsJsonAsync(ENDPOINT_SHIP_ORDER, new
+        {
+            CustomerId = customerId,
+            WarehouseId = warehouseId,
+            Items = new[]
+            {
+            new { ProductId = productId, Quantity = quantity, UnitPrice = price }
+        }
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            var orderId = await response.Content.ReadFromJsonAsync<Guid>();
+            SetStatus($"{ErrorCodes.UiMessages.STOCK_LOT_CREATED_SUCCESS} ORDER_ID: {orderId}", Brushes.Green);
+            await LoadDataAsync();
+        }
+        else
+        {
+            SetStatus($"{ErrorCodes.UiMessages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+        }
+    }
+
+    private async void Register_Click(object sender, RoutedEventArgs e)
+    {
+        var response = await _httpClient.PostAsJsonAsync(ENDPOINT_REGISTER, new
+        {
+            TenantId = Guid.Parse(DEFAULT_TENANT_ID),
+            Email = AuthEmailTextBox.Text,
+            Password = AuthPasswordTextBox.Text,
+            FullName = AuthNameTextBox.Text
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            SetStatus(ErrorCodes.UiMessages.STOCK_LOT_CREATED_SUCCESS, Brushes.Green);
+        }
+        else
+        {
+            SetStatus($"{ErrorCodes.UiMessages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+        }
+    }
+
+    private async void Login_Click(object sender, RoutedEventArgs e)
+    {
+        var response = await _httpClient.PostAsJsonAsync(ENDPOINT_LOGIN, new
+        {
+            Email = AuthEmailTextBox.Text,
+            Password = AuthPasswordTextBox.Text
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
+            if (result != null)
+            {
+                _jwtToken = result.Token;
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _jwtToken);
+
+                SetStatus($"AUTH_SUCCESS! LOGGED AS: {result.FullName}", Brushes.Green);
+                await LoadDataAsync();
+            }
+        }
+        else
+        {
+            SetStatus($"{ErrorCodes.UiMessages.API_ERROR_PREFIX}: {response.StatusCode}", Brushes.Red);
+        }
+    }
+
     private void SetStatus(string msg, Brush color)
     {
         StatusTextBlock.Foreground = color;
@@ -224,3 +421,14 @@ public partial class MainWindow : Window
 
 public record LookupItem(Guid Id, string Name);
 public record LookupDto(Guid Id, string Name, string? Code);
+
+public record DashboardSummaryDto(
+    int TotalProducts,
+    int TotalRecipes,
+    int ActiveBatchesCount,
+    int TotalCustomers,
+    decimal TotalStockQuantity,
+    decimal TotalSalesRevenue
+);
+
+public record LoginResponseDto(string Token, Guid TenantId, string FullName);

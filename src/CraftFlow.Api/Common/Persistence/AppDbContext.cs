@@ -1,6 +1,9 @@
 ﻿using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Modules.Catalog.Domain;
 using CraftFlow.Api.Modules.Inventory.Domain;
+using CraftFlow.Api.Modules.Production.Domain;
+using CraftFlow.Api.Modules.Sales.Domain;
+using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.SharedKernel.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -23,6 +26,10 @@ public class AppDbContext : DbContext
     public DbSet<RecipeIngredient> RecipeIngredients => Set<RecipeIngredient>();
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<StockLot> StockLots => Set<StockLot>();
+    public DbSet<ProductionBatch> ProductionBatches => Set<ProductionBatch>();
+    public DbSet<Customer> Customers => Set<Customer>();
+    public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
+    public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

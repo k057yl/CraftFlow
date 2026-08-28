@@ -1,6 +1,10 @@
 using CraftFlow.Api;
+using CraftFlow.Api.Modules.Analytics;
 using CraftFlow.Api.Modules.Catalog;
+using CraftFlow.Api.Modules.Identity;
 using CraftFlow.Api.Modules.Inventory;
+using CraftFlow.Api.Modules.Production;
+using CraftFlow.Api.Modules.Sales;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,8 +20,16 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+// Обязательно перед Map-эндпоинтами!
+app.UseAuthentication();
+app.UseAuthorization();
+
 // Эндпоинты модулей
 app.MapCatalogEndpoints();
 app.MapInventoryEndpoints();
+app.MapProductionEndpoints();
+app.MapSalesEndpoints();
+app.MapAnalyticsEndpoints();
+app.MapIdentityEndpoints();
 
 app.Run();
