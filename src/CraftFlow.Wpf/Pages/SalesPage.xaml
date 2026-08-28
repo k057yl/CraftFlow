@@ -1,0 +1,54 @@
+﻿<Page x:Class="CraftFlow.Wpf.Pages.SalesPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="SalesPage">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+        <StackPanel>
+            <TextBlock Text="SALES &amp; ORDERS MANAGEMENT" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+
+            <!-- 1. Покупатели -->
+            <GroupBox Header="1. CUSTOMERS" Margin="0,0,0,10" Padding="8">
+                <StackPanel>
+                    <TextBlock Text="CUSTOMER_NAME:"/>
+                    <TextBox x:Name="CustomerNameTextBox" Text="Ресторан Густо" Margin="0,0,0,5"/>
+                    <TextBlock Text="CUSTOMER_PHONE:"/>
+                    <TextBox x:Name="CustomerPhoneTextBox" Text="+380991112233" Margin="0,0,0,5"/>
+                    <Button Content="CREATE CUSTOMER" Click="CreateCustomer_Click" Height="25"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- 2. Продажа и Отгрузка -->
+            <GroupBox Header="2. SHIP SALES ORDER" Margin="0,0,0,10" Padding="8">
+                <StackPanel>
+                    <TextBlock Text="SELECT_CUSTOMER:"/>
+                    <ComboBox x:Name="OrderCustomerComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
+
+                    <TextBlock Text="SELECT_WAREHOUSE:"/>
+                    <ComboBox x:Name="OrderWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
+
+                    <TextBlock Text="SELECT_PRODUCT:"/>
+                    <ComboBox x:Name="OrderProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
+
+                    <Grid Margin="0,0,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                            <TextBlock Text="QUANTITY:"/>
+                            <TextBox x:Name="OrderQuantityTextBox" Text="5"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                            <TextBlock Text="UNIT_PRICE:"/>
+                            <TextBox x:Name="OrderPriceTextBox" Text="450"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Button Content="SHIP ORDER" Click="ShipOrder_Click" Height="25" Margin="0,5,0,0"/>
+                </StackPanel>
+            </GroupBox>
+
+            <TextBlock x:Name="StatusTextBlock" Text="READY" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

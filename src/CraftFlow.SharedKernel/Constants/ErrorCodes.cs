@@ -43,25 +43,17 @@ public static class ErrorCodes
         public const string CUSTOMER_NAME_REQUIRED = "SALES.CUSTOMER_NAME_REQUIRED";
     }
 
-    public static class UiMessages
-    {
-        public const string DATA_LOADED_SUCCESS = "UI.DATA_LOADED_SUCCESS";
-        public const string DATA_LOAD_ERROR = "UI.DATA_LOAD_ERROR";
-        public const string UOM_CREATED_SUCCESS = "UI.UOM_CREATED_SUCCESS";
-        public const string RAW_MATERIAL_CREATED_SUCCESS = "UI.RAW_MATERIAL_CREATED_SUCCESS";
-        public const string PRODUCT_CREATED_SUCCESS = "UI.PRODUCT_CREATED_SUCCESS";
-        public const string RECIPE_CREATED_SUCCESS = "UI.RECIPE_CREATED_SUCCESS";
-        public const string WAREHOUSE_CREATED_SUCCESS = "UI.WAREHOUSE_CREATED_SUCCESS";
-        public const string STOCK_LOT_CREATED_SUCCESS = "UI.STOCK_LOT_CREATED_SUCCESS";
-        public const string INVALID_INPUT_FIELDS = "UI.INVALID_INPUT_FIELDS";
-        public const string API_ERROR_PREFIX = "UI.API_ERROR_PREFIX";
-    }
-
     public static class Auth
     {
         public const string INVALID_CREDENTIALS = "AUTH.INVALID_CREDENTIALS";
         public const string USER_ALREADY_EXISTS = "AUTH.USER_ALREADY_EXISTS";
         public const string USER_NOT_FOUND = "AUTH.USER_NOT_FOUND";
         public const string TOKEN_GENERATION_FAILED = "AUTH.TOKEN_GENERATION_FAILED";
+    }
+
+    public static class Notifications
+    {
+        public const string LOW_STOCK_ALERT = "NOTIFICATIONS.LOW_STOCK_ALERT";
+        public const string COST_CALCULATED = "NOTIFICATIONS.COST_CALCULATED";
     }
 }

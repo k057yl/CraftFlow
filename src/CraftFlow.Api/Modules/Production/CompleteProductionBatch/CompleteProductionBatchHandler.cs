@@ -1,44 +1,46 @@
 ﻿using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Modules.Inventory.Domain;
+using CraftFlow.Api.Modules.Production.Events;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace CraftFlow.Api.Modules.Production.CompleteProductionBatch
+namespace CraftFlow.Api.Modules.Production.CompleteProductionBatch;
+
+public class CompleteProductionBatchHandler : IRequestHandler<CompleteProductionBatchCommand, Result<Guid>>
 {
-    public class CompleteProductionBatchHandler : IRequestHandler<CompleteProductionBatchCommand, Result<Guid>>
+    private readonly AppDbContext _dbContext;
+    private readonly IPublisher _publisher;
+
+    public CompleteProductionBatchHandler(AppDbContext dbContext, IPublisher publisher)
     {
-        private readonly AppDbContext _dbContext;
+        _dbContext = dbContext;
+        _publisher = publisher;
+    }
 
-        public CompleteProductionBatchHandler(AppDbContext dbContext)
+    public async Task<Result<Guid>> Handle(CompleteProductionBatchCommand request, CancellationToken cancellationToken)
+    {
+        var batch = await _dbContext.ProductionBatches
+            .FirstOrDefaultAsync(b => b.Id == request.BatchId, cancellationToken);
+
+        if (batch == null)
         {
-            _dbContext = dbContext;
+            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Production.BATCH_NOT_FOUND));
         }
 
-        public async Task<Result<Guid>> Handle(CompleteProductionBatchCommand request, CancellationToken cancellationToken)
-        {
-            var batch = await _dbContext.ProductionBatches
-                .FirstOrDefaultAsync(b => b.Id == request.BatchId, cancellationToken);
+        batch.Complete(request.ActualOutputQuantity);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-            if (batch == null)
-            {
-                return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Production.BATCH_NOT_FOUND));
-            }
-
-            batch.Complete(request.ActualOutputQuantity);
-
-            var finishedProductLot = StockLot.Create(
+        await _publisher.Publish(
+            new ProductionBatchCompletedEvent(
+                batch.Id,
+                batch.RecipeId,
                 batch.WarehouseId,
-                batch.TargetProductId,
-                request.ActualOutputQuantity,
-                $"BATCH-{batch.Id.ToString()[..8].ToUpper()}"
-            );
+                batch.ActualOutputQuantity
+            ),
+            cancellationToken
+        );
 
-            _dbContext.StockLots.Add(finishedProductLot);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return Result.Success(batch.Id);
-        }
+        return Result.Success(batch.Id);
     }
 }

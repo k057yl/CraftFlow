@@ -1,0 +1,42 @@
+﻿<Page x:Class="CraftFlow.Wpf.Pages.InventoryPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="InventoryPage">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+        <StackPanel>
+            <TextBlock Text="INVENTORY MANAGEMENT" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+
+            <!-- Склады -->
+            <GroupBox Header="1. WAREHOUSES" Margin="0,0,0,10" Padding="8">
+                <StackPanel>
+                    <TextBlock Text="WAREHOUSE_NAME:"/>
+                    <TextBox x:Name="WarehouseNameTextBox" Text="Main Raw Storage" Margin="0,0,0,5"/>
+                    <TextBlock Text="WAREHOUSE_ADDRESS:"/>
+                    <TextBox x:Name="WarehouseAddressTextBox" Text="Industrial Zone 1" Margin="0,0,0,5"/>
+                    <Button Content="CREATE WAREHOUSE" Click="CreateWarehouse_Click" Height="25" Margin="0,5,0,0"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- Оприходование сырья -->
+            <GroupBox Header="2. STOCK LOTS" Margin="0,0,0,10" Padding="8">
+                <StackPanel>
+                    <TextBlock Text="SELECT_WAREHOUSE:"/>
+                    <ComboBox x:Name="StockWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
+
+                    <TextBlock Text="SELECT_RAW_MATERIAL:"/>
+                    <ComboBox x:Name="StockRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
+
+                    <TextBlock Text="LOT_QUANTITY:"/>
+                    <TextBox x:Name="StockQuantityTextBox" Text="500" Margin="0,0,0,5"/>
+
+                    <TextBlock Text="BATCH_NUMBER:"/>
+                    <TextBox x:Name="StockBatchTextBox" Text="BATCH-2026-001" Margin="0,0,0,5"/>
+
+                    <Button Content="ADD STOCK LOT" Click="AddStockLot_Click" Height="25" Margin="0,5,0,0"/>
+                </StackPanel>
+            </GroupBox>
+
+            <TextBlock x:Name="StatusTextBlock" Text="READY" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

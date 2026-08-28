@@ -1,9 +1,10 @@
-﻿using CraftFlow.Api.Common.MultiTenancy;
+﻿using CraftFlow.Api.Common.Audit;
+using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Modules.Catalog.Domain;
+using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.Api.Modules.Inventory.Domain;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.Api.Modules.Sales.Domain;
-using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.SharedKernel.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,7 @@ public class AppDbContext : DbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -58,6 +60,22 @@ public class AppDbContext : DbContext
             {
                 entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue = _tenantContext.TenantId;
             }
+        }
+
+        var auditEntries = ChangeTracker.Entries()
+            .Where(e => e.Entity is not AuditLog && (e.State == EntityState.Added || e.State == EntityState.Modified))
+            .Select(e => AuditLog.Create(
+                _tenantContext.TenantId,
+                _tenantContext.UserId,
+                e.Entity.GetType().Name,
+                e.State.ToString(),
+                $"Entity {e.Entity.GetType().Name} changed."
+            ))
+            .ToList();
+
+        if (auditEntries.Count > 0)
+        {
+            AuditLogs.AddRange(auditEntries);
         }
 
         return base.SaveChangesAsync(cancellationToken);

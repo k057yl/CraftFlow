@@ -1,7 +1,9 @@
 ﻿using System.Text;
+using CraftFlow.Api.Common.BackgroundWorkers;
 using CraftFlow.Api.Common.Behaviors;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
+using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -16,20 +18,43 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        // 1. HttpContextAccessor для извлечения TenantId из заголовков/JWT
+        services
+            .AddTenantServices()
+            .AddDatabaseStorage(configuration)
+            .AddJwtAuthentication(configuration)
+            .AddMediatorAndValidation()
+            .AddBackgroundWorkers();
+
+        return services;
+    }
+
+    private static IServiceCollection AddTenantServices(this IServiceCollection services)
+    {
         services.AddHttpContextAccessor();
         services.AddScoped<ITenantContext, TenantContext>();
+        return services;
+    }
 
-        // 2. EF Core + PostgreSQL
-        var connectionString = configuration.GetConnectionString("Database");
+    private static IServiceCollection AddDatabaseStorage(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString(AuthConstants.DB_CONNECTION_STRING_PATH);
+
         services.AddDbContext<AppDbContext>(options =>
             options.UseNpgsql(connectionString, npgsqlOptions =>
             {
                 npgsqlOptions.EnableRetryOnFailure();
             }));
 
-        // 3. JWT Bearer Auth
-        var secretKey = configuration["Jwt:SecretKey"] ?? "SUPER_SECRET_KEY_CRAFT_FLOW_2026_OLD_SCHULL_MUST_BE_LONG_ENOUGH";
+        return services;
+    }
+
+    private static IServiceCollection AddJwtAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var secretKey = configuration[AuthConstants.JWT_SECRET_CONFIG_PATH] ?? AuthConstants.DEFAULT_JWT_SECRET;
         var keyBytes = Encoding.UTF8.GetBytes(secretKey);
 
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -47,8 +72,11 @@ public static class DependencyInjection
             });
 
         services.AddAuthorization();
+        return services;
+    }
 
-        // 4. MediatR + Pipeline Behaviors (Валидация и Транзакции)
+    private static IServiceCollection AddMediatorAndValidation(this IServiceCollection services)
+    {
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
@@ -56,9 +84,13 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
         });
 
-        // 5. FluentValidation (авто-регистрация всех валидаторов из сборок)
         services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+        return services;
+    }
 
+    private static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
+    {
+        services.AddHostedService<LowStockMonitorWorker>();
         return services;
     }
 }

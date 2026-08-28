@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Modules.Catalog.GetRecipes;
 using CraftFlow.Api.Modules.Production.CompleteProductionBatch;
 using CraftFlow.Api.Modules.Production.GetActiveBatches;
+using CraftFlow.Api.Modules.Production.GetBatchCost;
 using CraftFlow.Api.Modules.Production.StartProductionBatch;
 using MediatR;
 
@@ -28,6 +29,12 @@ namespace CraftFlow.Api.Modules.Production
             group.MapGet("/batches/active", async (ISender sender) =>
             {
                 var result = await sender.Send(new GetActiveBatchesQuery());
+                return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+            });
+
+            group.MapGet("/costing/{id:guid}", async (Guid id, ISender sender) =>
+            {
+                var result = await sender.Send(new GetBatchCostQuery(id));
                 return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
             });
         }

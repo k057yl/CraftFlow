@@ -1,241 +1,32 @@
 ﻿<Window x:Class="CraftFlow.Wpf.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="CraftFlow Control Panel" Height="750" Width="650">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="15">
-            <!-- 0. DASHBOARD SUMMARY -->
-            <GroupBox Header="0. SYSTEM_DASHBOARD" Margin="0,0,0,10" Padding="8" Background="#F0F4F8">
-                <Grid x:Name="DashboardGrid">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
+        Title="CraftFlow Management Console" Height="800" Width="1100"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
 
-                    <StackPanel Grid.Row="0" Grid.Column="0" Margin="5">
-                        <TextBlock Text="PRODUCTS / RECIPES:" FontSize="10" Foreground="Gray"/>
-                        <TextBlock x:Name="ProductsCountTextBlock" Text="0 / 0" FontSize="16" FontWeight="Bold"/>
-                    </StackPanel>
+        <!-- Sidebar Navigation Menu -->
+        <Border Grid.Column="0" Background="#1E293B" Padding="10">
+            <StackPanel>
+                <TextBlock Text="CRAFTFLOW" Foreground="White" FontSize="20" FontWeight="Bold" Margin="10,10,10,25" HorizontalAlignment="Center"/>
 
-                    <StackPanel Grid.Row="0" Grid.Column="1" Margin="5">
-                        <TextBlock Text="ACTIVE_BATCHES:" FontSize="10" Foreground="Gray"/>
-                        <TextBlock x:Name="ActiveBatchesTextBlock" Text="0" FontSize="16" FontWeight="Bold" Foreground="Orange"/>
-                    </StackPanel>
+                <Button Content="📊 DASHBOARD" Click="NavDashboard_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                <Button Content="📦 CATALOG" Click="NavCatalog_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                <Button Content="🏭 INVENTORY" Click="NavInventory_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                <Button Content="🧀 PRODUCTION" Click="NavProduction_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                <Button Content="💰 SALES &amp; ORDERS" Click="NavSales_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                <Button Content="🔐 AUTH (JWT)" Click="NavAuth_Click" Height="40" Margin="0,20,0,5" Background="#475569" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                <Button Content="📜 AUDIT LOGS" Click="NavAudit_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+            </StackPanel>
+        </Border>
 
-                    <StackPanel Grid.Row="0" Grid.Column="2" Margin="5">
-                        <TextBlock Text="CUSTOMERS:" FontSize="10" Foreground="Gray"/>
-                        <TextBlock x:Name="CustomersCountTextBlock" Text="0" FontSize="16" FontWeight="Bold"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="1" Grid.Column="0" Margin="5">
-                        <TextBlock Text="TOTAL_STOCK_QTY:" FontSize="10" Foreground="Gray"/>
-                        <TextBlock x:Name="TotalStockTextBlock" Text="0.00" FontSize="16" FontWeight="Bold" Foreground="Blue"/>
-                    </StackPanel>
-
-                    <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Margin="5">
-                        <TextBlock Text="TOTAL_REVENUE:" FontSize="10" Foreground="Gray"/>
-                        <TextBlock x:Name="TotalRevenueTextBlock" Text="$ 0.00" FontSize="16" FontWeight="Bold" Foreground="Green"/>
-                    </StackPanel>
-                </Grid>
-            </GroupBox>
-
-            <!-- 1. Единицы измерения -->
-            <GroupBox Header="1. UNITS_OF_MEASURE" Margin="0,0,0,10" Padding="8">
-                <StackPanel>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                            <TextBlock Text="UOM_NAME:"/>
-                            <TextBox x:Name="UomNameTextBox" Text="Kilogram"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                            <TextBlock Text="UOM_CODE:"/>
-                            <TextBox x:Name="UomCodeTextBox" Text="kg"/>
-                        </StackPanel>
-                    </Grid>
-                    <Button Content="CREATE_UOM" Click="CreateUom_Click" Margin="0,8,0,0" Height="25"/>
-                </StackPanel>
-            </GroupBox>
-
-            <!-- 2. Сырье -->
-            <GroupBox Header="2. RAW_MATERIALS" Margin="0,0,0,10" Padding="8">
-                <StackPanel>
-                    <TextBlock Text="RAW_MATERIAL_NAME:"/>
-                    <TextBox x:Name="RawMaterialNameTextBox" Text="Milk 3.6%" Margin="0,0,0,5"/>
-                    <TextBlock Text="SELECT_UOM:"/>
-                    <ComboBox x:Name="RawUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-                    <Button Content="CREATE_RAW_MATERIAL" Click="CreateRawMaterial_Click" Height="25"/>
-                </StackPanel>
-            </GroupBox>
-
-            <!-- 3. Продукция -->
-            <GroupBox Header="3. PRODUCTS" Margin="0,0,0,10" Padding="8">
-                <StackPanel>
-                    <TextBlock Text="PRODUCT_NAME:"/>
-                    <TextBox x:Name="ProductNameTextBox" Text="Gouda Cheese" Margin="0,0,0,5"/>
-                    <TextBlock Text="SELECT_UOM:"/>
-                    <ComboBox x:Name="ProductUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-                    <Button Content="CREATE_PRODUCT" Click="CreateProduct_Click" Height="25"/>
-                </StackPanel>
-            </GroupBox>
-
-            <!-- 4. Рецепт -->
-            <GroupBox Header="4. RECIPES" Margin="0,0,0,10" Padding="8">
-                <StackPanel>
-                    <TextBlock Text="RECIPE_NAME:"/>
-                    <TextBox x:Name="RecipeNameTextBox" Text="Classic Gouda Recipe" Margin="0,0,0,5"/>
-                    <TextBlock Text="SELECT_PRODUCT:"/>
-                    <ComboBox x:Name="RecipeProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-                    <TextBlock Text="TARGET_OUTPUT_QUANTITY:"/>
-                    <TextBox x:Name="RecipeOutputQuantityTextBox" Text="10" Margin="0,0,0,5"/>
-
-                    <Border BorderBrush="Gray" BorderThickness="1" Padding="5" Margin="0,5,0,5">
-                        <StackPanel>
-                            <TextBlock Text="INGREDIENT_SECTION" FontWeight="Bold"/>
-                            <TextBlock Text="SELECT_RAW_MATERIAL:"/>
-                            <ComboBox x:Name="RecipeRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-                            <TextBlock Text="INGREDIENT_QUANTITY:"/>
-                            <TextBox x:Name="RecipeIngredientQuantityTextBox" Text="100" Margin="0,0,0,5"/>
-                        </StackPanel>
-                    </Border>
-
-                    <Button Content="CREATE_RECIPE" Click="CreateRecipe_Click" Height="25"/>
-                </StackPanel>
-            </GroupBox>
-
-            <!-- 5. Склады -->
-            <GroupBox Header="5. WAREHOUSES" Margin="0,0,0,10" Padding="8">
-                <StackPanel>
-                    <TextBlock Text="WAREHOUSE_NAME:"/>
-                    <TextBox x:Name="WarehouseNameTextBox" Text="Main Raw Storage" Margin="0,0,0,5"/>
-                    <TextBlock Text="WAREHOUSE_ADDRESS:"/>
-                    <TextBox x:Name="WarehouseAddressTextBox" Text="Industrial Zone 1" Margin="0,0,0,5"/>
-                    <Button Content="CREATE_WAREHOUSE" Click="CreateWarehouse_Click" Height="25" Margin="0,5,0,0"/>
-                </StackPanel>
-            </GroupBox>
-
-            <!-- 6. Оприходование -->
-            <GroupBox Header="6. STOCK_LOTS" Margin="0,0,0,10" Padding="8">
-                <StackPanel>
-                    <TextBlock Text="SELECT_WAREHOUSE:"/>
-                    <ComboBox x:Name="StockWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-
-                    <TextBlock Text="SELECT_RAW_MATERIAL:"/>
-                    <ComboBox x:Name="StockRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-
-                    <TextBlock Text="LOT_QUANTITY:"/>
-                    <TextBox x:Name="StockQuantityTextBox" Text="500" Margin="0,0,0,5"/>
-
-                    <TextBlock Text="BATCH_NUMBER:"/>
-                    <TextBox x:Name="StockBatchTextBox" Text="BATCH-2026-001" Margin="0,0,0,5"/>
-
-                    <Button Content="ADD_STOCK_LOT" Click="AddStockLot_Click" Height="25" Margin="0,5,0,0"/>
-                </StackPanel>
-            </GroupBox>
-
-            <!-- 7. Производство (Варка) -->
-            <GroupBox Header="7. PRODUCTION_BATCHES" Margin="0,0,0,10" Padding="8">
-                <StackPanel>
-                    <TextBlock Text="SELECT_RECIPE:"/>
-                    <ComboBox x:Name="BatchRecipeComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-
-                    <TextBlock Text="SELECT_WAREHOUSE:"/>
-                    <ComboBox x:Name="BatchWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-
-                    <TextBlock Text="PLANNED_OUTPUT_QUANTITY:"/>
-                    <TextBox x:Name="BatchQuantityTextBox" Text="10" Margin="0,0,0,5"/>
-
-                    <Button Content="START_PRODUCTION_BATCH" Click="StartBatch_Click" Height="25" Margin="0,5,0,0"/>
-                </StackPanel>
-            </GroupBox>
-
-            <!-- 8. Завершить Варку -->
-            <GroupBox Header="8. COMPLETE_PRODUCTION_BATCH" Margin="0,0,0,10" Padding="8">
-                <StackPanel>
-                    <TextBlock Text="SELECT_ACTIVE_BATCH:"/>
-                    <ComboBox x:Name="ActiveBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-
-                    <TextBlock Text="ACTUAL_OUTPUT_QUANTITY:"/>
-                    <TextBox x:Name="ActualOutputQuantityTextBox" Text="9.8" Margin="0,0,0,5"/>
-
-                    <Button Content="COMPLETE_PRODUCTION_BATCH" Click="CompleteBatch_Click" Height="25" Margin="0,5,0,0"/>
-                </StackPanel>
-            </GroupBox>
-
-            <!-- 9. Клиенты -->
-            <GroupBox Header="9. CUSTOMERS" Margin="0,0,0,10" Padding="8">
-                <StackPanel>
-                    <TextBlock Text="CUSTOMER_NAME:"/>
-                    <TextBox x:Name="CustomerNameTextBox" Text="Ресторан Густо" Margin="0,0,0,5"/>
-                    <TextBlock Text="CUSTOMER_PHONE:"/>
-                    <TextBox x:Name="CustomerPhoneTextBox" Text="+380991112233" Margin="0,0,0,5"/>
-                    <Button Content="CREATE_CUSTOMER" Click="CreateCustomer_Click" Height="25"/>
-                </StackPanel>
-            </GroupBox>
-
-            <!-- 10. Отгрузка и Продажа -->
-            <GroupBox Header="10. SHIP_SALES_ORDER" Margin="0,0,0,10" Padding="8">
-                <StackPanel>
-                    <TextBlock Text="SELECT_CUSTOMER:"/>
-                    <ComboBox x:Name="OrderCustomerComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-
-                    <TextBlock Text="SELECT_WAREHOUSE:"/>
-                    <ComboBox x:Name="OrderWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-
-                    <TextBlock Text="SELECT_PRODUCT:"/>
-                    <ComboBox x:Name="OrderProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
-
-                    <Grid Margin="0,0,0,5">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                            <TextBlock Text="QUANTITY:"/>
-                            <TextBox x:Name="OrderQuantityTextBox" Text="5"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                            <TextBlock Text="UNIT_PRICE:"/>
-                            <TextBox x:Name="OrderPriceTextBox" Text="450"/>
-                        </StackPanel>
-                    </Grid>
-
-                    <Button Content="SHIP_ORDER" Click="ShipOrder_Click" Height="25" Margin="0,5,0,0"/>
-                </StackPanel>
-            </GroupBox>
-
-            <!-- 11. AUTHENTICATION & IDENTITY -->
-            <GroupBox Header="11. AUTHENTICATION (JWT)" Margin="0,0,0,10" Padding="8">
-                <StackPanel>
-                    <TextBlock Text="FULL_NAME:"/>
-                    <TextBox x:Name="AuthNameTextBox" Text="Главный Сыровар" Margin="0,0,0,5"/>
-
-                    <TextBlock Text="EMAIL:"/>
-                    <TextBox x:Name="AuthEmailTextBox" Text="cheesemaker@craftflow.io" Margin="0,0,0,5"/>
-
-                    <TextBlock Text="PASSWORD:"/>
-                    <TextBox x:Name="AuthPasswordTextBox" Text="secret123" Margin="0,0,0,5"/>
-
-                    <Grid Margin="0,5,0,0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <Button Grid.Column="0" Content="REGISTER" Click="Register_Click" Height="25" Margin="0,0,5,0"/>
-                        <Button Grid.Column="1" Content="LOGIN &amp; USE TOKEN" Click="Login_Click" Height="25" Margin="5,0,0,0"/>
-                    </Grid>
-                </StackPanel>
-            </GroupBox>
-
-            <TextBlock x:Name="StatusTextBlock" Text="READY" Foreground="Blue" FontWeight="Bold" TextWrapping="Wrap"/>
-        </StackPanel>
-    </ScrollViewer>
+        <!-- Main Content Viewport -->
+        <Grid Grid.Column="1" Background="#F1F5F9">
+            <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden"/>
+        </Grid>
+    </Grid>
 </Window>
