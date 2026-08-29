@@ -2,42 +2,49 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
-      Title="{loc:Loc TITLE_TRACEABILITY}">
+      Title="{loc:Loc Key=TITLE_TRACEABILITY}">
 
-	<Grid Margin="20">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="Auto"/>
-		</Grid.RowDefinitions>
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-		<TextBlock Text="{loc:Loc TITLE_TRACEABILITY}" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+        <TextBlock Text="{loc:Loc Key=TITLE_TRACEABILITY}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
 
-		<Grid Grid.Row="1" Margin="0,0,0,15">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="*"/>
-				<ColumnDefinition Width="Auto"/>
-			</Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" Margin="0,0,0,15">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
 
-			<ComboBox x:Name="StockLotsComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Grid.Column="0" Margin="0,0,10,0"/>
-			<Button Content="{loc:Loc RUN_TRACEABILITY}" Click="RunTraceability_Click" Grid.Column="1" Padding="15,5"/>
-		</Grid>
+            <ComboBox x:Name="StockLotsComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Grid.Column="0" Margin="0,0,10,0"/>
 
-		<GroupBox Header="{loc:Loc COL_DETAILS}" Grid.Row="2" Padding="10">
-			<TreeView x:Name="TraceTreeView" FontSize="14">
-				<TreeView.ItemTemplate>
-					<HierarchicalDataTemplate ItemsSource="{Binding Children}">
-						<StackPanel Orientation="Horizontal" Margin="2">
-							<TextBlock Text="{Binding Icon}" Margin="0,0,8,0"/>
-							<TextBlock Text="{Binding Title}" FontWeight="Bold" Margin="0,0,8,0"/>
-							<TextBlock Text="{Binding Details}" Foreground="Gray"/>
-						</StackPanel>
-					</HierarchicalDataTemplate>
-				</TreeView.ItemTemplate>
-			</TreeView>
-		</GroupBox>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,10,0" VerticalAlignment="Center">
+                <RadioButton x:Name="ForwardRadioButton" Content="Прямая (Forward)" IsChecked="True" Margin="0,0,10,0" FontWeight="SemiBold"/>
+                <RadioButton x:Name="BackwardRadioButton" Content="Обратная (Backward)" FontWeight="SemiBold"/>
+            </StackPanel>
 
-		<TextBlock x:Name="StatusTextBlock" Grid.Row="3" Text="READY" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
-	</Grid>
+            <Button Content="{loc:Loc Key=RUN_TRACEABILITY}" Click="RunTraceability_Click" Grid.Column="2" Padding="15,5" FontWeight="Bold" Background="#0284C7" Foreground="White"/>
+        </Grid>
+
+        <GroupBox Header="{loc:Loc Key=COL_DETAILS}" Grid.Row="2" Padding="10">
+            <TreeView x:Name="TraceTreeView" FontSize="14" BorderThickness="0">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                        <StackPanel Orientation="Horizontal" Margin="2">
+                            <TextBlock Text="{Binding Icon}" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding Title}" FontWeight="Bold" Margin="0,0,8,0"/>
+                            <TextBlock Text="{Binding Details}" Foreground="Gray"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </GroupBox>
+
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="3" Text="READY" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
+    </Grid>
 </Page>
