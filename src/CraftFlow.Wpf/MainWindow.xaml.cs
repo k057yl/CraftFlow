@@ -10,15 +10,10 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         Title = UiConstants.Titles.APP_TITLE;
-        MainFrame.Navigate(new DashboardPage());
+        MainFrame.Navigate(new ProductionPage());
     }
 
-    private void NavDashboard_Click(object sender, RoutedEventArgs e)
-    {
-        MainFrame.Navigate(new DashboardPage());
-    }
-
-    private void NavCatalog_Click(object sender, RoutedEventArgs e)
+    private void NavDirectory_Click(object sender, RoutedEventArgs e)
     {
         MainFrame.Navigate(new CatalogPage());
     }
@@ -36,11 +31,6 @@ public partial class MainWindow : Window
     private void NavProduction_Click(object sender, RoutedEventArgs e)
     {
         MainFrame.Navigate(new ProductionPage());
-    }
-
-    private void NavAging_Click(object sender, RoutedEventArgs e)
-    {
-        MainFrame.Navigate(new AgingPage());
     }
 
     private void NavSales_Click(object sender, RoutedEventArgs e)

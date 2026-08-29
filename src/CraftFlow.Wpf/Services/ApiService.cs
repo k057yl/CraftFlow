@@ -73,4 +73,39 @@ public class ApiService
         }
         return Result.Failure<MrpReportDto>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
     }
+
+    // --- Generic Delete ---
+    public async Task<bool> DeleteAsync(string endpoint)
+    {
+        try
+        {
+            var response = await _client.DeleteAsync(endpoint);
+            return response.IsSuccessStatusCode;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public async Task<(bool IsSuccess, string ContentOrError)> DeleteAndReadAsync(string endpoint)
+    {
+        try
+        {
+            var response = await _client.DeleteAsync(endpoint);
+            var content = await response.Content.ReadAsStringAsync();
+            var cleanContent = content.Trim('"').Trim();
+
+            if (response.IsSuccessStatusCode)
+            {
+                return (true, cleanContent);
+            }
+
+            return (false, string.IsNullOrWhiteSpace(cleanContent) ? response.StatusCode.ToString() : cleanContent);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
 }

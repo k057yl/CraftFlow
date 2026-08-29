@@ -70,13 +70,15 @@
 	<data name="SYSTEM_DASHBOARD_OVERVIEW" xml:space="preserve"><value>ОБЗОР СИСТЕМЫ (ДАШБОРД)</value></data>
 
 	<!-- Navigation -->
-	<data name="NAV_DASHBOARD" xml:space="preserve"><value>📊 ДАШБОРД</value></data>
-	<data name="NAV_CATALOG" xml:space="preserve"><value>📦 КАТАЛОГ</value></data>
-	<data name="NAV_INVENTORY" xml:space="preserve"><value>🏭 СКЛАД</value></data>
-	<data name="NAV_PRODUCTION" xml:space="preserve"><value>🧀 ПРОИЗВОДСТВО</value></data>
-	<data name="NAV_SALES" xml:space="preserve"><value>💰 ПРОДАЖИ И ЗАКАЗЫ</value></data>
-	<data name="NAV_AUTH" xml:space="preserve"><value>🔐 АВТОРИЗАЦИЯ</value></data>
-	<data name="NAV_AUDIT" xml:space="preserve"><value>📜 ЖУРНАЛ АУДИТА</value></data>
+	<data name="NAV_DIRECTORY" xml:space="preserve"><value>Номенклатура и Рецепты</value></data>
+	<data name="NAV_INVENTORY" xml:space="preserve"><value>Склад и Камеры</value></data>
+	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>Закупки и Поставки</value></data>
+	<data name="NAV_PRODUCTION" xml:space="preserve"><value>Цех и Варочная</value></data>
+	<data name="NAV_SALES" xml:space="preserve"><value>Продажи и Заказы</value></data>
+	<data name="NAV_TRACEABILITY" xml:space="preserve"><value>История Партий (S2S)</value></data>
+	<data name="NAV_MRP" xml:space="preserve"><value>Расчет Потребностей</value></data>
+	<data name="NAV_AUTH" xml:space="preserve"><value>Авторизация</value></data>
+	<data name="NAV_AUDIT" xml:space="preserve"><value>Журнал Действий</value></data>
 
 	<!-- GroupBox Headers -->
 	<data name="HEADER_UOM" xml:space="preserve"><value>1. ЕДИНИЦЫ ИЗМЕРЕНИЯ</value></data>
@@ -221,4 +223,8 @@
 	<data name="TRACE_AGING_DETAILS" xml:space="preserve"><value>Партия: {0} ({1})</value></data>
 	<data name="IS_AGING_REQUIRED" xml:space="preserve"><value>Требуется созревание</value></data>
 	<data name="DEFAULT_MIN_AGING_DAYS" xml:space="preserve"><value>Дней выдержки:</value></data>
+	<data name="AGING_CHAMBER_NAME" xml:space="preserve"><value>Название камеры</value></data>
+	<data name="TARGET_TEMPERATURE" xml:space="preserve"><value>Температура (°C)</value></data>
+	<data name="TARGET_HUMIDITY" xml:space="preserve"><value>Влажность (%)</value></data>
+	<data name="CREATE_AGING_CHAMBER" xml:space="preserve"><value>Создать Камеру Созревания</value></data>
 </root>

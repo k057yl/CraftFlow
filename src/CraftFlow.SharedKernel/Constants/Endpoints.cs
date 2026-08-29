@@ -25,7 +25,7 @@ public static class Endpoints
     public const string PURCHASE_ORDERS_RECEIVE = "api/procurement/purchase-orders/receive";
 
     // Aging
-    public const string AGING_CHAMBERS = "api/aging/chambers";
+    public const string AGING_CHAMBERS = "api/inventory/aging-chambers";
     public const string AGING_LOTS_ACTIVE = "api/aging/lots/active";
     public const string AGING_LOTS_TRANSFER = "api/aging/lots/transfer";
     public const string AGING_LOTS_RELEASE = "api/aging/lots/release";

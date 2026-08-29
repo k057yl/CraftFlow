@@ -1,4 +1,5 @@
 ﻿using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Modules.Aging.CreateChamber;
 using CraftFlow.Api.Modules.Inventory.AddStockLot;
 using CraftFlow.Api.Modules.Inventory.CreateWarehouse;
 using CraftFlow.Api.Modules.Inventory.GetWarehouses;
@@ -14,6 +15,7 @@ public static class InventoryEndpoints
         var group = app.MapGroup("api/inventory")
             .WithTags("Inventory");
 
+        // --- WAREHOUSES ---
         group.MapPost("/warehouses", async (CreateWarehouseCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
@@ -26,6 +28,24 @@ public static class InventoryEndpoints
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
+        // --- AGING CHAMBERS  ---
+        group.MapPost("/aging-chambers", async (CreateChamberCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapGet("/aging-chambers", async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        {
+            var chambers = await dbContext.AgingChambers
+                .AsNoTracking()
+                .Select(c => new { c.Id, Name = c.Name })
+                .ToListAsync(cancellationToken);
+
+            return Results.Ok(chambers);
+        });
+
+        // --- STOCK LOTS ---
         group.MapPost("/stock-lots", async (AddStockLotCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);

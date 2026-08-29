@@ -9,6 +9,8 @@ public static class ErrorCodes
         public const string INVALID_TENANT = "GENERAL.INVALID_TENANT";
         public const string UNAUTHORIZED = "GENERAL.UNAUTHORIZED";
         public const string NULL_VALUE = "GENERAL.NULL_VALUE";
+        public const string INVALID_FORMAT = "GENERAL.INVALID_FORMAT";
+        public const string ALREADY_EXISTS = "GENERAL.ALREADY_EXISTS";
     }
 
     public static class Production

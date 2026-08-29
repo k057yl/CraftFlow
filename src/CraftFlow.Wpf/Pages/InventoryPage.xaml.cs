@@ -1,25 +1,25 @@
-﻿using CraftFlow.SharedKernel.Constants;
-using CraftFlow.Wpf.Models;
-using CraftFlow.Wpf.Services;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using CraftFlow.SharedKernel.Constants;
+using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Services;
 
 namespace CraftFlow.Wpf.Pages;
 
 public partial class InventoryPage : Page
 {
     public ObservableCollection<LookupItem> Warehouses { get; } = [];
-    public ObservableCollection<LookupItem> RawMaterials { get; } = [];
+    public ObservableCollection<LookupItem> Chambers { get; } = [];
 
     public InventoryPage()
     {
         InitializeComponent();
 
-        StockWarehouseComboBox.ItemsSource = Warehouses;
-        StockRawMaterialComboBox.ItemsSource = RawMaterials;
+        WarehousesDataGrid.ItemsSource = Warehouses;
+        ChambersDataGrid.ItemsSource = Chambers;
 
         Loaded += async (s, e) => await LoadDataAsync();
     }
@@ -32,9 +32,9 @@ public partial class InventoryPage : Page
             Warehouses.Clear();
             warehouses?.ForEach(w => Warehouses.Add(new LookupItem(w.Id, w.Name)));
 
-            var raw = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.RAW_MATERIALS);
-            RawMaterials.Clear();
-            raw?.ForEach(r => RawMaterials.Add(new LookupItem(r.Id, r.Name)));
+            var chambers = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.AGING_CHAMBERS);
+            Chambers.Clear();
+            chambers?.ForEach(c => Chambers.Add(new LookupItem(c.Id, c.Name)));
 
             SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
         }
@@ -63,44 +63,51 @@ public partial class InventoryPage : Page
         }
     }
 
-    private async void AddStockLot_Click(object sender, RoutedEventArgs e)
+    private async void CreateChamber_Click(object sender, RoutedEventArgs e)
     {
-        var selectedWarehouse = StockWarehouseComboBox.SelectedItem as LookupItem;
-        var selectedRawMaterial = StockRawMaterialComboBox.SelectedItem as LookupItem;
+        var rawTempText = ChamberTempTextBox.Text.Replace(',', '.');
+        var rawHumidityText = ChamberHumidityTextBox.Text.Replace(',', '.');
 
-        if (selectedWarehouse == null || selectedRawMaterial == null)
+        if (!decimal.TryParse(rawTempText, NumberStyles.Any, CultureInfo.InvariantCulture, out var temp) ||
+            !decimal.TryParse(rawHumidityText, NumberStyles.Any, CultureInfo.InvariantCulture, out var humidity))
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
             return;
         }
 
-        var rawQuantityText = StockQuantityTextBox.Text.Replace(',', '.');
-        var rawPriceText = StockUnitPriceTextBox.Text.Replace(',', '.');
-
-        if (!decimal.TryParse(rawQuantityText, NumberStyles.Any, CultureInfo.InvariantCulture, out var quantity) ||
-            !decimal.TryParse(rawPriceText, NumberStyles.Any, CultureInfo.InvariantCulture, out var unitPrice))
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.AGING_CHAMBERS, new
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-            return;
-        }
-
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.STOCK_LOTS, new
-        {
-            WarehouseId = selectedWarehouse.Id,
-            ItemId = selectedRawMaterial.Id,
-            Quantity = quantity,
-            UnitPrice = unitPrice,
-            BatchNumber = StockBatchTextBox.Text
+            Name = ChamberNameTextBox.Text,
+            TargetTemperature = temp,
+            TargetHumidity = humidity
         });
 
         if (isSuccess)
         {
-            SetStatus($"{UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS} ID: {contentOrError}", Brushes.Green);
+            SetStatus(UiConstants.Messages.AGING_CHAMBER_CREATED_SUCCESS, Brushes.Green);
             await LoadDataAsync();
         }
         else
         {
             SetStatus(contentOrError, Brushes.Red);
+        }
+    }
+
+    private async void DeleteWarehouse_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is Guid id)
+        {
+            var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{Endpoints.WAREHOUSES}/{id}");
+            if (isSuccess) await LoadDataAsync(); else SetStatus(error, Brushes.Red);
+        }
+    }
+
+    private async void DeleteChamber_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is Guid id)
+        {
+            var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{Endpoints.AGING_CHAMBERS}/{id}");
+            if (isSuccess) await LoadDataAsync(); else SetStatus(error, Brushes.Red);
         }
     }
 

@@ -5,27 +5,34 @@
         Title="CRAFTFLOW" Height="720" Width="1280" WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="230"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar Navigation -->
         <Border Grid.Column="0" Background="#1E293B" Padding="15">
-            <StackPanel>
-                <TextBlock Text="CRAFTFLOW" Foreground="White" FontSize="22" FontWeight="Bold" Margin="0,0,0,30" HorizontalAlignment="Center"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="CRAFTFLOW" Foreground="White" FontSize="22" FontWeight="Bold" Margin="0,0,0,25" HorizontalAlignment="Center"/>
 
-                <Button Content="{loc:Loc NAV_DASHBOARD}" Click="NavDashboard_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                <Button Content="{loc:Loc NAV_CATALOG}" Click="NavCatalog_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                <Button Content="{loc:Loc NAV_INVENTORY}" Click="NavInventory_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                <Button Content="{loc:Loc NAV_PROCUREMENT}" Click="NavProcurement_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                <Button Content="{loc:Loc NAV_PRODUCTION}" Click="NavProduction_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                <Button Content="{loc:Loc NAV_AGING}" Click="NavAging_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                <Button Content="{loc:Loc NAV_SALES}" Click="NavSales_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                <Button Content="{loc:Loc NAV_TRACEABILITY}" Click="NavTraceability_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                <Button Content="{loc:Loc NAV_MRP}" Click="NavMrp_Click" Height="40" Margin="0,0,0,20" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                <Button Content="{loc:Loc NAV_AUTH}" Click="NavAuth_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                <Button Content="{loc:Loc NAV_AUDIT}" Click="NavAudit_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-            </StackPanel>
+                    <!-- 1. НОМЕНКЛАТУРА -->
+                    <Button Content="{loc:Loc NAV_DIRECTORY}" Click="NavDirectory_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+
+                    <!-- 2. ОПЕРАЦИИ -->
+                    <Button Content="{loc:Loc NAV_INVENTORY}" Click="NavInventory_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                    <Button Content="{loc:Loc NAV_PROCUREMENT}" Click="NavProcurement_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                    <Button Content="{loc:Loc NAV_PRODUCTION}" Click="NavProduction_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                    <Button Content="{loc:Loc NAV_SALES}" Click="NavSales_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+
+                    <!-- 3. АНАЛИТИКА И УЧЕТ -->
+                    <Button Content="{loc:Loc NAV_TRACEABILITY}" Click="NavTraceability_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                    <Button Content="{loc:Loc NAV_MRP}" Click="NavMrp_Click" Height="40" Margin="0,0,0,20" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+
+                    <!-- 4. СИСТЕМНЫЕ -->
+                    <Button Content="{loc:Loc NAV_AUTH}" Click="NavAuth_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                    <Button Content="{loc:Loc NAV_AUDIT}" Click="NavAudit_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                </StackPanel>
+            </ScrollViewer>
         </Border>
 
         <!-- Main Content Area -->

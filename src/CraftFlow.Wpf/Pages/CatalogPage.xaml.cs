@@ -8,7 +8,7 @@ using CraftFlow.Wpf.Services;
 
 namespace CraftFlow.Wpf.Pages;
 
-public record IngredientItemDto(Guid RawMaterialId, string Name, decimal Quantity)
+public record IngredientItemDto(Guid RawMaterialId, string Name, string Code, decimal Quantity)
 {
     public string DisplayInfo => $"{Name} — {Quantity}";
 }
@@ -18,8 +18,8 @@ public partial class CatalogPage : Page
     public ObservableCollection<LookupItem> UnitsOfMeasure { get; } = [];
     public ObservableCollection<LookupItem> RawMaterials { get; } = [];
     public ObservableCollection<LookupItem> Products { get; } = [];
+    public ObservableCollection<LookupItem> Recipes { get; } = [];
 
-    // Временный список ингредиентов для рецепта
     private readonly ObservableCollection<IngredientItemDto> _selectedIngredients = [];
 
     public CatalogPage()
@@ -32,6 +32,11 @@ public partial class CatalogPage : Page
         RecipeRawMaterialComboBox.ItemsSource = RawMaterials;
         AddedIngredientsListBox.ItemsSource = _selectedIngredients;
 
+        UomDataGrid.ItemsSource = UnitsOfMeasure;
+        RawMaterialsDataGrid.ItemsSource = RawMaterials;
+        ProductsDataGrid.ItemsSource = Products;
+        RecipesDataGrid.ItemsSource = Recipes;
+
         Loaded += async (s, e) => await LoadDataAsync();
     }
 
@@ -41,7 +46,7 @@ public partial class CatalogPage : Page
         {
             var uoms = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.UOM);
             UnitsOfMeasure.Clear();
-            uoms?.ForEach(u => UnitsOfMeasure.Add(new LookupItem(u.Id, $"{u.Name} ({u.Code})")));
+            uoms?.ForEach(u => UnitsOfMeasure.Add(new LookupItem(u.Id, u.Name, u.Code)));
 
             var raw = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.RAW_MATERIALS);
             RawMaterials.Clear();
@@ -50,6 +55,10 @@ public partial class CatalogPage : Page
             var prods = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.PRODUCTS);
             Products.Clear();
             prods?.ForEach(p => Products.Add(new LookupItem(p.Id, p.Name)));
+
+            var recs = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.RECIPES);
+            Recipes.Clear();
+            recs?.ForEach(r => Recipes.Add(new LookupItem(r.Id, r.Name)));
 
             SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
         }
@@ -64,9 +73,11 @@ public partial class CatalogPage : Page
         if (RecipeRawMaterialComboBox.SelectedItem is LookupItem rawItem &&
             decimal.TryParse(RecipeIngredientQuantityTextBox.Text, out var qty) && qty > 0)
         {
-            _selectedIngredients.Add(new IngredientItemDto(rawItem.Id, rawItem.Name, qty));
+            _selectedIngredients.Add(new IngredientItemDto(rawItem.Id, rawItem.Name, string.Empty, qty));
         }
     }
+
+    // --- СОЗДАНИЕ ---
 
     private async void CreateUom_Click(object sender, RoutedEventArgs e)
     {
@@ -76,24 +87,12 @@ public partial class CatalogPage : Page
             Code = UomCodeTextBox.Text
         });
 
-        if (isSuccess)
-        {
-            SetStatus(UiConstants.Messages.UOM_CREATED_SUCCESS, Brushes.Green);
-            await LoadDataAsync();
-        }
-        else
-        {
-            SetStatus(contentOrError, Brushes.Red);
-        }
+        if (isSuccess) { await LoadDataAsync(); } else { SetStatus(contentOrError, Brushes.Red); }
     }
 
     private async void CreateRawMaterial_Click(object sender, RoutedEventArgs e)
     {
-        if (RawUomComboBox.SelectedValue is not Guid uomId)
-        {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-            return;
-        }
+        if (RawUomComboBox.SelectedValue is not Guid uomId) return;
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.RAW_MATERIALS, new
         {
@@ -101,24 +100,12 @@ public partial class CatalogPage : Page
             UnitOfMeasureId = uomId
         });
 
-        if (isSuccess)
-        {
-            SetStatus(UiConstants.Messages.RAW_MATERIAL_CREATED_SUCCESS, Brushes.Green);
-            await LoadDataAsync();
-        }
-        else
-        {
-            SetStatus(contentOrError, Brushes.Red);
-        }
+        if (isSuccess) { await LoadDataAsync(); } else { SetStatus(contentOrError, Brushes.Red); }
     }
 
     private async void CreateProduct_Click(object sender, RoutedEventArgs e)
     {
-        if (ProductUomComboBox.SelectedValue is not Guid uomId)
-        {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-            return;
-        }
+        if (ProductUomComboBox.SelectedValue is not Guid uomId) return;
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.PRODUCTS, new
         {
@@ -126,15 +113,7 @@ public partial class CatalogPage : Page
             UnitOfMeasureId = uomId
         });
 
-        if (isSuccess)
-        {
-            SetStatus(UiConstants.Messages.PRODUCT_CREATED_SUCCESS, Brushes.Green);
-            await LoadDataAsync();
-        }
-        else
-        {
-            SetStatus(contentOrError, Brushes.Red);
-        }
+        if (isSuccess) { await LoadDataAsync(); } else { SetStatus(contentOrError, Brushes.Red); }
     }
 
     private async void CreateRecipe_Click(object sender, RoutedEventArgs e)
@@ -148,12 +127,7 @@ public partial class CatalogPage : Page
         }
 
         var isAgingRequired = IsAgingRequiredCheckBox.IsChecked ?? false;
-        int? defaultMinAgingDays = null;
-
-        if (isAgingRequired && int.TryParse(DefaultMinAgingDaysTextBox.Text, out var days))
-        {
-            defaultMinAgingDays = days;
-        }
+        int? defaultMinAgingDays = isAgingRequired && int.TryParse(DefaultMinAgingDaysTextBox.Text, out var days) ? days : null;
 
         var ingredientsPayload = _selectedIngredients
             .Select(i => new { RawMaterialId = i.RawMaterialId, Quantity = i.Quantity })
@@ -171,12 +145,50 @@ public partial class CatalogPage : Page
 
         if (isSuccess)
         {
-            SetStatus($"{UiConstants.Messages.RECIPE_CREATED_SUCCESS} ID: {contentOrError}", Brushes.Green);
             _selectedIngredients.Clear();
+            await LoadDataAsync();
         }
         else
         {
             SetStatus(contentOrError, Brushes.Red);
+        }
+    }
+
+    // --- УДАЛЕНИЕ ---
+
+    private async void DeleteUom_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is Guid id)
+        {
+            await ApiService.Instance.DeleteAsync($"{Endpoints.UOM}/{id}");
+            await LoadDataAsync();
+        }
+    }
+
+    private async void DeleteRawMaterial_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is Guid id)
+        {
+            await ApiService.Instance.DeleteAsync($"{Endpoints.RAW_MATERIALS}/{id}");
+            await LoadDataAsync();
+        }
+    }
+
+    private async void DeleteProduct_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is Guid id)
+        {
+            await ApiService.Instance.DeleteAsync($"{Endpoints.PRODUCTS}/{id}");
+            await LoadDataAsync();
+        }
+    }
+
+    private async void DeleteRecipe_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is Guid id)
+        {
+            await ApiService.Instance.DeleteAsync($"{Endpoints.RECIPES}/{id}");
+            await LoadDataAsync();
         }
     }
 

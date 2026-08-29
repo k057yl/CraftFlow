@@ -1,2 +1,3 @@
 ﻿namespace CraftFlow.Wpf.Models;
-public record LookupItem(Guid Id, string Name);
+
+public record LookupItem(Guid Id, string Name, string? Code = null);

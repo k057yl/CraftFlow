@@ -21,7 +21,7 @@ public partial class SalesPage : Page
     public ObservableCollection<LookupItem> Warehouses { get; } = [];
     public ObservableCollection<LookupItem> Products { get; } = [];
 
-    private bool _isAutoDiscountApplied = false;
+    private const decimal DEFAULT_MARKUP_MULTIPLIER = 2.0m;
 
     public SalesPage()
     {
@@ -30,6 +30,7 @@ public partial class SalesPage : Page
         OrderCustomerComboBox.ItemsSource = Customers;
         OrderWarehouseComboBox.ItemsSource = Warehouses;
         OrderProductComboBox.ItemsSource = Products;
+        CustomersListBox.ItemsSource = Customers;
 
         Loaded += async (s, e) => await LoadDataAsync();
     }
@@ -91,18 +92,30 @@ public partial class SalesPage : Page
 
                 if (info != null)
                 {
-                    ProductStockTextBlock.Text = $"{info.Quantity:F2}";
+                    ProductStockTextBlock.Text = $"{info.Quantity:F2} кг";
                     ProductCostTextBlock.Text = $"${info.UnitCost:F2}";
 
                     if (info.BasePrice > 0)
                     {
                         OrderBasePriceTextBox.Text = info.BasePrice.ToString("F2", CultureInfo.InvariantCulture);
+                        PricingNoticeTextBlock.Visibility = Visibility.Collapsed;
+                    }
+                    else if (info.UnitCost > 0)
+                    {
+                        var safePrice = info.UnitCost * DEFAULT_MARKUP_MULTIPLIER;
+                        OrderBasePriceTextBox.Text = safePrice.ToString("F2", CultureInfo.InvariantCulture);
+                        PricingNoticeTextBlock.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        OrderBasePriceTextBox.Text = "0.00";
+                        PricingNoticeTextBlock.Visibility = Visibility.Collapsed;
                     }
                 }
             }
             catch
             {
-                ProductStockTextBlock.Text = "0.00";
+                ProductStockTextBlock.Text = "0.00 кг";
                 ProductCostTextBlock.Text = "$0.00";
             }
         }
@@ -149,16 +162,27 @@ public partial class SalesPage : Page
 
     private async void CreateCustomer_Click(object sender, RoutedEventArgs e)
     {
+        if (string.IsNullOrWhiteSpace(CustomerNameTextBox.Text))
+        {
+            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
+
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.CUSTOMERS, new
         {
-            Name = CustomerNameTextBox.Text,
-            Phone = CustomerPhoneTextBox.Text
+            Name = CustomerNameTextBox.Text.Trim(),
+            Phone = CustomerPhoneTextBox.Text.Trim()
         });
 
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.CUSTOMER_CREATED_SUCCESS, Brushes.Green);
+            CustomerNameTextBox.Clear();
+            CustomerPhoneTextBox.Clear();
+
             await LoadDataAsync();
+
+            SalesTabControl.SelectedIndex = 0;
         }
         else
         {

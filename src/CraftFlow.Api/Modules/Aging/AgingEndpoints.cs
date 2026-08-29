@@ -2,7 +2,6 @@
 using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Aging.ReleaseFromAging;
 using CraftFlow.Api.Modules.Aging.TransferToAging;
-using CraftFlow.SharedKernel.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,19 +11,31 @@ public static class AgingEndpoints
 {
     public static void MapAgingEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapPost(Endpoints.AGING_LOTS_TRANSFER, async (TransferToAgingCommand command, ISender sender) =>
+        var group = app.MapGroup("api/aging");
+
+        group.MapPost("lots/transfer", async (TransferToAgingCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        app.MapPost(Endpoints.AGING_LOTS_RELEASE, async (ReleaseFromAgingCommand command, ISender sender) =>
+        group.MapPost("lots/release", async (ReleaseFromAgingCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
 
-        app.MapGet(Endpoints.AGING_LOTS_ACTIVE, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapGet("chambers", async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        {
+            var chambers = await dbContext.AgingChambers
+                .AsNoTracking()
+                .Select(c => new { c.Id, Name = c.Name })
+                .ToListAsync(cancellationToken);
+
+            return Results.Ok(chambers);
+        });
+
+        group.MapGet("lots/active", async (AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
             var activeLots = await dbContext.AgingLots
                 .AsNoTracking()
