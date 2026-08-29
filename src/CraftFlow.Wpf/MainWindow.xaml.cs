@@ -28,14 +28,34 @@ public partial class MainWindow : Window
         MainFrame.Navigate(new InventoryPage());
     }
 
+    private void NavProcurement_Click(object sender, RoutedEventArgs e)
+    {
+        MainFrame.Navigate(new ProcurementPage());
+    }
+
     private void NavProduction_Click(object sender, RoutedEventArgs e)
     {
         MainFrame.Navigate(new ProductionPage());
     }
 
+    private void NavAging_Click(object sender, RoutedEventArgs e)
+    {
+        MainFrame.Navigate(new AgingPage());
+    }
+
     private void NavSales_Click(object sender, RoutedEventArgs e)
     {
         MainFrame.Navigate(new SalesPage());
+    }
+
+    private void NavTraceability_Click(object sender, RoutedEventArgs e)
+    {
+        MainFrame.Navigate(new TraceabilityPage());
+    }
+
+    private void NavMrp_Click(object sender, RoutedEventArgs e)
+    {
+        MainFrame.Navigate(new MrpPage());
     }
 
     private void NavAuth_Click(object sender, RoutedEventArgs e)

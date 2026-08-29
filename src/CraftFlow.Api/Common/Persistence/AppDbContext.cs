@@ -1,8 +1,10 @@
 ﻿using CraftFlow.Api.Common.Audit;
 using CraftFlow.Api.Common.MultiTenancy;
+using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Catalog.Domain;
 using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.Api.Modules.Inventory.Domain;
+using CraftFlow.Api.Modules.Procurement.Domain;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.Api.Modules.Sales.Domain;
 using CraftFlow.SharedKernel.Domain;
@@ -32,6 +34,11 @@ public class AppDbContext : DbContext
     public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
     public DbSet<User> Users => Set<User>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
+    public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
+    public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
+    public DbSet<AgingChamber> AgingChambers => Set<AgingChamber>();
+    public DbSet<AgingLot> AgingLots => Set<AgingLot>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

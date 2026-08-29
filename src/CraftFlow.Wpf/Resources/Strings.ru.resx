@@ -183,4 +183,42 @@
 	<data name="PRODUCTION_INSUFFICIENT_RAW_MATERIAL" xml:space="preserve"><value>Недостаточно сырья для варки!</value></data>
 	<data name="PRODUCTION_BATCH_NOT_FOUND" xml:space="preserve"><value>Партия производства не найдена</value></data>
 	<data name="GENERAL_NOT_FOUND" xml:space="preserve"><value>Запрашиваемый ресурс не найден</value></data>
+
+	<!-- Procurement & Aging Titles & Headers -->
+	<data name="TITLE_PROCUREMENT" xml:space="preserve"><value>ЗАКУПКИ И ПОСТАВЩИКИ</value></data>
+	<data name="TITLE_AGING" xml:space="preserve"><value>КАМЕРЫ СОЗРЕВАНИЯ СЫРА</value></data>
+	<data name="TITLE_TRACEABILITY" xml:space="preserve"><value>СКВОЗНАЯ ТРАССИРОВКА ПАРТИЙ</value></data>
+	<data name="TITLE_MRP" xml:space="preserve"><value>ПЛАНИРОВАНИЕ ПОТРЕБНОСТЕЙ (MRP)</value></data>
+
+	<!-- Procurement & Aging Navigation -->
+	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>🚚 ЗАКУПКИ</value></data>
+	<data name="NAV_AGING" xml:space="preserve"><value>⏳ СОЗРЕВАНИЕ</value></data>
+	<data name="NAV_TRACEABILITY" xml:space="preserve"><value>🔍 ТРАССИРОВКА</value></data>
+	<data name="NAV_MRP" xml:space="preserve"><value>📈 MRP ПЛАНИРОВАНИЕ</value></data>
+
+	<!-- Procurement & Aging Headers -->
+	<data name="HEADER_SUPPLIERS" xml:space="preserve"><value>1. ПОСТАВЩИКИ СЫРЬЯ</value></data>
+	<data name="HEADER_PURCHASE_ORDERS" xml:space="preserve"><value>2. ЗАКАЗЫ И ПРИЁМКА ПОСТАВОК</value></data>
+	<data name="HEADER_AGING_CHAMBERS" xml:space="preserve"><value>1. КАМЕРЫ СОЗРЕВАНИЯ</value></data>
+	<data name="HEADER_AGING_LOTS" xml:space="preserve"><value>2. ПАРТИИ НА ВЫДЕРЖКЕ</value></data>
+
+	<!-- Procurement Buttons & Inputs -->
+	<data name="CREATE_SUPPLIER" xml:space="preserve"><value>Добавить Поставщика</value></data>
+	<data name="RECEIVE_GOODS" xml:space="preserve"><value>Принять Поставку</value></data>
+	<data name="SUPPLIER_NAME" xml:space="preserve"><value>Название Поставщика:</value></data>
+	<data name="SUPPLIER_PHONE" xml:space="preserve"><value>Телефон:</value></data>
+	<data name="SUPPLIER_EMAIL" xml:space="preserve"><value>Email:</value></data>
+
+	<!-- Procurement UI Messages -->
+	<data name="UI_SUPPLIER_CREATED_SUCCESS" xml:space="preserve"><value>Поставщик успешно добавлен!</value></data>
+	<data name="UI_GOODS_RECEIVED_SUCCESS" xml:space="preserve"><value>Поставка успешно принята на склад!</value></data>
+	<data name="UI_API_ERROR_PREFIX" xml:space="preserve"><value>Ошибка выполнения операции</value></data>
+
+	<data name="CREATE_PURCHASE_ORDER" xml:space="preserve"><value>Сформировать Заказ Поставщику</value></data>
+	<data name="TRACE_BATCH_TITLE" xml:space="preserve"><value>Варка #{0}</value></data>
+	<data name="TRACE_BATCH_DETAILS" xml:space="preserve"><value>Статус: {0} | Запущена: {1:dd.MM.yyyy}</value></data>
+	<data name="TRACE_AGING_TITLE" xml:space="preserve"><value>Камера: {0}</value></data>
+	<data name="TRACE_AGING_DETAILS" xml:space="preserve"><value>Партия: {0} ({1})</value></data>
+	<data name="IS_AGING_REQUIRED" xml:space="preserve"><value>Требуется созревание</value></data>
+	<data name="DEFAULT_MIN_AGING_DAYS" xml:space="preserve"><value>Дней выдержки:</value></data>
 </root>

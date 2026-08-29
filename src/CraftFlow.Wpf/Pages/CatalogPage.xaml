@@ -64,12 +64,23 @@
                     <ComboBox x:Name="RecipeProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,5"/>
 
                     <TextBlock Text="{loc:Loc TARGET_OUTPUT_QUANTITY}"/>
-                    <!-- БАЗОВЫЙ ВЫХОД ТЕПЕРЬ СТРОГО = 1 КГ/Л -->
                     <TextBox x:Name="RecipeOutputQuantityTextBox" Text="1" Margin="0,0,0,5"/>
+
+                    <!-- Настройки выдержки сыра -->
+                    <Grid Margin="0,5,0,5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <CheckBox x:Name="IsAgingRequiredCheckBox" Content="Требуется созревание" VerticalAlignment="Center" Margin="0,0,15,0"/>
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <TextBlock Text="Дней выдержки: " VerticalAlignment="Center" Margin="0,0,5,0"/>
+                            <TextBox x:Name="DefaultMinAgingDaysTextBox" Text="30" Width="60" Padding="2"/>
+                        </StackPanel>
+                    </Grid>
 
                     <GroupBox Header="{loc:Loc INGREDIENT_SECTION}" Margin="0,5,0,5" Padding="5">
                         <StackPanel>
-                            <!-- Выбор сырья и добавление нескольких ингредиентов -->
                             <Grid Margin="0,0,0,5">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="2*"/>
@@ -87,7 +98,6 @@
                                 <Button Grid.Column="2" Content="+" Click="AddIngredient_Click" Width="30" Height="23" VerticalAlignment="Bottom"/>
                             </Grid>
 
-                            <!-- Список добавленных ингредиентов (Молоко, Соль, Фермент) -->
                             <ListBox x:Name="AddedIngredientsListBox" Height="80" DisplayMemberPath="DisplayInfo" Margin="0,5,0,0"/>
                         </StackPanel>
                     </GroupBox>

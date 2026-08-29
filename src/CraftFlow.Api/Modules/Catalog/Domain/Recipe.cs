@@ -11,12 +11,19 @@ public sealed class Recipe : AggregateRoot, ITenantEntity
     public Guid ProductId { get; private set; }
     public string Name { get; private set; } = null!;
     public decimal TargetOutputQuantity { get; private set; }
+    public bool IsAgingRequired { get; private set; }
+    public int? DefaultMinAgingDays { get; private set; }
 
     public IReadOnlyCollection<RecipeIngredient> Ingredients => _ingredients.AsReadOnly();
 
     private Recipe() { }
 
-    public static Recipe Create(Guid productId, string name, decimal targetOutputQuantity)
+    public static Recipe Create(
+        Guid productId,
+        string name,
+        decimal targetOutputQuantity,
+        bool isAgingRequired = false,
+        int? defaultMinAgingDays = null)
     {
         if (targetOutputQuantity <= 0)
             throw new ArgumentException(ErrorCodes.Catalog.RECIPE_INVALID_TARGET_OUTPUT);
@@ -26,7 +33,9 @@ public sealed class Recipe : AggregateRoot, ITenantEntity
             Id = Guid.NewGuid(),
             ProductId = productId,
             Name = name,
-            TargetOutputQuantity = targetOutputQuantity
+            TargetOutputQuantity = targetOutputQuantity,
+            IsAgingRequired = isAgingRequired,
+            DefaultMinAgingDays = isAgingRequired ? defaultMinAgingDays : null
         };
     }
 

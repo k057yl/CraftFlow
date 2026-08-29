@@ -1,7 +1,9 @@
-﻿using CraftFlow.Api.Modules.Inventory.AddStockLot;
+﻿using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Modules.Inventory.AddStockLot;
 using CraftFlow.Api.Modules.Inventory.CreateWarehouse;
 using CraftFlow.Api.Modules.Inventory.GetWarehouses;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Inventory;
 
@@ -28,6 +30,16 @@ public static class InventoryEndpoints
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapGet("/stock-lots", async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        {
+            var lots = await dbContext.StockLots
+                .AsNoTracking()
+                .Select(l => new { l.Id, Name = l.BatchNumber })
+                .ToListAsync(cancellationToken);
+
+            return Results.Ok(lots);
         });
     }
 }

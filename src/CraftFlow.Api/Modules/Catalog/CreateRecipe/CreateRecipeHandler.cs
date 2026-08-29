@@ -35,7 +35,13 @@ namespace CraftFlow.Api.Modules.Catalog.CreateRecipe
                 return Result.Failure<Guid>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
             }
 
-            var recipe = Recipe.Create(request.ProductId, request.Name, request.TargetOutputQuantity);
+            var recipe = Recipe.Create(
+                request.ProductId,
+                request.Name,
+                request.TargetOutputQuantity,
+                request.IsAgingRequired,
+                request.DefaultMinAgingDays
+            );
 
             foreach (var ingredient in request.Ingredients)
             {

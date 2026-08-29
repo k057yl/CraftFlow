@@ -24,7 +24,13 @@ public record RequirementCalculationDto(
     bool IsSufficient
 )
 {
-    public string DisplayInfo => $"{MaterialName}: Нужно {RequiredQty:F2} | Доступно {AvailableQty:F2} " + (IsSufficient ? "✔" : "❌ (НЕ ХВАТАЕТ!)");
+    public string DisplayInfo => string.Format(
+        FormattingConstants.DISPLAY_INFO_REQUIREMENT_FORMAT,
+        MaterialName,
+        RequiredQty,
+        AvailableQty,
+        IsSufficient ? FormattingConstants.CHECKMARK_SUFFICIENT : FormattingConstants.CHECKMARK_INSUFFICIENT
+    );
 }
 
 public partial class ProductionPage : Page

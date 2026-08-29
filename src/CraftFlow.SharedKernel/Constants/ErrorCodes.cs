@@ -57,4 +57,27 @@ public static class ErrorCodes
         public const string LOW_STOCK_ALERT = "NOTIFICATIONS.LOW_STOCK_ALERT";
         public const string COST_CALCULATED = "NOTIFICATIONS.COST_CALCULATED";
     }
+
+    public static class Procurement
+    {
+        public const string SUPPLIER_NAME_REQUIRED = "PROCUREMENT.SUPPLIER_NAME_REQUIRED";
+        public const string SUPPLIER_NOT_FOUND = "PROCUREMENT.SUPPLIER_NOT_FOUND";
+        public const string PURCHASE_ORDER_NOT_FOUND = "PROCUREMENT.PURCHASE_ORDER_NOT_FOUND";
+        public const string PURCHASE_ORDER_INVALID_STATUS = "PROCUREMENT.PURCHASE_ORDER_INVALID_STATUS";
+        public const string PURCHASE_ORDER_ITEM_INVALID_QUANTITY = "PROCUREMENT.PURCHASE_ORDER_ITEM_INVALID_QUANTITY";
+        public const string PURCHASE_ORDER_ITEM_INVALID_PRICE = "PROCUREMENT.PURCHASE_ORDER_ITEM_INVALID_PRICE";
+    }
+
+    public static class Aging
+    {
+        public const string CHAMBER_NOT_FOUND = "AGING.CHAMBER_NOT_FOUND";
+        public const string CHAMBER_NAME_REQUIRED = "AGING.CHAMBER_NAME_REQUIRED";
+        public const string INVALID_LOT_STATE = "AGING.INVALID_LOT_STATE";
+        public const string INSUFFICIENT_AGING_CAPACITY = "AGING.INSUFFICIENT_AGING_CAPACITY";
+    }
+
+    public static class Saas
+    {
+        public const string QUOTA_EXCEEDED = "SAAS.QUOTA_EXCEEDED";
+    }
 }

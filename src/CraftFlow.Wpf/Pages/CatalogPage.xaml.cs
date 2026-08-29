@@ -147,6 +147,14 @@ public partial class CatalogPage : Page
             return;
         }
 
+        var isAgingRequired = IsAgingRequiredCheckBox.IsChecked ?? false;
+        int? defaultMinAgingDays = null;
+
+        if (isAgingRequired && int.TryParse(DefaultMinAgingDaysTextBox.Text, out var days))
+        {
+            defaultMinAgingDays = days;
+        }
+
         var ingredientsPayload = _selectedIngredients
             .Select(i => new { RawMaterialId = i.RawMaterialId, Quantity = i.Quantity })
             .ToArray();
@@ -156,6 +164,8 @@ public partial class CatalogPage : Page
             ProductId = productId,
             Name = RecipeNameTextBox.Text,
             TargetOutputQuantity = targetOutput,
+            IsAgingRequired = isAgingRequired,
+            DefaultMinAgingDays = defaultMinAgingDays,
             Ingredients = ingredientsPayload
         });
 

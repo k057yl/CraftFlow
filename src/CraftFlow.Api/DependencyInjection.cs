@@ -1,14 +1,17 @@
-﻿using System.Text;
+﻿using System.Data;
+using System.Text;
 using CraftFlow.Api.Common.BackgroundWorkers;
 using CraftFlow.Api.Common.Behaviors;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Modules.Traceability.TraceabilityRead;
 using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 
 namespace CraftFlow.Api;
 
@@ -47,6 +50,10 @@ public static class DependencyInjection
                 npgsqlOptions.EnableRetryOnFailure();
             }));
 
+        services.AddScoped<IDbConnection>(_ => new NpgsqlConnection(connectionString));
+
+        services.AddScoped<TraceabilityReadService>();
+
         return services;
     }
 
@@ -82,6 +89,7 @@ public static class DependencyInjection
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(SubscriptionQuotaBehavior<,>));
         });
 
         services.AddValidatorsFromAssembly(typeof(Program).Assembly);

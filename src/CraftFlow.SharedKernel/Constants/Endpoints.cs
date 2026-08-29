@@ -18,4 +18,20 @@ public static class Endpoints
     public const string LOGIN = "api/identity/login";
     public const string AUDIT_LOGS = "api/analytics/audit-logs";
     public const string PRODUCTION_COSTING = "api/production/costing";
+
+    // Procurement
+    public const string SUPPLIERS = "api/procurement/suppliers";
+    public const string PURCHASE_ORDERS = "api/procurement/purchase-orders";
+    public const string PURCHASE_ORDERS_RECEIVE = "api/procurement/purchase-orders/receive";
+
+    // Aging
+    public const string AGING_CHAMBERS = "api/aging/chambers";
+    public const string AGING_LOTS_ACTIVE = "api/aging/lots/active";
+    public const string AGING_LOTS_TRANSFER = "api/aging/lots/transfer";
+    public const string AGING_LOTS_RELEASE = "api/aging/lots/release";
+
+    // Traceability & MRP
+    public const string TRACEABILITY_FORWARD = "api/traceability/forward";
+    public const string TRACEABILITY_BACKWARD = "api/traceability/backward";
+    public const string MRP_REQUIREMENTS = "api/mrp/requirements";
 }

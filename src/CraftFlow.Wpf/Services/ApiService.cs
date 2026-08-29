@@ -1,4 +1,7 @@
-﻿using System.Net.Http;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Result;
+using CraftFlow.Wpf.Models;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -6,11 +9,6 @@ namespace CraftFlow.Wpf.Services;
 
 public class ApiService
 {
-    private const string API_BASE_URL = "http://localhost:5109/";
-    private const string TENANT_HEADER_KEY = "X-Tenant-Id";
-    private const string DEFAULT_TENANT_ID = "00000000-0000-0000-0000-000000000001";
-    private const string BEARER_SCHEME = "Bearer";
-
     private static readonly Lazy<ApiService> _instance = new(() => new ApiService());
     public static ApiService Instance => _instance.Value;
 
@@ -21,15 +19,15 @@ public class ApiService
     {
         _client = new HttpClient
         {
-            BaseAddress = new Uri(API_BASE_URL)
+            BaseAddress = new Uri(ApiConstants.API_BASE_URL)
         };
-        _client.DefaultRequestHeaders.Add(TENANT_HEADER_KEY, DEFAULT_TENANT_ID);
+        _client.DefaultRequestHeaders.Add(ApiConstants.TENANT_HEADER_KEY, ApiConstants.DEFAULT_TENANT_ID);
     }
 
     public void SetAuthToken(string token)
     {
         JwtToken = token;
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(BEARER_SCHEME, token);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(ApiConstants.BEARER_SCHEME, token);
     }
 
     public Task<T?> GetAsync<T>(string endpoint) => _client.GetFromJsonAsync<T>(endpoint);
@@ -49,5 +47,30 @@ public class ApiService
         }
 
         return (false, string.IsNullOrWhiteSpace(cleanContent) ? response.StatusCode.ToString() : cleanContent);
+    }
+
+    // --- Procurement ---
+    public Task<(bool IsSuccess, string ContentOrError)> CreateSupplierAsync(CreateSupplierRequest request) =>
+        PostAndReadAsync(Endpoints.SUPPLIERS, request);
+
+    public Task<(bool IsSuccess, string ContentOrError)> ReceiveGoodsAsync(ReceiveGoodsRequest request) =>
+        PostAndReadAsync(Endpoints.PURCHASE_ORDERS_RECEIVE, request);
+
+    // --- Aging ---
+    public Task<(bool IsSuccess, string ContentOrError)> TransferToAgingAsync(TransferToAgingRequest request) =>
+        PostAndReadAsync(Endpoints.AGING_LOTS_TRANSFER, request);
+
+    public Task<(bool IsSuccess, string ContentOrError)> ReleaseFromAgingAsync(ReleaseFromAgingRequest request) =>
+        PostAndReadAsync(Endpoints.AGING_LOTS_RELEASE, request);
+
+    // --- MRP ---
+    public async Task<Result<MrpReportDto>> GetMrpRequirementsAsync()
+    {
+        var report = await GetAsync<MrpReportDto>(Endpoints.MRP_REQUIREMENTS);
+        if (report != null)
+        {
+            return Result.Success(report);
+        }
+        return Result.Failure<MrpReportDto>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
     }
 }

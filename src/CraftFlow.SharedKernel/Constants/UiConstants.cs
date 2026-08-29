@@ -22,18 +22,17 @@ public static class UiConstants
         public const string API_ERROR_PREFIX = "UI.API_ERROR_PREFIX";
         public const string EXPORT_SUCCESS = "UI.EXPORT_SUCCESS";
         public const string BATCH_COST_CALCULATED = "UI.BATCH_COST_CALCULATED";
+        public const string SUPPLIER_CREATED_SUCCESS = "UI.SUPPLIER_CREATED_SUCCESS";
+        public const string PURCHASE_ORDER_CREATED_SUCCESS = "UI.PURCHASE_ORDER_CREATED_SUCCESS";
+        public const string GOODS_RECEIVED_SUCCESS = "UI.GOODS_RECEIVED_SUCCESS";
+        public const string AGING_CHAMBER_CREATED_SUCCESS = "UI.AGING_CHAMBER_CREATED_SUCCESS";
+        public const string LOT_TRANSFERRED_TO_AGING_SUCCESS = "UI.LOT_TRANSFERRED_TO_AGING_SUCCESS";
+        public const string LOT_RELEASED_FROM_AGING_SUCCESS = "UI.LOT_RELEASED_FROM_AGING_SUCCESS";
+        public const string GENERAL_NOT_FOUND = "GENERAL_NOT_FOUND";
     }
 
     public static class Titles
     {
-        public const string APP_TITLE = "CRAFTFLOW";
-        public const string DASHBOARD = "📊 DASHBOARD";
-        public const string CATALOG = "📦 CATALOG";
-        public const string INVENTORY = "🏭 INVENTORY";
-        public const string PRODUCTION = "🧀 PRODUCTION";
-        public const string SALES = "💰 SALES & ORDERS";
-        public const string AUTH = "🔐 AUTH (JWT)";
-        public const string READY = "READY";
-        public const string AUDIT = "📜 AUDIT LOGS";
+        public const string APP_TITLE = "Craft Flow";
     }
 }

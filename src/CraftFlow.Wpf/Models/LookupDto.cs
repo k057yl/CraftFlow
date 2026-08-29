@@ -1,2 +1,2 @@
 ﻿namespace CraftFlow.Wpf.Models;
-public record LookupDto(Guid Id, string Name, string? Code);
+public record LookupDto(Guid Id, string Name, string? Code = null);

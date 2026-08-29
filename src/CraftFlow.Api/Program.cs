@@ -1,10 +1,14 @@
 using CraftFlow.Api;
+using CraftFlow.Api.Modules.Aging;
 using CraftFlow.Api.Modules.Analytics;
 using CraftFlow.Api.Modules.Catalog;
 using CraftFlow.Api.Modules.Identity;
 using CraftFlow.Api.Modules.Inventory;
+using CraftFlow.Api.Modules.MRP;
+using CraftFlow.Api.Modules.Procurement;
 using CraftFlow.Api.Modules.Production;
 using CraftFlow.Api.Modules.Sales;
+using CraftFlow.Api.Modules.Traceability;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +23,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-// Обязательно перед Map-эндпоинтами!
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -31,5 +33,9 @@ app.MapProductionEndpoints();
 app.MapSalesEndpoints();
 app.MapAnalyticsEndpoints();
 app.MapIdentityEndpoints();
+app.MapProcurementEndpoints();
+app.MapAgingEndpoints();
+app.MapTraceabilityEndpoints();
+app.MapMrpEndpoints();
 
 app.Run();

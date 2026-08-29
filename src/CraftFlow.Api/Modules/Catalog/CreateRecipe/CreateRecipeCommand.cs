@@ -6,5 +6,7 @@ public record CreateRecipeCommand(
     Guid ProductId,
     string Name,
     decimal TargetOutputQuantity,
-    List<RecipeIngredientDto> Ingredients
+    List<RecipeIngredientDto> Ingredients,
+    bool IsAgingRequired = false, 
+    int? DefaultMinAgingDays = null
 ) : IRequest<Result<Guid>>;
