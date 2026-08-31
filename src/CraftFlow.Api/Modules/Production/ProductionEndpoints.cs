@@ -1,9 +1,11 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Production.CompleteProductionBatch;
+using CraftFlow.Api.Modules.Production.ConsumeIngredient;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.Api.Modules.Production.GetActiveBatches;
 using CraftFlow.Api.Modules.Production.GetBatchCost;
 using CraftFlow.Api.Modules.Production.StartProductionBatch;
+using CraftFlow.SharedKernel.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,22 +15,28 @@ public static class ProductionEndpoints
 {
     public static void MapProductionEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("api/production")
+        var group = app.MapGroup("")
             .WithTags("Production");
 
-        group.MapPost("/batches/start", async (StartProductionBatchCommand command, ISender sender) =>
+        group.MapPost(Endpoints.BATCHES_START, async (StartProductionBatchCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost("/batches/complete", async (CompleteProductionBatchCommand command, ISender sender) =>
+        group.MapPost(Endpoints.BATCHES_COMPLETE, async (CompleteProductionBatchCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost("/batches/discard", async (DiscardBatchRequest request, AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapPost(Endpoints.BATCHES_CONSUME, async (ConsumeIngredientCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapPost(Endpoints.BATCHES_DISCARD, async (DiscardBatchRequest request, AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
             var batch = await dbContext.ProductionBatches
                 .FirstOrDefaultAsync(b => b.Id == request.BatchId, cancellationToken);
@@ -41,30 +49,40 @@ public static class ProductionEndpoints
             return Results.Ok();
         });
 
-        group.MapGet("/batches/active", async (ISender sender) =>
+        group.MapGet(Endpoints.BATCHES_ACTIVE, async (ISender sender) =>
         {
             var result = await sender.Send(new GetActiveBatchesQuery());
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet("/batches/ready-for-aging", async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapGet(Endpoints.BATCHES_READY_AGING, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
             var batches = await dbContext.ProductionBatches
                 .AsNoTracking()
                 .Where(b => b.Status == BatchStatus.Completed)
-                .Select(b => new { b.Id, Name = $"BATCH #{b.Id.ToString().Substring(0, 8)} (Завершена)" })
+                .Join(dbContext.Recipes,
+                      batch => batch.RecipeId,
+                      recipe => recipe.Id,
+                      (batch, recipe) => new { Batch = batch, Recipe = recipe })
+                .Where(br => br.Recipe.IsAgingRequired)
+                .Select(br => new
+                {
+                    Id = br.Batch.Id,
+                    Name = $"Партия ГП #{br.Batch.Id.ToString().Substring(0, 8)}",
+                    DefaultAgingDays = br.Recipe.DefaultMinAgingDays ?? 0
+                })
                 .ToListAsync(cancellationToken);
 
             return Results.Ok(batches);
         });
 
-        group.MapGet("/costing/{id:guid}", async (Guid id, ISender sender) =>
+        group.MapGet($"{Endpoints.PRODUCTION_COSTING}/{{id:guid}}", async (Guid id, ISender sender) =>
         {
             var result = await sender.Send(new GetBatchCostQuery(id));
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet("/calculate-requirements", async (Guid recipeId, Guid warehouseId, decimal plannedQty, AppDbContext dbContext) =>
+        group.MapGet(Endpoints.CALCULATE_REQUIREMENTS, async (Guid recipeId, Guid warehouseId, decimal plannedQty, AppDbContext dbContext) =>
         {
             var recipe = await dbContext.Recipes
                 .Include(r => r.Ingredients)
@@ -103,7 +121,7 @@ public static class ProductionEndpoints
             return Results.Ok(result);
         });
 
-        group.MapGet("/estimate-cost", async (Guid recipeId, decimal plannedQty, AppDbContext dbContext) =>
+        group.MapGet(Endpoints.ESTIMATE_COST, async (Guid recipeId, decimal plannedQty, AppDbContext dbContext) =>
         {
             var recipe = await dbContext.Recipes
                 .Include(r => r.Ingredients)
@@ -141,5 +159,4 @@ public static class ProductionEndpoints
         });
     }
 }
-
 public record DiscardBatchRequest(Guid BatchId, string Reason);

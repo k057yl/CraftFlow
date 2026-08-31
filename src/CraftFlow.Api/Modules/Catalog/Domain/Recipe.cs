@@ -28,6 +28,8 @@ public sealed class Recipe : AggregateRoot, ITenantEntity
         if (targetOutputQuantity <= 0)
             throw new ArgumentException(ErrorCodes.Catalog.RECIPE_INVALID_TARGET_OUTPUT);
 
+        if (isAgingRequired && (defaultMinAgingDays is null or <= 0))
+            throw new ArgumentException(ErrorCodes.Catalog.RECIPE_INVALID_AGING_DAYS);
         return new Recipe
         {
             Id = Guid.NewGuid(),

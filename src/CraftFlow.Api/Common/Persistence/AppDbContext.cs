@@ -1,4 +1,5 @@
 ﻿using CraftFlow.Api.Common.Audit;
+using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Catalog.Domain;
@@ -30,6 +31,7 @@ public class AppDbContext : DbContext
     public DbSet<Warehouse> Warehouses => Set<Warehouse>();
     public DbSet<StockLot> StockLots => Set<StockLot>();
     public DbSet<ProductionBatch> ProductionBatches => Set<ProductionBatch>();
+    public DbSet<ConsumedIngredient> ConsumedIngredients => Set<ConsumedIngredient>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
     public DbSet<User> Users => Set<User>();
@@ -76,7 +78,7 @@ public class AppDbContext : DbContext
                 _tenantContext.UserId,
                 e.Entity.GetType().Name,
                 e.State.ToString(),
-                $"Entity {e.Entity.GetType().Name} changed."
+                string.Format(CoreConstants.Audit.AUDIT_CHANGE_FORMAT, e.Entity.GetType().Name)
             ))
             .ToList();
 

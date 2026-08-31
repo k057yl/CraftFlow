@@ -47,8 +47,6 @@ public record TraceabilityIngredientDto(
     decimal QuantityUsed
 );
 
-// --- UI Модели и Страница ---
-
 public sealed class TraceTreeNode
 {
     public string Icon { get; set; } = string.Empty;
@@ -173,9 +171,9 @@ public partial class TraceabilityPage : Page
             {
                 var rootNode = new TraceTreeNode
                 {
-                    Icon = "🧀",
+                    Icon = FormattingConstants.ICON_FINISHED_PRODUCT,
                     Title = traceData.ProductName,
-                    Details = $"Партия ГП #{traceData.ProductBatchNumber} | Покупатель: {traceData.CustomerName}"
+                    Details = string.Format(FormattingConstants.TRACE_PRODUCT_DETAILS_FORMAT, traceData.ProductBatchNumber, traceData.CustomerName)
                 };
 
                 if (traceData.OriginBatch != null)
@@ -186,8 +184,8 @@ public partial class TraceabilityPage : Page
                     var batchNode = new TraceTreeNode
                     {
                         Icon = FormattingConstants.ICON_PRODUCTION_BATCH,
-                        Title = $"Варка #{shortBatchId}",
-                        Details = $"Статус: {traceData.OriginBatch.BatchStatus} (Дата: {traceData.OriginBatch.StartedAt:dd.MM.yyyy})"
+                        Title = string.Format(FormattingConstants.TRACE_BATCH_TITLE_FORMAT, shortBatchId),
+                        Details = string.Format(FormattingConstants.TRACE_BATCH_DETAILS_FORMAT, traceData.OriginBatch.BatchStatus, traceData.OriginBatch.StartedAt.ToString("dd.MM.yyyy"))
                     };
 
                     foreach (var ing in traceData.OriginBatch.UsedIngredients ?? [])
@@ -196,7 +194,7 @@ public partial class TraceabilityPage : Page
                         {
                             Icon = FormattingConstants.ICON_RAW_MATERIAL,
                             Title = ing.RawMaterialName,
-                            Details = $"Партия сырья #{ing.BatchNumber} (Списано: {ing.QuantityUsed:F2})"
+                            Details = string.Format(FormattingConstants.TRACE_INGREDIENT_DETAILS_FORMAT, ing.BatchNumber, ing.QuantityUsed)
                         });
                     }
 

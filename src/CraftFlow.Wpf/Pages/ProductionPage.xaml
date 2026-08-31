@@ -106,7 +106,11 @@
                         <GroupBox Header="Размещение партии в Климатической Камере" Margin="0,0,0,15" Padding="10">
                             <StackPanel>
                                 <TextBlock Text="Выбор завершённой варки (Готовой к выдержке):" Margin="0,0,0,3"/>
-                                <ComboBox x:Name="CompletedBatchesComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10"/>
+                                <ComboBox x:Name="CompletedBatchesComboBox" 
+                                      DisplayMemberPath="Name" 
+                                      SelectedValuePath="Id" 
+                                      Margin="0,0,0,10" 
+                                      SelectionChanged="CompletedBatchesComboBox_SelectionChanged"/>
 
                                 <TextBlock Text="Выбор Климатической Камеры:" Margin="0,0,0,3"/>
                                 <ComboBox x:Name="AgingChambersComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10"/>

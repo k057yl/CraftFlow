@@ -11,6 +11,8 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
         public decimal Quantity { get; private set; }
         public decimal UnitPrice { get; private set; }
         public string? BatchNumber { get; private set; }
+        public Guid? ProductionBatchId { get; private set; }
+        public DateTime CreatedDate { get; private set; }
 
         private StockLot() { }
 
@@ -29,7 +31,8 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
                 ItemId = itemId,
                 Quantity = initialQuantity,
                 UnitPrice = unitPrice,
-                BatchNumber = batchNumber
+                BatchNumber = batchNumber,
+                CreatedDate = DateTime.UtcNow
             };
         }
 
@@ -39,6 +42,11 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
                 throw new InvalidOperationException(ErrorCodes.Inventory.STOCK_LOT_NEGATIVE_QUANTITY);
 
             Quantity += delta;
+        }
+
+        public void SetProductionOrigin(Guid productionBatchId)
+        {
+            ProductionBatchId = productionBatchId;
         }
     }
 }

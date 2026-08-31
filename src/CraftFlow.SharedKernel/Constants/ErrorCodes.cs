@@ -19,6 +19,7 @@ public static class ErrorCodes
         public const string INSUFFICIENT_RAW_MATERIAL = "PRODUCTION.INSUFFICIENT_RAW_MATERIAL";
         public const string INVALID_STATUS_TRANSITION = "PRODUCTION.INVALID_STATUS_TRANSITION";
         public const string BATCH_NAME_REQUIRED = "PRODUCTION.BATCH_NAME_REQUIRED";
+        public const string CONSUMED_INGREDIENT_NEGATIVE_QUANTITY = "PRODUCTION.CONSUMED_INGREDIENT_NEGATIVE_QUANTITY";
     }
 
     public static class Inventory
@@ -35,6 +36,7 @@ public static class ErrorCodes
         public const string RECIPE_INVALID_TARGET_OUTPUT = "CATALOG.RECIPE_INVALID_TARGET_OUTPUT";
         public const string RECIPE_INVALID_INGREDIENT_QUANTITY = "CATALOG.RECIPE_INVALID_INGREDIENT_QUANTITY";
         public const string UNIT_OF_MEASURE_NOT_FOUND = "CATALOG.UNIT_OF_MEASURE_NOT_FOUND";
+        public const string RECIPE_INVALID_AGING_DAYS = "CATALOG.RECIPE_INVALID_AGING_DAYS";
     }
 
     public static class Sales

@@ -33,12 +33,14 @@ public record RequirementCalculationDto(
     );
 }
 
+public record BatchReadyForAgingDto(Guid Id, string Name, int DefaultAgingDays);
+
 public partial class ProductionPage : Page
 {
     public ObservableCollection<LookupItem> Warehouses { get; } = [];
     public ObservableCollection<LookupItem> Recipes { get; } = [];
     public ObservableCollection<LookupItem> ActiveBatches { get; } = [];
-    public ObservableCollection<LookupItem> CompletedBatches { get; } = [];
+    public ObservableCollection<BatchReadyForAgingDto> CompletedBatches { get; } = [];
     public ObservableCollection<LookupItem> AgingChambers { get; } = [];
     public ObservableCollection<LookupItem> ActiveAgingLots { get; } = [];
 
@@ -64,6 +66,21 @@ public partial class ProductionPage : Page
         Loaded += async (s, e) => await LoadDataAsync();
     }
 
+    private static bool TryParseDecimal(string text, out decimal result)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            result = 0;
+            return false;
+        }
+
+        var normalized = text.Trim().Replace('.', ',');
+        if (decimal.TryParse(normalized, out result)) return true;
+
+        normalized = text.Trim().Replace(',', '.');
+        return decimal.TryParse(normalized, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out result);
+    }
+
     private async Task LoadDataAsync()
     {
         try
@@ -80,9 +97,9 @@ public partial class ProductionPage : Page
             ActiveBatches.Clear();
             activeBatches?.ForEach(b => ActiveBatches.Add(new LookupItem(b.Id, b.Name)));
 
-            var readyBatches = await ApiService.Instance.GetAsync<List<LookupDto>>("api/production/batches/ready-for-aging");
+            var readyBatches = await ApiService.Instance.GetAsync<List<BatchReadyForAgingDto>>(Endpoints.BATCHES_READY_AGING);
             CompletedBatches.Clear();
-            readyBatches?.ForEach(b => CompletedBatches.Add(new LookupItem(b.Id, b.Name)));
+            readyBatches?.ForEach(CompletedBatches.Add);
 
             var chambers = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.AGING_CHAMBERS);
             AgingChambers.Clear();
@@ -111,13 +128,25 @@ public partial class ProductionPage : Page
         }
     }
 
+    private void CompletedBatchesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (CompletedBatchesComboBox.SelectedItem is BatchReadyForAgingDto selectedBatch)
+        {
+            MinAgingDaysTextBox.Text = selectedBatch.DefaultAgingDays.ToString();
+        }
+        else
+        {
+            MinAgingDaysTextBox.Clear();
+        }
+    }
+
     private async void BatchInputs_Changed(object sender, RoutedEventArgs e)
     {
         if (EstimatedCostTextBlock == null || RequirementsListBox == null) return;
 
         if (BatchRecipeComboBox?.SelectedValue is not Guid recipeId ||
             BatchWarehouseComboBox?.SelectedValue is not Guid warehouseId ||
-            !decimal.TryParse(BatchQuantityTextBox?.Text, out var plannedQty) || plannedQty <= 0)
+            !TryParseDecimal(BatchQuantityTextBox?.Text ?? string.Empty, out var plannedQty) || plannedQty <= 0)
         {
             _requirements.Clear();
             EstimatedCostTextBlock.Text = "$ 0.00";
@@ -147,7 +176,7 @@ public partial class ProductionPage : Page
         if (BatchRecipeComboBox.SelectedValue is not Guid recipeId ||
             BatchWarehouseComboBox.SelectedValue is not Guid rawWarehouseId ||
             DestinationWarehouseComboBox.SelectedValue is not Guid destWarehouseId ||
-            !decimal.TryParse(BatchQuantityTextBox.Text, out var plannedQuantity))
+            !TryParseDecimal(BatchQuantityTextBox.Text, out var plannedQuantity))
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
             return;
@@ -163,7 +192,7 @@ public partial class ProductionPage : Page
 
         if (isSuccess)
         {
-            SetStatus($"{UiConstants.Messages.BATCH_STARTED_SUCCESS} BATCH_ID: {contentOrError}", Brushes.Green);
+            SetStatus(UiConstants.Messages.BATCH_STARTED_SUCCESS, Brushes.Green);
             await LoadDataAsync();
         }
         else
@@ -192,11 +221,10 @@ public partial class ProductionPage : Page
         }
     }
 
-    // Сценарий А: Завершить и оприходовать сразу на Склад ГП (без выдержки)
     private async void CompleteBatch_Click(object sender, RoutedEventArgs e)
     {
         if (ActiveBatchComboBox.SelectedValue is not Guid batchId ||
-            !decimal.TryParse(ActualOutputQuantityTextBox.Text, out var actualOutput))
+            !TryParseDecimal(ActualOutputQuantityTextBox.Text, out var actualOutput) || actualOutput <= 0)
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
             return;
@@ -220,11 +248,10 @@ public partial class ProductionPage : Page
         }
     }
 
-    // Сценарий Б: Завершить варку И сразу переключить юзера на созревание
     private async void SendToAging_Click(object sender, RoutedEventArgs e)
     {
         if (ActiveBatchComboBox.SelectedValue is not Guid batchId ||
-            !decimal.TryParse(ActualOutputQuantityTextBox.Text, out var actualOutput))
+            !TryParseDecimal(ActualOutputQuantityTextBox.Text, out var actualOutput) || actualOutput <= 0)
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
             return;
@@ -238,13 +265,12 @@ public partial class ProductionPage : Page
 
         if (isSuccess)
         {
-            SetStatus("Варка завершена! Выберите камеру созревания.", Brushes.Green);
+            SetStatus(UiConstants.Messages.BATCH_COMPLETED_SUCCESS, Brushes.Green);
             ActualOutputQuantityTextBox.Clear();
 
             await LoadDataAsync();
 
             ProductionTabControl.SelectedIndex = 1;
-
             CompletedBatchesComboBox.SelectedValue = batchId;
         }
         else
@@ -278,27 +304,46 @@ public partial class ProductionPage : Page
 
     private async void ReleaseFromAging_Click(object sender, RoutedEventArgs e)
     {
-        if (ActiveAgingLotsComboBox.SelectedValue is not Guid lotId ||
-            TargetWarehousesComboBox.SelectedValue is not Guid warehouseId ||
-            !decimal.TryParse(ActualFinalQuantityTextBox.Text.Trim(), out var finalQty) ||
-            !decimal.TryParse(UnitPriceTextBox.Text.Trim(), out var unitPrice))
+        if (ActiveAgingLotsComboBox.SelectedValue is not Guid lotId)
+        {
+            SetStatus(UiConstants.Messages.SELECT_AGING_LOT, Brushes.Red);
+            return;
+        }
+
+        if (TargetWarehousesComboBox.SelectedValue is not Guid warehouseId)
+        {
+            SetStatus(UiConstants.Messages.SELECT_WAREHOUSE, Brushes.Red);
+            return;
+        }
+
+        if (!TryParseDecimal(ActualFinalQuantityTextBox.Text, out var actualQty) || actualQty <= 0)
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
             return;
         }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.ReleaseFromAgingAsync(new ReleaseFromAgingRequest(lotId, warehouseId, finalQty, unitPrice));
+        TryParseDecimal(UnitPriceTextBox.Text, out var unitPrice);
 
-        if (isSuccess)
+        try
         {
-            SetStatus(UiConstants.Messages.LOT_RELEASED_FROM_AGING_SUCCESS, Brushes.Green);
-            ActualFinalQuantityTextBox.Clear();
-            UnitPriceTextBox.Clear();
-            await LoadDataAsync();
+            var request = new ReleaseFromAgingRequest(lotId, warehouseId, actualQty, unitPrice);
+            var (isSuccess, error) = await ApiService.Instance.ReleaseFromAgingAsync(request);
+
+            if (isSuccess)
+            {
+                SetStatus(UiConstants.Messages.LOT_RELEASED_FROM_AGING_SUCCESS, Brushes.Green);
+                ActualFinalQuantityTextBox.Clear();
+                UnitPriceTextBox.Clear();
+                await LoadDataAsync();
+            }
+            else
+            {
+                SetStatus($"{UiConstants.Messages.RELEASE_ERROR}: {error}", Brushes.Red);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatus($"{UiConstants.Messages.RELEASE_ERROR}: {ex.Message}", Brushes.Red);
         }
     }
 
@@ -319,7 +364,7 @@ public partial class ProductionPage : Page
 
         if (isSuccess)
         {
-            SetStatus("Партия успешно списана в брак!", Brushes.OrangeRed);
+            SetStatus(UiConstants.Messages.BATCH_COMPLETED_SUCCESS, Brushes.OrangeRed);
             DiscardReasonTextBox.Clear();
             await LoadDataAsync();
         }

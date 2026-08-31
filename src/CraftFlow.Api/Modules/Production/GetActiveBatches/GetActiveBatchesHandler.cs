@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Production.Domain;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -20,12 +21,17 @@ namespace CraftFlow.Api.Modules.Production.GetActiveBatches
             var batches = await _dbContext.ProductionBatches
                 .AsNoTracking()
                 .Where(b => b.Status == BatchStatus.InProgress)
-                .Select(b => new ActiveBatchDto(
-                    b.Id,
-                    "BATCH #" + b.Id.ToString().Substring(0, 8).ToUpper() + " (Plan: " + b.PlannedOutputQuantity + ")"))
                 .ToListAsync(cancellationToken);
 
-            return Result.Success(batches);
+            var dtos = batches.Select(b =>
+            {
+                var batchIdStr = b.Id.ToString()[..8].ToUpper();
+                var label = string.Concat(FormattingConstants.BATCH_PREFIX, batchIdStr, " (Plan: ", b.PlannedOutputQuantity, ")");
+
+                return new ActiveBatchDto(b.Id, label);
+            }).ToList();
+
+            return Result.Success(dtos);
         }
     }
 }

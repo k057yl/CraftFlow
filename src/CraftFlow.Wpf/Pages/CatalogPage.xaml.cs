@@ -2,9 +2,9 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
+using CraftFlow.SharedKernel.Constants;
 
 namespace CraftFlow.Wpf.Pages;
 

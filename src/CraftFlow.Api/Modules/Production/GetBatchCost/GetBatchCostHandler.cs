@@ -1,4 +1,5 @@
 ﻿using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
@@ -28,7 +29,6 @@ public class GetBatchCostHandler : IRequestHandler<GetBatchCostQuery, Result<Bat
 
         var recipe = await _dbContext.Recipes
             .AsNoTracking()
-            .Include(r => r.Ingredients)
             .FirstOrDefaultAsync(r => r.Id == batch.RecipeId, cancellationToken);
 
         if (recipe == null || recipe.TargetOutputQuantity <= 0)
@@ -36,19 +36,23 @@ public class GetBatchCostHandler : IRequestHandler<GetBatchCostQuery, Result<Bat
             return Result.Failure<BatchCostDto>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
         }
 
-        var planMultiplier = batch.PlannedOutputQuantity / recipe.TargetOutputQuantity;
+        var consumedIngredients = await _dbContext.Set<ConsumedIngredient>()
+            .AsNoTracking()
+            .Where(ci => ci.ProductionBatchId == batch.Id)
+            .ToListAsync(cancellationToken);
+
         decimal totalRawMaterialCost = 0m;
 
-        foreach (var ingredient in recipe.Ingredients)
+        foreach (var consumed in consumedIngredients)
         {
-            var requiredQty = ingredient.Quantity * planMultiplier;
+            var lot = await _dbContext.StockLots
+                .AsNoTracking()
+                .FirstOrDefaultAsync(sl => sl.Id == consumed.StockLotId, cancellationToken);
 
-            var avgUnitPrice = await _dbContext.StockLots
-                .Where(s => s.ItemId == ingredient.RawMaterialId)
-                .Select(s => (decimal?)s.UnitPrice)
-                .AverageAsync(cancellationToken) ?? 0m;
-
-            totalRawMaterialCost += requiredQty * avgUnitPrice;
+            if (lot != null)
+            {
+                totalRawMaterialCost += consumed.Quantity * lot.UnitPrice;
+            }
         }
 
         var outputQuantity = batch.ActualOutputQuantity > 0
@@ -59,9 +63,11 @@ public class GetBatchCostHandler : IRequestHandler<GetBatchCostQuery, Result<Bat
             ? totalRawMaterialCost / outputQuantity
             : 0m;
 
+        var recipeName = recipe.Name ?? FormattingConstants.NOT_AVAILABLE;
+
         var dto = new BatchCostDto(
             batch.Id,
-            recipe.Name ?? "N/A",
+            recipeName,
             batch.PlannedOutputQuantity,
             batch.ActualOutputQuantity,
             totalRawMaterialCost,

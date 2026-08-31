@@ -11,10 +11,21 @@ public static class FormattingConstants
     public const string ICON_RAW_MATERIAL = "🥛";
     public const string ICON_PRODUCTION_BATCH = "🧀";
     public const string ICON_AGING_LOT = "⏳";
+    public const string ICON_FINISHED_PRODUCT = "📦";
 
     public const string TRACE_BATCH_TITLE_FORMAT = "Варка #{0}";
-    public const string TRACE_BATCH_DETAILS_FORMAT = "Статус: {0} | Запущена: {1:dd.MM.yyyy}";
+    public const string TRACE_BATCH_DETAILS_FORMAT = "Статус: {0} | Запущена: {1}";
     public const string TRACE_AGING_TITLE_FORMAT = "Камера: {0}";
     public const string TRACE_AGING_DETAILS_FORMAT = "Партия: {0} ({1})";
     public const string TRACE_RAW_DETAILS_FORMAT = "[{0}]";
+
+    public const string TRACE_PRODUCT_DETAILS_FORMAT = "Партия ГП #{0} | Покупатель: {1}";
+    public const string TRACE_INGREDIENT_DETAILS_FORMAT = "Партия сырья #{0} (Списано: {1:F2})";
+
+    public const string CONST_DEFAULT_CUSTOMER_NAME = "Без покупателя";
+    public const string CONST_DEFAULT_MATERIAL_NAME = "N/A";
+    public const string CONST_DEFAULT_CHAMBER_NAME = "Камера";
+
+    public const string BATCH_PREFIX = "BATCH-";
+    public const string NOT_AVAILABLE = "N/A";
 }

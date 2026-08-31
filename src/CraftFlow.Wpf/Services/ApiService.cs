@@ -1,9 +1,10 @@
-﻿using CraftFlow.SharedKernel.Constants;
-using CraftFlow.SharedKernel.Result;
-using CraftFlow.Wpf.Models;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using CraftFlow.Api.Common.Constants;
+using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Result;
+using CraftFlow.Wpf.Models;
 
 namespace CraftFlow.Wpf.Services;
 
@@ -19,15 +20,21 @@ public class ApiService
     {
         _client = new HttpClient
         {
-            BaseAddress = new Uri(ApiConstants.API_BASE_URL)
+            BaseAddress = new Uri(CoreConstants.ApiServiceConstants.API_BASE_URL)
         };
-        _client.DefaultRequestHeaders.Add(ApiConstants.TENANT_HEADER_KEY, ApiConstants.DEFAULT_TENANT_ID);
+        _client.DefaultRequestHeaders.Add(
+            CoreConstants.MultiTenancy.HEADER_TENANT_ID,
+            CoreConstants.MultiTenancy.DEFAULT_TENANT_ID_STRING
+        );
     }
 
     public void SetAuthToken(string token)
     {
         JwtToken = token;
-        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(ApiConstants.BEARER_SCHEME, token);
+        _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            CoreConstants.ApiServiceConstants.BEARER_SCHEME,
+            token
+        );
     }
 
     public Task<T?> GetAsync<T>(string endpoint) => _client.GetFromJsonAsync<T>(endpoint);

@@ -11,6 +11,7 @@ public static class Endpoints
     public const string BATCHES_START = "api/production/batches/start";
     public const string BATCHES_ACTIVE = "api/production/batches/active";
     public const string BATCHES_COMPLETE = "api/production/batches/complete";
+    public const string BATCHES_CONSUME = "api/production/batches/consume-ingredient";
     public const string CUSTOMERS = "api/sales/customers";
     public const string ORDERS_SHIP = "api/sales/orders/ship";
     public const string DASHBOARD = "api/analytics/dashboard";
@@ -34,4 +35,9 @@ public static class Endpoints
     public const string TRACEABILITY_FORWARD = "api/traceability/forward";
     public const string TRACEABILITY_BACKWARD = "api/traceability/backward";
     public const string MRP_REQUIREMENTS = "api/mrp/requirements";
+
+    public const string BATCHES_READY_AGING = "api/production/batches/ready-for-aging";
+    public const string BATCHES_DISCARD = "api/production/batches/discard";
+    public const string CALCULATE_REQUIREMENTS = "api/production/calculate-requirements";
+    public const string ESTIMATE_COST = "api/production/estimate-cost";
 }

@@ -1,14 +1,16 @@
-﻿namespace CraftFlow.SharedKernel.Result;
+﻿using CraftFlow.SharedKernel.Constants;
+
+namespace CraftFlow.SharedKernel.Result;
 
 public class Result
 {
     protected Result(bool isSuccess, Error error)
     {
         if (isSuccess && error != Error.None)
-            throw new InvalidOperationException(Constants.ErrorCodes.General.INVALID_TENANT);
+            throw new InvalidOperationException(ErrorCodes.General.INVALID_TENANT);
 
         if (!isSuccess && error == Error.None)
-            throw new InvalidOperationException(Constants.ErrorCodes.General.VALUE_REQUIRED);
+            throw new InvalidOperationException(ErrorCodes.General.VALUE_REQUIRED);
 
         IsSuccess = isSuccess;
         Error = error;
@@ -37,7 +39,7 @@ public class Result<TValue> : Result
 
     public TValue Value => IsSuccess
         ? _value!
-        : throw new InvalidOperationException(Constants.ErrorCodes.General.NOT_FOUND);
+        : throw new InvalidOperationException(ErrorCodes.General.VALUE_REQUIRED);
 
     public static implicit operator Result<TValue>(TValue? value) =>
         value is not null ? Success(value) : Failure<TValue>(Error.NullValue);

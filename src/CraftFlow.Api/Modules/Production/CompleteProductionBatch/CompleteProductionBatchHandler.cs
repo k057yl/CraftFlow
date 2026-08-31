@@ -29,7 +29,6 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
         }
 
         batch.Complete(request.ActualOutputQuantity);
-        await _dbContext.SaveChangesAsync(cancellationToken);
 
         await _publisher.Publish(
             new ProductionBatchCompletedEvent(
@@ -40,6 +39,8 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
             ),
             cancellationToken
         );
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success(batch.Id);
     }

@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Common.Persistence;
+﻿using CraftFlow.Api.Common.Constants;
+using CraftFlow.Api.Common.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Common.BackgroundWorkers;
@@ -7,7 +8,7 @@ public class LowStockMonitorWorker : BackgroundService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<LowStockMonitorWorker> _logger;
-    private static readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(5);
+    private static readonly TimeSpan CheckInterval = TimeSpan.FromMinutes(CoreConstants.InventoryThresholds.MONITOR_INTERVAL_MINUTES);
 
     public LowStockMonitorWorker(IServiceProvider serviceProvider, ILogger<LowStockMonitorWorker> logger)
     {
@@ -28,13 +29,13 @@ public class LowStockMonitorWorker : BackgroundService
 
                 var lowStockLots = await dbContext.StockLots
                     .IgnoreQueryFilters()
-                    .Where(s => s.Quantity < 50m)
+                    .Where(s => s.Quantity < CoreConstants.InventoryThresholds.LOW_STOCK_MIN_QUANTITY)
                     .ToListAsync(stoppingToken);
 
                 if (lowStockLots.Count > 0)
                 {
                     _logger.LogWarning(
-                        "BACKGROUND WORKER ALERT: Found {Count} stock lots with quantity below 50 units!",
+                        "BACKGROUND WORKER ALERT: Found {Count} stock lots with quantity below threshold!",
                         lowStockLots.Count
                     );
                 }
@@ -44,7 +45,7 @@ public class LowStockMonitorWorker : BackgroundService
                 _logger.LogError(ex, "Error occurred while checking low stock items.");
             }
 
-            await Task.Delay(_checkInterval, stoppingToken);
+            await Task.Delay(CheckInterval, stoppingToken);
         }
     }
 }

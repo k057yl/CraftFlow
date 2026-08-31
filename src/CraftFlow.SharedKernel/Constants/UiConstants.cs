@@ -29,6 +29,9 @@ public static class UiConstants
         public const string LOT_TRANSFERRED_TO_AGING_SUCCESS = "UI.LOT_TRANSFERRED_TO_AGING_SUCCESS";
         public const string LOT_RELEASED_FROM_AGING_SUCCESS = "UI.LOT_RELEASED_FROM_AGING_SUCCESS";
         public const string GENERAL_NOT_FOUND = "GENERAL_NOT_FOUND";
+        public const string RELEASE_ERROR = "UI.RELEASE_ERROR";
+        public const string SELECT_AGING_LOT = "UI.SELECT_AGING_LOT";
+        public const string SELECT_WAREHOUSE = "UI.SELECT_WAREHOUSE";
     }
 
     public static class Titles
