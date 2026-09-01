@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Modules.Procurement.Domain;
+﻿using CraftFlow.Api.Common.Constants;
+using CraftFlow.Api.Modules.Procurement.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,7 +9,7 @@ public sealed class PurchaseOrderConfiguration : IEntityTypeConfiguration<Purcha
 {
     public void Configure(EntityTypeBuilder<PurchaseOrder> builder)
     {
-        builder.ToTable("PurchaseOrders", "procurement");
+        builder.ToTable(DbTables.PURCHASE_ORDERS, DbSchemas.PROCUREMENT);
 
         builder.HasKey(po => po.Id);
 

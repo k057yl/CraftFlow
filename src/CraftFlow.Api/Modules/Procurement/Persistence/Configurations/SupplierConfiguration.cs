@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Modules.Procurement.Domain;
+﻿using CraftFlow.Api.Common.Constants;
+using CraftFlow.Api.Modules.Procurement.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,7 +9,7 @@ public sealed class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
 {
     public void Configure(EntityTypeBuilder<Supplier> builder)
     {
-        builder.ToTable("Suppliers", "procurement");
+        builder.ToTable(DbTables.SUPPLIERS, DbSchemas.PROCUREMENT);
 
         builder.HasKey(s => s.Id);
 

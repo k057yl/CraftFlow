@@ -40,20 +40,22 @@ public sealed class TransferToAgingCommandHandler : IRequestHandler<TransferToAg
             return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Aging.CHAMBER_NOT_FOUND));
         }
 
-        var batchNumber = string.Format(
-            FormattingConstants.BATCH_NUMBER_FORMAT,
-            DateTime.UtcNow,
-            batch.Id.ToString()[..4].ToUpperInvariant()
-        );
+        var finalLotNumber = !string.IsNullOrWhiteSpace(request.CustomBatchNumber)
+            ? request.CustomBatchNumber.Trim()
+            : (!string.IsNullOrWhiteSpace(batch.Name)
+                ? batch.Name
+                : string.Format(FormattingConstants.BATCH_NUMBER_FORMAT, DateTime.UtcNow, batch.Id.ToString()[..4].ToUpperInvariant()));
 
         var agingLot = AgingLot.Create(
             batch.Id,
             batch.TargetProductId,
             request.AgingChamberId,
-            batchNumber,
+            finalLotNumber,
             batch.ActualOutputQuantity,
             request.MinAgingDays
         );
+
+        batch.MarkAsTransferredToAging();
 
         await _dbContext.Set<AgingLot>().AddAsync(agingLot, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);

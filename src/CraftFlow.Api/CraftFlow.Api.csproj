@@ -25,4 +25,8 @@
     <ProjectReference Include="..\CraftFlow.SharedKernel\CraftFlow.SharedKernel.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

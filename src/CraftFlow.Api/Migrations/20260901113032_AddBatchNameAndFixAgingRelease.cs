@@ -1,29 +1,31 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace CraftFlow.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddDestinationWarehouseToProductionBatch : Migration
+    public partial class AddBatchNameAndFixAgingRelease : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<Guid>(
-                name: "DestinationWarehouseId",
+            migrationBuilder.AddColumn<string>(
+                name: "Name",
+                schema: "public",
                 table: "production_batches",
-                type: "uuid",
+                type: "character varying(200)",
+                maxLength: 200,
                 nullable: false,
-                defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
+                defaultValue: "");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "DestinationWarehouseId",
+                name: "Name",
+                schema: "public",
                 table: "production_batches");
         }
     }

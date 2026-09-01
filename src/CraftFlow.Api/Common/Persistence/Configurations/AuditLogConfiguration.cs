@@ -1,4 +1,5 @@
 ﻿using CraftFlow.Api.Common.Audit;
+using CraftFlow.Api.Common.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,7 +9,7 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
 {
     public void Configure(EntityTypeBuilder<AuditLog> builder)
     {
-        builder.ToTable("audit_logs");
+        builder.ToTable(DbTables.AUDIT_LOGS);
         builder.HasKey(a => a.Id);
         builder.Property(a => a.EntityName).IsRequired().HasMaxLength(100);
         builder.Property(a => a.Action).IsRequired().HasMaxLength(50);

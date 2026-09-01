@@ -40,7 +40,17 @@ public static class AgingEndpoints
             var activeLots = await dbContext.AgingLots
                 .AsNoTracking()
                 .Where(l => l.Status == AgingStatus.InChamber)
-                .Select(l => new { l.Id, Name = l.BatchNumber })
+                .Join(dbContext.ProductionBatches,
+                      lot => lot.ProductionBatchId,
+                      batch => batch.Id,
+                      (lot, batch) => new { Lot = lot, Batch = batch })
+                .Select(x => new
+                {
+                    x.Lot.Id,
+                    Name = string.IsNullOrWhiteSpace(x.Batch.Name)
+                        ? x.Lot.BatchNumber
+                        : $"{x.Batch.Name} ({x.Lot.BatchNumber})"
+                })
                 .ToListAsync(cancellationToken);
 
             return Results.Ok(activeLots);

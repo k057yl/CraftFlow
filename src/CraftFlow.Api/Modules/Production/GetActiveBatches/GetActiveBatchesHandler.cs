@@ -25,8 +25,11 @@ namespace CraftFlow.Api.Modules.Production.GetActiveBatches
 
             var dtos = batches.Select(b =>
             {
-                var batchIdStr = b.Id.ToString()[..8].ToUpper();
-                var label = string.Concat(FormattingConstants.BATCH_PREFIX, batchIdStr, " (Plan: ", b.PlannedOutputQuantity, ")");
+                var batchIdStr = b.Id.ToString()[..8].ToUpperInvariant();
+                var fallbackName = string.Concat(FormattingConstants.BATCH_PREFIX, batchIdStr);
+
+                var displayName = string.IsNullOrWhiteSpace(b.Name) ? fallbackName : b.Name;
+                var label = $"{displayName} (Plan: {b.PlannedOutputQuantity})";
 
                 return new ActiveBatchDto(b.Id, label);
             }).ToList();

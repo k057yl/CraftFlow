@@ -1,12 +1,14 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Inventory.Domain;
+using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Aging.ReleaseFromAging;
+
 public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFromAgingCommand, Result>
 {
     private readonly AppDbContext _dbContext;
@@ -28,6 +30,14 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
 
         lot.RegisterWeightLoss(request.ActualFinalQuantity);
         lot.Release();
+
+        var batch = await _dbContext.Set<ProductionBatch>()
+            .FirstOrDefaultAsync(b => b.Id == lot.ProductionBatchId, cancellationToken);
+
+        if (batch != null)
+        {
+            batch.Complete(request.ActualFinalQuantity);
+        }
 
         var stockLot = StockLot.Create(
             request.TargetWarehouseId,

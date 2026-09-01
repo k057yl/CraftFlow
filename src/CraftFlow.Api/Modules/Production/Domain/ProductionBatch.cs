@@ -6,6 +6,7 @@ namespace CraftFlow.Api.Modules.Production.Domain;
 public sealed class ProductionBatch : AggregateRoot, ITenantEntity
 {
     public Guid TenantId { get; private set; }
+    public string Name { get; private set; } = string.Empty;
     public Guid RecipeId { get; private set; }
     public Guid TargetProductId { get; private set; }
     public Guid WarehouseId { get; private set; }
@@ -25,14 +26,19 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         Guid targetProductId,
         Guid warehouseId,
         Guid destinationWarehouseId,
-        decimal plannedOutputQuantity)
+        decimal plannedOutputQuantity,
+        string? customName = null)
     {
         if (plannedOutputQuantity <= 0)
             throw new ArgumentException(ErrorCodes.Catalog.RECIPE_INVALID_TARGET_OUTPUT);
 
+        var batchId = Guid.NewGuid();
+        var defaultName = string.Concat(FormattingConstants.BATCH_PREFIX, batchId.ToString()[..8].ToUpperInvariant());
+
         return new ProductionBatch
         {
-            Id = Guid.NewGuid(),
+            Id = batchId,
+            Name = string.IsNullOrWhiteSpace(customName) ? defaultName : customName.Trim(),
             RecipeId = recipeId,
             TargetProductId = targetProductId,
             WarehouseId = warehouseId,
@@ -54,7 +60,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
 
     public void Complete(decimal actualOutputQuantity)
     {
-        if (Status != BatchStatus.InProgress)
+        if (Status != BatchStatus.InProgress && Status != BatchStatus.TransferredToAging)
             throw new InvalidOperationException(ErrorCodes.Production.INVALID_STATUS_TRANSITION);
 
         ActualOutputQuantity = actualOutputQuantity;
@@ -70,5 +76,15 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         Status = BatchStatus.Cancelled;
         DiscardReason = reason;
         CompletedAt = DateTime.UtcNow;
+    }
+
+    public void MarkAsTransferredToAging()
+    {
+        if (Status != BatchStatus.Completed)
+        {
+            throw new InvalidOperationException(ErrorCodes.Production.ONLY_COMPLETED_BATCHES_CAN_BE_TRANSFERRED_TO_AGING);
+        }
+
+        Status = BatchStatus.TransferredToAging;
     }
 }

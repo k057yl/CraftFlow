@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Modules.Aging.Domain;
+﻿using CraftFlow.Api.Common.Constants;
+using CraftFlow.Api.Modules.Aging.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,7 +9,7 @@ public sealed class AgingLotConfiguration : IEntityTypeConfiguration<AgingLot>
 {
     public void Configure(EntityTypeBuilder<AgingLot> builder)
     {
-        builder.ToTable("AgingLots", "aging");
+        builder.ToTable(DbTables.AGING_LOTS, DbSchemas.AGING);
 
         builder.HasKey(l => l.Id);
         builder.Property(l => l.BatchNumber).HasMaxLength(100).IsRequired();

@@ -81,6 +81,12 @@ public partial class ProductionPage : Page
         return decimal.TryParse(normalized, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out result);
     }
 
+    private void GenerateDefaultBatchName()
+    {
+        var shortCode = Guid.NewGuid().ToString()[..8].ToUpperInvariant();
+        BatchNameTextBox.Text = string.Concat(FormattingConstants.BATCH_PREFIX, shortCode);
+    }
+
     private async Task LoadDataAsync()
     {
         try
@@ -118,6 +124,8 @@ public partial class ProductionPage : Page
             if (DestinationWarehouseComboBox.SelectedIndex < 0 && Warehouses.Count > 0)
                 DestinationWarehouseComboBox.SelectedIndex = Warehouses.Count > 1 ? 1 : 0;
 
+            GenerateDefaultBatchName();
+
             SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
 
             BatchInputs_Changed(this, null!);
@@ -133,10 +141,12 @@ public partial class ProductionPage : Page
         if (CompletedBatchesComboBox.SelectedItem is BatchReadyForAgingDto selectedBatch)
         {
             MinAgingDaysTextBox.Text = selectedBatch.DefaultAgingDays.ToString();
+            AgingLotNameTextBox.Text = $"{selectedBatch.Name} (Выдержка)";
         }
         else
         {
             MinAgingDaysTextBox.Clear();
+            AgingLotNameTextBox.Clear();
         }
     }
 
@@ -182,17 +192,22 @@ public partial class ProductionPage : Page
             return;
         }
 
+        var customName = BatchNameTextBox.Text?.Trim();
+
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.BATCHES_START, new
         {
             RecipeId = recipeId,
             WarehouseId = rawWarehouseId,
             DestinationWarehouseId = destWarehouseId,
-            PlannedOutputQuantity = plannedQuantity
+            PlannedOutputQuantity = plannedQuantity,
+            Name = string.IsNullOrWhiteSpace(customName) ? null : customName
         });
 
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.BATCH_STARTED_SUCCESS, Brushes.Green);
+            BatchNameTextBox.Clear();
+            GenerateDefaultBatchName();
             await LoadDataAsync();
         }
         else
@@ -289,11 +304,16 @@ public partial class ProductionPage : Page
             return;
         }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.TransferToAgingAsync(new TransferToAgingRequest(batchId, chamberId, minDays));
+        var customLotName = AgingLotNameTextBox.Text?.Trim();
+
+        var (isSuccess, contentOrError) = await ApiService.Instance.TransferToAgingAsync(
+            new TransferToAgingRequest(batchId, chamberId, minDays, string.IsNullOrWhiteSpace(customLotName) ? null : customLotName)
+        );
 
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.LOT_TRANSFERRED_TO_AGING_SUCCESS, Brushes.Green);
+            AgingLotNameTextBox.Clear();
             await LoadDataAsync();
         }
         else

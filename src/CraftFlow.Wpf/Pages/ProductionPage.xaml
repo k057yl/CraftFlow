@@ -21,6 +21,9 @@
                         <!-- 1. Запуск варки -->
                         <GroupBox Header="1. Запуск Варочного Процесса" Margin="0,0,0,15" Padding="10">
                             <StackPanel>
+                                <TextBlock Text="Наименование / Код партии (Опционально):" Margin="0,0,0,3"/>
+                                <TextBox x:Name="BatchNameTextBox" Margin="0,0,0,10" Padding="3"/>
+
                                 <TextBlock Text="Выберите Рецептуру:" Margin="0,0,0,3"/>
                                 <ComboBox x:Name="BatchRecipeComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10" SelectionChanged="BatchInputs_Changed"/>
 
@@ -107,10 +110,13 @@
                             <StackPanel>
                                 <TextBlock Text="Выбор завершённой варки (Готовой к выдержке):" Margin="0,0,0,3"/>
                                 <ComboBox x:Name="CompletedBatchesComboBox" 
-                                      DisplayMemberPath="Name" 
-                                      SelectedValuePath="Id" 
-                                      Margin="0,0,0,10" 
-                                      SelectionChanged="CompletedBatchesComboBox_SelectionChanged"/>
+                              DisplayMemberPath="Name" 
+                              SelectedValuePath="Id" 
+                              Margin="0,0,0,10" 
+                              SelectionChanged="CompletedBatchesComboBox_SelectionChanged"/>
+
+                                <TextBlock Text="Маркировка / Наименование лота на созревании:" Margin="0,0,0,3"/>
+                                <TextBox x:Name="AgingLotNameTextBox" Margin="0,0,0,10" Padding="3"/>
 
                                 <TextBlock Text="Выбор Климатической Камеры:" Margin="0,0,0,3"/>
                                 <ComboBox x:Name="AgingChambersComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10"/>

@@ -61,7 +61,8 @@ namespace CraftFlow.Api.Modules.Production.StartProductionBatch
                 recipe.ProductId,
                 request.WarehouseId,
                 destinationWarehouse,
-                request.PlannedOutputQuantity
+                request.PlannedOutputQuantity,
+                request.Name
             );
 
             batch.Start();

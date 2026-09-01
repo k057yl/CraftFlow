@@ -17,6 +17,7 @@ namespace CraftFlow.Api.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
+                .HasDefaultSchema("public")
                 .HasAnnotation("ProductVersion", "10.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
@@ -53,7 +54,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("audit_logs", (string)null);
+                    b.ToTable("audit_logs", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Aging.Domain.AgingChamber", b =>
@@ -80,7 +81,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AgingChambers", "aging");
+                    b.ToTable("aging_chambers", "aging");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Aging.Domain.AgingLot", b =>
@@ -128,7 +129,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AgingLots", "aging");
+                    b.ToTable("aging_lots", "aging");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.Product", b =>
@@ -153,7 +154,7 @@ namespace CraftFlow.Api.Migrations
                     b.HasIndex("TenantId", "Id")
                         .IsUnique();
 
-                    b.ToTable("products", (string)null);
+                    b.ToTable("products", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.RawMaterial", b =>
@@ -174,7 +175,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RawMaterials");
+                    b.ToTable("raw_materials", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.Recipe", b =>
@@ -208,7 +209,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasIndex("TenantId", "ProductId");
 
-                    b.ToTable("recipes", (string)null);
+                    b.ToTable("recipes", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.RecipeIngredient", b =>
@@ -230,7 +231,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("RecipeIngredients");
+                    b.ToTable("recipe_ingredients", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.UnitOfMeasure", b =>
@@ -252,7 +253,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("UnitsOfMeasure");
+                    b.ToTable("units_of_measure", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Identity.Domain.User", b =>
@@ -283,7 +284,7 @@ namespace CraftFlow.Api.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("users", (string)null);
+                    b.ToTable("users", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Inventory.Domain.StockLot", b =>
@@ -320,7 +321,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("stock_lots", (string)null);
+                    b.ToTable("stock_lots", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Inventory.Domain.Warehouse", b =>
@@ -343,7 +344,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("warehouses", (string)null);
+                    b.ToTable("warehouses", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Procurement.Domain.PurchaseOrder", b =>
@@ -373,7 +374,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PurchaseOrders", "procurement");
+                    b.ToTable("purchase_orders", "procurement");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Procurement.Domain.PurchaseOrderItem", b =>
@@ -400,7 +401,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasIndex("PurchaseOrderId");
 
-                    b.ToTable("PurchaseOrderItems", "procurement");
+                    b.ToTable("purchase_order_items", "procurement");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Procurement.Domain.Supplier", b =>
@@ -427,7 +428,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Suppliers", "procurement");
+                    b.ToTable("suppliers", "procurement");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Production.Domain.ConsumedIngredient", b =>
@@ -453,7 +454,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ConsumedIngredients");
+                    b.ToTable("consumed_ingredients", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Production.Domain.ProductionBatch", b =>
@@ -474,6 +475,11 @@ namespace CraftFlow.Api.Migrations
 
                     b.Property<string>("DiscardReason")
                         .HasColumnType("text");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<decimal>("PlannedOutputQuantity")
                         .HasPrecision(18, 4)
@@ -499,7 +505,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("production_batches", (string)null);
+                    b.ToTable("production_batches", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Sales.Domain.Customer", b =>
@@ -521,7 +527,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("customers", (string)null);
+                    b.ToTable("customers", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Sales.Domain.SalesOrder", b =>
@@ -548,7 +554,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("sales_orders", (string)null);
+                    b.ToTable("sales_orders", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Sales.Domain.SalesOrderItem", b =>
@@ -573,7 +579,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasIndex("SalesOrderId");
 
-                    b.ToTable("SalesOrderItem");
+                    b.ToTable("sales_order_items", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.Recipe", b =>

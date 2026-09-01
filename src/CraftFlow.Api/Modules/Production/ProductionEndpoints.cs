@@ -68,7 +68,9 @@ public static class ProductionEndpoints
                 .Select(br => new
                 {
                     Id = br.Batch.Id,
-                    Name = $"Партия ГП #{br.Batch.Id.ToString().Substring(0, 8)}",
+                    Name = string.IsNullOrWhiteSpace(br.Batch.Name)
+                        ? $"Партия ГП #{br.Batch.Id.ToString().Substring(0, 8)}"
+                        : br.Batch.Name,
                     DefaultAgingDays = br.Recipe.DefaultMinAgingDays ?? 0
                 })
                 .ToListAsync(cancellationToken);
