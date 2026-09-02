@@ -15,7 +15,7 @@ public sealed class AgingLotConfiguration : IEntityTypeConfiguration<AgingLot>
         builder.Property(l => l.BatchNumber).HasMaxLength(100).IsRequired();
         builder.Property(l => l.InitialQuantity).HasPrecision(18, 4);
         builder.Property(l => l.CurrentQuantity).HasPrecision(18, 4);
-        builder.Property(l => l.Status).HasConversion<int>();
+        builder.Property(l => l.State).HasConversion<int>();
 
         builder.HasQueryFilter(l => l.TenantId != Guid.Empty);
     }

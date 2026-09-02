@@ -1,12 +1,11 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Inventory.Domain;
 using CraftFlow.Api.Modules.Production.Domain;
-using CraftFlow.Api.Modules.Production.Events;
 using CraftFlow.SharedKernel.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace CraftFlow.Api.Modules.Production.CompleteProductionBatch;
+namespace CraftFlow.Api.Modules.Production.Events;
 
 public class ProductionBatchCompletedEventHandler : INotificationHandler<ProductionBatchCompletedEvent>
 {

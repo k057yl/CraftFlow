@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Common.Persistence;
+﻿using CraftFlow.Api.Common.MultiTenancy;
+using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Inventory.Domain;
 using CraftFlow.Api.Modules.Production.Domain;
@@ -12,10 +13,12 @@ namespace CraftFlow.Api.Modules.Aging.ReleaseFromAging;
 public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFromAgingCommand, Result>
 {
     private readonly AppDbContext _dbContext;
+    private readonly ITenantContext _tenantContext;
 
-    public ReleaseFromAgingCommandHandler(AppDbContext dbContext)
+    public ReleaseFromAgingCommandHandler(AppDbContext dbContext, ITenantContext tenantContext)
     {
         _dbContext = dbContext;
+        _tenantContext = tenantContext;
     }
 
     public async Task<Result> Handle(ReleaseFromAgingCommand request, CancellationToken cancellationToken)
@@ -36,15 +39,16 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
 
         if (batch != null)
         {
-            batch.Complete(request.ActualFinalQuantity);
+            batch.ReleaseFromAging(request.ActualFinalQuantity);
         }
 
         var stockLot = StockLot.Create(
-            request.TargetWarehouseId,
-            lot.ProductId,
-            lot.CurrentQuantity,
-            request.UnitPrice,
-            lot.BatchNumber
+            warehouseId: request.TargetWarehouseId,
+            itemId: lot.ProductId,
+            initialQuantity: lot.CurrentQuantity,
+            unitPrice: request.UnitPrice,
+            batchNumber: lot.BatchNumber,
+            tenantId: _tenantContext.TenantId
         );
 
         await _dbContext.Set<StockLot>().AddAsync(stockLot, cancellationToken);

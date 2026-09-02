@@ -27,11 +27,6 @@ public sealed class TransferToAgingCommandHandler : IRequestHandler<TransferToAg
             return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Production.BATCH_NOT_FOUND));
         }
 
-        if (batch.Status != BatchStatus.Completed)
-        {
-            return Result.Failure<Guid>(Error.Validation(ErrorCodes.Production.INVALID_STATUS_TRANSITION));
-        }
-
         var chamberExists = await _dbContext.Set<AgingChamber>()
             .AnyAsync(c => c.Id == request.AgingChamberId, cancellationToken);
 
@@ -46,12 +41,16 @@ public sealed class TransferToAgingCommandHandler : IRequestHandler<TransferToAg
                 ? batch.Name
                 : string.Format(FormattingConstants.BATCH_NUMBER_FORMAT, DateTime.UtcNow, batch.Id.ToString()[..4].ToUpperInvariant()));
 
+        var initialQuantity = batch.ActualOutputQuantity > 0
+            ? batch.ActualOutputQuantity
+            : batch.PlannedOutputQuantity;
+
         var agingLot = AgingLot.Create(
             batch.Id,
             batch.TargetProductId,
             request.AgingChamberId,
             finalLotNumber,
-            batch.ActualOutputQuantity,
+            initialQuantity,
             request.MinAgingDays
         );
 

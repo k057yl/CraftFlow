@@ -20,7 +20,7 @@ namespace CraftFlow.Api.Modules.Production.GetActiveBatches
         {
             var batches = await _dbContext.ProductionBatches
                 .AsNoTracking()
-                .Where(b => b.Status == BatchStatus.InProgress)
+                .Where(b => b.Status == BatchState.InProgress)
                 .ToListAsync(cancellationToken);
 
             var dtos = batches.Select(b =>

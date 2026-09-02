@@ -40,4 +40,5 @@ public static class Endpoints
     public const string BATCHES_DISCARD = "api/production/batches/discard";
     public const string CALCULATE_REQUIREMENTS = "api/production/calculate-requirements";
     public const string ESTIMATE_COST = "api/production/estimate-cost";
+    public const string CALCULATE_MAX_OUTPUT = "api/production/calculate-max-output";
 }

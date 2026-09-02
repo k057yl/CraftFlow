@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Production.CompleteProductionBatch;
 using CraftFlow.Api.Modules.Production.ConsumeIngredient;
+using CraftFlow.Api.Modules.Production.DiscardBatch;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.Api.Modules.Production.GetActiveBatches;
 using CraftFlow.Api.Modules.Production.GetBatchCost;
@@ -36,17 +37,10 @@ public static class ProductionEndpoints
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost(Endpoints.BATCHES_DISCARD, async (DiscardBatchRequest request, AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapPost(Endpoints.BATCHES_DISCARD, async (DiscardBatchCommand command, ISender sender) =>
         {
-            var batch = await dbContext.ProductionBatches
-                .FirstOrDefaultAsync(b => b.Id == request.BatchId, cancellationToken);
-
-            if (batch is null) return Results.NotFound();
-
-            batch.Discard(request.Reason);
-            await dbContext.SaveChangesAsync(cancellationToken);
-
-            return Results.Ok();
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
 
         group.MapGet(Endpoints.BATCHES_ACTIVE, async (ISender sender) =>
@@ -57,9 +51,15 @@ public static class ProductionEndpoints
 
         group.MapGet(Endpoints.BATCHES_READY_AGING, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
+            var existingAgingBatchIds = await dbContext.AgingLots
+                .AsNoTracking()
+                .Select(l => l.ProductionBatchId)
+                .ToListAsync(cancellationToken);
+
             var batches = await dbContext.ProductionBatches
                 .AsNoTracking()
-                .Where(b => b.Status == BatchStatus.Completed)
+                .Where(b => (b.Status == BatchState.Completed || b.Status == BatchState.ReadyForAging)
+                         && !existingAgingBatchIds.Contains(b.Id))
                 .Join(dbContext.Recipes,
                       batch => batch.RecipeId,
                       recipe => recipe.Id,
@@ -69,8 +69,8 @@ public static class ProductionEndpoints
                 {
                     Id = br.Batch.Id,
                     Name = string.IsNullOrWhiteSpace(br.Batch.Name)
-                        ? $"Партия ГП #{br.Batch.Id.ToString().Substring(0, 8)}"
-                        : br.Batch.Name,
+                        ? $"Партия #{br.Batch.Id.ToString().Substring(0, 8)} (Выход: {(br.Batch.ActualOutputQuantity > 0 ? br.Batch.ActualOutputQuantity : br.Batch.PlannedOutputQuantity)} кг)"
+                        : $"{br.Batch.Name} (Выход: {(br.Batch.ActualOutputQuantity > 0 ? br.Batch.ActualOutputQuantity : br.Batch.PlannedOutputQuantity)} кг)",
                     DefaultAgingDays = br.Recipe.DefaultMinAgingDays ?? 0
                 })
                 .ToListAsync(cancellationToken);
@@ -103,20 +103,22 @@ public static class ProductionEndpoints
 
             foreach (var ingredient in recipe.Ingredients)
             {
-                var requiredQty = ingredient.Quantity * multiplier;
+                var requiredQty = Math.Round(ingredient.Quantity * multiplier, 3);
 
                 var availableQty = await dbContext.StockLots
-                    .Where(s => s.WarehouseId == warehouseId && s.ItemId == ingredient.RawMaterialId)
+                    .Where(s => s.WarehouseId == warehouseId && s.ItemId == ingredient.RawMaterialId && s.Quantity > 0)
                     .SumAsync(s => s.Quantity);
 
                 var matName = rawMaterials.TryGetValue(ingredient.RawMaterialId, out var name) ? name : "Сырье";
+                var roundedAvailable = Math.Round(availableQty, 3);
+                var isSufficient = (roundedAvailable + 0.001m) >= requiredQty;
 
                 result.Add(new
                 {
                     MaterialName = matName,
                     RequiredQty = requiredQty,
-                    AvailableQty = availableQty,
-                    IsSufficient = availableQty >= requiredQty
+                    AvailableQty = roundedAvailable,
+                    IsSufficient = isSufficient
                 });
             }
 
@@ -159,6 +161,45 @@ public static class ProductionEndpoints
 
             return Results.Ok(totalEstimatedCost);
         });
+
+        group.MapGet(Endpoints.CALCULATE_MAX_OUTPUT, async (Guid recipeId, Guid warehouseId, AppDbContext dbContext) =>
+        {
+            var recipe = await dbContext.Recipes
+                .Include(r => r.Ingredients)
+                .FirstOrDefaultAsync(r => r.Id == recipeId);
+
+            if (recipe == null || recipe.TargetOutputQuantity <= 0 || !recipe.Ingredients.Any())
+                return Results.Ok(0m);
+
+            decimal maxPossibleMultiplier = decimal.MaxValue;
+
+            foreach (var ingredient in recipe.Ingredients)
+            {
+                if (ingredient.Quantity <= 0) continue;
+
+                var availableStock = await dbContext.StockLots
+                    .Where(s => s.WarehouseId == warehouseId && s.ItemId == ingredient.RawMaterialId && s.Quantity > 0)
+                    .SumAsync(s => s.Quantity);
+
+                if (availableStock <= 0)
+                {
+                    return Results.Ok(0m);
+                }
+
+                var ingredientLimitMultiplier = availableStock / ingredient.Quantity;
+
+                if (ingredientLimitMultiplier < maxPossibleMultiplier)
+                {
+                    maxPossibleMultiplier = ingredientLimitMultiplier;
+                }
+            }
+
+            if (maxPossibleMultiplier == decimal.MaxValue || maxPossibleMultiplier <= 0)
+                return Results.Ok(0m);
+
+            var maxPlannedOutput = Math.Floor(recipe.TargetOutputQuantity * maxPossibleMultiplier * 100m) / 100m;
+
+            return Results.Ok(maxPlannedOutput);
+        });
     }
 }
-public record DiscardBatchRequest(Guid BatchId, string Reason);

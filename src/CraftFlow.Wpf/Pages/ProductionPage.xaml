@@ -11,174 +11,284 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Управление Производством и Выдержкой" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+        <TextBlock Text="{loc:Loc Key=PRODUCTION_HEADER}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
 
         <TabControl Grid.Row="1" x:Name="ProductionTabControl">
-            <!-- Вкладка 1: Варочный цех -->
-            <TabItem Header="1. Варочный цех">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="15">
-                    <StackPanel>
-                        <!-- 1. Запуск варки -->
-                        <GroupBox Header="1. Запуск Варочного Процесса" Margin="0,0,0,15" Padding="10">
-                            <StackPanel>
-                                <TextBlock Text="Наименование / Код партии (Опционально):" Margin="0,0,0,3"/>
-                                <TextBox x:Name="BatchNameTextBox" Margin="0,0,0,10" Padding="3"/>
 
-                                <TextBlock Text="Выберите Рецептуру:" Margin="0,0,0,3"/>
-                                <ComboBox x:Name="BatchRecipeComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10" SelectionChanged="BatchInputs_Changed"/>
+            <!-- Вкладка 1: Варочный цех -->
+            <TabItem Header="{loc:Loc Key=TAB_BREWHOUSE}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
+                    <!-- Максимальная ширина контейнера, чтобы поля не размазывались -->
+                    <StackPanel MaxWidth="920" HorizontalAlignment="Left" Width="920">
+
+                        <!-- 1. Запуск варки -->
+                        <GroupBox Header="{loc:Loc Key=GROUP_START_BATCH}" Margin="0,0,0,12" Padding="12">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="3*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_BATCH_CODE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBox x:Name="BatchNameTextBox" Padding="5,4"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_SELECT_RECIPE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <ComboBox x:Name="BatchRecipeComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4" SelectionChanged="BatchInputs_Changed"/>
+                                    </StackPanel>
+                                </Grid>
 
                                 <Grid Margin="0,0,0,10">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                                        <TextBlock Text="Склад списания сырья:" Margin="0,0,0,3"/>
-                                        <ComboBox x:Name="BatchWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="BatchInputs_Changed"/>
+
+                                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_RAW_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <ComboBox x:Name="BatchWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4" SelectionChanged="BatchInputs_Changed"/>
                                     </StackPanel>
-                                    <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                                        <TextBlock Text="Склад зачисления продукции (для сыров без выдержки):" Margin="0,0,0,3"/>
-                                        <ComboBox x:Name="DestinationWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id"/>
+
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_DEST_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <ComboBox x:Name="DestinationWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
                                     </StackPanel>
                                 </Grid>
 
-                                <TextBlock Text="Планируемый объём выхода (кг/л):" Margin="0,0,0,3"/>
-                                <TextBox x:Name="BatchQuantityTextBox" Text="10" Margin="0,0,0,10" TextChanged="BatchInputs_Changed" Padding="3"/>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_PLANNED_OUTPUT}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBox x:Name="BatchQuantityTextBox" Text="10" TextChanged="BatchInputs_Changed" Padding="5,4"/>
+                                    </StackPanel>
+                                    <Button Grid.Column="1" 
+                                            Content="{loc:Loc Key=BTN_CALC_MAX}" 
+                                            Click="CalculateMaxQuantity_Click" 
+                                            Margin="10,18,0,0" 
+                                            Padding="12,4" 
+                                            Height="28"
+                                            Background="#0284C7" 
+                                            Foreground="White" 
+                                            FontWeight="SemiBold"/>
+                                </Grid>
 
                                 <!-- Интерактивный калькулятор сырья -->
-                                <GroupBox Header="Расчётная потребность и остатки сырья на складе" Margin="0,5,0,10" Padding="8" Background="#F8FAFC">
+                                <GroupBox Header="{loc:Loc Key=GROUP_RAW_REQUIREMENTS}" Margin="0,5,0,10" Padding="8" Background="#F8FAFC">
                                     <StackPanel>
-                                        <ListBox x:Name="RequirementsListBox" Height="80" DisplayMemberPath="DisplayInfo" BorderThickness="0" Background="Transparent"/>
-                                        <StackPanel Orientation="Horizontal" Margin="0,5,0,0">
-                                            <TextBlock Text="Предварительная себестоимость сырья:" Foreground="Gray" Margin="0,0,5,0"/>
-                                            <TextBlock x:Name="EstimatedCostTextBlock" Text="$ 0.00" FontWeight="Bold" Foreground="Green"/>
-                                        </StackPanel>
+                                        <ListBox x:Name="RequirementsListBox" Height="90" DisplayMemberPath="DisplayInfo" BorderThickness="0" Background="Transparent"/>
+                                        <Grid Margin="0,5,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="{loc:Loc Key=LABEL_ESTIMATED_COST}" Foreground="Gray" Margin="0,0,5,0"/>
+                                                <TextBlock x:Name="EstimatedCostTextBlock" Text="$ 0.00" FontWeight="Bold" Foreground="Green"/>
+                                            </StackPanel>
+                                            <Button Grid.Column="1" 
+                                                    Content="{loc:Loc Key=BTN_PRINT_CARD}" 
+                                                    Click="PrintRecipeCard_Click" 
+                                                    Padding="10,4" 
+                                                    Background="#475569" 
+                                                    Foreground="White"/>
+                                        </Grid>
                                     </StackPanel>
                                 </GroupBox>
 
-                                <Button Content="Запустить Варку" Click="StartBatch_Click" Height="30" FontWeight="Bold"/>
+                                <Button Content="{loc:Loc Key=BTN_START_BATCH}" 
+                                        Click="StartBatch_Click" 
+                                        Height="32" 
+                                        Width="180" 
+                                        HorizontalAlignment="Left" 
+                                        FontWeight="Bold"/>
                             </StackPanel>
                         </GroupBox>
 
-                        <!-- 2. Завершение варки -->
-                        <GroupBox Header="2. Завершение Варочного Процесса" Margin="0,0,0,15" Padding="10">
-                            <StackPanel>
-                                <TextBlock Text="Выберите активную варку (В процессе):" Margin="0,0,0,3"/>
-                                <ComboBox x:Name="ActiveBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10" SelectionChanged="ActiveBatchComboBox_SelectionChanged"/>
+                        <!-- 2. Завершение варки и Анализ -->
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="3*"/>
+                                <ColumnDefinition Width="2*"/>
+                            </Grid.ColumnDefinitions>
 
-                                <TextBlock Text="Фактический выход сырной массы / зерна (кг):" Margin="0,0,0,3"/>
-                                <TextBox x:Name="ActualOutputQuantityTextBox" Margin="0,0,0,10" Padding="3"/>
+                            <!-- Завершение -->
+                            <GroupBox Grid.Column="0" Header="{loc:Loc Key=GROUP_COMPLETE_BATCH}" Margin="0,0,10,0" Padding="10">
+                                <StackPanel>
+                                    <TextBlock Text="{loc:Loc Key=LABEL_ACTIVE_BATCH}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <ComboBox x:Name="ActiveBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,8" Padding="5,4" SelectionChanged="ActiveBatchComboBox_SelectionChanged"/>
 
-                                <!-- Сценарии завершения -->
-                                <StackPanel Orientation="Horizontal">
-                                    <!-- Сценарий А: Прямой выпуск на склад (без выдержки) -->
-                                    <Button x:Name="CompleteBatchButton" Content="Завершить и оприходовать на Склад ГП" Click="CompleteBatch_Click" Height="32" Padding="15,0" Margin="0,0,10,0"/>
+                                    <TextBlock Text="{loc:Loc Key=LABEL_ACTUAL_OUTPUT}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <TextBox x:Name="ActualOutputQuantityTextBox" Margin="0,0,0,12" Padding="5,4"/>
 
-                                    <!-- Сценарий Б: Выдержка (Перевод варки в Completed + переход на Таб 2) -->
-                                    <Button x:Name="SendToAgingButton" Content="Завершить варку и перенести в Камеру ➔" Click="SendToAging_Click" Height="32" Padding="15,0" Background="#0284C7" Foreground="White" FontWeight="Bold"/>
+                                    <Button x:Name="CompleteBatchButton" 
+                                            Content="{loc:Loc Key=BTN_COMPLETE_BATCH}" 
+                                            Click="CompleteBatch_Click" 
+                                            Height="32" 
+                                            HorizontalAlignment="Left"
+                                            Padding="15,0"
+                                            Background="#0284C7" 
+                                            Foreground="White" 
+                                            FontWeight="Bold"/>
                                 </StackPanel>
-                            </StackPanel>
-                        </GroupBox>
+                            </GroupBox>
 
-                        <!-- 3. Анализ себестоимости -->
-                        <GroupBox Header="3. Анализ Себестоимости Выбранной Партии" Padding="10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <StackPanel Grid.Column="0">
-                                    <TextBlock Text="Общая стоимость сырья:" FontSize="11" Foreground="Gray"/>
-                                    <TextBlock x:Name="TotalCostTextBlock" Text="$ 0.00" FontSize="18" FontWeight="Bold" Foreground="Green"/>
-                                </StackPanel>
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock Text="Себестоимость единицы:" FontSize="11" Foreground="Gray"/>
+                            <!-- Себестоимость -->
+                            <GroupBox Grid.Column="1" Header="{loc:Loc Key=GROUP_COST_ANALYSIS}" Padding="10">
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{loc:Loc Key=LABEL_TOTAL_RAW_COST}" FontSize="11" Foreground="Gray"/>
+                                    <TextBlock x:Name="TotalCostTextBlock" Text="$ 0.00" FontSize="18" FontWeight="Bold" Foreground="Green" Margin="0,0,0,10"/>
+
+                                    <TextBlock Text="{loc:Loc Key=LABEL_UNIT_COST}" FontSize="11" Foreground="Gray"/>
                                     <TextBlock x:Name="UnitCostTextBlock" Text="$ 0.00" FontSize="18" FontWeight="Bold" Foreground="Blue"/>
                                 </StackPanel>
-                            </Grid>
-                        </GroupBox>
+                            </GroupBox>
+                        </Grid>
+
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
             <!-- Вкладка 2: Созревание и Аффинаж -->
-            <TabItem Header="2. Созревание и Аффинаж">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="15">
-                    <StackPanel>
-                        <!-- Перемещение в камеру -->
-                        <GroupBox Header="Размещение партии в Климатической Камере" Margin="0,0,0,15" Padding="10">
+            <TabItem Header="{loc:Loc Key=TAB_AGING}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
+                    <StackPanel MaxWidth="920" HorizontalAlignment="Left" Width="920">
+
+                        <!-- Размещение в камере -->
+                        <GroupBox Header="{loc:Loc Key=GROUP_TRANSFER_AGING}" Margin="0,0,0,12" Padding="10">
                             <StackPanel>
-                                <TextBlock Text="Выбор завершённой варки (Готовой к выдержке):" Margin="0,0,0,3"/>
-                                <ComboBox x:Name="CompletedBatchesComboBox" 
-                              DisplayMemberPath="Name" 
-                              SelectedValuePath="Id" 
-                              Margin="0,0,0,10" 
-                              SelectionChanged="CompletedBatchesComboBox_SelectionChanged"/>
-
-                                <TextBlock Text="Маркировка / Наименование лота на созревании:" Margin="0,0,0,3"/>
-                                <TextBox x:Name="AgingLotNameTextBox" Margin="0,0,0,10" Padding="3"/>
-
-                                <TextBlock Text="Выбор Климатической Камеры:" Margin="0,0,0,3"/>
-                                <ComboBox x:Name="AgingChambersComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10"/>
-
-                                <TextBlock Text="Минимальный срок выдержки (дней):" Margin="0,0,0,3"/>
-                                <TextBox x:Name="MinAgingDaysTextBox" Text="30" Margin="0,0,0,15" Padding="3"/>
-
-                                <Button Content="Разместить в Камере Созревания" Click="TransferToAging_Click" Height="32" Background="#059669" Foreground="White" FontWeight="Bold"/>
-                            </StackPanel>
-                        </GroupBox>
-
-                        <!-- Снятие с выдержки -->
-                        <GroupBox Header="Снятие с выдержки (Фасовка / Передача на Склад ГП)" Padding="10">
-                            <StackPanel>
-                                <TextBlock Text="Выберите партию на выдержке (В камере):" Margin="0,0,0,3"/>
-                                <ComboBox x:Name="ActiveAgingLotsComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10"/>
-
-                                <TextBlock Text="Склад зачисления готового сыра:" Margin="0,0,0,3"/>
-                                <ComboBox x:Name="TargetWarehousesComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10"/>
-
-                                <Grid Margin="0,0,0,10">
+                                <Grid Margin="0,0,0,8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                                        <TextBlock Text="Фактический вес после усушки (кг):" Margin="0,0,0,3"/>
-                                        <TextBox x:Name="ActualFinalQuantityTextBox" Padding="3"/>
+
+                                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_COMPLETED_BATCH}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <ComboBox x:Name="CompletedBatchesComboBox" 
+                                                  DisplayMemberPath="Name" 
+                                                  SelectedValuePath="Id" 
+                                                  Padding="5,4" 
+                                                  SelectionChanged="CompletedBatchesComboBox_SelectionChanged"/>
                                     </StackPanel>
-                                    <StackPanel Grid.Column="1" Margin="5,0,0,0">
-                                        <TextBlock Text="Отпускная цена за ед.:" Margin="0,0,0,3"/>
-                                        <TextBox x:Name="UnitPriceTextBox" Padding="3"/>
+
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_AGING_LOT_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBox x:Name="AgingLotNameTextBox" Padding="5,4"/>
                                     </StackPanel>
                                 </Grid>
 
-                                <Button Content="Выпустить в Продажу на Склад" Click="ReleaseFromAging_Click" Height="32" FontWeight="Bold"/>
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="1*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_AGING_CHAMBER}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <ComboBox x:Name="AgingChambersComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_MIN_AGING_DAYS}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBox x:Name="MinAgingDaysTextBox" Text="30" Padding="5,4"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Button Content="{loc:Loc Key=BTN_TRANSFER_AGING}" 
+                                        Click="TransferToAging_Click" 
+                                        Height="32" 
+                                        HorizontalAlignment="Left"
+                                        Padding="15,0"
+                                        Background="#059669" 
+                                        Foreground="White" 
+                                        FontWeight="Bold"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                        <!-- Снятие с выдержки -->
+                        <GroupBox Header="{loc:Loc Key=GROUP_RELEASE_AGING}" Padding="10">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_ACTIVE_AGING_LOT}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <ComboBox x:Name="ActiveAgingLotsComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_TARGET_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <ComboBox x:Name="TargetWarehousesComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_FINAL_WEIGHT}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBox x:Name="ActualFinalQuantityTextBox" Padding="5,4"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_UNIT_PRICE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBox x:Name="UnitPriceTextBox" Padding="5,4"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Button Content="{loc:Loc Key=BTN_RELEASE_AGING}" 
+                                        Click="ReleaseFromAging_Click" 
+                                        Height="32" 
+                                        HorizontalAlignment="Left"
+                                        Padding="15,0"
+                                        FontWeight="Bold"/>
+                            </StackPanel>
+                        </GroupBox>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Вкладка 3: Брак и Списание -->
+            <TabItem Header="{loc:Loc Key=TAB_DISCARD}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
+                    <StackPanel MaxWidth="600" HorizontalAlignment="Left" Width="600">
+                        <GroupBox Header="{loc:Loc Key=GROUP_DISCARD}" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="{loc:Loc Key=LABEL_DISCARD_BATCH}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                <ComboBox x:Name="DiscardBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10" Padding="5,4"/>
+
+                                <TextBlock Text="{loc:Loc Key=LABEL_DISCARD_REASON}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                <TextBox x:Name="DiscardReasonTextBox" Text="Закисание партии при формовании" Margin="0,0,0,15" Padding="5,4"/>
+
+                                <Button Content="{loc:Loc Key=BTN_DISCARD_BATCH}" 
+                                        Click="DiscardBatch_Click" 
+                                        Height="35" 
+                                        HorizontalAlignment="Left"
+                                        Padding="15,0"
+                                        Background="#DC2626" 
+                                        Foreground="White" 
+                                        FontWeight="Bold"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
 
-            <!-- Вкладка 3: Брак и Списание -->
-            <TabItem Header="3. Брак и Списание">
-                <Grid Margin="15">
-                    <StackPanel>
-                        <GroupBox Header="Регистрация брака и утилизация партии" Padding="10">
-                            <StackPanel>
-                                <TextBlock Text="Выберите бракованную варку / партию:" Margin="0,0,0,3"/>
-                                <ComboBox x:Name="DiscardBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10"/>
-
-                                <TextBlock Text="Причина списания (Брак / Закисание / Плесень):" Margin="0,0,0,3"/>
-                                <TextBox x:Name="DiscardReasonTextBox" Text="Закисание партии при формовании" Margin="0,0,0,15" Padding="3"/>
-
-                                <Button Content="❌ Списать партию в утиль (Зафиксировать брак)" Click="DiscardBatch_Click" Height="35" Background="#DC2626" Foreground="White" FontWeight="Bold"/>
-                            </StackPanel>
-                        </GroupBox>
-                    </StackPanel>
-                </Grid>
-            </TabItem>
         </TabControl>
 
-        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="ГОТОВО" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
     </Grid>
 </Page>

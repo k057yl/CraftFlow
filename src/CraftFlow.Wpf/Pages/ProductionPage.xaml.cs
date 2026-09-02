@@ -1,10 +1,12 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
-using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
+using System.Collections.ObjectModel;
+using System.Globalization;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -27,8 +29,8 @@ public record RequirementCalculationDto(
     public string DisplayInfo => string.Format(
         FormattingConstants.DISPLAY_INFO_REQUIREMENT_FORMAT,
         MaterialName,
-        RequiredQty,
-        AvailableQty,
+        Math.Round(RequiredQty, 3),
+        Math.Round(AvailableQty, 3),
         IsSufficient ? FormattingConstants.CHECKMARK_SUFFICIENT : FormattingConstants.CHECKMARK_INSUFFICIENT
     );
 }
@@ -165,14 +167,16 @@ public partial class ProductionPage : Page
 
         try
         {
+            var qtyStr = plannedQty.ToString(CultureInfo.InvariantCulture);
+
             var calc = await ApiService.Instance.GetAsync<List<RequirementCalculationDto>>(
-                $"api/production/calculate-requirements?recipeId={recipeId}&warehouseId={warehouseId}&plannedQty={plannedQty}");
+                $"{Endpoints.CALCULATE_REQUIREMENTS}?recipeId={recipeId}&warehouseId={warehouseId}&plannedQty={qtyStr}");
 
             _requirements.Clear();
             calc?.ForEach(_requirements.Add);
 
             var estimatedCost = await ApiService.Instance.GetAsync<decimal>(
-                $"api/production/estimate-cost?recipeId={recipeId}&plannedQty={plannedQty}");
+                $"{Endpoints.ESTIMATE_COST}?recipeId={recipeId}&plannedQty={qtyStr}");
 
             EstimatedCostTextBlock.Text = $"${estimatedCost:F2}";
         }
@@ -255,38 +259,16 @@ public partial class ProductionPage : Page
         {
             SetStatus(UiConstants.Messages.BATCH_COMPLETED_SUCCESS, Brushes.Green);
             ActualOutputQuantityTextBox.Clear();
-            await LoadDataAsync();
-        }
-        else
-        {
-            SetStatus(contentOrError, Brushes.Red);
-        }
-    }
-
-    private async void SendToAging_Click(object sender, RoutedEventArgs e)
-    {
-        if (ActiveBatchComboBox.SelectedValue is not Guid batchId ||
-            !TryParseDecimal(ActualOutputQuantityTextBox.Text, out var actualOutput) || actualOutput <= 0)
-        {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-            return;
-        }
-
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.BATCHES_COMPLETE, new
-        {
-            BatchId = batchId,
-            ActualOutputQuantity = actualOutput
-        });
-
-        if (isSuccess)
-        {
-            SetStatus(UiConstants.Messages.BATCH_COMPLETED_SUCCESS, Brushes.Green);
-            ActualOutputQuantityTextBox.Clear();
 
             await LoadDataAsync();
 
-            ProductionTabControl.SelectedIndex = 1;
-            CompletedBatchesComboBox.SelectedValue = batchId;
+            var isReadyForAging = CompletedBatches.Any(b => b.Id == batchId);
+
+            if (isReadyForAging)
+            {
+                ProductionTabControl.SelectedIndex = 1;
+                CompletedBatchesComboBox.SelectedValue = batchId;
+            }
         }
         else
         {
@@ -306,14 +288,21 @@ public partial class ProductionPage : Page
 
         var customLotName = AgingLotNameTextBox.Text?.Trim();
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.TransferToAgingAsync(
-            new TransferToAgingRequest(batchId, chamberId, minDays, string.IsNullOrWhiteSpace(customLotName) ? null : customLotName)
-        );
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.AGING_LOTS_TRANSFER, new
+        {
+            ProductionBatchId = batchId,
+            AgingChamberId = chamberId,
+            MinAgingDays = minDays,
+            CustomBatchNumber = string.IsNullOrWhiteSpace(customLotName) ? null : customLotName
+        });
 
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.LOT_TRANSFERRED_TO_AGING_SUCCESS, Brushes.Green);
+
+            CompletedBatchesComboBox.SelectedIndex = -1;
             AgingLotNameTextBox.Clear();
+
             await LoadDataAsync();
         }
         else
@@ -344,26 +333,24 @@ public partial class ProductionPage : Page
 
         TryParseDecimal(UnitPriceTextBox.Text, out var unitPrice);
 
-        try
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.AGING_LOTS_RELEASE, new
         {
-            var request = new ReleaseFromAgingRequest(lotId, warehouseId, actualQty, unitPrice);
-            var (isSuccess, error) = await ApiService.Instance.ReleaseFromAgingAsync(request);
+            AgingLotId = lotId,
+            TargetWarehouseId = warehouseId,
+            ActualFinalQuantity = actualQty,
+            UnitPrice = unitPrice
+        });
 
-            if (isSuccess)
-            {
-                SetStatus(UiConstants.Messages.LOT_RELEASED_FROM_AGING_SUCCESS, Brushes.Green);
-                ActualFinalQuantityTextBox.Clear();
-                UnitPriceTextBox.Clear();
-                await LoadDataAsync();
-            }
-            else
-            {
-                SetStatus($"{UiConstants.Messages.RELEASE_ERROR}: {error}", Brushes.Red);
-            }
-        }
-        catch (Exception ex)
+        if (isSuccess)
         {
-            SetStatus($"{UiConstants.Messages.RELEASE_ERROR}: {ex.Message}", Brushes.Red);
+            SetStatus(UiConstants.Messages.LOT_RELEASED_FROM_AGING_SUCCESS, Brushes.Green);
+            ActualFinalQuantityTextBox.Clear();
+            UnitPriceTextBox.Clear();
+            await LoadDataAsync();
+        }
+        else
+        {
+            SetStatus($"{UiConstants.Messages.RELEASE_ERROR}: {contentOrError}", Brushes.Red);
         }
     }
 
@@ -376,7 +363,7 @@ public partial class ProductionPage : Page
             return;
         }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync("api/production/batches/discard", new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.BATCHES_DISCARD, new
         {
             BatchId = batchId,
             Reason = DiscardReasonTextBox.Text.Trim()
@@ -391,6 +378,87 @@ public partial class ProductionPage : Page
         else
         {
             SetStatus(contentOrError, Brushes.Red);
+        }
+    }
+
+    private async void CalculateMaxQuantity_Click(object sender, RoutedEventArgs e)
+    {
+        if (BatchRecipeComboBox.SelectedValue is not Guid recipeId ||
+            BatchWarehouseComboBox.SelectedValue is not Guid warehouseId)
+        {
+            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
+
+        try
+        {
+            var maxQty = await ApiService.Instance.GetAsync<decimal>(
+                $"{Endpoints.CALCULATE_MAX_OUTPUT}?recipeId={recipeId}&warehouseId={warehouseId}");
+
+            if (maxQty > 0)
+            {
+                BatchQuantityTextBox.Text = Math.Round(maxQty, 2).ToString("0.##");
+                SetStatus($"Рассчитан максимальный объем: {Math.Round(maxQty, 2)} кг/л", Brushes.Green);
+            }
+            else
+            {
+                SetStatus("Недостаточно компонентов на складе для запуска варки!", Brushes.OrangeRed);
+            }
+        }
+        catch (Exception ex)
+        {
+            SetStatus($"Ошибка расчета максимума: {ex.Message}", Brushes.Red);
+        }
+    }
+
+    private void PrintRecipeCard_Click(object sender, RoutedEventArgs e)
+    {
+        if (_requirements.Count == 0)
+        {
+            SetStatus("Нет данных для печати тех. карты", Brushes.Red);
+            return;
+        }
+
+        var recipeName = (BatchRecipeComboBox.SelectedItem as LookupItem)?.Name ?? "Рецептура";
+        var printDialog = new PrintDialog();
+
+        if (printDialog.ShowDialog() == true)
+        {
+            var flowDocument = new FlowDocument
+            {
+                PagePadding = new Thickness(50),
+                ColumnWidth = printDialog.PrintableAreaWidth
+            };
+
+            flowDocument.Blocks.Add(new Paragraph(
+                new Run($"ТЕХНОЛОГИЧЕСКАЯ КАРТА ВАРКИ: {recipeName.ToUpper()}"))
+            {
+                FontSize = 18,
+                FontWeight = FontWeights.Bold,
+                TextAlignment = TextAlignment.Center
+            });
+
+            flowDocument.Blocks.Add(new Paragraph(
+                new Run($"Дата: {DateTime.Now:dd.MM.yyyy HH:mm} | Партия: {BatchNameTextBox.Text} | План выхода: {BatchQuantityTextBox.Text} кг/л"))
+            {
+                FontSize = 12,
+                FontStyle = FontStyles.Italic,
+                TextAlignment = TextAlignment.Center
+            });
+
+            var list = new List();
+            foreach (var req in _requirements)
+            {
+                list.ListItems.Add(new ListItem(
+                    new Paragraph(
+                        new Run($"{req.MaterialName}: {req.RequiredQty:F3} кг/л (На складе: {req.AvailableQty:F3})"))
+                    { FontSize = 14 }));
+            }
+
+            flowDocument.Blocks.Add(list);
+
+            var idp = ((IDocumentPaginatorSource)flowDocument).DocumentPaginator;
+            printDialog.PrintDocument(idp, $"ТехКарта_{recipeName}");
         }
     }
 

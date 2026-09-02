@@ -36,7 +36,7 @@ public sealed class TraceabilityReadService
             .GroupBy(r => (Guid)r.production_batch_id)
             .Select(g => new TraceabilityProductionBatchDto(
                 g.Key,
-                ((BatchStatus)(int)g.First().batch_status_int).ToString(),
+                ((BatchState)(int)g.First().batch_status_int).ToString(),
                 (DateTime?)g.First().started_at ?? DateTime.MinValue,
                 (DateTime?)g.First().completed_at,
                 g.Where(r => r.aging_lot_id != null)
@@ -79,7 +79,7 @@ public sealed class TraceabilityReadService
 
         var originBatch = new TraceabilityProductionBatchDto(
             (Guid)header.production_batch_id,
-            ((BatchStatus)(int)header.batch_status_int).ToString(),
+            ((BatchState)(int)header.batch_status_int).ToString(),
             (DateTime?)header.started_at ?? DateTime.MinValue,
             (DateTime?)header.completed_at,
             new List<TraceabilityAgingLotDto>(),

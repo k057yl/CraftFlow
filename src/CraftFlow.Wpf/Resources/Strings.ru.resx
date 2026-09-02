@@ -59,17 +59,19 @@
 		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 	</resheader>
 
-	<!-- Titles & Headers -->
+	<!-- Page Titles -->
 	<data name="TITLE_CATALOG" xml:space="preserve"><value>УПРАВЛЕНИЕ КАТАЛОГОМ</value></data>
 	<data name="TITLE_INVENTORY" xml:space="preserve"><value>УПРАВЛЕНИЕ СКЛАДОМ</value></data>
 	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>УПРАВЛЕНИЕ ПРОИЗВОДСТВОМ</value></data>
 	<data name="TITLE_SALES" xml:space="preserve"><value>ПРОДАЖИ И ЗАКАЗЫ</value></data>
 	<data name="TITLE_AUTH" xml:space="preserve"><value>АУТЕНТИФИКАЦИЯ И JWT</value></data>
 	<data name="TITLE_DASHBOARD" xml:space="preserve"><value>ДАШБОРД СИСТЕМЫ</value></data>
-	<data name="SYSTEM_AUDIT_LOGS" xml:space="preserve"><value>Журнал аудита системы</value></data>
-	<data name="SYSTEM_DASHBOARD_OVERVIEW" xml:space="preserve"><value>ОБЗОР СИСТЕМЫ (ДАШБОРД)</value></data>
+	<data name="TITLE_PROCUREMENT" xml:space="preserve"><value>ЗАКУПКИ И ПОСТАВЩИКИ</value></data>
+	<data name="TITLE_AGING" xml:space="preserve"><value>КАМЕРЫ СОЗРЕВАНИЯ СЫРА</value></data>
+	<data name="TITLE_TRACEABILITY" xml:space="preserve"><value>СКВОЗНАЯ ТРАССИРОВКА ПАРТИЙ</value></data>
+	<data name="TITLE_MRP" xml:space="preserve"><value>ПЛАНИРОВАНИЕ ПОТРЕБНОСТЕЙ (MRP)</value></data>
 
-	<!-- Navigation -->
+	<!-- Main Navigation -->
 	<data name="NAV_DIRECTORY" xml:space="preserve"><value>Номенклатура и Рецепты</value></data>
 	<data name="NAV_INVENTORY" xml:space="preserve"><value>Склад и Камеры</value></data>
 	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>Закупки и Поставки</value></data>
@@ -77,42 +79,42 @@
 	<data name="NAV_SALES" xml:space="preserve"><value>Продажи и Заказы</value></data>
 	<data name="NAV_TRACEABILITY" xml:space="preserve"><value>История Партий (S2S)</value></data>
 	<data name="NAV_MRP" xml:space="preserve"><value>Расчет Потребностей</value></data>
+	<data name="NAV_AGING" xml:space="preserve"><value>Созревание и Аффинаж</value></data>
 	<data name="NAV_AUTH" xml:space="preserve"><value>Авторизация</value></data>
 	<data name="NAV_AUDIT" xml:space="preserve"><value>Журнал Действий</value></data>
 
-	<!-- GroupBox Headers -->
+	<!-- Section Headers & GroupBoxes -->
 	<data name="HEADER_UOM" xml:space="preserve"><value>1. ЕДИНИЦЫ ИЗМЕРЕНИЯ</value></data>
 	<data name="HEADER_RAW_MATERIALS" xml:space="preserve"><value>2. СЫРЬЁ И ИНГРЕДИЕНТЫ</value></data>
 	<data name="HEADER_PRODUCTS" xml:space="preserve"><value>3. ГОТОВАЯ ПРОДУКЦИЯ</value></data>
 	<data name="HEADER_RECIPES" xml:space="preserve"><value>4. ТЕХНОЛОГИЧЕСКИЕ РЕЦЕПТЫ</value></data>
 	<data name="HEADER_CUSTOMERS" xml:space="preserve"><value>1. КЛИЕНТЫ И ПОКУПАТЕЛИ</value></data>
 	<data name="HEADER_SHIP_ORDER" xml:space="preserve"><value>2. ОФОРМЛЕНИЕ И ОТГРУЗКА ЗАКАЗА</value></data>
-	<data name="PRODUCTION_BATCHES_START" xml:space="preserve"><value>1. ЗАПУСК ВАРКИ</value></data>
-	<data name="COMPLETE_PRODUCTION_BATCH_HEADER" xml:space="preserve"><value>2. ЗАВЕРШЕНИЕ ВАРКИ</value></data>
-	<data name="BATCH_COST_ANALYSIS" xml:space="preserve"><value>3. АНАЛИЗ СЕБЕСТОИМОСТИ</value></data>
+	<data name="HEADER_SUPPLIERS" xml:space="preserve"><value>1. ПОСТАВЩИКИ СЫРЬЯ</value></data>
+	<data name="HEADER_PURCHASE_ORDERS" xml:space="preserve"><value>2. ЗАКАЗЫ И ПРИЁМКА ПОСТАВОК</value></data>
+	<data name="HEADER_AGING_CHAMBERS" xml:space="preserve"><value>1. КАМЕРЫ СОЗРЕВАНИЯ</value></data>
+	<data name="HEADER_AGING_LOTS" xml:space="preserve"><value>2. ПАРТИИ НА ВЫДЕРЖКЕ</value></data>
 	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>1. СКЛАДЫ</value></data>
 	<data name="STOCK_LOTS_HEADER" xml:space="preserve"><value>2. ОПРИХОДОВАНИЕ СЫРЬЯ</value></data>
 	<data name="USER_AUTHENTICATION" xml:space="preserve"><value>АУТЕНТИФИКАЦИЯ ПОЛЬЗОВАТЕЛЯ</value></data>
+	<data name="SYSTEM_AUDIT_LOGS" xml:space="preserve"><value>Журнал аудита системы</value></data>
+	<data name="SYSTEM_DASHBOARD_OVERVIEW" xml:space="preserve"><value>ОБЗОР СИСТЕМЫ (ДАШБОРД)</value></data>
 
-	<!-- Buttons & Actions -->
-	<data name="REFRESH_LOGS" xml:space="preserve"><value>Обновить</value></data>
-	<data name="EXPORT_CSV" xml:space="preserve"><value>Экспорт CSV</value></data>
-	<data name="CREATE_UOM" xml:space="preserve"><value>Создать Ед. Изм.</value></data>
-	<data name="CREATE_RAW_MATERIAL" xml:space="preserve"><value>Добавить Сырьё</value></data>
-	<data name="CREATE_PRODUCT" xml:space="preserve"><value>Создать Продукт</value></data>
-	<data name="CREATE_RECIPE" xml:space="preserve"><value>Сохранить Рецепт</value></data>
-	<data name="CREATE_WAREHOUSE" xml:space="preserve"><value>Создать Склад</value></data>
-	<data name="ADD_STOCK_LOT" xml:space="preserve"><value>Принять Партию</value></data>
-	<data name="START_PRODUCTION_BATCH" xml:space="preserve"><value>Запустить Варку</value></data>
-	<data name="COMPLETE_PRODUCTION_BATCH" xml:space="preserve"><value>Завершить Варку</value></data>
-	<data name="CALCULATE_BATCH_COST" xml:space="preserve"><value>Рассчитать Себестоимость</value></data>
-	<data name="CREATE_CUSTOMER" xml:space="preserve"><value>Создать Клиента</value></data>
-	<data name="SHIP_ORDER" xml:space="preserve"><value>Отгрузить Заказ</value></data>
-	<data name="SHIP_SALES_ORDER" xml:space="preserve"><value>Отгрузка Заказа</value></data>
-	<data name="REGISTER" xml:space="preserve"><value>Регистрация</value></data>
-	<data name="LOGIN_USE_TOKEN" xml:space="preserve"><value>Войти и Получить Токен</value></data>
+	<!-- Production Page Structure (NEW) -->
+	<data name="PRODUCTION_HEADER" xml:space="preserve"><value>Управление Производством и Выдержкой</value></data>
+	<data name="TAB_BREWHOUSE" xml:space="preserve"><value>1. Варочный цех</value></data>
+	<data name="TAB_AGING" xml:space="preserve"><value>2. Созревание и Аффинаж</value></data>
+	<data name="TAB_DISCARD" xml:space="preserve"><value>3. Брак и Списание</value></data>
+	
+	<data name="GROUP_START_BATCH" xml:space="preserve"><value>1. Запуск Варочного Процесса</value></data>
+	<data name="GROUP_COMPLETE_BATCH" xml:space="preserve"><value>2. Завершение Варочного Процесса</value></data>
+	<data name="GROUP_COST_ANALYSIS" xml:space="preserve"><value>3. Анализ Себестоимости</value></data>
+	<data name="GROUP_RAW_REQUIREMENTS" xml:space="preserve"><value>Расчётная потребность и остатки сырья на складе</value></data>
+	<data name="GROUP_TRANSFER_AGING" xml:space="preserve"><value>Размещение партии в Климатической Камере</value></data>
+	<data name="GROUP_RELEASE_AGING" xml:space="preserve"><value>Снятие с выдержки (Фасовка / Склад ГП)</value></data>
+	<data name="GROUP_DISCARD" xml:space="preserve"><value>Регистрация брака и утилизация партии</value></data>
 
-	<!-- Input Labels -->
+	<!-- Input Labels & Display Fields -->
 	<data name="UOM_NAME" xml:space="preserve"><value>Название Ед. Изм.:</value></data>
 	<data name="UOM_CODE" xml:space="preserve"><value>Код Ед. Изм.:</value></data>
 	<data name="RAW_MATERIAL_NAME" xml:space="preserve"><value>Название Сырья:</value></data>
@@ -127,35 +129,89 @@
 	<data name="WAREHOUSE_NAME" xml:space="preserve"><value>Название Склада:</value></data>
 	<data name="WAREHOUSE_ADDRESS" xml:space="preserve"><value>Адрес Склада:</value></data>
 	<data name="BATCH_NUMBER" xml:space="preserve"><value>Номер Партии:</value></data>
-	<data name="SELECT_RECIPE" xml:space="preserve"><value>Выберите Рецепт:</value></data>
-	<data name="SELECT_ACTIVE_BATCH" xml:space="preserve"><value>Выберите Активную Варку:</value></data>
-	<data name="PLANNED_OUTPUT_QUANTITY" xml:space="preserve"><value>Плановый объём партии (кг/л):</value></data>
-	<data name="ACTUAL_OUTPUT_QUANTITY" xml:space="preserve"><value>Фактический выход после варки (кг/л):</value></data>
-	<data name="TOTAL_RAW_MATERIAL_COST" xml:space="preserve"><value>ОБЩАЯ СТОИМОСТЬ СЫРЬЯ:</value></data>
-	<data name="UNIT_COST_PER_UNIT" xml:space="preserve"><value>СЕБЕСТОИМОСТЬ ЕДИНИЦЫ:</value></data>
 	<data name="CUSTOMER_NAME" xml:space="preserve"><value>Имя Клиента:</value></data>
 	<data name="CUSTOMER_PHONE" xml:space="preserve"><value>Телефон:</value></data>
+	<data name="SUPPLIER_NAME" xml:space="preserve"><value>Название Поставщика:</value></data>
+	<data name="SUPPLIER_PHONE" xml:space="preserve"><value>Телефон:</value></data>
+	<data name="SUPPLIER_EMAIL" xml:space="preserve"><value>Email:</value></data>
+	<data name="FULL_NAME" xml:space="preserve"><value>Полное Имя:</value></data>
+	<data name="EMAIL" xml:space="preserve"><value>Email:</value></data>
+	<data name="PASSWORD" xml:space="preserve"><value>Пароль:</value></data>
+	<data name="QUANTITY" xml:space="preserve"><value>Количество:</value></data>
+	<data name="UNIT_PRICE" xml:space="preserve"><value>Цена за Ед.:</value></data>
+	<data name="LOT_QUANTITY" xml:space="preserve"><value>Объём / Вес сырья (л/кг):</value></data>
+	<data name="IS_AGING_REQUIRED" xml:space="preserve"><value>Требуется созревание</value></data>
+	<data name="DEFAULT_MIN_AGING_DAYS" xml:space="preserve"><value>Дней выдержки:</value></data>
+	<data name="AGING_CHAMBER_NAME" xml:space="preserve"><value>Название камеры:</value></data>
+	<data name="TARGET_TEMPERATURE" xml:space="preserve"><value>Температура (°C):</value></data>
+	<data name="TARGET_HUMIDITY" xml:space="preserve"><value>Влажность (%):</value></data>
+
+	<!-- Production Labels (NEW) -->
+	<data name="LABEL_BATCH_CODE" xml:space="preserve"><value>Код / Наименование партии:</value></data>
+	<data name="LABEL_SELECT_RECIPE" xml:space="preserve"><value>Выберите Рецептуру:</value></data>
+	<data name="LABEL_RAW_WAREHOUSE" xml:space="preserve"><value>Склад списания сырья:</value></data>
+	<data name="LABEL_DEST_WAREHOUSE" xml:space="preserve"><value>Склад зачисления продукции:</value></data>
+	<data name="LABEL_PLANNED_OUTPUT" xml:space="preserve"><value>Планируемый объём (кг/л):</value></data>
+	<data name="LABEL_ESTIMATED_COST" xml:space="preserve"><value>Предварительная себестоимость сырья:</value></data>
+	<data name="LABEL_ACTIVE_BATCH" xml:space="preserve"><value>Выберите активную варку (В процессе):</value></data>
+	<data name="LABEL_ACTUAL_OUTPUT" xml:space="preserve"><value>Фактический выход зерна/массы (кг):</value></data>
+	<data name="LABEL_TOTAL_RAW_COST" xml:space="preserve"><value>Общая стоимость сырья:</value></data>
+	<data name="LABEL_UNIT_COST" xml:space="preserve"><value>Себестоимость единицы:</value></data>
+	<data name="LABEL_COMPLETED_BATCH" xml:space="preserve"><value>Выбор завершённой варки:</value></data>
+	<data name="LABEL_AGING_LOT_NAME" xml:space="preserve"><value>Маркировка лота на созревании:</value></data>
+	<data name="LABEL_AGING_CHAMBER" xml:space="preserve"><value>Выбор Климатической Камеры:</value></data>
+	<data name="LABEL_MIN_AGING_DAYS" xml:space="preserve"><value>Срок выдержки (дней):</value></data>
+	<data name="LABEL_ACTIVE_AGING_LOT" xml:space="preserve"><value>Выберите партию в камере:</value></data>
+	<data name="LABEL_TARGET_WAREHOUSE" xml:space="preserve"><value>Склад зачисления сыра:</value></data>
+	<data name="LABEL_FINAL_WEIGHT" xml:space="preserve"><value>Фактический вес после усушки (кг):</value></data>
+	<data name="LABEL_UNIT_PRICE" xml:space="preserve"><value>Отпускная цена за ед.:</value></data>
+	<data name="LABEL_DISCARD_BATCH" xml:space="preserve"><value>Выберите бракованную партию:</value></data>
+	<data name="LABEL_DISCARD_REASON" xml:space="preserve"><value>Причина списания:</value></data>
+
+	<!-- Select ComboBox Options -->
+	<data name="SELECT_RECIPE" xml:space="preserve"><value>Выберите Рецепт:</value></data>
+	<data name="SELECT_ACTIVE_BATCH" xml:space="preserve"><value>Выберите Активную Варку:</value></data>
 	<data name="SELECT_CUSTOMER" xml:space="preserve"><value>Выберите Клиента:</value></data>
 	<data name="SELECT_WAREHOUSE" xml:space="preserve"><value>Выберите склад:</value></data>
 	<data name="SELECT_WAREHOUSE_RAW" xml:space="preserve"><value>Склад списания сырья:</value></data>
 	<data name="SELECT_WAREHOUSE_FINISHED" xml:space="preserve"><value>Склад готовой продукции:</value></data>
-	<data name="AVAILABLE_STOCK" xml:space="preserve"><value>Доступный остаток на складе:</value></data>
-	<data name="QUANTITY" xml:space="preserve"><value>Количество:</value></data>
-	<data name="UNIT_PRICE" xml:space="preserve"><value>Цена за Ед.:</value></data>
-	<data name="FULL_NAME" xml:space="preserve"><value>Полное Имя:</value></data>
-	<data name="EMAIL" xml:space="preserve"><value>Email:</value></data>
-	<data name="PASSWORD" xml:space="preserve"><value>Пароль:</value></data>
-	<data name="LOT_QUANTITY" xml:space="preserve"><value>Объём / Вес сырья (л/кг):</value></data>
+	<data name="SELECT_WAREHOUSE_DESTINATION" xml:space="preserve"><value>Склад зачисления готовой продукции:</value></data>
+
+	<!-- Dashboard Cards -->
 	<data name="PRODUCTS_RECIPES" xml:space="preserve"><value>ПРОДУКТЫ / РЕЦЕПТЫ</value></data>
 	<data name="ACTIVE_BATCHES" xml:space="preserve"><value>АКТИВНЫЕ ВАРКИ</value></data>
 	<data name="CUSTOMERS" xml:space="preserve"><value>КЛИЕНТЫ</value></data>
 	<data name="TOTAL_STOCK_QTY" xml:space="preserve"><value>ОБЩИЙ ОСТАТОК НА СКЛАДЕ</value></data>
 	<data name="TOTAL_REVENUE" xml:space="preserve"><value>ОБЩАЯ ВЫРУЧКА</value></data>
-	<data name="TOTAL_SALES_REVENUE" xml:space="preserve"><value>ОБЩАЯ ВЫРУЧКА</value></data>
-	<data name="CALCULATED_REQUIREMENTS" xml:space="preserve"><value>Расчётная потребность и остатки сырья:</value></data>
-	<data name="ESTIMATED_BATCH_COST" xml:space="preserve"><value>Предварительная себестоимость сырья:</value></data>
-	<data name="SELECT_WAREHOUSE_DESTINATION" xml:space="preserve"><value>Склад зачисления готовой продукции:</value></data>
-	<data name="UNIT_PRICE" xml:space="preserve"><value>Цена за ед.:</value></data>
+	<data name="AVAILABLE_STOCK" xml:space="preserve"><value>Доступный остаток на складе:</value></data>
+
+	<!-- Buttons & Action Commands -->
+	<data name="REFRESH_LOGS" xml:space="preserve"><value>Обновить</value></data>
+	<data name="EXPORT_CSV" xml:space="preserve"><value>Экспорт CSV</value></data>
+	<data name="CREATE_UOM" xml:space="preserve"><value>Создать Ед. Изм.</value></data>
+	<data name="CREATE_RAW_MATERIAL" xml:space="preserve"><value>Добавить Сырьё</value></data>
+	<data name="CREATE_PRODUCT" xml:space="preserve"><value>Создать Продукт</value></data>
+	<data name="CREATE_RECIPE" xml:space="preserve"><value>Сохранить Рецепт</value></data>
+	<data name="CREATE_WAREHOUSE" xml:space="preserve"><value>Создать Склад</value></data>
+	<data name="ADD_STOCK_LOT" xml:space="preserve"><value>Принять Партию</value></data>
+	<data name="CREATE_CUSTOMER" xml:space="preserve"><value>Создать Клиента</value></data>
+	<data name="CREATE_SUPPLIER" xml:space="preserve"><value>Добавить Поставщика</value></data>
+	<data name="CREATE_PURCHASE_ORDER" xml:space="preserve"><value>Сформировать Заказ Поставщику</value></data>
+	<data name="CREATE_AGING_CHAMBER" xml:space="preserve"><value>Создать Камеру Созревания</value></data>
+	<data name="RECEIVE_GOODS" xml:space="preserve"><value>Принять Поставку</value></data>
+	<data name="SHIP_ORDER" xml:space="preserve"><value>Отгрузить Заказ</value></data>
+	<data name="SHIP_SALES_ORDER" xml:space="preserve"><value>Отгрузка Заказа</value></data>
+	<data name="REGISTER" xml:space="preserve"><value>Регистрация</value></data>
+	<data name="LOGIN_USE_TOKEN" xml:space="preserve"><value>Войти и Получить Токен</value></data>
+
+	<!-- Production Buttons (NEW) -->
+	<data name="BTN_CALC_MAX" xml:space="preserve"><value>⚡ Максимум по остаткам</value></data>
+	<data name="BTN_PRINT_CARD" xml:space="preserve"><value>🖨️ Печать тех. карты</value></data>
+	<data name="BTN_START_BATCH" xml:space="preserve"><value>Запустить Варку</value></data>
+	<data name="BTN_COMPLETE_BATCH" xml:space="preserve"><value>Завершить Варку</value></data>
+	<data name="BTN_TRANSFER_AGING" xml:space="preserve"><value>Разместить в Камере</value></data>
+	<data name="BTN_RELEASE_AGING" xml:space="preserve"><value>Выпустить в Продажу</value></data>
+	<data name="BTN_DISCARD_BATCH" xml:space="preserve"><value>❌ Списать в утиль</value></data>
 
 	<!-- DataGrid Columns -->
 	<data name="COL_ENTITY_NAME" xml:space="preserve"><value>Сущность</value></data>
@@ -163,7 +219,14 @@
 	<data name="COL_DETAILS" xml:space="preserve"><value>Детали</value></data>
 	<data name="COL_CREATED_AT" xml:space="preserve"><value>Дата / Время (UTC)</value></data>
 
-	<!-- UI & API Messages -->
+	<!-- Traceability Template Formats -->
+	<data name="TRACE_BATCH_TITLE" xml:space="preserve"><value>Варка #{0}</value></data>
+	<data name="TRACE_BATCH_DETAILS" xml:space="preserve"><value>Статус: {0} | Запущена: {1:dd.MM.yyyy}</value></data>
+	<data name="TRACE_AGING_TITLE" xml:space="preserve"><value>Камера: {0}</value></data>
+	<data name="TRACE_AGING_DETAILS" xml:space="preserve"><value>Партия: {0} ({1})</value></data>
+
+	<!-- UI & Status Messages -->
+	<data name="STATUS_READY" xml:space="preserve"><value>ГОТОВО</value></data>
 	<data name="UI_DATA_LOADED_SUCCESS" xml:space="preserve"><value>Данные успешно загружены</value></data>
 	<data name="UI_DATA_LOAD_ERROR" xml:space="preserve"><value>Ошибка загрузки данных</value></data>
 	<data name="UI_INVALID_INPUT_FIELDS" xml:space="preserve"><value>Заполните все обязательные поля!</value></data>
@@ -178,53 +241,16 @@
 	<data name="UI_BATCH_COMPLETED_SUCCESS" xml:space="preserve"><value>Варка завершена! Продукция на складе.</value></data>
 	<data name="UI_CUSTOMER_CREATED_SUCCESS" xml:space="preserve"><value>Клиент успешно добавлен</value></data>
 	<data name="UI_ORDER_SHIPPED_SUCCESS" xml:space="preserve"><value>Заказ успешно отгружен!</value></data>
+	<data name="UI_SUPPLIER_CREATED_SUCCESS" xml:space="preserve"><value>Поставщик успешно добавлен!</value></data>
+	<data name="UI_GOODS_RECEIVED_SUCCESS" xml:space="preserve"><value>Поставка успешно принята на склад!</value></data>
 	<data name="UI_REGISTER_SUCCESS" xml:space="preserve"><value>Пользователь зарегистрирован</value></data>
 	<data name="UI_LOGIN_SUCCESS" xml:space="preserve"><value>Успешный вход в систему</value></data>
 	<data name="UI_BATCH_COST_CALCULATED" xml:space="preserve"><value>Себестоимость рассчитана</value></data>
+	<data name="UI_API_ERROR_PREFIX" xml:space="preserve"><value>Ошибка выполнения операции</value></data>
+
+	<!-- Domain & Business Errors -->
 	<data name="SALES_INSUFFICIENT_PRODUCT_STOCK" xml:space="preserve"><value>Недостаточно товара на складе!</value></data>
 	<data name="PRODUCTION_INSUFFICIENT_RAW_MATERIAL" xml:space="preserve"><value>Недостаточно сырья для варки!</value></data>
 	<data name="PRODUCTION_BATCH_NOT_FOUND" xml:space="preserve"><value>Партия производства не найдена</value></data>
 	<data name="GENERAL_NOT_FOUND" xml:space="preserve"><value>Запрашиваемый ресурс не найден</value></data>
-
-	<!-- Procurement & Aging Titles & Headers -->
-	<data name="TITLE_PROCUREMENT" xml:space="preserve"><value>ЗАКУПКИ И ПОСТАВЩИКИ</value></data>
-	<data name="TITLE_AGING" xml:space="preserve"><value>КАМЕРЫ СОЗРЕВАНИЯ СЫРА</value></data>
-	<data name="TITLE_TRACEABILITY" xml:space="preserve"><value>СКВОЗНАЯ ТРАССИРОВКА ПАРТИЙ</value></data>
-	<data name="TITLE_MRP" xml:space="preserve"><value>ПЛАНИРОВАНИЕ ПОТРЕБНОСТЕЙ (MRP)</value></data>
-
-	<!-- Procurement & Aging Navigation -->
-	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>🚚 ЗАКУПКИ</value></data>
-	<data name="NAV_AGING" xml:space="preserve"><value>⏳ СОЗРЕВАНИЕ</value></data>
-	<data name="NAV_TRACEABILITY" xml:space="preserve"><value>🔍 ТРАССИРОВКА</value></data>
-	<data name="NAV_MRP" xml:space="preserve"><value>📈 MRP ПЛАНИРОВАНИЕ</value></data>
-
-	<!-- Procurement & Aging Headers -->
-	<data name="HEADER_SUPPLIERS" xml:space="preserve"><value>1. ПОСТАВЩИКИ СЫРЬЯ</value></data>
-	<data name="HEADER_PURCHASE_ORDERS" xml:space="preserve"><value>2. ЗАКАЗЫ И ПРИЁМКА ПОСТАВОК</value></data>
-	<data name="HEADER_AGING_CHAMBERS" xml:space="preserve"><value>1. КАМЕРЫ СОЗРЕВАНИЯ</value></data>
-	<data name="HEADER_AGING_LOTS" xml:space="preserve"><value>2. ПАРТИИ НА ВЫДЕРЖКЕ</value></data>
-
-	<!-- Procurement Buttons & Inputs -->
-	<data name="CREATE_SUPPLIER" xml:space="preserve"><value>Добавить Поставщика</value></data>
-	<data name="RECEIVE_GOODS" xml:space="preserve"><value>Принять Поставку</value></data>
-	<data name="SUPPLIER_NAME" xml:space="preserve"><value>Название Поставщика:</value></data>
-	<data name="SUPPLIER_PHONE" xml:space="preserve"><value>Телефон:</value></data>
-	<data name="SUPPLIER_EMAIL" xml:space="preserve"><value>Email:</value></data>
-
-	<!-- Procurement UI Messages -->
-	<data name="UI_SUPPLIER_CREATED_SUCCESS" xml:space="preserve"><value>Поставщик успешно добавлен!</value></data>
-	<data name="UI_GOODS_RECEIVED_SUCCESS" xml:space="preserve"><value>Поставка успешно принята на склад!</value></data>
-	<data name="UI_API_ERROR_PREFIX" xml:space="preserve"><value>Ошибка выполнения операции</value></data>
-
-	<data name="CREATE_PURCHASE_ORDER" xml:space="preserve"><value>Сформировать Заказ Поставщику</value></data>
-	<data name="TRACE_BATCH_TITLE" xml:space="preserve"><value>Варка #{0}</value></data>
-	<data name="TRACE_BATCH_DETAILS" xml:space="preserve"><value>Статус: {0} | Запущена: {1:dd.MM.yyyy}</value></data>
-	<data name="TRACE_AGING_TITLE" xml:space="preserve"><value>Камера: {0}</value></data>
-	<data name="TRACE_AGING_DETAILS" xml:space="preserve"><value>Партия: {0} ({1})</value></data>
-	<data name="IS_AGING_REQUIRED" xml:space="preserve"><value>Требуется созревание</value></data>
-	<data name="DEFAULT_MIN_AGING_DAYS" xml:space="preserve"><value>Дней выдержки:</value></data>
-	<data name="AGING_CHAMBER_NAME" xml:space="preserve"><value>Название камеры</value></data>
-	<data name="TARGET_TEMPERATURE" xml:space="preserve"><value>Температура (°C)</value></data>
-	<data name="TARGET_HUMIDITY" xml:space="preserve"><value>Влажность (%)</value></data>
-	<data name="CREATE_AGING_CHAMBER" xml:space="preserve"><value>Создать Камеру Созревания</value></data>
 </root>

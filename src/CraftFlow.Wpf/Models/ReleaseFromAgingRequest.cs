@@ -1,8 +1,8 @@
 ﻿namespace CraftFlow.Wpf.Models;
 
-public record ReleaseFromAgingRequest(
+public sealed record ReleaseFromAgingRequest(
     Guid AgingLotId,
-    Guid DestinationWarehouseId,
-    decimal ActualQuantity,
+    Guid TargetWarehouseId,
+    decimal ActualFinalQuantity,
     decimal UnitPrice
 );

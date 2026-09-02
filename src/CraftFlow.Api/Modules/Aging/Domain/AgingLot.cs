@@ -1,10 +1,12 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Modules.Aging.Domain;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
-
-namespace CraftFlow.Api.Modules.Aging.Domain;
+using Stateless;
 
 public sealed class AgingLot : AggregateRoot, ITenantEntity
 {
+    private StateMachine<AgingState, AgingTrigger>? _stateMachine;
+
     public Guid TenantId { get; private set; }
     public Guid ProductionBatchId { get; private set; }
     public Guid ProductId { get; private set; }
@@ -13,7 +15,7 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
 
     public decimal InitialQuantity { get; private set; }
     public decimal CurrentQuantity { get; private set; }
-    public AgingStatus Status { get; private set; }
+    public AgingState State { get; private set; }
 
     public DateTime PlacedAt { get; private set; }
     public DateTime TargetReleaseDate { get; private set; }
@@ -34,7 +36,7 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
 
         var now = DateTime.UtcNow;
 
-        return new AgingLot
+        var lot = new AgingLot
         {
             Id = Guid.NewGuid(),
             ProductionBatchId = productionBatchId,
@@ -43,15 +45,20 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
             BatchNumber = batchNumber,
             InitialQuantity = initialQuantity,
             CurrentQuantity = initialQuantity,
-            Status = AgingStatus.InChamber,
+            State = AgingState.InChamber,
             PlacedAt = now,
             TargetReleaseDate = now.AddDays(minAgingDays)
         };
+
+        lot.InitStateMachine();
+        return lot;
     }
 
     public void RegisterWeightLoss(decimal actualQuantity)
     {
-        if (Status != AgingStatus.InChamber)
+        EnsureMachine();
+
+        if (_stateMachine!.State != AgingState.InChamber)
             throw new InvalidOperationException(ErrorCodes.Aging.INVALID_LOT_STATE);
 
         if (actualQuantity < 0 || actualQuantity > CurrentQuantity)
@@ -62,10 +69,40 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
 
     public void Release()
     {
-        if (Status != AgingStatus.InChamber && Status != AgingStatus.ReadyForRelease)
-            throw new InvalidOperationException(ErrorCodes.Aging.INVALID_LOT_STATE);
+        EnsureMachine();
 
-        Status = AgingStatus.Released;
         ActualReleaseDate = DateTime.UtcNow;
+        _stateMachine!.Fire(AgingTrigger.Release);
+    }
+
+    public void Discard()
+    {
+        EnsureMachine();
+
+        ActualReleaseDate = DateTime.UtcNow;
+        _stateMachine!.Fire(AgingTrigger.Discard);
+    }
+
+    private void EnsureMachine()
+    {
+        if (_stateMachine is null)
+            InitStateMachine();
+    }
+
+    private void InitStateMachine()
+    {
+        _stateMachine = new StateMachine<AgingState, AgingTrigger>(
+            () => State,
+            s => State = s
+        );
+
+        _stateMachine.Configure(AgingState.InChamber)
+            .Permit(AgingTrigger.MarkReadyForRelease, AgingState.ReadyForRelease)
+            .Permit(AgingTrigger.Release, AgingState.Released)
+            .Permit(AgingTrigger.Discard, AgingState.Discarded);
+
+        _stateMachine.Configure(AgingState.ReadyForRelease)
+            .Permit(AgingTrigger.Release, AgingState.Released)
+            .Permit(AgingTrigger.Discard, AgingState.Discarded);
     }
 }

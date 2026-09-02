@@ -1,10 +1,13 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
+using Stateless;
 
 namespace CraftFlow.Api.Modules.Production.Domain;
 
 public sealed class ProductionBatch : AggregateRoot, ITenantEntity
 {
+    private StateMachine<BatchState, BatchTrigger>? _stateMachine;
+
     public Guid TenantId { get; private set; }
     public string Name { get; private set; } = string.Empty;
     public Guid RecipeId { get; private set; }
@@ -13,13 +16,13 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
 
     public decimal PlannedOutputQuantity { get; private set; }
     public decimal ActualOutputQuantity { get; private set; }
-    public BatchStatus Status { get; private set; }
+    public BatchState Status { get; private set; }
     public DateTime StartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
     public Guid DestinationWarehouseId { get; private set; }
     public string? DiscardReason { get; private set; }
 
-    private ProductionBatch() { }
+    private ProductionBatch(){}
 
     public static ProductionBatch Create(
         Guid recipeId,
@@ -35,7 +38,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         var batchId = Guid.NewGuid();
         var defaultName = string.Concat(FormattingConstants.BATCH_PREFIX, batchId.ToString()[..8].ToUpperInvariant());
 
-        return new ProductionBatch
+        var batch = new ProductionBatch
         {
             Id = batchId,
             Name = string.IsNullOrWhiteSpace(customName) ? defaultName : customName.Trim(),
@@ -45,46 +48,80 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
             DestinationWarehouseId = destinationWarehouseId,
             PlannedOutputQuantity = plannedOutputQuantity,
             ActualOutputQuantity = 0,
-            Status = BatchStatus.Draft,
+            Status = BatchState.Draft,
             StartedAt = DateTime.UtcNow
         };
+
+        batch.InitStateMachine();
+        return batch;
     }
 
     public void Start()
     {
-        if (Status != BatchStatus.Draft)
-            throw new InvalidOperationException(ErrorCodes.Production.INVALID_STATUS_TRANSITION);
-
-        Status = BatchStatus.InProgress;
+        EnsureMachine();
+        _stateMachine!.Fire(BatchTrigger.Start);
     }
 
     public void Complete(decimal actualOutputQuantity)
     {
-        if (Status != BatchStatus.InProgress && Status != BatchStatus.TransferredToAging)
-            throw new InvalidOperationException(ErrorCodes.Production.INVALID_STATUS_TRANSITION);
-
+        EnsureMachine();
         ActualOutputQuantity = actualOutputQuantity;
-        Status = BatchStatus.Completed;
         CompletedAt = DateTime.UtcNow;
-    }
-
-    public void Discard(string reason)
-    {
-        if (Status == BatchStatus.Cancelled)
-            throw new InvalidOperationException(ErrorCodes.Production.INVALID_STATUS_TRANSITION);
-
-        Status = BatchStatus.Cancelled;
-        DiscardReason = reason;
-        CompletedAt = DateTime.UtcNow;
+        _stateMachine!.Fire(BatchTrigger.Complete);
     }
 
     public void MarkAsTransferredToAging()
     {
-        if (Status != BatchStatus.Completed)
-        {
-            throw new InvalidOperationException(ErrorCodes.Production.ONLY_COMPLETED_BATCHES_CAN_BE_TRANSFERRED_TO_AGING);
-        }
+        EnsureMachine();
+        _stateMachine!.Fire(BatchTrigger.TransferToAging);
+    }
 
-        Status = BatchStatus.TransferredToAging;
+    public void ReleaseFromAging(decimal finalQuantity)
+    {
+        EnsureMachine();
+        ActualOutputQuantity = finalQuantity;
+        CompletedAt = DateTime.UtcNow;
+        _stateMachine!.Fire(BatchTrigger.ReleaseFromAging);
+    }
+
+    public void Discard(string reason)
+    {
+        EnsureMachine();
+        DiscardReason = reason;
+        CompletedAt = DateTime.UtcNow;
+        _stateMachine!.Fire(BatchTrigger.Discard);
+    }
+
+    private void EnsureMachine()
+    {
+        if (_stateMachine is null)
+            InitStateMachine();
+    }
+
+    private void InitStateMachine()
+    {
+        _stateMachine = new StateMachine<BatchState, BatchTrigger>(
+            () => Status,
+            s => Status = s
+        );
+
+        _stateMachine.Configure(BatchState.Draft)
+            .Permit(BatchTrigger.Start, BatchState.InProgress);
+
+        _stateMachine.Configure(BatchState.InProgress)
+            .Permit(BatchTrigger.Complete, BatchState.Completed)
+            .Permit(BatchTrigger.TransferToAging, BatchState.InAging)
+            .Permit(BatchTrigger.Discard, BatchState.Discarded);
+
+        _stateMachine.Configure(BatchState.ReadyForAging)
+            .Permit(BatchTrigger.TransferToAging, BatchState.InAging)
+            .Permit(BatchTrigger.Discard, BatchState.Discarded);
+
+        _stateMachine.Configure(BatchState.Completed)
+            .Permit(BatchTrigger.TransferToAging, BatchState.InAging);
+
+        _stateMachine.Configure(BatchState.InAging)
+            .Permit(BatchTrigger.ReleaseFromAging, BatchState.Completed)
+            .Permit(BatchTrigger.Discard, BatchState.Discarded);
     }
 }

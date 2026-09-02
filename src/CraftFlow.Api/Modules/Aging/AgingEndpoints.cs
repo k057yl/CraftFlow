@@ -2,6 +2,7 @@
 using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Aging.ReleaseFromAging;
 using CraftFlow.Api.Modules.Aging.TransferToAging;
+using CraftFlow.Api.Modules.Production.Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,11 +40,12 @@ public static class AgingEndpoints
         {
             var activeLots = await dbContext.AgingLots
                 .AsNoTracking()
-                .Where(l => l.Status == AgingStatus.InChamber)
+                .Where(l => l.State == AgingState.InChamber)
                 .Join(dbContext.ProductionBatches,
                       lot => lot.ProductionBatchId,
                       batch => batch.Id,
                       (lot, batch) => new { Lot = lot, Batch = batch })
+                .Where(x => x.Batch.Status == BatchState.InAging)
                 .Select(x => new
                 {
                     x.Lot.Id,
