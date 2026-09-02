@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Catalog.DeleteRecipe;
+
 public class DeleteRecipeHandler : IRequestHandler<DeleteRecipeCommand, Result>
 {
     private readonly AppDbContext _dbContext;
@@ -24,15 +25,7 @@ public class DeleteRecipeHandler : IRequestHandler<DeleteRecipeCommand, Result>
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
         }
 
-        var hasBatches = await _dbContext.ProductionBatches
-            .AnyAsync(b => b.RecipeId == request.Id, cancellationToken);
-
-        if (hasBatches)
-        {
-            return Result.Failure(Error.Conflict(ErrorCodes.General.ALREADY_EXISTS));
-        }
-
-        _dbContext.Recipes.Remove(recipe);
+        recipe.Archive();
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

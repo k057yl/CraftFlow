@@ -42,13 +42,20 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             batch.ReleaseFromAging(request.ActualFinalQuantity);
         }
 
+        var cleanBatchName = lot.BatchNumber.Contains("(Выход:")
+            ? lot.BatchNumber.Substring(0, lot.BatchNumber.IndexOf("(Выход:")).Trim()
+            : lot.BatchNumber;
+
+        var finalBatchNumber = $"{cleanBatchName} (Выход: {request.ActualFinalQuantity:N2} кг)";
+
         var stockLot = StockLot.Create(
             warehouseId: request.TargetWarehouseId,
             itemId: lot.ProductId,
-            initialQuantity: lot.CurrentQuantity,
+            initialQuantity: request.ActualFinalQuantity,
             unitPrice: request.UnitPrice,
-            batchNumber: lot.BatchNumber,
-            tenantId: _tenantContext.TenantId
+            batchNumber: finalBatchNumber,
+            tenantId: _tenantContext.TenantId,
+            productionBatchId: lot.ProductionBatchId
         );
 
         await _dbContext.Set<StockLot>().AddAsync(stockLot, cancellationToken);

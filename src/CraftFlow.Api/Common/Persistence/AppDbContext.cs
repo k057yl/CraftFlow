@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Common.Audit;
+﻿using System.Reflection;
+using CraftFlow.Api.Common.Audit;
 using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Modules.Aging.Domain;
@@ -52,11 +53,32 @@ public class AppDbContext : DbContext
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            if (typeof(ITenantEntity).IsAssignableFrom(entityType.ClrType))
+            var clrType = entityType.ClrType;
+
+            var isTenant = typeof(ITenantEntity).IsAssignableFrom(clrType);
+            var isEntity = typeof(Entity).IsAssignableFrom(clrType);
+
+            if (isTenant && isEntity)
             {
                 var method = typeof(AppDbContext)
-                    .GetMethod(nameof(SetTenantFilter), System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    ?.MakeGenericMethod(entityType.ClrType);
+                    .GetMethod(nameof(SetTenantAndActiveFilter), BindingFlags.NonPublic | BindingFlags.Instance)
+                    ?.MakeGenericMethod(clrType);
+
+                method?.Invoke(this, new object[] { modelBuilder });
+            }
+            else if (isTenant)
+            {
+                var method = typeof(AppDbContext)
+                    .GetMethod(nameof(SetTenantFilter), BindingFlags.NonPublic | BindingFlags.Instance)
+                    ?.MakeGenericMethod(clrType);
+
+                method?.Invoke(this, new object[] { modelBuilder });
+            }
+            else if (isEntity)
+            {
+                var method = typeof(AppDbContext)
+                    .GetMethod(nameof(SetActiveFilter), BindingFlags.NonPublic | BindingFlags.Instance)
+                    ?.MakeGenericMethod(clrType);
 
                 method?.Invoke(this, new object[] { modelBuilder });
             }
@@ -92,8 +114,21 @@ public class AppDbContext : DbContext
         return base.SaveChangesAsync(cancellationToken);
     }
 
-    private void SetTenantFilter<TEntity>(ModelBuilder modelBuilder) where TEntity : class, ITenantEntity
+    private void SetTenantAndActiveFilter<TEntity>(ModelBuilder modelBuilder)
+        where TEntity : Entity, ITenantEntity
+    {
+        modelBuilder.Entity<TEntity>().HasQueryFilter(e => e.TenantId == _tenantContext.TenantId && e.IsActive);
+    }
+
+    private void SetTenantFilter<TEntity>(ModelBuilder modelBuilder)
+        where TEntity : class, ITenantEntity
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(e => e.TenantId == _tenantContext.TenantId);
+    }
+
+    private void SetActiveFilter<TEntity>(ModelBuilder modelBuilder)
+        where TEntity : Entity
+    {
+        modelBuilder.Entity<TEntity>().HasQueryFilter(e => e.IsActive);
     }
 }

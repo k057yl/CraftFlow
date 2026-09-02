@@ -4,19 +4,16 @@ namespace CraftFlow.Api.Modules.Traceability.TraceabilityRead;
 
 public static class TraceabilityConstants
 {
-    // 1. Заголовок сырья для Forward Traceability
     public const string SQL_GET_FORWARD_HEADER = $"""
         SELECT 
             sl."Id" AS RawMaterialStockLotId,
             COALESCE(sl."BatchNumber", 'Б/Н') AS RawMaterialBatchNumber,
-            COALESCE(rm."Name", p."Name", @DefaultMaterialName) AS RawMaterialName
+            COALESCE(rm."Name", @DefaultMaterialName) AS RawMaterialName
         FROM {DbTables.STOCK_LOTS} sl
-        LEFT JOIN {DbTables.RAW_MATERIALS} rm ON rm."Id" = sl."ItemId"
-        LEFT JOIN {DbTables.PRODUCTS} p ON p."Id" = sl."ItemId"
+        INNER JOIN {DbTables.RAW_MATERIALS} rm ON rm."Id" = sl."ItemId"
         WHERE sl."Id" = @StockLotId AND sl."TenantId" = @TenantId;
         """;
 
-    // 2. Все варки и камеры созревания, где использовался этот StockLot сырья
     public const string SQL_GET_FORWARD_BATCHES = $"""
         SELECT 
             pb."Id" AS production_batch_id,
@@ -34,36 +31,43 @@ public static class TraceabilityConstants
         WHERE ci."StockLotId" = @StockLotId AND pb."TenantId" = @TenantId;
         """;
 
-    // 3. Заголовок готовой продукции и варка-источник для Backward Traceability
     public const string SQL_GET_BACKWARD_HEADER = $"""
         SELECT 
-            NULL::uuid AS sales_order_id,
-            'На складе' AS customer_name,
-            COALESCE(sl."Id", pb."Id") AS product_stock_lot_id,
+            sl."Id" AS product_stock_lot_id,
             COALESCE(sl."BatchNumber", pb."Name") AS product_batch_number,
             p."Name" AS product_name,
-            pb."Id" AS production_batch_id,
+            sl."Quantity" AS actual_quantity,
+            sl."UnitPrice" AS unit_price,
+            COALESCE(sl."ProductionBatchId", al."ProductionBatchId", pb."Id") AS production_batch_id,
             pb."Status" AS batch_status_int,
             pb."StartedAt" AS started_at,
-            pb."CompletedAt" AS completed_at
-        FROM {DbTables.PRODUCTION_BATCHES} pb
-        INNER JOIN {DbTables.PRODUCTS} p ON p."Id" = pb."TargetProductId"
-        LEFT JOIN {DbTables.STOCK_LOTS} sl ON sl."ProductionBatchId" = pb."Id"
-        WHERE (pb."Id" = @ProductStockLotId OR sl."Id" = @ProductStockLotId) 
-          AND pb."TenantId" = @TenantId
+            pb."CompletedAt" AS completed_at,
+            COALESCE(pb."PlannedOutputQuantity", 0) AS planned_quantity,
+            pb."ActualOutputQuantity" AS brew_output_quantity,
+            COALESCE(EXTRACT(DAY FROM (COALESCE(al."ActualReleaseDate", NOW()) - al."PlacedAt"))::integer, 0) AS aging_days,
+            ach."Name" AS chamber_name
+        FROM {DbTables.STOCK_LOTS} sl
+        INNER JOIN {DbTables.PRODUCTS} p ON p."Id" = sl."ItemId"
+        LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_LOTS} al ON al."ProductId" = p."Id" OR al."ProductionBatchId" = sl."ProductionBatchId"
+        LEFT JOIN {DbTables.PRODUCTION_BATCHES} pb ON pb."Id" = COALESCE(sl."ProductionBatchId", al."ProductionBatchId")
+        LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_CHAMBERS} ach ON ach."Id" = al."AgingChamberId"
+        WHERE sl."Id" = @ProductStockLotId AND sl."TenantId" = @TenantId
+        ORDER BY al."PlacedAt" DESC NULLS LAST
         LIMIT 1;
         """;
 
-    // 4. Все ингредиенты (сырье), задействованные в этой варке
     public const string SQL_GET_BACKWARD_CONSUMED = $"""
         SELECT 
             COALESCE(rm_sl."Id", ci."StockLotId") AS raw_material_stock_lot_id,
             COALESCE(rm."Name", 'Сырье') AS raw_material_name,
             COALESCE(rm_sl."BatchNumber", 'Б/Н') AS batch_number,
-            ci."Quantity" AS quantity_used
+            ci."Quantity" AS quantity_used,
+            COALESCE(uom."Code", '') AS unit_of_measure,
+            '—' AS supplier_name
         FROM {DbTables.CONSUMED_INGREDIENTS} ci
         LEFT JOIN {DbTables.STOCK_LOTS} rm_sl ON rm_sl."Id" = ci."StockLotId"
         LEFT JOIN {DbTables.RAW_MATERIALS} rm ON rm."Id" = ci."RawMaterialId"
+        LEFT JOIN {DbTables.UNITS_OF_MEASURE} uom ON uom."Id" = rm."UnitOfMeasureId"
         WHERE ci."ProductionBatchId" = @BatchId;
         """;
 }

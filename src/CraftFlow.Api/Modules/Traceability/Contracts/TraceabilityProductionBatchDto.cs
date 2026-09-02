@@ -1,9 +1,12 @@
 ﻿namespace CraftFlow.Api.Modules.Traceability.Contracts;
+
 public sealed record TraceabilityProductionBatchDto(
     Guid ProductionBatchId,
-    string BatchStatus,
+    int BatchStatusInt,
     DateTime StartedAt,
     DateTime? CompletedAt,
-    List<TraceabilityAgingLotDto> AgingLots,
-    List<TraceabilityIngredientDto> UsedIngredients
+    decimal PlannedQuantity,
+    decimal ActualOutputQuantity,
+    decimal OutputYieldPercentage,
+    List<TraceabilityIngredientDto> ConsumedIngredients
 );

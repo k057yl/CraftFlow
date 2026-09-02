@@ -6,6 +6,7 @@ using CraftFlow.SharedKernel.Result;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Traceability.GetBackwardTraceability;
+
 public sealed class GetBackwardTraceabilityQueryHandler : IRequestHandler<GetBackwardTraceabilityQuery, Result<BackwardTraceabilityDto>>
 {
     private readonly TraceabilityReadService _readService;

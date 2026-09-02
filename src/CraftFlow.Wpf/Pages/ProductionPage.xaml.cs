@@ -91,6 +91,7 @@ public partial class ProductionPage : Page
 
     private async Task LoadDataAsync()
     {
+        _isInitializing = true;
         try
         {
             var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.WAREHOUSES);
@@ -129,12 +130,15 @@ public partial class ProductionPage : Page
             GenerateDefaultBatchName();
 
             SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
-
-            BatchInputs_Changed(this, null!);
         }
         catch (Exception ex)
         {
             SetStatus($"{UiConstants.Messages.DATA_LOAD_ERROR}: {ex.Message}", Brushes.Red);
+        }
+        finally
+        {
+            _isInitializing = false;
+            BatchInputs_Changed(this, null!);
         }
     }
 
@@ -186,12 +190,14 @@ public partial class ProductionPage : Page
         }
     }
 
+    private bool _isInitializing = true;
+
     private async void BatchInputs_Changed(object sender, RoutedEventArgs e)
     {
-        if (EstimatedCostTextBlock == null || RequirementsListBox == null) return;
+        if (_isInitializing || EstimatedCostTextBlock == null || RequirementsListBox == null) return;
 
-        if (BatchRecipeComboBox?.SelectedValue is not Guid recipeId ||
-            BatchWarehouseComboBox?.SelectedValue is not Guid warehouseId ||
+        if (BatchRecipeComboBox?.SelectedValue is not Guid recipeId || recipeId == Guid.Empty ||
+            BatchWarehouseComboBox?.SelectedValue is not Guid warehouseId || warehouseId == Guid.Empty ||
             !TryParseDecimal(BatchQuantityTextBox?.Text ?? string.Empty, out var plannedQty) || plannedQty <= 0)
         {
             _requirements.Clear();

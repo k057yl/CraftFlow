@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Catalog.DeleteRawMaterial;
+
 public class DeleteRawMaterialHandler : IRequestHandler<DeleteRawMaterialCommand, Result>
 {
     private readonly AppDbContext _dbContext;
@@ -22,16 +23,7 @@ public class DeleteRawMaterialHandler : IRequestHandler<DeleteRawMaterialCommand
         if (rawMaterial is null)
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
 
-        var isUsedInRecipes = await _dbContext.RecipeIngredients
-            .AnyAsync(ri => ri.RawMaterialId == request.Id, cancellationToken);
-
-        var isUsedInStock = await _dbContext.StockLots
-            .AnyAsync(sl => sl.ItemId == request.Id, cancellationToken);
-
-        if (isUsedInRecipes || isUsedInStock)
-            return Result.Failure(Error.Conflict(ErrorCodes.General.ALREADY_EXISTS));
-
-        _dbContext.RawMaterials.Remove(rawMaterial);
+        rawMaterial.Archive();
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

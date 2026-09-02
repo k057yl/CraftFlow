@@ -87,14 +87,16 @@ public static class ProductionEndpoints
         group.MapGet(Endpoints.CALCULATE_REQUIREMENTS, async (Guid recipeId, Guid warehouseId, decimal plannedQty, AppDbContext dbContext) =>
         {
             var recipe = await dbContext.Recipes
+                .AsNoTracking()
                 .Include(r => r.Ingredients)
                 .FirstOrDefaultAsync(r => r.Id == recipeId);
 
-            if (recipe == null || recipe.TargetOutputQuantity <= 0)
+            if (recipe == null || recipe.TargetOutputQuantity <= 0 || recipe.Ingredients == null || !recipe.Ingredients.Any())
                 return Results.Ok(new List<object>());
 
             var rawMaterialIds = recipe.Ingredients.Select(i => i.RawMaterialId).ToList();
             var rawMaterials = await dbContext.RawMaterials
+                .AsNoTracking()
                 .Where(rm => rawMaterialIds.Contains(rm.Id))
                 .ToDictionaryAsync(rm => rm.Id, rm => rm.Name);
 
@@ -106,8 +108,9 @@ public static class ProductionEndpoints
                 var requiredQty = Math.Round(ingredient.Quantity * multiplier, 3);
 
                 var availableQty = await dbContext.StockLots
+                    .AsNoTracking()
                     .Where(s => s.WarehouseId == warehouseId && s.ItemId == ingredient.RawMaterialId && s.Quantity > 0)
-                    .SumAsync(s => s.Quantity);
+                    .SumAsync(s => (decimal?)s.Quantity) ?? 0m;
 
                 var matName = rawMaterials.TryGetValue(ingredient.RawMaterialId, out var name) ? name : "Сырье";
                 var roundedAvailable = Math.Round(availableQty, 3);

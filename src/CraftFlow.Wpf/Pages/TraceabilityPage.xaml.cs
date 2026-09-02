@@ -16,11 +16,16 @@ public record ForwardTraceabilityDto(
 );
 
 public record BackwardTraceabilityDto(
-    Guid SalesOrderId,
+    Guid? SalesOrderId,
     string CustomerName,
     Guid ProductStockLotId,
     string ProductBatchNumber,
     string ProductName,
+    decimal CurrentStockQuantity,
+    decimal UnitPrice,
+    int AgingDaysTotal,
+    decimal AgingLossPercentage,
+    string StorageChamberName,
     TraceabilityProductionBatchDto OriginBatch
 );
 
@@ -29,8 +34,11 @@ public record TraceabilityProductionBatchDto(
     string BatchStatus,
     DateTime StartedAt,
     DateTime? CompletedAt,
+    decimal PlannedQuantity,
+    decimal ActualOutputQuantity,
+    decimal OutputYieldPercentage,
     List<TraceabilityAgingLotDto> AgingLots,
-    List<TraceabilityIngredientDto> UsedIngredients
+    List<TraceabilityIngredientDto> ConsumedIngredients
 );
 
 public record TraceabilityAgingLotDto(
@@ -44,7 +52,9 @@ public record TraceabilityIngredientDto(
     Guid RawMaterialStockLotId,
     string RawMaterialName,
     string BatchNumber,
-    decimal QuantityUsed
+    decimal QuantityUsed,
+    string UnitOfMeasure,
+    string SupplierName
 );
 
 public sealed class TraceTreeNode
@@ -146,7 +156,7 @@ public partial class TraceabilityPage : Page
                     {
                         Icon = "🧀",
                         Title = $"Варка #{shortBatchId}",
-                        Details = $"Статус: {batch.BatchStatus} | Запуск: {batch.StartedAt:dd.MM.yyyy}"
+                        Details = $"Статус: {batch.BatchStatus} | Запуск: {batch.StartedAt:dd.MM.yyyy HH:mm}"
                     };
 
                     foreach (var aging in batch.AgingLots ?? [])
@@ -189,36 +199,69 @@ public partial class TraceabilityPage : Page
                     ? "На складе"
                     : traceData.CustomerName;
 
+                var priceInfo = traceData.UnitPrice > 0 ? $" | Цена/С/С: ${traceData.UnitPrice:N2}" : string.Empty;
+                var agingLossInfo = traceData.AgingLossPercentage > 0 ? $" | Усушка: {traceData.AgingLossPercentage:N2}%" : string.Empty;
+
                 var rootNode = new TraceTreeNode
                 {
                     Icon = FormattingConstants.ICON_FINISHED_PRODUCT,
                     Title = traceData.ProductName,
-                    Details = $"Партия: {traceData.ProductBatchNumber} | Покупатель: {customerInfo}"
+                    Details = $"Партия: {traceData.ProductBatchNumber} | Остаток: {traceData.CurrentStockQuantity:N2} кг | Покупатель: {customerInfo}{priceInfo}"
                 };
+
+                TraceTreeNode parentForBatch = rootNode;
+
+                bool hasRealAging = traceData.AgingDaysTotal > 0 ||
+                    (!string.IsNullOrWhiteSpace(traceData.StorageChamberName)
+                     && traceData.StorageChamberName != FormattingConstants.CONST_DEFAULT_CHAMBER_NAME
+                     && traceData.StorageChamberName != "Камера");
+
+                if (hasRealAging)
+                {
+                    var agingNode = new TraceTreeNode
+                    {
+                        Icon = "⏳",
+                        Title = $"Выдержка: {traceData.StorageChamberName}",
+                        Details = $"Дней в камере: {traceData.AgingDaysTotal}{agingLossInfo}"
+                    };
+
+                    rootNode.Children.Add(agingNode);
+                    parentForBatch = agingNode;
+                }
 
                 if (traceData.OriginBatch != null)
                 {
                     var batchIdStr = traceData.OriginBatch.ProductionBatchId.ToString();
                     var shortBatchId = batchIdStr.Length >= 8 ? batchIdStr[..8].ToUpperInvariant() : batchIdStr;
 
+                    var yieldInfo = traceData.OriginBatch.OutputYieldPercentage > 0
+                        ? $" | Выход: {traceData.OriginBatch.ActualOutputQuantity:N2} кг ({traceData.OriginBatch.OutputYieldPercentage:N1}% от плана)"
+                        : string.Empty;
+
                     var batchNode = new TraceTreeNode
                     {
                         Icon = FormattingConstants.ICON_PRODUCTION_BATCH,
                         Title = $"Варка #{shortBatchId}",
-                        Details = $"Статус: {traceData.OriginBatch.BatchStatus} | Запуск: {traceData.OriginBatch.StartedAt:dd.MM.yyyy}"
+                        Details = $"Статус: {traceData.OriginBatch.BatchStatus} | Запуск: {traceData.OriginBatch.StartedAt:dd.MM.yyyy HH:mm}{yieldInfo}"
                     };
 
-                    foreach (var ing in traceData.OriginBatch.UsedIngredients ?? [])
+                    foreach (var ing in traceData.OriginBatch.ConsumedIngredients ?? [])
                     {
+                        var supplier = !string.IsNullOrEmpty(ing.SupplierName) && ing.SupplierName != "—"
+                            ? $" | Поставщик: {ing.SupplierName}"
+                            : string.Empty;
+
+                        var uom = !string.IsNullOrEmpty(ing.UnitOfMeasure) ? $" {ing.UnitOfMeasure}" : string.Empty;
+
                         batchNode.Children.Add(new TraceTreeNode
                         {
                             Icon = FormattingConstants.ICON_RAW_MATERIAL,
                             Title = ing.RawMaterialName,
-                            Details = $"Партия: {ing.BatchNumber} | Расход: {ing.QuantityUsed}"
+                            Details = $"Партия: {ing.BatchNumber} | Расход: {ing.QuantityUsed:N2}{uom}{supplier}"
                         });
                     }
 
-                    rootNode.Children.Add(batchNode);
+                    parentForBatch.Children.Add(batchNode);
                 }
 
                 TreeNodes.Add(rootNode);

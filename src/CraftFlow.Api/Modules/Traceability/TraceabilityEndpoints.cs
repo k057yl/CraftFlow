@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Traceability.GetBackwardTraceability;
 using CraftFlow.Api.Modules.Traceability.GetForwardTraceability;
+using CraftFlow.SharedKernel.Constants;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Traceability;
@@ -19,7 +20,13 @@ public static class TraceabilityEndpoints
         group.MapGet("backward/{productStockLotId:guid}", async (Guid productStockLotId, ISender sender) =>
         {
             var result = await sender.Send(new GetBackwardTraceabilityQuery(productStockLotId));
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+
+            if (result.IsSuccess)
+                return Results.Ok(result.Value);
+
+            return result.Error.Code == ErrorCodes.Inventory.ITEM_NOT_FOUND
+                ? Results.NotFound(result.Error)
+                : Results.BadRequest(result.Error);
         });
     }
 }

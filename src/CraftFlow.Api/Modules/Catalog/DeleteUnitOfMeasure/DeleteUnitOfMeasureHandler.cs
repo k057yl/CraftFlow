@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Catalog.DeleteUnitOfMeasure;
+
 public class DeleteUnitOfMeasureHandler : IRequestHandler<DeleteUnitOfMeasureCommand, Result>
 {
     private readonly AppDbContext _dbContext;
@@ -22,16 +23,7 @@ public class DeleteUnitOfMeasureHandler : IRequestHandler<DeleteUnitOfMeasureCom
         if (unit is null)
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
 
-        var isUsedInRaw = await _dbContext.RawMaterials
-            .AnyAsync(r => r.UnitOfMeasureId == request.Id, cancellationToken);
-
-        var isUsedInProducts = await _dbContext.Products
-            .AnyAsync(p => p.UnitOfMeasureId == request.Id, cancellationToken);
-
-        if (isUsedInRaw || isUsedInProducts)
-            return Result.Failure(Error.Conflict(ErrorCodes.General.ALREADY_EXISTS));
-
-        _dbContext.UnitsOfMeasure.Remove(unit);
+        unit.Archive();
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

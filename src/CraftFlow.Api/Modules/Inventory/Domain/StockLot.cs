@@ -22,7 +22,8 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
             decimal initialQuantity,
             decimal unitPrice,
             string? batchNumber = null,
-            Guid tenantId = default)
+            Guid tenantId = default,
+            Guid? productionBatchId = null)
         {
             if (initialQuantity < 0)
                 throw new ArgumentException(ErrorCodes.Inventory.STOCK_LOT_NEGATIVE_QUANTITY);
@@ -39,6 +40,7 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
                 UnitPrice = unitPrice,
                 BatchNumber = batchNumber,
                 TenantId = tenantId,
+                ProductionBatchId = productionBatchId,
                 CreatedDate = DateTime.UtcNow
             };
         }
