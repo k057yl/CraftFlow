@@ -18,7 +18,6 @@
             <!-- Вкладка 1: Варочный цех -->
             <TabItem Header="{loc:Loc Key=TAB_BREWHOUSE}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
-                    <!-- Максимальная ширина контейнера, чтобы поля не размазывались -->
                     <StackPanel MaxWidth="920" HorizontalAlignment="Left" Width="920">
 
                         <!-- 1. Запуск варки -->
@@ -123,6 +122,9 @@
                                     <TextBlock Text="{loc:Loc Key=LABEL_ACTIVE_BATCH}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
                                     <ComboBox x:Name="ActiveBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,8" Padding="5,4" SelectionChanged="ActiveBatchComboBox_SelectionChanged"/>
 
+                                    <TextBlock Text="Наименование готовой партии:" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <TextBox x:Name="CompleteBatchNameTextBox" Margin="0,0,0,8" Padding="5,4"/>
+
                                     <TextBlock Text="{loc:Loc Key=LABEL_ACTUAL_OUTPUT}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
                                     <TextBox x:Name="ActualOutputQuantityTextBox" Margin="0,0,0,12" Padding="5,4"/>
 
@@ -222,12 +224,28 @@
 
                                     <StackPanel Grid.Column="0" Margin="0,0,10,0">
                                         <TextBlock Text="{loc:Loc Key=LABEL_ACTIVE_AGING_LOT}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <ComboBox x:Name="ActiveAgingLotsComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
+                                        <ComboBox x:Name="ActiveAgingLotsComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4" SelectionChanged="ActiveAgingLotsComboBox_SelectionChanged"/>
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="1">
                                         <TextBlock Text="{loc:Loc Key=LABEL_TARGET_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
                                         <ComboBox x:Name="TargetWarehousesComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                        <TextBlock Text="Наименование лота готовой продукции:" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBox x:Name="ReleaseLotNameTextBox" Padding="5,4"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1">
+                                        <!-- Пустой слот для симметрии сетки -->
                                     </StackPanel>
                                 </Grid>
 

@@ -12,39 +12,58 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="{loc:Loc Key=TITLE_TRACEABILITY}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+        <TextBlock Text="{loc:Loc Key=TITLE_TRACEABILITY}" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
 
-        <Grid Grid.Row="1" Margin="0,0,0,15">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <!-- Панель управления трассировкой -->
+        <StackPanel Grid.Row="1" MaxWidth="920" HorizontalAlignment="Left" Width="920">
+            <GroupBox Header="{loc:Loc Key=GROUP_TRACE_CONTROLS}" Padding="12" Margin="0,0,0,15">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
 
-            <ComboBox x:Name="StockLotsComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Grid.Column="0" Margin="0,0,10,0"/>
+                    <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                        <TextBlock Text="{loc:Loc Key=LABEL_SELECT_LOT_TRACE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                        <ComboBox x:Name="StockLotsComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4" Height="28"/>
+                    </StackPanel>
 
-            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,10,0" VerticalAlignment="Center">
-                <RadioButton x:Name="ForwardRadioButton" Content="Прямая (Forward)" IsChecked="True" Margin="0,0,10,0" FontWeight="SemiBold"/>
-                <RadioButton x:Name="BackwardRadioButton" Content="Обратная (Backward)" FontWeight="SemiBold"/>
-            </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,15,0" VerticalAlignment="Bottom" Height="28">
+                        <RadioButton x:Name="ForwardRadioButton" Content="{loc:Loc Key=TRACE_FORWARD}" IsChecked="True" Margin="0,0,15,0" VerticalAlignment="Center" FontWeight="SemiBold" Checked="RadioButton_Checked"/>
+                        <RadioButton x:Name="BackwardRadioButton" Content="{loc:Loc Key=TRACE_BACKWARD}" VerticalAlignment="Center" FontWeight="SemiBold" Checked="RadioButton_Checked"/>
+                    </StackPanel>
 
-            <Button Content="{loc:Loc Key=RUN_TRACEABILITY}" Click="RunTraceability_Click" Grid.Column="2" Padding="15,5" FontWeight="Bold" Background="#0284C7" Foreground="White"/>
-        </Grid>
+                    <Button Grid.Column="2" 
+                            Content="{loc:Loc Key=RUN_TRACEABILITY}" 
+                            Click="RunTraceability_Click" 
+                            Padding="20,0" 
+                            Height="28" 
+                            VerticalAlignment="Bottom"
+                            FontWeight="Bold" 
+                            Background="#0284C7" 
+                            Foreground="White"/>
+                </Grid>
+            </GroupBox>
+        </StackPanel>
 
-        <GroupBox Header="{loc:Loc Key=COL_DETAILS}" Grid.Row="2" Padding="10">
-            <TreeView x:Name="TraceTreeView" FontSize="14" BorderThickness="0">
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate ItemsSource="{Binding Children}">
-                        <StackPanel Orientation="Horizontal" Margin="2">
-                            <TextBlock Text="{Binding Icon}" Margin="0,0,8,0"/>
-                            <TextBlock Text="{Binding Title}" FontWeight="Bold" Margin="0,0,8,0"/>
-                            <TextBlock Text="{Binding Details}" Foreground="Gray"/>
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
-        </GroupBox>
+        <!-- Дерево результатов -->
+        <StackPanel Grid.Row="2" MaxWidth="920" HorizontalAlignment="Left" Width="920">
+            <GroupBox Header="{loc:Loc Key=GROUP_TRACE_RESULTS}" Padding="10" MinHeight="300">
+                <TreeView x:Name="TraceTreeView" FontSize="14" BorderThickness="0" Background="Transparent">
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal" Margin="2,4">
+                                <TextBlock Text="{Binding Icon}" Margin="0,0,8,0" FontSize="16"/>
+                                <TextBlock Text="{Binding Title}" FontWeight="Bold" Margin="0,0,8,0" Foreground="#0F172A"/>
+                                <TextBlock Text="{Binding Details}" Foreground="#475569"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </GroupBox>
+        </StackPanel>
 
-        <TextBlock x:Name="StatusTextBlock" Grid.Row="3" Text="READY" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="3" Text="{loc:Loc Key=STATUS_READY}" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
     </Grid>
 </Page>

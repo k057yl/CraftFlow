@@ -1,65 +1,69 @@
 ﻿using CraftFlow.Api.Common.Constants;
 
 namespace CraftFlow.Api.Modules.Traceability.TraceabilityRead;
+
 public static class TraceabilityConstants
 {
+    // 1. Заголовок сырья для Forward Traceability
     public const string SQL_GET_FORWARD_HEADER = $"""
         SELECT 
-            sl.id AS RawMaterialStockLotId,
-            sl.batch_number AS RawMaterialBatchNumber,
-            COALESCE(rm.name, p.name, @DefaultMaterialName) AS RawMaterialName
+            sl."Id" AS RawMaterialStockLotId,
+            COALESCE(sl."BatchNumber", 'Б/Н') AS RawMaterialBatchNumber,
+            COALESCE(rm."Name", p."Name", @DefaultMaterialName) AS RawMaterialName
         FROM {DbTables.STOCK_LOTS} sl
-        LEFT JOIN {DbTables.RAW_MATERIALS} rm ON rm.id = sl.item_id
-        LEFT JOIN {DbTables.PRODUCTS} p ON p.id = sl.item_id
-        WHERE sl.id = @StockLotId AND sl.tenant_id = @TenantId;
+        LEFT JOIN {DbTables.RAW_MATERIALS} rm ON rm."Id" = sl."ItemId"
+        LEFT JOIN {DbTables.PRODUCTS} p ON p."Id" = sl."ItemId"
+        WHERE sl."Id" = @StockLotId AND sl."TenantId" = @TenantId;
         """;
 
+    // 2. Все варки и камеры созревания, где использовался этот StockLot сырья
     public const string SQL_GET_FORWARD_BATCHES = $"""
         SELECT 
-            pb.id AS production_batch_id,
-            pb.status AS batch_status_int,
-            pb.created_date AS started_at,
-            pb.completed_at AS completed_at,
-            al.id AS aging_lot_id,
-            al.batch_number AS aging_batch_number,
-            ach.name AS chamber_name,
-            al.status::text AS aging_status
+            pb."Id" AS production_batch_id,
+            pb."Status" AS batch_status_int,
+            pb."StartedAt" AS started_at,
+            pb."CompletedAt" AS completed_at,
+            al."Id" AS aging_lot_id,
+            al."BatchNumber" AS aging_batch_number,
+            ach."Name" AS chamber_name,
+            al."State"::text AS aging_status
         FROM {DbTables.CONSUMED_INGREDIENTS} ci
-        JOIN {DbTables.PRODUCTION_BATCHES} pb ON pb.id = ci.production_batch_id
-        LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_LOTS} al ON al.production_batch_id = pb.id
-        LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_CHAMBERS} ach ON ach.id = al.aging_chamber_id
-        WHERE ci.stock_lot_id = @StockLotId AND pb.tenant_id = @TenantId;
+        JOIN {DbTables.PRODUCTION_BATCHES} pb ON pb."Id" = ci."ProductionBatchId"
+        LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_LOTS} al ON al."ProductionBatchId" = pb."Id"
+        LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_CHAMBERS} ach ON ach."Id" = al."AgingChamberId"
+        WHERE ci."StockLotId" = @StockLotId AND pb."TenantId" = @TenantId;
         """;
 
+    // 3. Заголовок готовой продукции и варка-источник для Backward Traceability
     public const string SQL_GET_BACKWARD_HEADER = $"""
         SELECT 
-            so.id AS sales_order_id,
-            c.name AS customer_name,
-            sl.id AS product_stock_lot_id,
-            sl.batch_number AS product_batch_number,
-            p.name AS product_name,
-            pb.id AS production_batch_id,
-            pb.status AS batch_status_int,
-            pb.created_date AS started_at,
-            pb.completed_at AS completed_at
-        FROM {DbTables.STOCK_LOTS} sl
-        JOIN {DbTables.PRODUCTS} p ON p.id = sl.item_id
-        LEFT JOIN {DbTables.SALES_ORDER_ITEMS} soi ON soi.product_id = p.id
-        LEFT JOIN {DbTables.SALES_ORDERS} so ON so.id = soi.sales_order_id
-        LEFT JOIN {DbTables.CUSTOMERS} c ON c.id = so.customer_id
-        LEFT JOIN {DbTables.PRODUCTION_BATCHES} pb ON pb.id = sl.production_batch_id
-        WHERE sl.id = @ProductStockLotId AND sl.tenant_id = @TenantId;
+            NULL::uuid AS sales_order_id,
+            'На складе' AS customer_name,
+            COALESCE(sl."Id", pb."Id") AS product_stock_lot_id,
+            COALESCE(sl."BatchNumber", pb."Name") AS product_batch_number,
+            p."Name" AS product_name,
+            pb."Id" AS production_batch_id,
+            pb."Status" AS batch_status_int,
+            pb."StartedAt" AS started_at,
+            pb."CompletedAt" AS completed_at
+        FROM {DbTables.PRODUCTION_BATCHES} pb
+        INNER JOIN {DbTables.PRODUCTS} p ON p."Id" = pb."TargetProductId"
+        LEFT JOIN {DbTables.STOCK_LOTS} sl ON sl."ProductionBatchId" = pb."Id"
+        WHERE (pb."Id" = @ProductStockLotId OR sl."Id" = @ProductStockLotId) 
+          AND pb."TenantId" = @TenantId
+        LIMIT 1;
         """;
 
+    // 4. Все ингредиенты (сырье), задействованные в этой варке
     public const string SQL_GET_BACKWARD_CONSUMED = $"""
         SELECT 
-            rm_sl.id AS raw_material_stock_lot_id,
-            rm.name AS raw_material_name,
-            rm_sl.batch_number AS batch_number,
-            ci.quantity AS quantity_used
+            COALESCE(rm_sl."Id", ci."StockLotId") AS raw_material_stock_lot_id,
+            COALESCE(rm."Name", 'Сырье') AS raw_material_name,
+            COALESCE(rm_sl."BatchNumber", 'Б/Н') AS batch_number,
+            ci."Quantity" AS quantity_used
         FROM {DbTables.CONSUMED_INGREDIENTS} ci
-        JOIN {DbTables.STOCK_LOTS} rm_sl ON rm_sl.id = ci.stock_lot_id
-        JOIN {DbTables.RAW_MATERIALS} rm ON rm.id = ci.raw_material_id
-        WHERE ci.production_batch_id = @BatchId AND rm_sl.tenant_id = @TenantId;
+        LEFT JOIN {DbTables.STOCK_LOTS} rm_sl ON rm_sl."Id" = ci."StockLotId"
+        LEFT JOIN {DbTables.RAW_MATERIALS} rm ON rm."Id" = ci."RawMaterialId"
+        WHERE ci."ProductionBatchId" = @BatchId;
         """;
 }

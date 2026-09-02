@@ -4,86 +4,125 @@
       xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
       Title="{loc:Loc Key=TITLE_PROCUREMENT}">
 
-	<Grid Margin="15">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="Auto"/>
-		</Grid.RowDefinitions>
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-		<TextBlock Text="{loc:Loc Key=TITLE_PROCUREMENT}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+        <TextBlock Text="{loc:Loc Key=TITLE_PROCUREMENT}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
 
-		<TabControl Grid.Row="1">
-			<!-- 1. Оприходование -->
-			<TabItem Header="1. Оприходование сырья">
-				<ScrollViewer VerticalScrollBarVisibility="Auto" Padding="15">
-					<StackPanel>
-						<GroupBox Header="Принять партию сырья на склад" Padding="10">
-							<StackPanel>
-								<TextBlock Text="Выбор Поставщика:" Margin="0,0,0,3"/>
-								<ComboBox x:Name="StockSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10"/>
+        <TabControl Grid.Row="1">
+            <!-- 1. Оприходование -->
+            <TabItem Header="{loc:Loc Key=TAB_GOODS_RECEIPT}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
+                    <StackPanel MaxWidth="920" HorizontalAlignment="Left" Width="920">
+                        <GroupBox Header="{loc:Loc Key=GROUP_RECEIVE_STOCK_LOT}" Padding="12">
+                            <StackPanel>
+                                <!-- Выбор поставщика, склада и сырья в 3 колонки -->
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-								<TextBlock Text="{loc:Loc Key=SELECT_WAREHOUSE}" Margin="0,0,0,3"/>
-								<ComboBox x:Name="StockWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10"/>
+                                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                        <TextBlock Text="{loc:Loc Key=LABEL_SELECT_SUPPLIER}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <ComboBox x:Name="StockSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
+                                    </StackPanel>
 
-								<TextBlock Text="{loc:Loc Key=SELECT_RAW_MATERIAL}" Margin="0,0,0,3"/>
-								<ComboBox x:Name="StockRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10"/>
+                                    <StackPanel Grid.Column="1" Margin="4,0,4,0">
+                                        <TextBlock Text="{loc:Loc Key=SELECT_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <ComboBox x:Name="StockWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
+                                    </StackPanel>
 
-								<Grid Margin="0,0,0,10">
-									<Grid.ColumnDefinitions>
-										<ColumnDefinition Width="*"/>
-										<ColumnDefinition Width="*"/>
-									</Grid.ColumnDefinitions>
-									<StackPanel Grid.Column="0" Margin="0,0,5,0">
-										<TextBlock Text="{loc:Loc Key=LOT_QUANTITY}" Margin="0,0,0,3"/>
-										<TextBox x:Name="StockQuantityTextBox" Text="500" Padding="3"/>
-									</StackPanel>
-									<StackPanel Grid.Column="1" Margin="5,0,0,0">
-										<TextBlock Text="{loc:Loc Key=UNIT_PRICE}" Margin="0,0,0,3"/>
-										<TextBox x:Name="StockUnitPriceTextBox" Text="25.00" Padding="3"/>
-									</StackPanel>
-								</Grid>
+                                    <StackPanel Grid.Column="2" Margin="8,0,0,0">
+                                        <TextBlock Text="{loc:Loc Key=SELECT_RAW_MATERIAL}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <ComboBox x:Name="StockRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
+                                    </StackPanel>
+                                </Grid>
 
-								<TextBlock Text="{loc:Loc Key=BATCH_NUMBER}" Margin="0,0,0,3"/>
-								<TextBox x:Name="StockBatchTextBox" Text="BATCH-2026-001" Margin="0,0,0,15" Padding="3"/>
+                                <!-- Количество, Цена и Номер партии -->
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-								<Button Content="{loc:Loc Key=ADD_STOCK_LOT}" Click="AddStockLot_Click" Height="30"/>
-							</StackPanel>
-						</GroupBox>
-					</StackPanel>
-				</ScrollViewer>
-			</TabItem>
+                                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                        <TextBlock Text="{loc:Loc Key=LOT_QUANTITY}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBox x:Name="StockQuantityTextBox" Text="500" Padding="5,4"/>
+                                    </StackPanel>
 
-			<!-- 2. Поставщики -->
-			<TabItem Header="2. Поставщики сырья">
-				<Grid Margin="15">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="Auto"/>
-						<RowDefinition Height="Auto"/>
-						<RowDefinition Height="Auto"/>
-						<RowDefinition Height="Auto"/>
-					</Grid.RowDefinitions>
+                                    <StackPanel Grid.Column="1" Margin="4,0,4,0">
+                                        <TextBlock Text="{loc:Loc Key=UNIT_PRICE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBox x:Name="StockUnitPriceTextBox" Text="25.00" Padding="5,4"/>
+                                    </StackPanel>
 
-					<StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-						<TextBlock Text="{loc:Loc Key=SUPPLIER_NAME}" Width="150" VerticalAlignment="Center"/>
-						<TextBox x:Name="NameTextBox" Width="250" Padding="5"/>
-					</StackPanel>
+                                    <StackPanel Grid.Column="2" Margin="8,0,0,0">
+                                        <TextBlock Text="{loc:Loc Key=BATCH_NUMBER}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBox x:Name="StockBatchTextBox" Text="BATCH-2026-001" Padding="5,4"/>
+                                    </StackPanel>
+                                </Grid>
 
-					<StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
-						<TextBlock Text="{loc:Loc Key=SUPPLIER_PHONE}" Width="150" VerticalAlignment="Center"/>
-						<TextBox x:Name="PhoneTextBox" Width="250" Padding="5"/>
-					</StackPanel>
+                                <Button Content="{loc:Loc Key=ADD_STOCK_LOT}" 
+								        Click="AddStockLot_Click" 
+								        Height="32" 
+								        Width="180" 
+								        HorizontalAlignment="Left" 
+								        FontWeight="Bold" 
+								        Background="#0284C7" 
+								        Foreground="White"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
 
-					<StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,20">
-						<TextBlock Text="{loc:Loc Key=SUPPLIER_EMAIL}" Width="150" VerticalAlignment="Center"/>
-						<TextBox x:Name="EmailTextBox" Width="250" Padding="5"/>
-					</StackPanel>
+            <!-- 2. Поставщики -->
+            <TabItem Header="{loc:Loc Key=TAB_SUPPLIERS}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
+                    <StackPanel MaxWidth="920" HorizontalAlignment="Left" Width="920">
+                        <GroupBox Header="{loc:Loc Key=HEADER_SUPPLIERS}" Padding="12" MaxWidth="600" HorizontalAlignment="Left" Width="600">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
 
-					<Button Grid.Row="3" Content="{loc:Loc Key=CREATE_SUPPLIER}" Width="180" HorizontalAlignment="Left" Padding="10,5" Click="CreateSupplier_Click"/>
-				</Grid>
-			</TabItem>
-		</TabControl>
+                                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                                        <TextBlock Text="{loc:Loc Key=SUPPLIER_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBox x:Name="NameTextBox" Padding="5,4"/>
+                                    </StackPanel>
 
-		<TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="READY" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
-	</Grid>
+                                    <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                        <TextBlock Text="{loc:Loc Key=SUPPLIER_PHONE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBox x:Name="PhoneTextBox" Padding="5,4"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <StackPanel Margin="0,0,0,15">
+                                    <TextBlock Text="{loc:Loc Key=SUPPLIER_EMAIL}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <TextBox x:Name="EmailTextBox" Padding="5,4"/>
+                                </StackPanel>
+
+                                <Button Content="{loc:Loc Key=CREATE_SUPPLIER}" 
+								        Width="180" 
+								        Height="32"
+								        HorizontalAlignment="Left" 
+								        FontWeight="Bold"
+								        Click="CreateSupplier_Click"/>
+                            </StackPanel>
+                        </GroupBox>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
+    </Grid>
 </Page>

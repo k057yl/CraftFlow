@@ -253,4 +253,41 @@
 	<data name="PRODUCTION_INSUFFICIENT_RAW_MATERIAL" xml:space="preserve"><value>Недостаточно сырья для варки!</value></data>
 	<data name="PRODUCTION_BATCH_NOT_FOUND" xml:space="preserve"><value>Партия производства не найдена</value></data>
 	<data name="GENERAL_NOT_FOUND" xml:space="preserve"><value>Запрашиваемый ресурс не найден</value></data>
+
+	<!-- Sales Page Keys -->
+	<data name="SALES_HEADER" xml:space="preserve"><value>Управление Продажами и Клиентами</value></data>
+	<data name="TAB_SALES_SHIPMENT" xml:space="preserve"><value>1. Продажи и Отгрузка</value></data>
+	<data name="TAB_CUSTOMERS" xml:space="preserve"><value>2. Клиенты и Покупатели</value></data>
+	<data name="GROUP_SALES_ORDER" xml:space="preserve"><value>Оформление и Отгрузка Заказа</value></data>
+	<data name="GROUP_REGISTER_CUSTOMER" xml:space="preserve"><value>Регистрация нового контрагента</value></data>
+	<data name="GROUP_ACTIVE_CUSTOMERS" xml:space="preserve"><value>Список активных клиентов</value></data>
+	<data name="LABEL_SELECT_CUSTOMER" xml:space="preserve"><value>Выберите Покупателя:</value></data>
+	<data name="LABEL_FINISHED_WAREHOUSE" xml:space="preserve"><value>Склад готовой продукции:</value></data>
+	<data name="LABEL_SELECT_PRODUCT" xml:space="preserve"><value>Выберите Продукт:</value></data>
+	<data name="LABEL_AVAILABLE_STOCK" xml:space="preserve"><value>Доступный остаток:</value></data>
+	<data name="LABEL_UNIT_COST_CALC" xml:space="preserve"><value>Расчётная себестоимость 1 кг:</value></data>
+	<data name="LABEL_QTY_KG" xml:space="preserve"><value>Количество (кг):</value></data>
+	<data name="LABEL_PRICE_PER_KG" xml:space="preserve"><value>Цена за 1 кг ($):</value></data>
+	<data name="LABEL_DISCOUNT_PERCENT" xml:space="preserve"><value>Скидка (%):</value></data>
+	<data name="LABEL_DISCOUNTED_PRICE_UNIT" xml:space="preserve"><value>Цена со скидкой за ед.:</value></data>
+	<data name="LABEL_TOTAL_ORDER_SUM" xml:space="preserve"><value>ИТОГО К ОПЛАТЕ:</value></data>
+	<data name="LABEL_CUSTOMER_NAME" xml:space="preserve"><value>Наименование (Ресторан / Сетка / ФЛ):</value></data>
+	<data name="LABEL_CUSTOMER_PHONE" xml:space="preserve"><value>Контактный телефон:</value></data>
+	<data name="NOTICE_MARKUP_APPLIED" xml:space="preserve"><value>* Автоматически применена базовая наценка x2 к себестоимости</value></data>
+	<data name="BTN_SHIP_ORDER" xml:space="preserve"><value>🚀 Отгрузить Заказ</value></data>
+	<data name="BTN_CREATE_CUSTOMER" xml:space="preserve"><value>➕ Зарегистрировать Клиента</value></data>
+
+	<!-- Procurement Page Extra Keys -->
+	<data name="TAB_GOODS_RECEIPT" xml:space="preserve"><value>1. Оприходование сырья</value></data>
+	<data name="TAB_SUPPLIERS" xml:space="preserve"><value>2. Поставщики сырья</value></data>
+	<data name="GROUP_RECEIVE_STOCK_LOT" xml:space="preserve"><value>Принять партию сырья на склад</value></data>
+	<data name="LABEL_SELECT_SUPPLIER" xml:space="preserve"><value>Выбор Поставщика:</value></data>
+
+	<!-- Traceability Page Keys -->
+	<data name="GROUP_TRACE_CONTROLS" xml:space="preserve"><value>Параметры поиска</value></data>
+	<data name="GROUP_TRACE_RESULTS" xml:space="preserve"><value>Дерево происхождения / распределения</value></data>
+	<data name="LABEL_SELECT_LOT_TRACE" xml:space="preserve"><value>Выберите партию (Сырьё или Готовая продукция):</value></data>
+	<data name="TRACE_FORWARD" xml:space="preserve"><value>Прямая (От Сырья)</value></data>
+	<data name="TRACE_BACKWARD" xml:space="preserve"><value>Обратная (От Продукта)</value></data>
+	<data name="RUN_TRACEABILITY" xml:space="preserve"><value>🔍 Выполнить трассировку</value></data>
 </root>

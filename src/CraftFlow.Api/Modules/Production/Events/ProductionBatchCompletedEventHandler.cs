@@ -59,16 +59,20 @@ public class ProductionBatchCompletedEventHandler : INotificationHandler<Product
             ? batch.DestinationWarehouseId
             : batch.WarehouseId;
 
-        var batchNumberString = batch.Id.ToString()[..8].ToUpper();
-        var lotNumber = string.Concat(FormattingConstants.BATCH_PREFIX, batchNumberString);
+        var lotNumber = !string.IsNullOrWhiteSpace(batch.Name)
+            ? batch.Name
+            : string.Concat(FormattingConstants.BATCH_PREFIX, batch.Id.ToString()[..8].ToUpperInvariant());
 
         var finishedStockLot = StockLot.Create(
             destWarehouseId,
             batch.TargetProductId,
             notification.ActualOutputQuantity,
             calculatedUnitCost,
-            lotNumber
+            lotNumber,
+            batch.TenantId
         );
+
+        finishedStockLot.SetProductionOrigin(batch.Id);
 
         _dbContext.StockLots.Add(finishedStockLot);
     }

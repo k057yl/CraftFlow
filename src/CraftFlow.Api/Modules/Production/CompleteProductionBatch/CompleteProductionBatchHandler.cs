@@ -28,6 +28,11 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
             return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Production.BATCH_NOT_FOUND));
         }
 
+        if (!string.IsNullOrWhiteSpace(request.BatchNumber))
+        {
+            batch.UpdateName(request.BatchNumber);
+        }
+
         batch.Complete(request.ActualOutputQuantity);
 
         await _publisher.Publish(

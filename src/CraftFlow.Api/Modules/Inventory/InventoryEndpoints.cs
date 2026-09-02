@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Common.Persistence;
+﻿using CraftFlow.Api.Common.MultiTenancy;
+using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging.CreateChamber;
 using CraftFlow.Api.Modules.Inventory.AddStockLot;
 using CraftFlow.Api.Modules.Inventory.CreateWarehouse;
@@ -60,6 +61,45 @@ public static class InventoryEndpoints
                 .ToListAsync(cancellationToken);
 
             return Results.Ok(lots);
+        });
+
+        group.MapGet("/stock-lots/raw", async (AppDbContext dbContext, ITenantContext tenantContext, CancellationToken cancellationToken) =>
+        {
+            var lots = await dbContext.StockLots
+                .AsNoTracking()
+                .Where(s => s.TenantId == tenantContext.TenantId && s.ProductionBatchId == null)
+                .Select(s => new
+                {
+                    s.Id,
+                    Name = dbContext.RawMaterials.Where(rm => rm.Id == s.ItemId).Select(rm => rm.Name).FirstOrDefault() != null
+                        ? dbContext.RawMaterials.Where(rm => rm.Id == s.ItemId).Select(rm => rm.Name).FirstOrDefault() + " (" + (s.BatchNumber ?? "Б/Н") + ")"
+                        : "Сырье (" + (s.BatchNumber ?? "Б/Н") + ")"
+                })
+                .ToListAsync(cancellationToken);
+
+            return Results.Ok(lots);
+        });
+
+        group.MapGet("/stock-lots/products", async (AppDbContext dbContext, ITenantContext tenantContext, CancellationToken cancellationToken) =>
+        {
+            var productsFromBatches = await (
+                from pb in dbContext.ProductionBatches
+                join p in dbContext.Products on pb.TargetProductId equals p.Id
+                join sl in dbContext.StockLots on pb.Id equals sl.ProductionBatchId into slGroup
+                from sl in slGroup.DefaultIfEmpty()
+                where pb.TenantId == tenantContext.TenantId
+                select new
+                {
+                    Id = sl != null ? sl.Id : pb.Id,
+                    Name = sl != null && !string.IsNullOrEmpty(sl.BatchNumber)
+                        ? sl.BatchNumber
+                        : (!string.IsNullOrEmpty(pb.Name) ? pb.Name : p.Name + " (Варка #" + pb.Id.ToString().Substring(0, 8).ToUpper() + ")")
+                })
+                .AsNoTracking()
+                .Distinct()
+                .ToListAsync(cancellationToken);
+
+            return Results.Ok(productsFromBatches);
         });
     }
 }

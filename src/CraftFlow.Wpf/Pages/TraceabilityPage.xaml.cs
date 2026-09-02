@@ -67,15 +67,27 @@ public partial class TraceabilityPage : Page
         StockLotsComboBox.ItemsSource = StockLots;
         TraceTreeView.ItemsSource = TreeNodes;
 
-        Loaded += async (s, e) => await LoadDataAsync();
+        Loaded += async (s, e) => await LoadStockLotsAsync();
     }
 
-    private async Task LoadDataAsync()
+    private async void RadioButton_Checked(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded) return;
+        await LoadStockLotsAsync();
+    }
+
+    private async Task LoadStockLotsAsync()
     {
         try
         {
-            var stockLots = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.STOCK_LOTS);
             StockLots.Clear();
+
+            bool isForward = ForwardRadioButton?.IsChecked ?? true;
+            string endpoint = isForward
+                ? "api/inventory/stock-lots/raw"
+                : "api/inventory/stock-lots/products";
+
+            var stockLots = await ApiService.Instance.GetAsync<List<LookupDto>>(endpoint);
             stockLots?.ForEach(l => StockLots.Add(new LookupItem(l.Id, l.Name)));
 
             if (StockLotsComboBox.SelectedIndex < 0 && StockLots.Count > 0)
@@ -116,34 +128,34 @@ public partial class TraceabilityPage : Page
             var endpoint = $"{Endpoints.TRACEABILITY_FORWARD}/{stockLotId}";
             var traceData = await ApiService.Instance.GetAsync<ForwardTraceabilityDto>(endpoint);
 
-            if (traceData != null)
+            if (traceData != null && !string.IsNullOrEmpty(traceData.RawMaterialName))
             {
                 var rootNode = new TraceTreeNode
                 {
-                    Icon = FormattingConstants.ICON_RAW_MATERIAL,
+                    Icon = "📦",
                     Title = traceData.RawMaterialName,
-                    Details = string.Format(FormattingConstants.TRACE_RAW_DETAILS_FORMAT, traceData.RawMaterialBatchNumber)
+                    Details = $"Партия сырья: {traceData.RawMaterialBatchNumber}"
                 };
 
                 foreach (var batch in traceData.Batches ?? [])
                 {
                     var batchIdStr = batch.ProductionBatchId.ToString();
-                    var shortBatchId = batchIdStr.Length >= 4 ? batchIdStr.Substring(0, 4).ToUpperInvariant() : batchIdStr;
+                    var shortBatchId = batchIdStr.Length >= 8 ? batchIdStr[..8].ToUpperInvariant() : batchIdStr;
 
                     var batchNode = new TraceTreeNode
                     {
-                        Icon = FormattingConstants.ICON_PRODUCTION_BATCH,
-                        Title = string.Format(FormattingConstants.TRACE_BATCH_TITLE_FORMAT, shortBatchId),
-                        Details = string.Format(FormattingConstants.TRACE_BATCH_DETAILS_FORMAT, batch.BatchStatus, batch.StartedAt.ToString("dd.MM.yyyy"))
+                        Icon = "🧀",
+                        Title = $"Варка #{shortBatchId}",
+                        Details = $"Статус: {batch.BatchStatus} | Запуск: {batch.StartedAt:dd.MM.yyyy}"
                     };
 
                     foreach (var aging in batch.AgingLots ?? [])
                     {
                         batchNode.Children.Add(new TraceTreeNode
                         {
-                            Icon = FormattingConstants.ICON_AGING_LOT,
-                            Title = string.Format(FormattingConstants.TRACE_AGING_TITLE_FORMAT, aging.ChamberName),
-                            Details = string.Format(FormattingConstants.TRACE_AGING_DETAILS_FORMAT, aging.AgingBatchNumber, aging.AgingStatus)
+                            Icon = "⏳",
+                            Title = $"Камера: {aging.ChamberName}",
+                            Details = $"Лот: {aging.AgingBatchNumber} ({aging.AgingStatus})"
                         });
                     }
 
@@ -152,6 +164,10 @@ public partial class TraceabilityPage : Page
 
                 TreeNodes.Add(rootNode);
                 SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            }
+            else
+            {
+                SetStatus("Связи трассировки для данной партии не найдены!", Brushes.OrangeRed);
             }
         }
         catch (Exception ex)
@@ -169,23 +185,27 @@ public partial class TraceabilityPage : Page
 
             if (traceData != null)
             {
+                var customerInfo = string.IsNullOrEmpty(traceData.CustomerName) || traceData.CustomerName == FormattingConstants.CONST_DEFAULT_CUSTOMER_NAME
+                    ? "На складе"
+                    : traceData.CustomerName;
+
                 var rootNode = new TraceTreeNode
                 {
                     Icon = FormattingConstants.ICON_FINISHED_PRODUCT,
                     Title = traceData.ProductName,
-                    Details = string.Format(FormattingConstants.TRACE_PRODUCT_DETAILS_FORMAT, traceData.ProductBatchNumber, traceData.CustomerName)
+                    Details = $"Партия: {traceData.ProductBatchNumber} | Покупатель: {customerInfo}"
                 };
 
                 if (traceData.OriginBatch != null)
                 {
                     var batchIdStr = traceData.OriginBatch.ProductionBatchId.ToString();
-                    var shortBatchId = batchIdStr.Length >= 4 ? batchIdStr.Substring(0, 4).ToUpperInvariant() : batchIdStr;
+                    var shortBatchId = batchIdStr.Length >= 8 ? batchIdStr[..8].ToUpperInvariant() : batchIdStr;
 
                     var batchNode = new TraceTreeNode
                     {
                         Icon = FormattingConstants.ICON_PRODUCTION_BATCH,
-                        Title = string.Format(FormattingConstants.TRACE_BATCH_TITLE_FORMAT, shortBatchId),
-                        Details = string.Format(FormattingConstants.TRACE_BATCH_DETAILS_FORMAT, traceData.OriginBatch.BatchStatus, traceData.OriginBatch.StartedAt.ToString("dd.MM.yyyy"))
+                        Title = $"Варка #{shortBatchId}",
+                        Details = $"Статус: {traceData.OriginBatch.BatchStatus} | Запуск: {traceData.OriginBatch.StartedAt:dd.MM.yyyy}"
                     };
 
                     foreach (var ing in traceData.OriginBatch.UsedIngredients ?? [])
@@ -194,7 +214,7 @@ public partial class TraceabilityPage : Page
                         {
                             Icon = FormattingConstants.ICON_RAW_MATERIAL,
                             Title = ing.RawMaterialName,
-                            Details = string.Format(FormattingConstants.TRACE_INGREDIENT_DETAILS_FORMAT, ing.BatchNumber, ing.QuantityUsed)
+                            Details = $"Партия: {ing.BatchNumber} | Расход: {ing.QuantityUsed}"
                         });
                     }
 
@@ -203,6 +223,10 @@ public partial class TraceabilityPage : Page
 
                 TreeNodes.Add(rootNode);
                 SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            }
+            else
+            {
+                SetStatus("Связи трассировки для данной партии не найдены!", Brushes.OrangeRed);
             }
         }
         catch (Exception ex)

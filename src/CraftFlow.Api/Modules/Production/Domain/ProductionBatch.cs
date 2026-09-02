@@ -22,7 +22,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
     public Guid DestinationWarehouseId { get; private set; }
     public string? DiscardReason { get; private set; }
 
-    private ProductionBatch(){}
+    private ProductionBatch() { }
 
     public static ProductionBatch Create(
         Guid recipeId,
@@ -54,6 +54,14 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
 
         batch.InitStateMachine();
         return batch;
+    }
+
+    public void UpdateName(string newName)
+    {
+        if (!string.IsNullOrWhiteSpace(newName))
+        {
+            Name = newName.Trim();
+        }
     }
 
     public void Start()

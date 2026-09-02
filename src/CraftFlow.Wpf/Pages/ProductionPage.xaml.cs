@@ -80,7 +80,7 @@ public partial class ProductionPage : Page
         if (decimal.TryParse(normalized, out result)) return true;
 
         normalized = text.Trim().Replace(',', '.');
-        return decimal.TryParse(normalized, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out result);
+        return decimal.TryParse(normalized, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
     }
 
     private void GenerateDefaultBatchName()
@@ -152,6 +152,40 @@ public partial class ProductionPage : Page
         }
     }
 
+    private async void ActiveBatchComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ActiveBatchComboBox.SelectedItem is not LookupItem selectedBatch) return;
+
+        CompleteBatchNameTextBox.Text = $"{selectedBatch.Name} (Готовая продукция)";
+
+        try
+        {
+            var endpoint = $"{Endpoints.PRODUCTION_COSTING}/{selectedBatch.Id}";
+            var costData = await ApiService.Instance.GetAsync<BatchCostDto>(endpoint);
+
+            if (costData != null)
+            {
+                TotalCostTextBlock.Text = $"${costData.TotalRawMaterialCost:F2}";
+                UnitCostTextBlock.Text = $"${costData.UnitCost:F2}";
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private void ActiveAgingLotsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ActiveAgingLotsComboBox.SelectedItem is LookupItem selectedLot)
+        {
+            ReleaseLotNameTextBox.Text = $"{selectedLot.Name} (Снято с выдержки)";
+        }
+        else
+        {
+            ReleaseLotNameTextBox.Clear();
+        }
+    }
+
     private async void BatchInputs_Changed(object sender, RoutedEventArgs e)
     {
         if (EstimatedCostTextBlock == null || RequirementsListBox == null) return;
@@ -220,26 +254,6 @@ public partial class ProductionPage : Page
         }
     }
 
-    private async void ActiveBatchComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (ActiveBatchComboBox.SelectedValue is not Guid batchId) return;
-
-        try
-        {
-            var endpoint = $"{Endpoints.PRODUCTION_COSTING}/{batchId}";
-            var costData = await ApiService.Instance.GetAsync<BatchCostDto>(endpoint);
-
-            if (costData != null)
-            {
-                TotalCostTextBlock.Text = $"${costData.TotalRawMaterialCost:F2}";
-                UnitCostTextBlock.Text = $"${costData.UnitCost:F2}";
-            }
-        }
-        catch
-        {
-        }
-    }
-
     private async void CompleteBatch_Click(object sender, RoutedEventArgs e)
     {
         if (ActiveBatchComboBox.SelectedValue is not Guid batchId ||
@@ -249,16 +263,20 @@ public partial class ProductionPage : Page
             return;
         }
 
+        var customBatchName = CompleteBatchNameTextBox.Text?.Trim();
+
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.BATCHES_COMPLETE, new
         {
             BatchId = batchId,
-            ActualOutputQuantity = actualOutput
+            ActualOutputQuantity = actualOutput,
+            BatchNumber = string.IsNullOrWhiteSpace(customBatchName) ? null : customBatchName
         });
 
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.BATCH_COMPLETED_SUCCESS, Brushes.Green);
             ActualOutputQuantityTextBox.Clear();
+            CompleteBatchNameTextBox.Clear();
 
             await LoadDataAsync();
 
@@ -332,13 +350,15 @@ public partial class ProductionPage : Page
         }
 
         TryParseDecimal(UnitPriceTextBox.Text, out var unitPrice);
+        var customLotName = ReleaseLotNameTextBox.Text?.Trim();
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.AGING_LOTS_RELEASE, new
         {
             AgingLotId = lotId,
             TargetWarehouseId = warehouseId,
             ActualFinalQuantity = actualQty,
-            UnitPrice = unitPrice
+            UnitPrice = unitPrice,
+            CustomBatchNumber = string.IsNullOrWhiteSpace(customLotName) ? null : customLotName
         });
 
         if (isSuccess)
@@ -346,6 +366,7 @@ public partial class ProductionPage : Page
             SetStatus(UiConstants.Messages.LOT_RELEASED_FROM_AGING_SUCCESS, Brushes.Green);
             ActualFinalQuantityTextBox.Clear();
             UnitPriceTextBox.Clear();
+            ReleaseLotNameTextBox.Clear();
             await LoadDataAsync();
         }
         else

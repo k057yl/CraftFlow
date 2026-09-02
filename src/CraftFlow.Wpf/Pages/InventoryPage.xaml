@@ -2,7 +2,8 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
-      Title="InventoryPage">
+      Title="{loc:Loc Key=TITLE_INVENTORY}">
+
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -21,21 +22,30 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <GroupBox Header="{loc:Loc Key=CREATE_WAREHOUSE}" Margin="0,0,0,10" Padding="8">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{loc:Loc Key=WAREHOUSE_NAME}" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                            <TextBox x:Name="WarehouseNameTextBox" Width="180" Margin="0,0,15,0" Text="Склад сырья №1"/>
+                    <GroupBox Header="{loc:Loc Key=CREATE_WAREHOUSE}" Margin="0,0,0,10" Padding="10">
+                        <WrapPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
+                                <TextBlock Text="{loc:Loc Key=WAREHOUSE_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
+                                <TextBox x:Name="WarehouseNameTextBox" Width="180" Padding="5,3" Text="Склад сырья №1"/>
+                            </StackPanel>
 
-                            <TextBlock Text="{loc:Loc Key=WAREHOUSE_ADDRESS}" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                            <TextBox x:Name="WarehouseAddressTextBox" Width="200" Margin="0,0,15,0" Text="Industrial Zone 1"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
+                                <TextBlock Text="{loc:Loc Key=WAREHOUSE_ADDRESS}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
+                                <TextBox x:Name="WarehouseAddressTextBox" Width="220" Padding="5,3" Text="Industrial Zone 1"/>
+                            </StackPanel>
 
-                            <Button Content="{loc:Loc Key=CREATE_WAREHOUSE}" Click="CreateWarehouse_Click" Width="120" Height="25"/>
-                        </StackPanel>
+                            <Button Content="{loc:Loc Key=CREATE_WAREHOUSE}" 
+                                    Click="CreateWarehouse_Click" 
+                                    Width="130" 
+                                    Height="28" 
+                                    Margin="0,0,0,5" 
+                                    FontWeight="SemiBold"/>
+                        </WrapPanel>
                     </GroupBox>
 
                     <DataGrid Grid.Row="1" x:Name="WarehousesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Название Склада" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding Name}" Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
@@ -49,30 +59,41 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <GroupBox Header="{loc:Loc Key=CREATE_AGING_CHAMBER}" Margin="0,0,0,10" Padding="8">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="{loc:Loc Key=AGING_CHAMBER_NAME}" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                            <TextBox x:Name="ChamberNameTextBox" Width="160" Margin="0,0,15,0" Text="Chamber #1 (Gouda)"/>
+                    <GroupBox Header="{loc:Loc Key=CREATE_AGING_CHAMBER}" Margin="0,0,0,10" Padding="10">
+                        <WrapPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
+                                <TextBlock Text="{loc:Loc Key=AGING_CHAMBER_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
+                                <TextBox x:Name="ChamberNameTextBox" Width="160" Padding="5,3" Text="Chamber #1 (Gouda)"/>
+                            </StackPanel>
 
-                            <TextBlock Text="{loc:Loc Key=TARGET_TEMPERATURE}" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                            <TextBox x:Name="ChamberTempTextBox" Width="60" Margin="0,0,15,0" Text="12.0"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
+                                <TextBlock Text="{loc:Loc Key=TARGET_TEMPERATURE}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
+                                <TextBox x:Name="ChamberTempTextBox" Width="60" Padding="5,3" Text="12.0"/>
+                            </StackPanel>
 
-                            <TextBlock Text="{loc:Loc Key=TARGET_HUMIDITY}" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                            <TextBox x:Name="ChamberHumidityTextBox" Width="60" Margin="0,0,15,0" Text="85.0"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
+                                <TextBlock Text="{loc:Loc Key=TARGET_HUMIDITY}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
+                                <TextBox x:Name="ChamberHumidityTextBox" Width="60" Padding="5,3" Text="85.0"/>
+                            </StackPanel>
 
-                            <Button Content="{loc:Loc Key=CREATE_AGING_CHAMBER}" Click="CreateChamber_Click" Width="140" Height="25"/>
-                        </StackPanel>
+                            <Button Content="{loc:Loc Key=CREATE_AGING_CHAMBER}" 
+                                    Click="CreateChamber_Click" 
+                                    Width="160" 
+                                    Height="28" 
+                                    Margin="0,0,0,5" 
+                                    FontWeight="SemiBold"/>
+                        </WrapPanel>
                     </GroupBox>
 
                     <DataGrid Grid.Row="1" x:Name="ChambersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Название Камеры" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=AGING_CHAMBER_NAME}" Binding="{Binding Name}" Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
         </TabControl>
 
-        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="READY" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
     </Grid>
 </Page>
