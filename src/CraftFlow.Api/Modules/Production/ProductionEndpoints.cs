@@ -3,7 +3,7 @@ using CraftFlow.Api.Modules.Production.CompleteProductionBatch;
 using CraftFlow.Api.Modules.Production.ConsumeIngredient;
 using CraftFlow.Api.Modules.Production.DiscardBatch;
 using CraftFlow.Api.Modules.Production.Domain;
-using CraftFlow.Api.Modules.Production.GetActiveBatches;
+using CraftFlow.Api.Modules.Production.GetActiveBatchesSummary;
 using CraftFlow.Api.Modules.Production.GetBatchCost;
 using CraftFlow.Api.Modules.Production.StartProductionBatch;
 using CraftFlow.SharedKernel.Constants;
@@ -43,9 +43,9 @@ public static class ProductionEndpoints
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
 
-        group.MapGet(Endpoints.BATCHES_ACTIVE, async (ISender sender) =>
+        group.MapGet(Endpoints.BATCHES_ACTIVE_SUMMARY, async (ISender sender) =>
         {
-            var result = await sender.Send(new GetActiveBatchesQuery());
+            var result = await sender.Send(new GetActiveBatchesSummaryQuery());
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 

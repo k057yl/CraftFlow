@@ -9,7 +9,7 @@ public static class Endpoints
     public const string WAREHOUSES = "api/inventory/warehouses";
     public const string STOCK_LOTS = "api/inventory/stock-lots";
     public const string BATCHES_START = "api/production/batches/start";
-    public const string BATCHES_ACTIVE = "api/production/batches/active";
+    public const string BATCHES_ACTIVE_SUMMARY = "api/production/batches/active-summary";
     public const string BATCHES_COMPLETE = "api/production/batches/complete";
     public const string BATCHES_CONSUME = "api/production/batches/consume-ingredient";
     public const string CUSTOMERS = "api/sales/customers";

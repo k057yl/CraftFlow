@@ -28,4 +28,6 @@ public static class FormattingConstants
 
     public const string BATCH_PREFIX = "BATCH-";
     public const string NOT_AVAILABLE = "N/A";
+
+    public const string DEFAULT_WEIGHT_UNIT = "KG";
 }

@@ -13,13 +13,19 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
     public Guid RecipeId { get; private set; }
     public Guid TargetProductId { get; private set; }
     public Guid WarehouseId { get; private set; }
+    public Guid DestinationWarehouseId { get; private set; }
 
     public decimal PlannedOutputQuantity { get; private set; }
     public decimal ActualOutputQuantity { get; private set; }
     public BatchState Status { get; private set; }
+
     public DateTime StartedAt { get; private set; }
+    public DateTime? BrewingCompletedAt { get; private set; }
+    public DateTime? AgingStartedAt { get; private set; }
     public DateTime? CompletedAt { get; private set; }
-    public Guid DestinationWarehouseId { get; private set; }
+
+    public int TargetDurationMinutes { get; private set; }
+    public bool IsTelegramNotified { get; private set; }
     public string? DiscardReason { get; private set; }
 
     private ProductionBatch() { }
@@ -30,6 +36,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         Guid warehouseId,
         Guid destinationWarehouseId,
         decimal plannedOutputQuantity,
+        int targetDurationMinutes,
         string? customName = null)
     {
         if (plannedOutputQuantity <= 0)
@@ -47,21 +54,15 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
             WarehouseId = warehouseId,
             DestinationWarehouseId = destinationWarehouseId,
             PlannedOutputQuantity = plannedOutputQuantity,
+            TargetDurationMinutes = targetDurationMinutes > 0 ? targetDurationMinutes : 180,
             ActualOutputQuantity = 0,
             Status = BatchState.Draft,
-            StartedAt = DateTime.UtcNow
+            StartedAt = DateTime.UtcNow,
+            IsTelegramNotified = false
         };
 
         batch.InitStateMachine();
         return batch;
-    }
-
-    public void UpdateName(string newName)
-    {
-        if (!string.IsNullOrWhiteSpace(newName))
-        {
-            Name = newName.Trim();
-        }
     }
 
     public void Start()
@@ -74,13 +75,23 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
     {
         EnsureMachine();
         ActualOutputQuantity = actualOutputQuantity;
+        BrewingCompletedAt = DateTime.UtcNow;
         CompletedAt = DateTime.UtcNow;
+        _stateMachine!.Fire(BatchTrigger.Complete);
+    }
+
+    public void MarkReadyForAging(decimal actualOutputQuantity)
+    {
+        EnsureMachine();
+        ActualOutputQuantity = actualOutputQuantity;
+        BrewingCompletedAt = DateTime.UtcNow;
         _stateMachine!.Fire(BatchTrigger.Complete);
     }
 
     public void MarkAsTransferredToAging()
     {
         EnsureMachine();
+        AgingStartedAt = DateTime.UtcNow;
         _stateMachine!.Fire(BatchTrigger.TransferToAging);
     }
 
@@ -100,10 +111,23 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         _stateMachine!.Fire(BatchTrigger.Discard);
     }
 
+    public void MarkTelegramNotified()
+    {
+        IsTelegramNotified = true;
+    }
+
     private void EnsureMachine()
     {
         if (_stateMachine is null)
             InitStateMachine();
+    }
+
+    public void UpdateName(string newName)
+    {
+        if (!string.IsNullOrWhiteSpace(newName))
+        {
+            Name = newName.Trim();
+        }
     }
 
     private void InitStateMachine()
@@ -121,12 +145,12 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
             .Permit(BatchTrigger.TransferToAging, BatchState.InAging)
             .Permit(BatchTrigger.Discard, BatchState.Discarded);
 
+        _stateMachine.Configure(BatchState.Completed)
+            .Permit(BatchTrigger.TransferToAging, BatchState.InAging);
+
         _stateMachine.Configure(BatchState.ReadyForAging)
             .Permit(BatchTrigger.TransferToAging, BatchState.InAging)
             .Permit(BatchTrigger.Discard, BatchState.Discarded);
-
-        _stateMachine.Configure(BatchState.Completed)
-            .Permit(BatchTrigger.TransferToAging, BatchState.InAging);
 
         _stateMachine.Configure(BatchState.InAging)
             .Permit(BatchTrigger.ReleaseFromAging, BatchState.Completed)

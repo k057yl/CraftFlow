@@ -7,6 +7,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -58,20 +59,54 @@ public record GetAgingLotDetailsDto(
     int UnitsCount
 );
 
+public class ActiveBatchSummaryDto : System.ComponentModel.INotifyPropertyChanged
+{
+    public Guid Id { get; set; }
+    public string BatchName { get; set; } = string.Empty;
+    public string RecipeName { get; set; } = string.Empty;
+    public DateTime StartedAt { get; set; }
+    public int TargetDurationMinutes { get; set; }
+    public int ElapsedMinutes { get; set; }
+    public bool IsOverdue { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public decimal PlannedOutputQuantity { get; set; }
+
+    private TimeSpan _currentElapsed;
+    public TimeSpan CurrentElapsed
+    {
+        get => _currentElapsed;
+        set
+        {
+            _currentElapsed = value;
+            OnPropertyChanged(nameof(FormattedElapsed));
+            OnPropertyChanged(nameof(IsOverdueStatus));
+        }
+    }
+
+    public string FormattedElapsed => $"{((int)CurrentElapsed.TotalHours):D2}:{CurrentElapsed.Minutes:D2}:{CurrentElapsed.Seconds:D2}";
+
+    public bool IsOverdueStatus => CurrentElapsed.TotalMinutes >= TargetDurationMinutes;
+
+    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(name));
+}
+
 public partial class ProductionPage : Page
 {
     public ObservableCollection<LookupItem> Warehouses { get; } = [];
     public ObservableCollection<LookupItem> Recipes { get; } = [];
     public ObservableCollection<LookupItem> ActiveBatches { get; } = [];
+    public ObservableCollection<ActiveBatchSummaryDto> ActiveBatchesSummary { get; } = [];
     public ObservableCollection<BatchReadyForAgingDto> CompletedBatches { get; } = [];
     public ObservableCollection<LookupItem> AgingChambers { get; } = [];
     public ObservableCollection<LookupItem> ActiveAgingLots { get; } = [];
     public ObservableCollection<AgingLotSummaryDto> AgingLotsSummary { get; } = [];
 
     private readonly ObservableCollection<RequirementCalculationDto> _requirements = [];
+    private readonly DispatcherTimer _uiTimer = new();
 
     private decimal _selectedLotTotalCost;
-    private string _selectedLotUnitName = "кг";
+    private string _selectedLotUnitName = FormattingConstants.DEFAULT_WEIGHT_UNIT;
 
     public ProductionPage()
     {
@@ -91,8 +126,21 @@ public partial class ProductionPage : Page
         ActiveAgingLotsComboBox.ItemsSource = ActiveAgingLots;
 
         AgingLotsDataGrid.ItemsSource = AgingLotsSummary;
+        ActiveBatchesDataGrid.ItemsSource = ActiveBatchesSummary;
+
+        _uiTimer.Interval = TimeSpan.FromSeconds(1);
+        _uiTimer.Tick += UiTimer_Tick;
+        _uiTimer.Start();
 
         Loaded += async (s, e) => await LoadDataAsync();
+    }
+
+    private void UiTimer_Tick(object? sender, EventArgs e)
+    {
+        foreach (var batch in ActiveBatchesSummary)
+        {
+            batch.CurrentElapsed = batch.CurrentElapsed.Add(TimeSpan.FromSeconds(1));
+        }
     }
 
     private static bool TryParseDecimal(string text, out decimal result)
@@ -129,9 +177,28 @@ public partial class ProductionPage : Page
             Recipes.Clear();
             recipes?.ForEach(r => Recipes.Add(new LookupItem(r.Id, r.Name)));
 
-            var activeBatches = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.BATCHES_ACTIVE);
+            var activeBatches = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.BATCHES_ACTIVE_SUMMARY);
             ActiveBatches.Clear();
             activeBatches?.ForEach(b => ActiveBatches.Add(new LookupItem(b.Id, b.Name)));
+
+            try
+            {
+                var summaryList = await ApiService.Instance.GetAsync<List<ActiveBatchSummaryDto>>("api/production/batches/active-summary");
+                ActiveBatchesSummary.Clear();
+                ActiveBatches.Clear();
+                if (summaryList != null)
+                {
+                    var now = DateTime.UtcNow;
+                    foreach (var b in summaryList)
+                    {
+                        b.CurrentElapsed = now - b.StartedAt;
+                        ActiveBatchesSummary.Add(b);
+
+                        ActiveBatches.Add(new LookupItem(b.Id, b.BatchName));
+                    }
+                }
+            }
+            catch { }
 
             var readyBatches = await ApiService.Instance.GetAsync<List<BatchReadyForAgingDto>>(Endpoints.BATCHES_READY_AGING);
             CompletedBatches.Clear();
@@ -151,9 +218,7 @@ public partial class ProductionPage : Page
                 AgingLotsSummary.Clear();
                 activeSummary?.ForEach(AgingLotsSummary.Add);
             }
-            catch
-            {
-            }
+            catch { }
 
             if (BatchRecipeComboBox.SelectedIndex < 0 && Recipes.Count > 0)
                 BatchRecipeComboBox.SelectedIndex = 0;
@@ -176,6 +241,14 @@ public partial class ProductionPage : Page
         {
             _isInitializing = false;
             BatchInputs_Changed(this, null!);
+        }
+    }
+
+    private void ActiveBatchesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (ActiveBatchesDataGrid.SelectedItem is ActiveBatchSummaryDto selectedBatch)
+        {
+            ActiveBatchComboBox.SelectedValue = selectedBatch.Id;
         }
     }
 

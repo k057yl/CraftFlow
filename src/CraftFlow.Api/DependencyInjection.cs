@@ -1,9 +1,11 @@
-﻿using CraftFlow.Api.Common.BackgroundWorkers;
+﻿using CraftFlow.Api.BackgroundWorkers;
+using CraftFlow.Api.Common.BackgroundWorkers;
 using CraftFlow.Api.Common.Behaviors;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging.GetActiveAgingLots;
 using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
+using CraftFlow.Api.Modules.Production.GetActiveBatchesSummary;
 using CraftFlow.Api.Modules.Traceability.TraceabilityRead;
 using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
@@ -28,6 +30,7 @@ public static class DependencyInjection
             .AddDatabaseStorage(configuration)
             .AddJwtAuthentication(configuration)
             .AddMediatorAndValidation()
+            .AddTelegramNotifications()
             .AddBackgroundWorkers();
 
         return services;
@@ -58,6 +61,7 @@ public static class DependencyInjection
 
         services.AddScoped<GetActiveAgingLotsQueryHandler>();
         services.AddScoped<GetAgingLotDetailsQueryHandler>();
+        services.AddScoped<GetActiveBatchesSummaryQueryHandler>();
 
         return services;
     }
@@ -101,9 +105,16 @@ public static class DependencyInjection
         return services;
     }
 
+    private static IServiceCollection AddTelegramNotifications(this IServiceCollection services)
+    {
+        services.AddHttpClient<ITelegramNotificationService, TelegramNotificationService>();
+        return services;
+    }
+
     private static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
     {
         services.AddHostedService<LowStockMonitorWorker>();
+        services.AddHostedService<ProductionTimerWorker>();
         return services;
     }
 }

@@ -109,6 +109,60 @@
                             </StackPanel>
                         </GroupBox>
 
+                        <!-- ⏱ ТЕКУЩИЕ ВАРКИ В РАБОТЕ (ЖИВОЙ МОНИТОР) -->
+                        <GroupBox Header="Текущие варки в процессе" Margin="0,0,0,12" Padding="8">
+                            <DataGrid x:Name="ActiveBatchesDataGrid" 
+                                  AutoGenerateColumns="False" 
+                                  IsReadOnly="True" 
+                                  GridLinesVisibility="Horizontal"
+                                  HeadersVisibility="Column"
+                                  Background="Transparent"
+                                  RowHeaderWidth="0"
+                                  MaxHeight="160"
+                                  SelectionMode="Single"
+                                  SelectionChanged="ActiveBatchesDataGrid_SelectionChanged">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Партия" Binding="{Binding BatchName}" Width="1.5*"/>
+                                    <DataGridTextColumn Header="Рецептурный состав" Binding="{Binding RecipeName}" Width="2*"/>
+                                    <DataGridTextColumn Header="План (кг/л)" Binding="{Binding PlannedOutputQuantity, StringFormat={}{0:F2}}" Width="1*"/>
+                                    <DataGridTextColumn Header="Старт" Binding="{Binding StartedAt, StringFormat={}{0:HH:mm}}" Width="0.8*"/>
+
+                                    <!-- Динамический таймер -->
+                                    <DataGridTemplateColumn Header="В работе" Width="1.2*">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding FormattedElapsed}" 
+                                   FontWeight="Bold" 
+                                   VerticalAlignment="Center" 
+                                   HorizontalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Foreground" Value="#0369A1"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsOverdueStatus}" Value="True">
+                                                                    <Setter Property="Foreground" Value="#DC2626"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+
+                                    <DataGridTextColumn Header="План (мин)" Binding="{Binding TargetDurationMinutes}" Width="0.8*"/>
+
+                                    <DataGridTemplateColumn Header="Готовность" Width="Auto">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <CheckBox IsChecked="{Binding IsOverdueStatus, Mode=OneWay}" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </GroupBox>
+
                         <!-- 2. Завершение варки и Анализ -->
                         <Grid>
                             <Grid.ColumnDefinitions>

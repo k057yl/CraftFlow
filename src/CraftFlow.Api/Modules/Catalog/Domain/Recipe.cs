@@ -14,6 +14,8 @@ public sealed class Recipe : AggregateRoot, ITenantEntity
     public bool IsAgingRequired { get; private set; }
     public int? DefaultMinAgingDays { get; private set; }
 
+    public int TargetDurationMinutes { get; private set; }
+
     public IReadOnlyCollection<RecipeIngredient> Ingredients => _ingredients.AsReadOnly();
 
     private Recipe() { }
@@ -23,13 +25,15 @@ public sealed class Recipe : AggregateRoot, ITenantEntity
         string name,
         decimal targetOutputQuantity,
         bool isAgingRequired = false,
-        int? defaultMinAgingDays = null)
+        int? defaultMinAgingDays = null,
+        int targetDurationMinutes = 180)
     {
         if (targetOutputQuantity <= 0)
             throw new ArgumentException(ErrorCodes.Catalog.RECIPE_INVALID_TARGET_OUTPUT);
 
         if (isAgingRequired && (defaultMinAgingDays is null or <= 0))
             throw new ArgumentException(ErrorCodes.Catalog.RECIPE_INVALID_AGING_DAYS);
+
         return new Recipe
         {
             Id = Guid.NewGuid(),
@@ -37,8 +41,17 @@ public sealed class Recipe : AggregateRoot, ITenantEntity
             Name = name,
             TargetOutputQuantity = targetOutputQuantity,
             IsAgingRequired = isAgingRequired,
-            DefaultMinAgingDays = isAgingRequired ? defaultMinAgingDays : null
+            DefaultMinAgingDays = isAgingRequired ? defaultMinAgingDays : null,
+            TargetDurationMinutes = targetDurationMinutes > 0 ? targetDurationMinutes : 180
         };
+    }
+
+    public void UpdateTargetDuration(int durationMinutes)
+    {
+        if (durationMinutes <= 0)
+            throw new ArgumentException(ErrorCodes.Catalog.RECIPE_INVALID_TARGET_OUTPUT);
+
+        TargetDurationMinutes = durationMinutes;
     }
 
     public void AddIngredient(Guid rawMaterialId, decimal quantity)
