@@ -27,11 +27,12 @@ namespace CraftFlow.Api.Modules.Inventory.AddStockLot
             }
 
             var stockLot = StockLot.Create(
-                request.WarehouseId,
-                request.ItemId,
-                request.Quantity,
-                request.UnitPrice,
-                request.BatchNumber
+                warehouseId: request.WarehouseId,
+                itemId: request.ItemId,
+                initialQuantity: request.Quantity,
+                unitsCount: request.UnitsCount > 0 ? request.UnitsCount : 1,
+                unitPrice: request.UnitPrice,
+                batchNumber: request.BatchNumber
             );
 
             _dbContext.StockLots.Add(stockLot);

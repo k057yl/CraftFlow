@@ -40,7 +40,8 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
                 batch.Id,
                 batch.RecipeId,
                 batch.WarehouseId,
-                batch.ActualOutputQuantity
+                batch.ActualOutputQuantity,
+                request.UnitsCount
             ),
             cancellationToken
         );

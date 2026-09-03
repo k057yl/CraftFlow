@@ -1,5 +1,7 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging.Domain;
+using CraftFlow.Api.Modules.Aging.GetActiveAgingLots;
+using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
 using CraftFlow.Api.Modules.Aging.ReleaseFromAging;
 using CraftFlow.Api.Modules.Aging.TransferToAging;
 using CraftFlow.Api.Modules.Production.Domain;
@@ -56,6 +58,18 @@ public static class AgingEndpoints
                 .ToListAsync(cancellationToken);
 
             return Results.Ok(activeLots);
+        });
+
+        group.MapGet("/lots/active-summary", async (GetActiveAgingLotsQueryHandler handler) =>
+        {
+            var result = await handler.HandleAsync();
+            return Results.Ok(result);
+        });
+
+        group.MapGet("lots/active/{id:guid}", async (Guid id, GetAgingLotDetailsQueryHandler handler) =>
+        {
+            var result = await handler.HandleAsync(id);
+            return result is not null ? Results.Ok(result) : Results.NotFound();
         });
     }
 }

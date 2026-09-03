@@ -1,49 +1,98 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
+using Stateless;
 
-namespace CraftFlow.Api.Modules.Sales.Domain
+namespace CraftFlow.Api.Modules.Sales.Domain;
+
+public sealed class SalesOrder : AggregateRoot, ITenantEntity
 {
-    public sealed class SalesOrder : AggregateRoot, ITenantEntity
+    private StateMachine<OrderState, OrderTrigger>? _stateMachine;
+    private readonly List<SalesOrderItem> _items = [];
+
+    public Guid TenantId { get; private set; }
+    public Guid CustomerId { get; private set; }
+    public Guid WarehouseId { get; private set; }
+    public OrderState Status { get; private set; }
+    public decimal TotalAmount { get; private set; }
+    public DateTime CreatedAt { get; private set; }
+    public DateTime? ShippedAt { get; private set; }
+
+    public IReadOnlyCollection<SalesOrderItem> Items => _items.AsReadOnly();
+
+    private SalesOrder() { }
+
+    public static SalesOrder Create(Guid customerId, Guid warehouseId)
     {
-        private readonly List<SalesOrderItem> _items = [];
+        if (customerId == Guid.Empty || warehouseId == Guid.Empty)
+            throw new ArgumentException(ErrorCodes.General.VALUE_REQUIRED);
 
-        public Guid TenantId { get; private set; }
-        public Guid CustomerId { get; private set; }
-        public Guid WarehouseId { get; private set; }
-        public OrderStatus Status { get; private set; }
-        public decimal TotalAmount { get; private set; }
-        public IReadOnlyCollection<SalesOrderItem> Items => _items.AsReadOnly();
-
-        private SalesOrder() { }
-
-        public static SalesOrder Create(Guid customerId, Guid warehouseId)
+        var order = new SalesOrder
         {
-            return new SalesOrder
-            {
-                Id = Guid.NewGuid(),
-                CustomerId = customerId,
-                WarehouseId = warehouseId,
-                Status = OrderStatus.Draft,
-                TotalAmount = 0
-            };
-        }
+            Id = Guid.NewGuid(),
+            CustomerId = customerId,
+            WarehouseId = warehouseId,
+            Status = OrderState.Draft,
+            TotalAmount = 0m,
+            CreatedAt = DateTime.UtcNow
+        };
 
-        public void AddItem(Guid productId, decimal quantity, decimal unitPrice)
-        {
-            if (Status != OrderStatus.Draft)
-                throw new InvalidOperationException(ErrorCodes.Sales.INVALID_ORDER_STATUS);
+        order.InitStateMachine();
+        return order;
+    }
 
-            var item = SalesOrderItem.Create(productId, quantity, unitPrice);
-            _items.Add(item);
-            TotalAmount += quantity * unitPrice;
-        }
+    public void AddItem(Guid stockLotId, decimal quantity, decimal unitPrice)
+    {
+        EnsureMachine();
+        if (Status != OrderState.Draft)
+            throw new InvalidOperationException(ErrorCodes.Sales.INVALID_ORDER_STATUS);
 
-        public void Ship()
-        {
-            if (Status != OrderStatus.Draft && Status != OrderStatus.Confirmed)
-                throw new InvalidOperationException(ErrorCodes.Sales.INVALID_ORDER_STATUS);
+        var item = SalesOrderItem.Create(stockLotId, quantity, unitPrice);
+        _items.Add(item);
+        TotalAmount += quantity * unitPrice;
+    }
 
-            Status = OrderStatus.Shipped;
-        }
+    public void Confirm()
+    {
+        EnsureMachine();
+        _stateMachine!.Fire(OrderTrigger.Confirm);
+    }
+
+    public void Ship()
+    {
+        EnsureMachine();
+        ShippedAt = DateTime.UtcNow;
+        _stateMachine!.Fire(OrderTrigger.Ship);
+    }
+
+    public void Cancel()
+    {
+        EnsureMachine();
+        _stateMachine!.Fire(OrderTrigger.Cancel);
+    }
+
+    private void EnsureMachine()
+    {
+        if (_stateMachine is null)
+            InitStateMachine();
+    }
+
+    private void InitStateMachine()
+    {
+        _stateMachine = new StateMachine<OrderState, OrderTrigger>(
+            () => Status,
+            s => Status = s
+        );
+
+        _stateMachine.Configure(OrderState.Draft)
+            .Permit(OrderTrigger.Confirm, OrderState.Confirmed)
+            .Permit(OrderTrigger.Ship, OrderState.Shipped)
+            .Permit(OrderTrigger.Cancel, OrderState.Cancelled);
+
+        _stateMachine.Configure(OrderState.Confirmed)
+            .Permit(OrderTrigger.Ship, OrderState.Shipped)
+            .Permit(OrderTrigger.Cancel, OrderState.Cancelled);
+
+        _stateMachine.Configure(OrderState.Shipped);
+        _stateMachine.Configure(OrderState.Cancelled);
     }
 }

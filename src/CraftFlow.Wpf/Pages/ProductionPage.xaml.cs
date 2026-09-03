@@ -37,6 +37,27 @@ public record RequirementCalculationDto(
 
 public record BatchReadyForAgingDto(Guid Id, string Name, int DefaultAgingDays);
 
+public record AgingLotSummaryDto(
+    Guid LotId,
+    string BatchNumber,
+    string ChamberName,
+    int UnitsCount,
+    decimal InitialQuantity,
+    int DaysInChamber,
+    int TargetDays,
+    bool IsReadyForRelease
+);
+
+public record GetAgingLotDetailsDto(
+    Guid LotId,
+    Guid ProductId,
+    string ProductName,
+    string UnitName,
+    decimal TotalBatchCost,
+    decimal InitialQuantity,
+    int UnitsCount
+);
+
 public partial class ProductionPage : Page
 {
     public ObservableCollection<LookupItem> Warehouses { get; } = [];
@@ -45,8 +66,12 @@ public partial class ProductionPage : Page
     public ObservableCollection<BatchReadyForAgingDto> CompletedBatches { get; } = [];
     public ObservableCollection<LookupItem> AgingChambers { get; } = [];
     public ObservableCollection<LookupItem> ActiveAgingLots { get; } = [];
+    public ObservableCollection<AgingLotSummaryDto> AgingLotsSummary { get; } = [];
 
     private readonly ObservableCollection<RequirementCalculationDto> _requirements = [];
+
+    private decimal _selectedLotTotalCost;
+    private string _selectedLotUnitName = "кг";
 
     public ProductionPage()
     {
@@ -64,6 +89,8 @@ public partial class ProductionPage : Page
         RequirementsListBox.ItemsSource = _requirements;
         AgingChambersComboBox.ItemsSource = AgingChambers;
         ActiveAgingLotsComboBox.ItemsSource = ActiveAgingLots;
+
+        AgingLotsDataGrid.ItemsSource = AgingLotsSummary;
 
         Loaded += async (s, e) => await LoadDataAsync();
     }
@@ -117,6 +144,16 @@ public partial class ProductionPage : Page
             var activeLots = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.AGING_LOTS_ACTIVE);
             ActiveAgingLots.Clear();
             activeLots?.ForEach(l => ActiveAgingLots.Add(new LookupItem(l.Id, l.Name)));
+
+            try
+            {
+                var activeSummary = await ApiService.Instance.GetAsync<List<AgingLotSummaryDto>>(Endpoints.AGING_LOTS_ACTIVE_SUMMARY);
+                AgingLotsSummary.Clear();
+                activeSummary?.ForEach(AgingLotsSummary.Add);
+            }
+            catch
+            {
+            }
 
             if (BatchRecipeComboBox.SelectedIndex < 0 && Recipes.Count > 0)
                 BatchRecipeComboBox.SelectedIndex = 0;
@@ -178,15 +215,71 @@ public partial class ProductionPage : Page
         }
     }
 
-    private void ActiveAgingLotsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void ActiveAgingLotsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (ActiveAgingLotsComboBox.SelectedItem is LookupItem selectedLot)
         {
             ReleaseLotNameTextBox.Text = $"{selectedLot.Name} (Снято с выдержки)";
+
+            try
+            {
+                var details = await ApiService.Instance.GetAsync<GetAgingLotDetailsDto>($"{Endpoints.AGING_LOTS_ACTIVE}/{selectedLot.Id}");
+                if (details != null)
+                {
+                    _selectedLotTotalCost = details.TotalBatchCost;
+                    _selectedLotUnitName = string.IsNullOrWhiteSpace(details.UnitName) ? "кг" : details.UnitName;
+
+                    var costFormat = LocalizationService.Get("LABEL_CALCULATED_UNIT_COST");
+                    CalculatedCostLabelTextBlock.Text = string.Format(costFormat, _selectedLotUnitName);
+
+                    var priceFormat = LocalizationService.Get("LABEL_SELLING_PRICE_PER_UNIT");
+                    UnitPriceLabelTextBlock.Text = string.Format(priceFormat, _selectedLotUnitName);
+
+                    ActualFinalQuantityTextBox.Text = details.InitialQuantity.ToString("F2", CultureInfo.InvariantCulture);
+
+                    ReleaseUnitsCountTextBox.Text = details.UnitsCount > 0 ? details.UnitsCount.ToString() : "1";
+
+                    RecalculateUnitPrice();
+                }
+            }
+            catch
+            {
+            }
         }
         else
         {
             ReleaseLotNameTextBox.Clear();
+            ActualFinalQuantityTextBox.Clear();
+            ReleaseUnitsCountTextBox.Text = "1";
+            UnitPriceTextBox.Clear();
+            CalculatedUnitCostTextBlock.Text = "$ 0.00";
+            _selectedLotTotalCost = 0;
+
+            CalculatedCostLabelTextBlock.Text = "Рассчитанная себестоимость:";
+            UnitPriceLabelTextBlock.Text = "Отпускная цена:";
+        }
+    }
+
+    private void ActualFinalQuantityTextBox_TextChanged(object sender, TextChangedEventArgs e)
+    {
+        RecalculateUnitPrice();
+    }
+
+    private void RecalculateUnitPrice()
+    {
+        if (TryParseDecimal(ActualFinalQuantityTextBox.Text, out var actualQty) && actualQty > 0 && _selectedLotTotalCost > 0)
+        {
+            var calculatedUnitCost = _selectedLotTotalCost / actualQty;
+            CalculatedUnitCostTextBlock.Text = $"${calculatedUnitCost:F2}";
+
+            if (string.IsNullOrWhiteSpace(UnitPriceTextBox.Text) || UnitPriceTextBox.Text == "0.00")
+            {
+                UnitPriceTextBox.Text = calculatedUnitCost.ToString("F2", CultureInfo.InvariantCulture);
+            }
+        }
+        else
+        {
+            CalculatedUnitCostTextBlock.Text = "$ 0.00";
         }
     }
 
@@ -263,7 +356,8 @@ public partial class ProductionPage : Page
     private async void CompleteBatch_Click(object sender, RoutedEventArgs e)
     {
         if (ActiveBatchComboBox.SelectedValue is not Guid batchId ||
-            !TryParseDecimal(ActualOutputQuantityTextBox.Text, out var actualOutput) || actualOutput <= 0)
+            !TryParseDecimal(ActualOutputQuantityTextBox.Text, out var actualOutput) || actualOutput <= 0 ||
+            !int.TryParse(ActualUnitsCountTextBox.Text.Trim(), out var unitsCount) || unitsCount < 0)
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
             return;
@@ -275,6 +369,7 @@ public partial class ProductionPage : Page
         {
             BatchId = batchId,
             ActualOutputQuantity = actualOutput,
+            UnitsCount = unitsCount,
             BatchNumber = string.IsNullOrWhiteSpace(customBatchName) ? null : customBatchName
         });
 
@@ -282,6 +377,7 @@ public partial class ProductionPage : Page
         {
             SetStatus(UiConstants.Messages.BATCH_COMPLETED_SUCCESS, Brushes.Green);
             ActualOutputQuantityTextBox.Clear();
+            ActualUnitsCountTextBox.Text = "1";
             CompleteBatchNameTextBox.Clear();
 
             await LoadDataAsync();
@@ -355,6 +451,12 @@ public partial class ProductionPage : Page
             return;
         }
 
+        if (!int.TryParse(ReleaseUnitsCountTextBox.Text.Trim(), out var unitsCount) || unitsCount <= 0)
+        {
+            SetStatus("Укажите количество штук (должно быть больше 0)", Brushes.Red);
+            return;
+        }
+
         TryParseDecimal(UnitPriceTextBox.Text, out var unitPrice);
         var customLotName = ReleaseLotNameTextBox.Text?.Trim();
 
@@ -363,6 +465,7 @@ public partial class ProductionPage : Page
             AgingLotId = lotId,
             TargetWarehouseId = warehouseId,
             ActualFinalQuantity = actualQty,
+            UnitsCount = unitsCount,
             UnitPrice = unitPrice,
             CustomBatchNumber = string.IsNullOrWhiteSpace(customLotName) ? null : customLotName
         });
@@ -371,6 +474,7 @@ public partial class ProductionPage : Page
         {
             SetStatus(UiConstants.Messages.LOT_RELEASED_FROM_AGING_SUCCESS, Brushes.Green);
             ActualFinalQuantityTextBox.Clear();
+            ReleaseUnitsCountTextBox.Clear();
             UnitPriceTextBox.Clear();
             ReleaseLotNameTextBox.Clear();
             await LoadDataAsync();
@@ -486,6 +590,14 @@ public partial class ProductionPage : Page
 
             var idp = ((IDocumentPaginatorSource)flowDocument).DocumentPaginator;
             printDialog.PrintDocument(idp, $"ТехКарта_{recipeName}");
+        }
+    }
+
+    private void AgingLotsDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (AgingLotsDataGrid.SelectedItem is AgingLotSummaryDto selectedLot)
+        {
+            ActiveAgingLotsComboBox.SelectedValue = selectedLot.LotId;
         }
     }
 

@@ -9,6 +9,7 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
         public Guid WarehouseId { get; private set; }
         public Guid ItemId { get; private set; }
         public decimal Quantity { get; private set; }
+        public int UnitsCount { get; private set; }
         public decimal UnitPrice { get; private set; }
         public string? BatchNumber { get; private set; }
         public Guid? ProductionBatchId { get; private set; }
@@ -20,6 +21,7 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
             Guid warehouseId,
             Guid itemId,
             decimal initialQuantity,
+            int unitsCount,
             decimal unitPrice,
             string? batchNumber = null,
             Guid tenantId = default,
@@ -37,6 +39,7 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
                 WarehouseId = warehouseId,
                 ItemId = itemId,
                 Quantity = initialQuantity,
+                UnitsCount = unitsCount,
                 UnitPrice = unitPrice,
                 BatchNumber = batchNumber,
                 TenantId = tenantId,

@@ -290,4 +290,10 @@
 	<data name="TRACE_FORWARD" xml:space="preserve"><value>Прямая (От Сырья)</value></data>
 	<data name="TRACE_BACKWARD" xml:space="preserve"><value>Обратная (От Продукта)</value></data>
 	<data name="RUN_TRACEABILITY" xml:space="preserve"><value>🔍 Выполнить трассировку</value></data>
+
+	<!-- Aging Details & Dynamic Units (NEW) -->
+	<data name="LABEL_UNIT_PRICE_DYNAMIC" xml:space="preserve"><value>Отпускная цена / Себестоимость ({0}):</value></data>
+	<data name="LABEL_UNITS_COUNT" xml:space="preserve"><value>Кол-во штук / головок:</value></data>
+	<data name="LABEL_CALCULATED_UNIT_COST" xml:space="preserve"><value>Рассчитанная себестоимость 1 {0}:</value></data>
+	<data name="LABEL_SELLING_PRICE_PER_UNIT" xml:space="preserve"><value>Отпускная цена (за 1 {0}):</value></data>
 </root>

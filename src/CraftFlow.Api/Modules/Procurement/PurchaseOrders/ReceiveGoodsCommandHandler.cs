@@ -39,11 +39,13 @@ public sealed class ReceiveGoodsCommandHandler : IRequestHandler<ReceiveGoodsCom
             );
 
             var stockLot = StockLot.Create(
-                order.WarehouseId,
-                item.RawMaterialId,
-                item.Quantity,
-                item.UnitPrice,
-                batchNumber
+                warehouseId: order.WarehouseId,
+                itemId: item.RawMaterialId,
+                initialQuantity: item.Quantity,
+                unitsCount: 1,
+                unitPrice: item.UnitPrice,
+                batchNumber: batchNumber,
+                tenantId: order.TenantId
             );
 
             await _dbContext.Set<StockLot>().AddAsync(stockLot, cancellationToken);

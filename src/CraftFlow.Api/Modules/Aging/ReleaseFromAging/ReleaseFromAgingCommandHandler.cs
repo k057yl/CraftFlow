@@ -23,6 +23,11 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
 
     public async Task<Result> Handle(ReleaseFromAgingCommand request, CancellationToken cancellationToken)
     {
+        if (request.ActualFinalQuantity <= 0 || request.UnitsCount <= 0)
+        {
+            return Result.Failure(Error.Validation(ErrorCodes.General.VALUE_REQUIRED));
+        }
+
         var lot = await _dbContext.Set<AgingLot>()
             .FirstOrDefaultAsync(l => l.Id == request.AgingLotId, cancellationToken);
 
@@ -31,7 +36,7 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
         }
 
-        lot.RegisterWeightLoss(request.ActualFinalQuantity);
+        lot.RegisterLoss(request.ActualFinalQuantity, request.UnitsCount);
         lot.Release();
 
         var batch = await _dbContext.Set<ProductionBatch>()
@@ -52,6 +57,7 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             warehouseId: request.TargetWarehouseId,
             itemId: lot.ProductId,
             initialQuantity: request.ActualFinalQuantity,
+            unitsCount: request.UnitsCount,
             unitPrice: request.UnitPrice,
             batchNumber: finalBatchNumber,
             tenantId: _tenantContext.TenantId,

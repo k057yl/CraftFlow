@@ -1,9 +1,9 @@
-﻿using System.Data;
-using System.Text;
-using CraftFlow.Api.Common.BackgroundWorkers;
+﻿using CraftFlow.Api.Common.BackgroundWorkers;
 using CraftFlow.Api.Common.Behaviors;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Modules.Aging.GetActiveAgingLots;
+using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
 using CraftFlow.Api.Modules.Traceability.TraceabilityRead;
 using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
@@ -12,6 +12,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using System.Data;
+using System.Text;
 
 namespace CraftFlow.Api;
 
@@ -53,6 +55,9 @@ public static class DependencyInjection
         services.AddScoped<IDbConnection>(_ => new NpgsqlConnection(connectionString));
 
         services.AddScoped<TraceabilityReadService>();
+
+        services.AddScoped<GetActiveAgingLotsQueryHandler>();
+        services.AddScoped<GetAgingLotDetailsQueryHandler>();
 
         return services;
     }

@@ -30,6 +30,7 @@ public static class Endpoints
     public const string AGING_LOTS_ACTIVE = "api/aging/lots/active";
     public const string AGING_LOTS_TRANSFER = "api/aging/lots/transfer";
     public const string AGING_LOTS_RELEASE = "api/aging/lots/release";
+    public const string AGING_LOTS_ACTIVE_SUMMARY = "api/aging/lots/active-summary";
 
     // Traceability & MRP
     public const string TRACEABILITY_FORWARD = "api/traceability/forward";

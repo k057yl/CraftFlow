@@ -1,7 +1,8 @@
-﻿using CraftFlow.Api.Modules.Aging.Domain;
-using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
 using Stateless;
+
+namespace CraftFlow.Api.Modules.Aging.Domain;
 
 public sealed class AgingLot : AggregateRoot, ITenantEntity
 {
@@ -12,6 +13,7 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
     public Guid ProductId { get; private set; }
     public Guid AgingChamberId { get; private set; }
     public string BatchNumber { get; private set; } = null!;
+    public int UnitsCount { get; private set; }
 
     public decimal InitialQuantity { get; private set; }
     public decimal CurrentQuantity { get; private set; }
@@ -29,9 +31,10 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
         Guid agingChamberId,
         string batchNumber,
         decimal initialQuantity,
+        int unitsCount,
         int minAgingDays)
     {
-        if (initialQuantity <= 0)
+        if (initialQuantity <= 0 || unitsCount <= 0)
             throw new ArgumentException(ErrorCodes.General.VALUE_REQUIRED);
 
         var now = DateTime.UtcNow;
@@ -43,6 +46,7 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
             ProductId = productId,
             AgingChamberId = agingChamberId,
             BatchNumber = batchNumber,
+            UnitsCount = unitsCount,
             InitialQuantity = initialQuantity,
             CurrentQuantity = initialQuantity,
             State = AgingState.InChamber,
@@ -54,17 +58,21 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
         return lot;
     }
 
-    public void RegisterWeightLoss(decimal actualQuantity)
+    public void RegisterLoss(decimal actualQuantity, int actualUnitsCount)
     {
         EnsureMachine();
 
-        if (_stateMachine!.State != AgingState.InChamber)
+        if (_stateMachine!.State != AgingState.InChamber && _stateMachine!.State != AgingState.ReadyForRelease)
             throw new InvalidOperationException(ErrorCodes.Aging.INVALID_LOT_STATE);
 
-        if (actualQuantity < 0 || actualQuantity > CurrentQuantity)
+        if (actualQuantity <= 0)
+            throw new ArgumentException(ErrorCodes.General.VALUE_REQUIRED);
+
+        if (actualUnitsCount <= 0)
             throw new ArgumentException(ErrorCodes.General.VALUE_REQUIRED);
 
         CurrentQuantity = actualQuantity;
+        UnitsCount = actualUnitsCount;
     }
 
     public void Release()
