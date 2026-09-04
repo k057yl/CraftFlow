@@ -2,7 +2,8 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
-      Title="{loc:Loc Key=TITLE_INVENTORY}">
+      Title="{loc:Loc Key=TITLE_INVENTORY}"
+      Background="{DynamicResource AppBackgroundBrush}">
 
     <Grid Margin="15">
         <Grid.RowDefinitions>
@@ -11,7 +12,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="{loc:Loc Key=TITLE_INVENTORY}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+        <TextBlock Text="{loc:Loc Key=TITLE_INVENTORY}" 
+                   FontSize="20" 
+                   FontWeight="Bold" 
+                   Foreground="{DynamicResource AppForegroundBrush}" 
+                   Margin="0,0,0,10"/>
 
         <TabControl Grid.Row="1">
             <!-- 1. Склады -->
@@ -22,30 +27,64 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <GroupBox Header="{loc:Loc Key=CREATE_WAREHOUSE}" Margin="0,0,0,10" Padding="10">
+                    <GroupBox Header="{loc:Loc Key=CREATE_WAREHOUSE}" 
+                              Foreground="{DynamicResource AppForegroundBrush}" 
+                              Margin="0,0,0,10" 
+                              Padding="10">
                         <WrapPanel VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                <TextBlock Text="{loc:Loc Key=WAREHOUSE_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
-                                <TextBox x:Name="WarehouseNameTextBox" Width="180" Padding="5,3" Text="Склад сырья №1"/>
+                                <TextBlock Text="{loc:Loc Key=WAREHOUSE_NAME}" 
+                                           VerticalAlignment="Center" 
+                                           Margin="0,0,8,0" 
+                                           FontSize="11" 
+                                           Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="WarehouseNameTextBox" Width="180" Padding="5,3"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                <TextBlock Text="{loc:Loc Key=WAREHOUSE_ADDRESS}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
-                                <TextBox x:Name="WarehouseAddressTextBox" Width="220" Padding="5,3" Text="Industrial Zone 1"/>
+                                <TextBlock Text="{loc:Loc Key=WAREHOUSE_ADDRESS}" 
+                                           VerticalAlignment="Center" 
+                                           Margin="0,0,8,0" 
+                                           FontSize="11" 
+                                           Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="WarehouseAddressTextBox" Width="220" Padding="5,3"/>
                             </StackPanel>
 
                             <Button Content="{loc:Loc Key=CREATE_WAREHOUSE}" 
                                     Click="CreateWarehouse_Click" 
-                                    Width="130" 
+                                    Width="140" 
                                     Height="28" 
                                     Margin="0,0,0,5" 
-                                    FontWeight="SemiBold"/>
+                                    FontWeight="SemiBold"
+                                    Background="#0284C7"
+                                    Foreground="White"/>
                         </WrapPanel>
                     </GroupBox>
 
-                    <DataGrid Grid.Row="1" x:Name="WarehousesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                    <DataGrid Grid.Row="1" 
+                              x:Name="WarehousesDataGrid" 
+                              AutoGenerateColumns="False" 
+                              IsReadOnly="True" 
+                              CanUserAddRows="False"
+                              GridLinesVisibility="Horizontal"
+                              HeadersVisibility="Column"
+                              Background="Transparent">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTemplateColumn Width="60">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="❌" 
+                                                Click="DeleteWarehouse_Click" 
+                                                Tag="{Binding Id}" 
+                                                Background="Transparent" 
+                                                BorderThickness="0" 
+                                                Foreground="#DC2626" 
+                                                FontWeight="Bold" 
+                                                HorizontalAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
@@ -59,20 +98,35 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <GroupBox Header="{loc:Loc Key=CREATE_AGING_CHAMBER}" Margin="0,0,0,10" Padding="10">
+                    <GroupBox Header="{loc:Loc Key=CREATE_AGING_CHAMBER}" 
+                              Foreground="{DynamicResource AppForegroundBrush}" 
+                              Margin="0,0,0,10" 
+                              Padding="10">
                         <WrapPanel VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                <TextBlock Text="{loc:Loc Key=AGING_CHAMBER_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
-                                <TextBox x:Name="ChamberNameTextBox" Width="160" Padding="5,3" Text="Chamber #1 (Gouda)"/>
+                                <TextBlock Text="{loc:Loc Key=AGING_CHAMBER_NAME}" 
+                                           VerticalAlignment="Center" 
+                                           Margin="0,0,8,0" 
+                                           FontSize="11" 
+                                           Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="ChamberNameTextBox" Width="160" Padding="5,3"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                <TextBlock Text="{loc:Loc Key=TARGET_TEMPERATURE}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
+                                <TextBlock Text="{loc:Loc Key=TARGET_TEMPERATURE}" 
+                                           VerticalAlignment="Center" 
+                                           Margin="0,0,8,0" 
+                                           FontSize="11" 
+                                           Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="ChamberTempTextBox" Width="60" Padding="5,3" Text="12.0"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                <TextBlock Text="{loc:Loc Key=TARGET_HUMIDITY}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
+                                <TextBlock Text="{loc:Loc Key=TARGET_HUMIDITY}" 
+                                           VerticalAlignment="Center" 
+                                           Margin="0,0,8,0" 
+                                           FontSize="11" 
+                                           Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="ChamberHumidityTextBox" Width="60" Padding="5,3" Text="85.0"/>
                             </StackPanel>
 
@@ -81,19 +135,42 @@
                                     Width="160" 
                                     Height="28" 
                                     Margin="0,0,0,5" 
-                                    FontWeight="SemiBold"/>
+                                    FontWeight="SemiBold"
+                                    Background="#0284C7"
+                                    Foreground="White"/>
                         </WrapPanel>
                     </GroupBox>
 
-                    <DataGrid Grid.Row="1" x:Name="ChambersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                    <DataGrid Grid.Row="1" 
+                              x:Name="ChambersDataGrid" 
+                              AutoGenerateColumns="False" 
+                              IsReadOnly="True" 
+                              CanUserAddRows="False"
+                              GridLinesVisibility="Horizontal"
+                              HeadersVisibility="Column"
+                              Background="Transparent">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="{loc:Loc Key=AGING_CHAMBER_NAME}" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTemplateColumn Width="60">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="❌" 
+                                                Click="DeleteChamber_Click" 
+                                                Tag="{Binding Id}" 
+                                                Background="Transparent" 
+                                                BorderThickness="0" 
+                                                Foreground="#DC2626" 
+                                                FontWeight="Bold" 
+                                                HorizontalAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
                 </Grid>
             </TabItem>
         </TabControl>
 
-        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="#0284C7" FontWeight="Bold" Margin="0,10,0,0"/>
     </Grid>
 </Page>

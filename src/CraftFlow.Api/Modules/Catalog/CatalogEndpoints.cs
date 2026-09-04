@@ -20,7 +20,8 @@ public static class CatalogEndpoints
     public static void MapCatalogEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("")
-            .WithTags("Catalog");
+            .WithTags("Catalog")
+            .RequireAuthorization();
 
         // Commands - Create
         group.MapPost(Endpoints.UOM, async (CreateUnitOfMeasureCommand command, ISender sender) =>

@@ -3,28 +3,128 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
       Title="AuthPage">
-	<ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
-		<StackPanel Width="400" HorizontalAlignment="Left">
-			<TextBlock Text="{loc:Loc TITLE_AUTH}" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
-			<GroupBox Header="{loc:Loc USER_AUTHENTICATION}" Padding="15">
-				<StackPanel>
-					<TextBlock Text="{loc:Loc FULL_NAME}"/>
-					<TextBox x:Name="AuthNameTextBox" Text="Главный Сыровар" Margin="0,0,0,10"/>
-					<TextBlock Text="{loc:Loc EMAIL}"/>
-					<TextBox x:Name="AuthEmailTextBox" Text="cheesemaker@craftflow.io" Margin="0,0,0,10"/>
-					<TextBlock Text="{loc:Loc PASSWORD}"/>
-					<TextBox x:Name="AuthPasswordTextBox" Text="secret123" Margin="0,0,0,10"/>
-					<Grid Margin="0,10,0,0">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*"/>
-							<ColumnDefinition Width="*"/>
-						</Grid.ColumnDefinitions>
-						<Button Grid.Column="0" Content="{loc:Loc REGISTER}" Click="Register_Click" Height="30" Margin="0,0,5,0"/>
-						<Button Grid.Column="1" Content="{loc:Loc LOGIN_USE_TOKEN}" Click="Login_Click" Height="30" Margin="5,0,0,0"/>
-					</Grid>
-				</StackPanel>
-			</GroupBox>
-			<TextBlock x:Name="StatusTextBlock" Text="READY" Foreground="Blue" FontWeight="Bold" Margin="0,15,0,0" TextWrapping="Wrap"/>
-		</StackPanel>
-	</ScrollViewer>
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Border Padding="25">
+            <StackPanel Width="440" HorizontalAlignment="Left">
+                <TextBlock Text="{loc:Loc TITLE_AUTH}" 
+                           FontSize="22" 
+                           FontWeight="Bold" 
+                           Foreground="{DynamicResource AppForegroundBrush}" 
+                           Margin="0,0,0,20"/>
+
+                <Border Background="{DynamicResource CardBackgroundBrush}" 
+                        BorderBrush="{DynamicResource BorderBrush}" 
+                        BorderThickness="1" 
+                        CornerRadius="8" 
+                        Padding="15">
+                    <TabControl x:Name="AuthTabControl" MinHeight="360">
+                        <!-- Вкладка 1: Вход -->
+                        <TabItem Header="Вход">
+                            <StackPanel Margin="15,20,15,15">
+                                <TextBlock Text="{loc:Loc EMAIL}" 
+                                           Foreground="{DynamicResource AppForegroundBrush}" 
+                                           Margin="0,0,0,4" 
+                                           FontWeight="SemiBold"/>
+                                <TextBox x:Name="LoginEmailTextBox" 
+                                         Text="cheesemaker@craftflow.io" 
+                                         Height="30" 
+                                         Margin="0,0,0,12"/>
+
+                                <TextBlock Text="{loc:Loc PASSWORD}" 
+                                           Foreground="{DynamicResource AppForegroundBrush}" 
+                                           Margin="0,0,0,4" 
+                                           FontWeight="SemiBold"/>
+                                <PasswordBox x:Name="LoginPasswordBox" 
+                                             Height="30" 
+                                             Margin="0,0,0,20"/>
+
+                                <Button Content="Войти" 
+                                        Style="{StaticResource PrimaryButtonStyle}" 
+                                        Click="Login_Click" 
+                                        Height="36"/>
+                            </StackPanel>
+                        </TabItem>
+
+                        <!-- Вкладка 2: Регистрация -->
+                        <TabItem Header="Регистрация">
+                            <StackPanel Margin="15,20,15,15">
+                                <TextBlock Text="{loc:Loc FULL_NAME}" 
+                                           Foreground="{DynamicResource AppForegroundBrush}" 
+                                           Margin="0,0,0,4" 
+                                           FontWeight="SemiBold"/>
+                                <TextBox x:Name="RegisterNameTextBox" 
+                                         Text="Главный Сыровар" 
+                                         Height="30" 
+                                         Margin="0,0,0,10"/>
+
+                                <TextBlock Text="{loc:Loc EMAIL}" 
+                                           Foreground="{DynamicResource AppForegroundBrush}" 
+                                           Margin="0,0,0,4" 
+                                           FontWeight="SemiBold"/>
+                                <TextBox x:Name="RegisterEmailTextBox" 
+                                         Text="cheesemaker@craftflow.io" 
+                                         Height="30" 
+                                         Margin="0,0,0,10"/>
+
+                                <TextBlock Text="{loc:Loc PASSWORD}" 
+                                           Foreground="{DynamicResource AppForegroundBrush}" 
+                                           Margin="0,0,0,4" 
+                                           FontWeight="SemiBold"/>
+                                <PasswordBox x:Name="RegisterPasswordBox" 
+                                             Height="30" 
+                                             Margin="0,0,0,10"/>
+
+                                <TextBlock Text="{loc:Loc CONFIRM_PASSWORD}" 
+                                           Foreground="{DynamicResource AppForegroundBrush}" 
+                                           Margin="0,0,0,4" 
+                                           FontWeight="SemiBold"/>
+                                <PasswordBox x:Name="RegisterConfirmPasswordBox" 
+                                             Height="30" 
+                                             Margin="0,0,0,20"/>
+
+                                <Button Content="Зарегистрироваться" 
+                                        Style="{StaticResource PrimaryButtonStyle}" 
+                                        Click="Register_Click" 
+                                        Height="36"/>
+                            </StackPanel>
+                        </TabItem>
+
+                        <!-- Вкладка 3: Подтверждение OTP -->
+                        <TabItem Header="Код из письма">
+                            <StackPanel Margin="15,20,15,15">
+                                <TextBlock Text="{loc:Loc EMAIL}" 
+                                           Foreground="{DynamicResource AppForegroundBrush}" 
+                                           Margin="0,0,0,4" 
+                                           FontWeight="SemiBold"/>
+                                <TextBox x:Name="OtpEmailTextBox" 
+                                         Text="cheesemaker@craftflow.io" 
+                                         Height="30" 
+                                         Margin="0,0,0,12"/>
+
+                                <TextBlock Text="6-значный код (OTP)" 
+                                           Foreground="{DynamicResource AppForegroundBrush}" 
+                                           Margin="0,0,0,4" 
+                                           FontWeight="SemiBold"/>
+                                <TextBox x:Name="OtpCodeTextBox" 
+                                         Height="30" 
+                                         Margin="0,0,0,20"/>
+
+                                <Button Content="Подтвердить код" 
+                                        Style="{StaticResource PrimaryButtonStyle}" 
+                                        Click="VerifyOtp_Click" 
+                                        Height="36"/>
+                            </StackPanel>
+                        </TabItem>
+                    </TabControl>
+                </Border>
+
+                <TextBlock x:Name="StatusTextBlock" 
+                           Text="READY" 
+                           Foreground="{DynamicResource AccentBrush}" 
+                           FontWeight="Bold" 
+                           Margin="0,15,0,0" 
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+    </ScrollViewer>
 </Page>

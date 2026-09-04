@@ -9,15 +9,17 @@ public static class TraceabilityEndpoints
 {
     public static void MapTraceabilityEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("api/traceability");
+        var group = app.MapGroup("")
+            .WithTags("Traceability")
+            .RequireAuthorization();
 
-        group.MapGet("forward/{stockLotId:guid}", async (Guid stockLotId, ISender sender) =>
+        group.MapGet($"{Endpoints.TRACEABILITY_FORWARD}/{{stockLotId:guid}}", async (Guid stockLotId, ISender sender) =>
         {
             var result = await sender.Send(new GetForwardTraceabilityQuery(stockLotId));
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet("backward/{productStockLotId:guid}", async (Guid productStockLotId, ISender sender) =>
+        group.MapGet($"{Endpoints.TRACEABILITY_BACKWARD}/{{productStockLotId:guid}}", async (Guid productStockLotId, ISender sender) =>
         {
             var result = await sender.Send(new GetBackwardTraceabilityQuery(productStockLotId));
 

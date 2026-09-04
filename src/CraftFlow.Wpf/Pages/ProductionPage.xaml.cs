@@ -1,5 +1,6 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Models.Productions;
 using CraftFlow.Wpf.Services;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -10,86 +11,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace CraftFlow.Wpf.Pages;
-
-public record BatchCostDto(
-    Guid BatchId,
-    string RecipeName,
-    decimal PlannedOutputQuantity,
-    decimal ActualOutputQuantity,
-    decimal TotalRawMaterialCost,
-    decimal UnitCost
-);
-
-public record RequirementCalculationDto(
-    string MaterialName,
-    decimal RequiredQty,
-    decimal AvailableQty,
-    bool IsSufficient
-)
-{
-    public string DisplayInfo => string.Format(
-        FormattingConstants.DISPLAY_INFO_REQUIREMENT_FORMAT,
-        MaterialName,
-        Math.Round(RequiredQty, 3),
-        Math.Round(AvailableQty, 3),
-        IsSufficient ? FormattingConstants.CHECKMARK_SUFFICIENT : FormattingConstants.CHECKMARK_INSUFFICIENT
-    );
-}
-
-public record BatchReadyForAgingDto(Guid Id, string Name, int DefaultAgingDays);
-
-public record AgingLotSummaryDto(
-    Guid LotId,
-    string BatchNumber,
-    string ChamberName,
-    int UnitsCount,
-    decimal InitialQuantity,
-    int DaysInChamber,
-    int TargetDays,
-    bool IsReadyForRelease
-);
-
-public record GetAgingLotDetailsDto(
-    Guid LotId,
-    Guid ProductId,
-    string ProductName,
-    string UnitName,
-    decimal TotalBatchCost,
-    decimal InitialQuantity,
-    int UnitsCount
-);
-
-public class ActiveBatchSummaryDto : System.ComponentModel.INotifyPropertyChanged
-{
-    public Guid Id { get; set; }
-    public string BatchName { get; set; } = string.Empty;
-    public string RecipeName { get; set; } = string.Empty;
-    public DateTime StartedAt { get; set; }
-    public int TargetDurationMinutes { get; set; }
-    public int ElapsedMinutes { get; set; }
-    public bool IsOverdue { get; set; }
-    public string Status { get; set; } = string.Empty;
-    public decimal PlannedOutputQuantity { get; set; }
-
-    private TimeSpan _currentElapsed;
-    public TimeSpan CurrentElapsed
-    {
-        get => _currentElapsed;
-        set
-        {
-            _currentElapsed = value;
-            OnPropertyChanged(nameof(FormattedElapsed));
-            OnPropertyChanged(nameof(IsOverdueStatus));
-        }
-    }
-
-    public string FormattedElapsed => $"{((int)CurrentElapsed.TotalHours):D2}:{CurrentElapsed.Minutes:D2}:{CurrentElapsed.Seconds:D2}";
-
-    public bool IsOverdueStatus => CurrentElapsed.TotalMinutes >= TargetDurationMinutes;
-
-    public event System.ComponentModel.PropertyChangedEventHandler? PropertyChanged;
-    protected void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(name));
-}
 
 public partial class ProductionPage : Page
 {
@@ -107,6 +28,8 @@ public partial class ProductionPage : Page
 
     private decimal _selectedLotTotalCost;
     private string _selectedLotUnitName = FormattingConstants.DEFAULT_WEIGHT_UNIT;
+    private decimal _currentRawCost = 0m;
+    private bool _isInitializing = true;
 
     public ProductionPage()
     {
@@ -231,11 +154,11 @@ public partial class ProductionPage : Page
 
             GenerateDefaultBatchName();
 
-            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);
         }
         catch (Exception ex)
         {
-            SetStatus($"{UiConstants.Messages.DATA_LOAD_ERROR}: {ex.Message}", Brushes.Red);
+            SetStatusFormatted("UI_DATA_LOAD_ERROR", Brushes.Red, ex.Message);
         }
         finally
         {
@@ -257,7 +180,7 @@ public partial class ProductionPage : Page
         if (CompletedBatchesComboBox.SelectedItem is BatchReadyForAgingDto selectedBatch)
         {
             MinAgingDaysTextBox.Text = selectedBatch.DefaultAgingDays.ToString();
-            AgingLotNameTextBox.Text = $"{selectedBatch.Name} (Выдержка)";
+            AgingLotNameTextBox.Text = $"{selectedBatch.Name} ({LocalizationService.Get("NAV_AGING")})";
         }
         else
         {
@@ -270,7 +193,7 @@ public partial class ProductionPage : Page
     {
         if (ActiveBatchComboBox.SelectedItem is not LookupItem selectedBatch) return;
 
-        CompleteBatchNameTextBox.Text = $"{selectedBatch.Name} (Готовая продукция)";
+        CompleteBatchNameTextBox.Text = $"{selectedBatch.Name} ({LocalizationService.Get("HEADER_PRODUCTS")})";
 
         try
         {
@@ -279,20 +202,63 @@ public partial class ProductionPage : Page
 
             if (costData != null)
             {
-                TotalCostTextBlock.Text = $"${costData.TotalRawMaterialCost:F2}";
-                UnitCostTextBlock.Text = $"${costData.UnitCost:F2}";
+                _currentRawCost = costData.TotalRawMaterialCost;
+
+                if (costData.OverheadPercentage.HasValue)
+                {
+                    UseOverheadCheckBox.IsChecked = true;
+                    OverheadPercentageTextBox.Text = costData.OverheadPercentage.Value.ToString("F2", CultureInfo.InvariantCulture);
+                }
+
+                if (costData.ActualOutputQuantity > 0 && string.IsNullOrWhiteSpace(ActualOutputQuantityTextBox.Text))
+                {
+                    ActualOutputQuantityTextBox.Text = costData.ActualOutputQuantity.ToString("F2", CultureInfo.InvariantCulture);
+                }
+
+                RecalculateBatchCostUI();
             }
         }
-        catch
+        catch { }
+    }
+
+    private void CostInputs_Changed(object sender, RoutedEventArgs e)
+    {
+        RecalculateBatchCostUI();
+    }
+
+    private void RecalculateBatchCostUI()
+    {
+        if (RawMaterialCostTextBlock == null || TotalBatchCostTextBlock == null || UnitCostTextBlock == null) return;
+
+        decimal rawCost = _currentRawCost;
+        decimal overheadPercent = 0m;
+
+        if (UseOverheadCheckBox.IsChecked == true && TryParseDecimal(OverheadPercentageTextBox.Text, out var parsedOverhead))
         {
+            overheadPercent = parsedOverhead;
         }
+
+        decimal overheadAmount = rawCost * (overheadPercent / 100m);
+        decimal totalBatchCost = rawCost + overheadAmount;
+
+        if (!TryParseDecimal(ActualOutputQuantityTextBox.Text, out var actualWeight) || actualWeight <= 0)
+        {
+            actualWeight = 1m;
+        }
+
+        decimal unitCostPerKg = totalBatchCost / actualWeight;
+
+        RawMaterialCostTextBlock.Text = $"${rawCost:F2}";
+        OverheadCostTextBlock.Text = $"+${overheadAmount:F2} ({overheadPercent:0.##}%)";
+        TotalBatchCostTextBlock.Text = $"${totalBatchCost:F2}";
+        UnitCostTextBlock.Text = $"${unitCostPerKg:F2} / {FormattingConstants.DEFAULT_WEIGHT_UNIT}";
     }
 
     private async void ActiveAgingLotsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (ActiveAgingLotsComboBox.SelectedItem is LookupItem selectedLot)
         {
-            ReleaseLotNameTextBox.Text = $"{selectedLot.Name} (Снято с выдержки)";
+            ReleaseLotNameTextBox.Text = $"{selectedLot.Name} ({LocalizationService.Get("GROUP_RELEASE_AGING")})";
 
             try
             {
@@ -300,7 +266,7 @@ public partial class ProductionPage : Page
                 if (details != null)
                 {
                     _selectedLotTotalCost = details.TotalBatchCost;
-                    _selectedLotUnitName = string.IsNullOrWhiteSpace(details.UnitName) ? "кг" : details.UnitName;
+                    _selectedLotUnitName = string.IsNullOrWhiteSpace(details.UnitName) ? FormattingConstants.DEFAULT_WEIGHT_UNIT : details.UnitName;
 
                     var costFormat = LocalizationService.Get("LABEL_CALCULATED_UNIT_COST");
                     CalculatedCostLabelTextBlock.Text = string.Format(costFormat, _selectedLotUnitName);
@@ -309,15 +275,12 @@ public partial class ProductionPage : Page
                     UnitPriceLabelTextBlock.Text = string.Format(priceFormat, _selectedLotUnitName);
 
                     ActualFinalQuantityTextBox.Text = details.InitialQuantity.ToString("F2", CultureInfo.InvariantCulture);
-
                     ReleaseUnitsCountTextBox.Text = details.UnitsCount > 0 ? details.UnitsCount.ToString() : "1";
 
                     RecalculateUnitPrice();
                 }
             }
-            catch
-            {
-            }
+            catch { }
         }
         else
         {
@@ -328,8 +291,8 @@ public partial class ProductionPage : Page
             CalculatedUnitCostTextBlock.Text = "$ 0.00";
             _selectedLotTotalCost = 0;
 
-            CalculatedCostLabelTextBlock.Text = "Рассчитанная себестоимость:";
-            UnitPriceLabelTextBlock.Text = "Отпускная цена:";
+            CalculatedCostLabelTextBlock.Text = string.Format(LocalizationService.Get("LABEL_CALCULATED_UNIT_COST"), FormattingConstants.DEFAULT_WEIGHT_UNIT);
+            UnitPriceLabelTextBlock.Text = string.Format(LocalizationService.Get("LABEL_SELLING_PRICE_PER_UNIT"), FormattingConstants.DEFAULT_WEIGHT_UNIT);
         }
     }
 
@@ -355,8 +318,6 @@ public partial class ProductionPage : Page
             CalculatedUnitCostTextBlock.Text = "$ 0.00";
         }
     }
-
-    private bool _isInitializing = true;
 
     private async void BatchInputs_Changed(object sender, RoutedEventArgs e)
     {
@@ -386,9 +347,7 @@ public partial class ProductionPage : Page
 
             EstimatedCostTextBlock.Text = $"${estimatedCost:F2}";
         }
-        catch
-        {
-        }
+        catch { }
     }
 
     private async void StartBatch_Click(object sender, RoutedEventArgs e)
@@ -398,7 +357,7 @@ public partial class ProductionPage : Page
             DestinationWarehouseComboBox.SelectedValue is not Guid destWarehouseId ||
             !TryParseDecimal(BatchQuantityTextBox.Text, out var plannedQuantity))
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -415,14 +374,14 @@ public partial class ProductionPage : Page
 
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.BATCH_STARTED_SUCCESS, Brushes.Green);
+            SetStatus("UI_BATCH_STARTED_SUCCESS", Brushes.Green);
             BatchNameTextBox.Clear();
             GenerateDefaultBatchName();
             await LoadDataAsync();
         }
         else
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatusRaw(contentOrError, Brushes.Red);
         }
     }
 
@@ -432,8 +391,22 @@ public partial class ProductionPage : Page
             !TryParseDecimal(ActualOutputQuantityTextBox.Text, out var actualOutput) || actualOutput <= 0 ||
             !int.TryParse(ActualUnitsCountTextBox.Text.Trim(), out var unitsCount) || unitsCount < 0)
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
+        }
+
+        decimal? overheadPercentage = null;
+        if (UseOverheadCheckBox.IsChecked == true)
+        {
+            if (TryParseDecimal(OverheadPercentageTextBox.Text, out var parsedOverhead) && parsedOverhead >= 0)
+            {
+                overheadPercentage = parsedOverhead;
+            }
+            else
+            {
+                SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
+                return;
+            }
         }
 
         var customBatchName = CompleteBatchNameTextBox.Text?.Trim();
@@ -443,15 +416,18 @@ public partial class ProductionPage : Page
             BatchId = batchId,
             ActualOutputQuantity = actualOutput,
             UnitsCount = unitsCount,
-            BatchNumber = string.IsNullOrWhiteSpace(customBatchName) ? null : customBatchName
+            BatchNumber = string.IsNullOrWhiteSpace(customBatchName) ? null : customBatchName,
+            OverheadPercentage = overheadPercentage
         });
 
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.BATCH_COMPLETED_SUCCESS, Brushes.Green);
+            SetStatus("UI_BATCH_COMPLETED_SUCCESS", Brushes.Green);
             ActualOutputQuantityTextBox.Clear();
             ActualUnitsCountTextBox.Text = "1";
             CompleteBatchNameTextBox.Clear();
+            UseOverheadCheckBox.IsChecked = false;
+            OverheadPercentageTextBox.Text = "15";
 
             await LoadDataAsync();
 
@@ -465,7 +441,7 @@ public partial class ProductionPage : Page
         }
         else
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatusRaw(contentOrError, Brushes.Red);
         }
     }
 
@@ -475,7 +451,7 @@ public partial class ProductionPage : Page
             AgingChambersComboBox.SelectedValue is not Guid chamberId ||
             !int.TryParse(MinAgingDaysTextBox.Text.Trim(), out var minDays))
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -491,7 +467,7 @@ public partial class ProductionPage : Page
 
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.LOT_TRANSFERRED_TO_AGING_SUCCESS, Brushes.Green);
+            SetStatus("UI_BATCH_STARTED_SUCCESS", Brushes.Green);
 
             CompletedBatchesComboBox.SelectedIndex = -1;
             AgingLotNameTextBox.Clear();
@@ -500,7 +476,7 @@ public partial class ProductionPage : Page
         }
         else
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatusRaw(contentOrError, Brushes.Red);
         }
     }
 
@@ -508,25 +484,25 @@ public partial class ProductionPage : Page
     {
         if (ActiveAgingLotsComboBox.SelectedValue is not Guid lotId)
         {
-            SetStatus(UiConstants.Messages.SELECT_AGING_LOT, Brushes.Red);
+            SetStatus("LABEL_ACTIVE_AGING_LOT", Brushes.Red);
             return;
         }
 
         if (TargetWarehousesComboBox.SelectedValue is not Guid warehouseId)
         {
-            SetStatus(UiConstants.Messages.SELECT_WAREHOUSE, Brushes.Red);
+            SetStatus("SELECT_WAREHOUSE", Brushes.Red);
             return;
         }
 
         if (!TryParseDecimal(ActualFinalQuantityTextBox.Text, out var actualQty) || actualQty <= 0)
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
         if (!int.TryParse(ReleaseUnitsCountTextBox.Text.Trim(), out var unitsCount) || unitsCount <= 0)
         {
-            SetStatus("Укажите количество штук (должно быть больше 0)", Brushes.Red);
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -545,7 +521,7 @@ public partial class ProductionPage : Page
 
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.LOT_RELEASED_FROM_AGING_SUCCESS, Brushes.Green);
+            SetStatus("UI_ORDER_SHIPPED_SUCCESS", Brushes.Green);
             ActualFinalQuantityTextBox.Clear();
             ReleaseUnitsCountTextBox.Clear();
             UnitPriceTextBox.Clear();
@@ -554,7 +530,7 @@ public partial class ProductionPage : Page
         }
         else
         {
-            SetStatus($"{UiConstants.Messages.RELEASE_ERROR}: {contentOrError}", Brushes.Red);
+            SetStatusFormatted("UI_API_ERROR_PREFIX", Brushes.Red, contentOrError);
         }
     }
 
@@ -563,7 +539,7 @@ public partial class ProductionPage : Page
         if (DiscardBatchComboBox.SelectedValue is not Guid batchId ||
             string.IsNullOrWhiteSpace(DiscardReasonTextBox.Text))
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -575,13 +551,13 @@ public partial class ProductionPage : Page
 
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.BATCH_COMPLETED_SUCCESS, Brushes.OrangeRed);
+            SetStatus("UI_BATCH_COMPLETED_SUCCESS", Brushes.OrangeRed);
             DiscardReasonTextBox.Clear();
             await LoadDataAsync();
         }
         else
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatusRaw(contentOrError, Brushes.Red);
         }
     }
 
@@ -590,7 +566,7 @@ public partial class ProductionPage : Page
         if (BatchRecipeComboBox.SelectedValue is not Guid recipeId ||
             BatchWarehouseComboBox.SelectedValue is not Guid warehouseId)
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -602,16 +578,16 @@ public partial class ProductionPage : Page
             if (maxQty > 0)
             {
                 BatchQuantityTextBox.Text = Math.Round(maxQty, 2).ToString("0.##");
-                SetStatus($"Рассчитан максимальный объем: {Math.Round(maxQty, 2)} кг/л", Brushes.Green);
+                SetStatusFormatted("LABEL_PLANNED_OUTPUT", Brushes.Green, Math.Round(maxQty, 2));
             }
             else
             {
-                SetStatus("Недостаточно компонентов на складе для запуска варки!", Brushes.OrangeRed);
+                SetStatus("PRODUCTION_INSUFFICIENT_RAW_MATERIAL", Brushes.OrangeRed);
             }
         }
         catch (Exception ex)
         {
-            SetStatus($"Ошибка расчета максимума: {ex.Message}", Brushes.Red);
+            SetStatusFormatted("UI_API_ERROR_PREFIX", Brushes.Red, ex.Message);
         }
     }
 
@@ -619,11 +595,11 @@ public partial class ProductionPage : Page
     {
         if (_requirements.Count == 0)
         {
-            SetStatus("Нет данных для печати тех. карты", Brushes.Red);
+            SetStatus("GENERAL_NOT_FOUND", Brushes.Red);
             return;
         }
 
-        var recipeName = (BatchRecipeComboBox.SelectedItem as LookupItem)?.Name ?? "Рецептура";
+        var recipeName = (BatchRecipeComboBox.SelectedItem as LookupItem)?.Name ?? LocalizationService.Get("RECIPE_NAME");
         var printDialog = new PrintDialog();
 
         if (printDialog.ShowDialog() == true)
@@ -635,7 +611,7 @@ public partial class ProductionPage : Page
             };
 
             flowDocument.Blocks.Add(new Paragraph(
-                new Run($"ТЕХНОЛОГИЧЕСКАЯ КАРТА ВАРКИ: {recipeName.ToUpper()}"))
+                new Run($"{LocalizationService.Get("HEADER_RECIPES")}: {recipeName.ToUpper()}"))
             {
                 FontSize = 18,
                 FontWeight = FontWeights.Bold,
@@ -643,7 +619,7 @@ public partial class ProductionPage : Page
             });
 
             flowDocument.Blocks.Add(new Paragraph(
-                new Run($"Дата: {DateTime.Now:dd.MM.yyyy HH:mm} | Партия: {BatchNameTextBox.Text} | План выхода: {BatchQuantityTextBox.Text} кг/л"))
+                new Run($"Дата: {DateTime.Now:dd.MM.yyyy HH:mm} | {LocalizationService.Get("LABEL_BATCH_CODE")} {BatchNameTextBox.Text} | {LocalizationService.Get("LABEL_PLANNED_OUTPUT")} {BatchQuantityTextBox.Text}"))
             {
                 FontSize = 12,
                 FontStyle = FontStyles.Italic,
@@ -655,14 +631,14 @@ public partial class ProductionPage : Page
             {
                 list.ListItems.Add(new ListItem(
                     new Paragraph(
-                        new Run($"{req.MaterialName}: {req.RequiredQty:F3} кг/л (На складе: {req.AvailableQty:F3})"))
+                        new Run($"{req.MaterialName}: {req.RequiredQty:F3} ({LocalizationService.Get("AVAILABLE_STOCK")} {req.AvailableQty:F3})"))
                     { FontSize = 14 }));
             }
 
             flowDocument.Blocks.Add(list);
 
             var idp = ((IDocumentPaginatorSource)flowDocument).DocumentPaginator;
-            printDialog.PrintDocument(idp, $"ТехКарта_{recipeName}");
+            printDialog.PrintDocument(idp, $"TechCard_{recipeName}");
         }
     }
 
@@ -674,9 +650,22 @@ public partial class ProductionPage : Page
         }
     }
 
-    private void SetStatus(string msg, Brush color)
+    private void SetStatus(string resourceKey, Brush color)
     {
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = LocalizationService.Get(msg);
+        StatusTextBlock.Text = LocalizationService.Get(resourceKey);
+    }
+
+    private void SetStatusFormatted(string resourceKey, Brush color, params object[] args)
+    {
+        StatusTextBlock.Foreground = color;
+        var format = LocalizationService.Get(resourceKey);
+        StatusTextBlock.Text = string.Format(format, args);
+    }
+
+    private void SetStatusRaw(string rawText, Brush color)
+    {
+        StatusTextBlock.Foreground = color;
+        StatusTextBlock.Text = rawText;
     }
 }

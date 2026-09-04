@@ -24,12 +24,16 @@ logs/
 # Environment & Local Secrets (Локальные конфигурации и пароли)
 appsettings.Secrets.json
 appsettings.Local.json
-*.env
+appsettings.Development.json
+.env
+.env.*
+!.env.example
 
-# Windows system temp files (Мусор ОС)
+# Windows & OS system temp files (Мусор ОС)
 Thumbs.db
 ehthumbs.db
 Desktop.ini
+.DS_Store
 
 # Test Results (Результаты прогона тестов)
 TestResults/

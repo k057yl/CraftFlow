@@ -7,5 +7,6 @@ public record RegisterUserCommand(
     Guid TenantId,
     string Email,
     string Password,
+    string ConfirmPassword,
     string FullName
 ) : IRequest<Result<Guid>>;

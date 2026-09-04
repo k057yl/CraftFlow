@@ -55,12 +55,14 @@ public class GetBatchCostHandler : IRequestHandler<GetBatchCostQuery, Result<Bat
             }
         }
 
+        var totalCostWithOverhead = batch.CalculateTotalCost(totalRawMaterialCost);
+
         var outputQuantity = batch.ActualOutputQuantity > 0
             ? batch.ActualOutputQuantity
             : batch.PlannedOutputQuantity;
 
         var unitCost = outputQuantity > 0
-            ? totalRawMaterialCost / outputQuantity
+            ? totalCostWithOverhead / outputQuantity
             : 0m;
 
         var recipeName = recipe.Name ?? FormattingConstants.NOT_AVAILABLE;
@@ -71,6 +73,8 @@ public class GetBatchCostHandler : IRequestHandler<GetBatchCostQuery, Result<Bat
             batch.PlannedOutputQuantity,
             batch.ActualOutputQuantity,
             totalRawMaterialCost,
+            totalCostWithOverhead,
+            batch.OverheadPercentage,
             unitCost
         );
 

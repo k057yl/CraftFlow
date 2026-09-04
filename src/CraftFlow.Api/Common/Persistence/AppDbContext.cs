@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using CraftFlow.Api.Common.Audit;
 using CraftFlow.Api.Common.Constants;
+using CraftFlow.Api.Common.Domain;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Catalog.Domain;
@@ -42,12 +43,29 @@ public class AppDbContext : DbContext
     public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
     public DbSet<AgingChamber> AgingChambers => Set<AgingChamber>();
     public DbSet<AgingLot> AgingLots => Set<AgingLot>();
+    public DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
+    public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.HasDefaultSchema("public");
+
+        modelBuilder.Entity<TenantSubscription>(builder =>
+        {
+            builder.HasKey(s => s.TenantId);
+
+            builder.HasOne(s => s.Plan)
+                   .WithMany()
+                   .HasForeignKey(s => s.PlanId)
+                   .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<SubscriptionPlan>(builder =>
+        {
+            builder.HasKey(p => p.Id);
+        });
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 

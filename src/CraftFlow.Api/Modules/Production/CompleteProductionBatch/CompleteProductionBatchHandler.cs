@@ -33,7 +33,7 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
             batch.UpdateName(request.BatchNumber);
         }
 
-        batch.Complete(request.ActualOutputQuantity);
+        batch.Complete(request.ActualOutputQuantity, request.OverheadPercentage);
 
         await _publisher.Publish(
             new ProductionBatchCompletedEvent(

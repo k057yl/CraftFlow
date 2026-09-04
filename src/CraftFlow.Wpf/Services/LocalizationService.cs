@@ -8,6 +8,10 @@ public static class LocalizationService
 {
     private static readonly ResourceManager _resourceManager = new(typeof(Strings));
 
+    public static CultureInfo CurrentCulture => CultureInfo.CurrentUICulture;
+
+    public static event Action? LanguageChanged;
+
     public static string Get(string key)
     {
         if (string.IsNullOrWhiteSpace(key)) return string.Empty;
@@ -28,7 +32,11 @@ public static class LocalizationService
     public static void SetCulture(string cultureName)
     {
         var culture = new CultureInfo(cultureName);
+
         CultureInfo.CurrentCulture = culture;
         CultureInfo.CurrentUICulture = culture;
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        LanguageChanged?.Invoke();
     }
 }

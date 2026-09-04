@@ -11,6 +11,7 @@ public static class ErrorCodes
         public const string NULL_VALUE = "GENERAL.NULL_VALUE";
         public const string INVALID_FORMAT = "GENERAL.INVALID_FORMAT";
         public const string ALREADY_EXISTS = "GENERAL.ALREADY_EXISTS";
+        public const string VALIDATION_ERROR = "GENERAL.VALIDATION_ERROR";
     }
 
     public static class Production
@@ -84,5 +85,6 @@ public static class ErrorCodes
     public static class Saas
     {
         public const string QUOTA_EXCEEDED = "SAAS.QUOTA_EXCEEDED";
+        public const string SUBSCRIPTION_EXPIRED = "SAAS.SUBSCRIPTION_EXPIRED";
     }
 }

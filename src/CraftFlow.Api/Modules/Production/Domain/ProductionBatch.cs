@@ -17,6 +17,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
 
     public decimal PlannedOutputQuantity { get; private set; }
     public decimal ActualOutputQuantity { get; private set; }
+    public decimal? OverheadPercentage { get; private set; }
     public BatchState State { get; private set; }
 
     public DateTime StartedAt { get; private set; }
@@ -71,13 +72,33 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         _stateMachine!.Fire(BatchTrigger.Start);
     }
 
-    public void Complete(decimal actualOutputQuantity)
+    public void Complete(decimal actualOutputQuantity, decimal? overheadPercentage = null)
     {
         EnsureMachine();
         ActualOutputQuantity = actualOutputQuantity;
+        SetOverheadPercentage(overheadPercentage);
         BrewingCompletedAt = DateTime.UtcNow;
         CompletedAt = DateTime.UtcNow;
         _stateMachine!.Fire(BatchTrigger.Complete);
+    }
+
+    public void SetOverheadPercentage(decimal? percentage)
+    {
+        if (percentage.HasValue && percentage.Value < 0)
+            throw new ArgumentException(ErrorCodes.General.VALIDATION_ERROR);
+
+        OverheadPercentage = percentage;
+    }
+
+    public decimal CalculateTotalCost(decimal rawMaterialCost)
+    {
+        if (!OverheadPercentage.HasValue || OverheadPercentage.Value <= 0)
+        {
+            return rawMaterialCost;
+        }
+
+        var multiplier = 1m + (OverheadPercentage.Value / 100m);
+        return rawMaterialCost * multiplier;
     }
 
     public void MarkReadyForAging(decimal actualOutputQuantity)

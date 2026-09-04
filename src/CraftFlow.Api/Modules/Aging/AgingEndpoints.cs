@@ -5,6 +5,7 @@ using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
 using CraftFlow.Api.Modules.Aging.ReleaseFromAging;
 using CraftFlow.Api.Modules.Aging.TransferToAging;
 using CraftFlow.Api.Modules.Production.Domain;
+using CraftFlow.SharedKernel.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,21 +15,23 @@ public static class AgingEndpoints
 {
     public static void MapAgingEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("api/aging");
+        var group = app.MapGroup("")
+            .WithTags("Aging")
+            .RequireAuthorization();
 
-        group.MapPost("lots/transfer", async (TransferToAgingCommand command, ISender sender) =>
+        group.MapPost(Endpoints.AGING_LOTS_TRANSFER, async (TransferToAgingCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost("lots/release", async (ReleaseFromAgingCommand command, ISender sender) =>
+        group.MapPost(Endpoints.AGING_LOTS_RELEASE, async (ReleaseFromAgingCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
 
-        group.MapGet("chambers", async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapGet(Endpoints.AGING_CHAMBERS, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
             var chambers = await dbContext.AgingChambers
                 .AsNoTracking()
@@ -38,7 +41,7 @@ public static class AgingEndpoints
             return Results.Ok(chambers);
         });
 
-        group.MapGet("lots/active", async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapGet(Endpoints.AGING_LOTS_ACTIVE, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
             var activeLots = await dbContext.AgingLots
                 .AsNoTracking()
@@ -60,13 +63,13 @@ public static class AgingEndpoints
             return Results.Ok(activeLots);
         });
 
-        group.MapGet("/lots/active-summary", async (GetActiveAgingLotsQueryHandler handler) =>
+        group.MapGet(Endpoints.AGING_LOTS_ACTIVE_SUMMARY, async (GetActiveAgingLotsQueryHandler handler) =>
         {
             var result = await handler.HandleAsync();
             return Results.Ok(result);
         });
 
-        group.MapGet("lots/active/{id:guid}", async (Guid id, GetAgingLotDetailsQueryHandler handler) =>
+        group.MapGet($"{Endpoints.AGING_LOTS_ACTIVE}/{{id:guid}}", async (Guid id, GetAgingLotDetailsQueryHandler handler) =>
         {
             var result = await handler.HandleAsync(id);
             return result is not null ? Results.Ok(result) : Results.NotFound();

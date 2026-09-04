@@ -60,6 +60,59 @@ namespace CraftFlow.Api.Migrations
                     b.ToTable("audit_logs", "public");
                 });
 
+            modelBuilder.Entity("CraftFlow.Api.Common.Domain.SubscriptionPlan", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("MaxChambers")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxMonthlyBatches")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxUsers")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("MaxWarehouses")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubscriptionPlans", "public");
+                });
+
+            modelBuilder.Entity("CraftFlow.Api.Common.Domain.TenantSubscription", b =>
+                {
+                    b.Property<Guid>("TenantId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("ExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PlanId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("TenantId");
+
+                    b.HasIndex("PlanId");
+
+                    b.ToTable("TenantSubscriptions", "public");
+                });
+
             modelBuilder.Entity("CraftFlow.Api.Modules.Aging.Domain.AgingChamber", b =>
                 {
                     b.Property<Guid>("Id")
@@ -305,6 +358,12 @@ namespace CraftFlow.Api.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("OtpCodeHash")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("OtpExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
@@ -547,6 +606,9 @@ namespace CraftFlow.Api.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<decimal?>("OverheadPercentage")
+                        .HasColumnType("numeric");
+
                     b.Property<decimal>("PlannedOutputQuantity")
                         .HasPrecision(18, 4)
                         .HasColumnType("numeric(18,4)");
@@ -664,6 +726,17 @@ namespace CraftFlow.Api.Migrations
                     b.HasIndex("SalesOrderId");
 
                     b.ToTable("sales_order_items", "public");
+                });
+
+            modelBuilder.Entity("CraftFlow.Api.Common.Domain.TenantSubscription", b =>
+                {
+                    b.HasOne("CraftFlow.Api.Common.Domain.SubscriptionPlan", "Plan")
+                        .WithMany()
+                        .HasForeignKey("PlanId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Plan");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.Recipe", b =>

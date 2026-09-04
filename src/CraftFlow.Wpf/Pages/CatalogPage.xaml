@@ -25,16 +25,16 @@
                     <GroupBox Header="{loc:Loc Key=HEADER_UOM}" Margin="0,0,0,10" Padding="10">
                         <WrapPanel VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                <TextBlock Text="{loc:Loc Key=UOM_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
-                                <TextBox x:Name="UomNameTextBox" Width="180" Padding="5,3" Text="Килограмм"/>
+                                <TextBlock Text="{loc:Loc Key=UOM_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
+                                <TextBox x:Name="UomNameTextBox" Width="180"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                <TextBlock Text="{loc:Loc Key=UOM_CODE}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
-                                <TextBox x:Name="UomCodeTextBox" Width="90" Padding="5,3" Text="кг"/>
+                                <TextBlock Text="{loc:Loc Key=UOM_CODE}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
+                                <TextBox x:Name="UomCodeTextBox" Width="90"/>
                             </StackPanel>
 
-                            <Button Content="{loc:Loc Key=CREATE_UOM}" Click="CreateUom_Click" Width="120" Height="28" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                            <Button Content="{loc:Loc Key=CREATE_UOM}" Click="CreateUom_Click" Style="{StaticResource PrimaryButtonStyle}" Width="130" Height="28" Margin="0,0,0,5"/>
                         </WrapPanel>
                     </GroupBox>
 
@@ -45,7 +45,7 @@
                             <DataGridTemplateColumn Width="60">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="❌" Click="DeleteUom_Click" Tag="{Binding Id}" Background="Transparent" BorderThickness="0" Foreground="Red" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                        <Button Content="❌" Click="DeleteUom_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" HorizontalAlignment="Center"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -54,7 +54,7 @@
                 </Grid>
             </TabItem>
 
-            <!-- 2. Сырье и Ингредиенты -->
+            <!-- 2. Сырье -->
             <TabItem Header="{loc:Loc Key=HEADER_RAW_MATERIALS}">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
@@ -65,16 +65,16 @@
                     <GroupBox Header="{loc:Loc Key=HEADER_RAW_MATERIALS}" Margin="0,0,0,10" Padding="10">
                         <WrapPanel VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                <TextBlock Text="{loc:Loc Key=RAW_MATERIAL_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
-                                <TextBox x:Name="RawMaterialNameTextBox" Width="220" Padding="5,3" Text="Молоко цельное 3.6%"/>
+                                <TextBlock Text="{loc:Loc Key=RAW_MATERIAL_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
+                                <TextBox x:Name="RawMaterialNameTextBox" Width="220"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                <TextBlock Text="{loc:Loc Key=SELECT_UOM}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
-                                <ComboBox x:Name="RawUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="140" Padding="5,3"/>
+                                <TextBlock Text="{loc:Loc Key=SELECT_UOM}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
+                                <ComboBox x:Name="RawUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="140"/>
                             </StackPanel>
 
-                            <Button Content="{loc:Loc Key=CREATE_RAW_MATERIAL}" Click="CreateRawMaterial_Click" Width="130" Height="28" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                            <Button Content="{loc:Loc Key=CREATE_RAW_MATERIAL}" Click="CreateRawMaterial_Click" Style="{StaticResource PrimaryButtonStyle}" Width="140" Height="28" Margin="0,0,0,5"/>
                         </WrapPanel>
                     </GroupBox>
 
@@ -84,7 +84,7 @@
                             <DataGridTemplateColumn Width="60">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="❌" Click="DeleteRawMaterial_Click" Tag="{Binding Id}" Background="Transparent" BorderThickness="0" Foreground="Red" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                        <Button Content="❌" Click="DeleteRawMaterial_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" HorizontalAlignment="Center"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -104,16 +104,16 @@
                     <GroupBox Header="{loc:Loc Key=HEADER_PRODUCTS}" Margin="0,0,0,10" Padding="10">
                         <WrapPanel VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                <TextBlock Text="{loc:Loc Key=PRODUCT_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
-                                <TextBox x:Name="ProductNameTextBox" Width="220" Padding="5,3" Text="Сыр Гауда"/>
+                                <TextBlock Text="{loc:Loc Key=PRODUCT_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
+                                <TextBox x:Name="ProductNameTextBox" Width="220"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                <TextBlock Text="{loc:Loc Key=SELECT_UOM}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11" Foreground="#475569"/>
-                                <ComboBox x:Name="ProductUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="140" Padding="5,3"/>
+                                <TextBlock Text="{loc:Loc Key=SELECT_UOM}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
+                                <ComboBox x:Name="ProductUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="140"/>
                             </StackPanel>
 
-                            <Button Content="{loc:Loc Key=CREATE_PRODUCT}" Click="CreateProduct_Click" Width="130" Height="28" Margin="0,0,0,5" FontWeight="SemiBold"/>
+                            <Button Content="{loc:Loc Key=CREATE_PRODUCT}" Click="CreateProduct_Click" Style="{StaticResource PrimaryButtonStyle}" Width="140" Height="28" Margin="0,0,0,5"/>
                         </WrapPanel>
                     </GroupBox>
 
@@ -123,7 +123,7 @@
                             <DataGridTemplateColumn Width="60">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="❌" Click="DeleteProduct_Click" Tag="{Binding Id}" Background="Transparent" BorderThickness="0" Foreground="Red" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                        <Button Content="❌" Click="DeleteProduct_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" HorizontalAlignment="Center"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -140,18 +140,17 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Конструктор Рецепта -->
                     <GroupBox Header="{loc:Loc Key=HEADER_RECIPES}" Grid.Column="0" Margin="0,0,10,0" Padding="10" MaxWidth="420">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
-                                <TextBlock Text="{loc:Loc Key=RECIPE_NAME}" FontSize="11" Foreground="#475569" Margin="0,0,0,2"/>
-                                <TextBox x:Name="RecipeNameTextBox" Text="Классическая Гауда" Padding="5,3" Margin="0,0,0,8"/>
+                                <TextBlock Text="{loc:Loc Key=RECIPE_NAME}" FontSize="11" Margin="0,0,0,2"/>
+                                <TextBox x:Name="RecipeNameTextBox" Margin="0,0,0,8"/>
 
-                                <TextBlock Text="{loc:Loc Key=SELECT_PRODUCT}" FontSize="11" Foreground="#475569" Margin="0,0,0,2"/>
-                                <ComboBox x:Name="RecipeProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,3" Margin="0,0,0,8"/>
+                                <TextBlock Text="{loc:Loc Key=SELECT_PRODUCT}" FontSize="11" Margin="0,0,0,2"/>
+                                <ComboBox x:Name="RecipeProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,8"/>
 
-                                <TextBlock Text="{loc:Loc Key=TARGET_OUTPUT_QUANTITY}" FontSize="11" Foreground="#475569" Margin="0,0,0,2"/>
-                                <TextBox x:Name="RecipeOutputQuantityTextBox" Text="1" Padding="5,3" Margin="0,0,0,10"/>
+                                <TextBlock Text="{loc:Loc Key=TARGET_OUTPUT_QUANTITY}" FontSize="11" Margin="0,0,0,2"/>
+                                <TextBox x:Name="RecipeOutputQuantityTextBox" Text="1" Margin="0,0,0,10"/>
 
                                 <Grid Margin="0,0,0,10">
                                     <Grid.ColumnDefinitions>
@@ -162,12 +161,12 @@
                                     <CheckBox x:Name="IsAgingRequiredCheckBox" Content="{loc:Loc Key=IS_AGING_REQUIRED}" VerticalAlignment="Center" Grid.Column="0"/>
 
                                     <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                        <TextBlock Text="{loc:Loc Key=DEFAULT_MIN_AGING_DAYS}" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="11" Foreground="#475569"/>
-                                        <TextBox x:Name="DefaultMinAgingDaysTextBox" Text="30" Width="50" Padding="4,2"/>
+                                        <TextBlock Text="{loc:Loc Key=DEFAULT_MIN_AGING_DAYS}" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="11"/>
+                                        <TextBox x:Name="DefaultMinAgingDaysTextBox" Text="30" Width="50"/>
                                     </StackPanel>
                                 </Grid>
 
-                                <GroupBox Header="{loc:Loc Key=INGREDIENT_SECTION}" Margin="0,5,0,12" Padding="8" Background="#F8FAFC">
+                                <GroupBox Header="{loc:Loc Key=INGREDIENT_SECTION}" Margin="0,5,0,12" Padding="8">
                                     <StackPanel>
                                         <Grid Margin="0,0,0,8">
                                             <Grid.ColumnDefinitions>
@@ -176,28 +175,27 @@
                                                 <ColumnDefinition Width="Auto"/>
                                             </Grid.ColumnDefinitions>
 
-                                            <ComboBox Grid.Column="0" x:Name="RecipeRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="4,3" Margin="0,0,6,0"/>
-                                            <TextBox Grid.Column="1" x:Name="RecipeIngredientQuantityTextBox" Text="10" Padding="4,3" Margin="0,0,6,0"/>
-                                            <Button Grid.Column="2" Content="+" Click="AddIngredient_Click" Width="28" Height="26" FontWeight="Bold"/>
+                                            <ComboBox Grid.Column="0" x:Name="RecipeRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,6,0"/>
+                                            <TextBox Grid.Column="1" x:Name="RecipeIngredientQuantityTextBox" Text="1" Margin="0,0,6,0"/>
+                                            <Button Grid.Column="2" Content="+" Click="AddIngredient_Click" Style="{StaticResource PrimaryButtonStyle}" Width="28" Height="26"/>
                                         </Grid>
 
-                                        <ListBox x:Name="AddedIngredientsListBox" Height="100" DisplayMemberPath="DisplayInfo"/>
+                                        <ListBox x:Name="AddedIngredientsListBox" Height="100" DisplayMemberPath="DisplayInfo" Background="Transparent"/>
                                     </StackPanel>
                                 </GroupBox>
 
-                                <Button Content="{loc:Loc Key=CREATE_RECIPE}" Click="CreateRecipe_Click" Height="32" FontWeight="Bold" Background="#0284C7" Foreground="White"/>
+                                <Button Content="{loc:Loc Key=CREATE_RECIPE}" Click="CreateRecipe_Click" Style="{StaticResource PrimaryButtonStyle}" Height="32"/>
                             </StackPanel>
                         </ScrollViewer>
                     </GroupBox>
 
-                    <!-- Список Существующих Рецептов -->
                     <DataGrid Grid.Column="1" x:Name="RecipesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="{loc:Loc Key=RECIPE_NAME}" Binding="{Binding Name}" Width="*"/>
                             <DataGridTemplateColumn Width="80">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="❌" Click="DeleteRecipe_Click" Tag="{Binding Id}" Background="Transparent" BorderThickness="0" Foreground="Red" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                        <Button Content="❌" Click="DeleteRecipe_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" HorizontalAlignment="Center"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -207,6 +205,6 @@
             </TabItem>
         </TabControl>
 
-        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="0,10,0,0"/>
     </Grid>
 </Page>

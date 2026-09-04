@@ -7,6 +7,7 @@ using CraftFlow.Api.Modules.Aging.GetActiveAgingLots;
 using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
 using CraftFlow.Api.Modules.Production.GetActiveBatchesSummary;
 using CraftFlow.Api.Modules.Traceability.TraceabilityRead;
+using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
 using MediatR;
@@ -32,6 +33,8 @@ public static class DependencyInjection
             .AddMediatorAndValidation()
             .AddTelegramNotifications()
             .AddBackgroundWorkers();
+
+        services.AddHttpClient<IEmailService, EmailService>();
 
         return services;
     }
@@ -96,9 +99,10 @@ public static class DependencyInjection
         services.AddMediatR(cfg =>
         {
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
+
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(SubscriptionQuotaBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
         });
 
         services.AddValidatorsFromAssembly(typeof(Program).Assembly);

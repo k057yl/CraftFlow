@@ -1,4 +1,5 @@
 using CraftFlow.Api;
+using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging;
 using CraftFlow.Api.Modules.Analytics;
 using CraftFlow.Api.Modules.Catalog;
@@ -10,7 +11,11 @@ using CraftFlow.Api.Modules.Production;
 using CraftFlow.Api.Modules.Sales;
 using CraftFlow.Api.Modules.Traceability;
 
+DotNetEnv.Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Services.AddOpenApi();
 builder.Services.AddInfrastructureAndServices(builder.Configuration);
@@ -23,16 +28,19 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
+await DatabaseInitializer.SeedSaasPlansAsync(app.Services, app.Configuration);
+
 // Эндпоинты модулей
+app.MapIdentityEndpoints();
 app.MapCatalogEndpoints();
 app.MapInventoryEndpoints();
 app.MapProductionEndpoints();
 app.MapSalesEndpoints();
 app.MapAnalyticsEndpoints();
-app.MapIdentityEndpoints();
 app.MapProcurementEndpoints();
 app.MapAgingEndpoints();
 app.MapTraceabilityEndpoints();

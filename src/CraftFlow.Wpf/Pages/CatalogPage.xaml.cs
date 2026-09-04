@@ -1,17 +1,14 @@
-﻿using System.Collections.ObjectModel;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Services;
+using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using CraftFlow.Wpf.Models;
-using CraftFlow.Wpf.Services;
-using CraftFlow.SharedKernel.Constants;
+using static CraftFlow.Wpf.Models.Catalogs.CatalogDtos;
 
 namespace CraftFlow.Wpf.Pages;
-
-public record IngredientItemDto(Guid RawMaterialId, string Name, string Code, decimal Quantity)
-{
-    public string DisplayInfo => $"{Name} — {Quantity}";
-}
 
 public partial class CatalogPage : Page
 {
@@ -40,6 +37,21 @@ public partial class CatalogPage : Page
         Loaded += async (s, e) => await LoadDataAsync();
     }
 
+    private static bool TryParseDecimal(string text, out decimal result)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            result = 0;
+            return false;
+        }
+
+        var normalized = text.Trim().Replace('.', ',');
+        if (decimal.TryParse(normalized, out result)) return true;
+
+        normalized = text.Trim().Replace(',', '.');
+        return decimal.TryParse(normalized, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    }
+
     private async Task LoadDataAsync()
     {
         try
@@ -60,20 +72,25 @@ public partial class CatalogPage : Page
             Recipes.Clear();
             recs?.ForEach(r => Recipes.Add(new LookupItem(r.Id, r.Name)));
 
-            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);
         }
         catch (Exception ex)
         {
-            SetStatus($"{UiConstants.Messages.DATA_LOAD_ERROR}: {ex.Message}", Brushes.Red);
+            SetStatusFormatted("UI_DATA_LOAD_ERROR", Brushes.Red, ex.Message);
         }
     }
 
     private void AddIngredient_Click(object sender, RoutedEventArgs e)
     {
         if (RecipeRawMaterialComboBox.SelectedItem is LookupItem rawItem &&
-            decimal.TryParse(RecipeIngredientQuantityTextBox.Text, out var qty) && qty > 0)
+            TryParseDecimal(RecipeIngredientQuantityTextBox.Text, out var qty) && qty > 0)
         {
             _selectedIngredients.Add(new IngredientItemDto(rawItem.Id, rawItem.Name, string.Empty, qty));
+            RecipeIngredientQuantityTextBox.Text = "1";
+        }
+        else
+        {
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
         }
     }
 
@@ -81,53 +98,96 @@ public partial class CatalogPage : Page
 
     private async void CreateUom_Click(object sender, RoutedEventArgs e)
     {
+        var name = UomNameTextBox.Text?.Trim();
+        var code = UomCodeTextBox.Text?.Trim();
+
+        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(code))
+        {
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
+            return;
+        }
+
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.UOM, new
         {
-            Name = UomNameTextBox.Text,
-            Code = UomCodeTextBox.Text
+            Name = name,
+            Code = code
         });
 
-        if (isSuccess) { await LoadDataAsync(); } else { SetStatus(contentOrError, Brushes.Red); }
+        if (isSuccess)
+        {
+            UomNameTextBox.Clear();
+            UomCodeTextBox.Clear();
+            await LoadDataAsync();
+        }
+        else
+        {
+            SetStatusRaw(contentOrError, Brushes.Red);
+        }
     }
 
     private async void CreateRawMaterial_Click(object sender, RoutedEventArgs e)
     {
-        if (RawUomComboBox.SelectedValue is not Guid uomId) return;
+        if (RawUomComboBox.SelectedValue is not Guid uomId || string.IsNullOrWhiteSpace(RawMaterialNameTextBox.Text))
+        {
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
+            return;
+        }
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.RAW_MATERIALS, new
         {
-            Name = RawMaterialNameTextBox.Text,
+            Name = RawMaterialNameTextBox.Text.Trim(),
             UnitOfMeasureId = uomId
         });
 
-        if (isSuccess) { await LoadDataAsync(); } else { SetStatus(contentOrError, Brushes.Red); }
+        if (isSuccess)
+        {
+            RawMaterialNameTextBox.Clear();
+            await LoadDataAsync();
+        }
+        else
+        {
+            SetStatusRaw(contentOrError, Brushes.Red);
+        }
     }
 
     private async void CreateProduct_Click(object sender, RoutedEventArgs e)
     {
-        if (ProductUomComboBox.SelectedValue is not Guid uomId) return;
+        if (ProductUomComboBox.SelectedValue is not Guid uomId || string.IsNullOrWhiteSpace(ProductNameTextBox.Text))
+        {
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
+            return;
+        }
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.PRODUCTS, new
         {
-            Name = ProductNameTextBox.Text,
+            Name = ProductNameTextBox.Text.Trim(),
             UnitOfMeasureId = uomId
         });
 
-        if (isSuccess) { await LoadDataAsync(); } else { SetStatus(contentOrError, Brushes.Red); }
+        if (isSuccess)
+        {
+            ProductNameTextBox.Clear();
+            await LoadDataAsync();
+        }
+        else
+        {
+            SetStatusRaw(contentOrError, Brushes.Red);
+        }
     }
 
     private async void CreateRecipe_Click(object sender, RoutedEventArgs e)
     {
         if (RecipeProductComboBox.SelectedValue is not Guid productId ||
-            !decimal.TryParse(RecipeOutputQuantityTextBox.Text, out var targetOutput) ||
-            _selectedIngredients.Count == 0)
+            !TryParseDecimal(RecipeOutputQuantityTextBox.Text, out var targetOutput) ||
+            _selectedIngredients.Count == 0 ||
+            string.IsNullOrWhiteSpace(RecipeNameTextBox.Text))
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
         var isAgingRequired = IsAgingRequiredCheckBox.IsChecked ?? false;
-        int? defaultMinAgingDays = isAgingRequired && int.TryParse(DefaultMinAgingDaysTextBox.Text, out var days) ? days : null;
+        int? defaultMinAgingDays = isAgingRequired && int.TryParse(DefaultMinAgingDaysTextBox.Text.Trim(), out var days) ? days : null;
 
         var ingredientsPayload = _selectedIngredients
             .Select(i => new { RawMaterialId = i.RawMaterialId, Quantity = i.Quantity })
@@ -136,7 +196,7 @@ public partial class CatalogPage : Page
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.RECIPES, new
         {
             ProductId = productId,
-            Name = RecipeNameTextBox.Text,
+            Name = RecipeNameTextBox.Text.Trim(),
             TargetOutputQuantity = targetOutput,
             IsAgingRequired = isAgingRequired,
             DefaultMinAgingDays = defaultMinAgingDays,
@@ -145,12 +205,13 @@ public partial class CatalogPage : Page
 
         if (isSuccess)
         {
+            RecipeNameTextBox.Clear();
             _selectedIngredients.Clear();
             await LoadDataAsync();
         }
         else
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatusRaw(contentOrError, Brushes.Red);
         }
     }
 
@@ -192,9 +253,22 @@ public partial class CatalogPage : Page
         }
     }
 
-    private void SetStatus(string msg, Brush color)
+    private void SetStatus(string resourceKey, Brush color)
     {
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = LocalizationService.Get(msg);
+        StatusTextBlock.Text = LocalizationService.Get(resourceKey);
+    }
+
+    private void SetStatusFormatted(string resourceKey, Brush color, params object[] args)
+    {
+        StatusTextBlock.Foreground = color;
+        var format = LocalizationService.Get(resourceKey);
+        StatusTextBlock.Text = string.Format(format, args);
+    }
+
+    private void SetStatusRaw(string rawText, Brush color)
+    {
+        StatusTextBlock.Foreground = color;
+        StatusTextBlock.Text = rawText;
     }
 }

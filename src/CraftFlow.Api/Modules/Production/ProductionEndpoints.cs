@@ -17,7 +17,8 @@ public static class ProductionEndpoints
     public static void MapProductionEndpoints(this IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("")
-            .WithTags("Production");
+            .WithTags("Production")
+            .RequireAuthorization();
 
         group.MapPost(Endpoints.BATCHES_START, async (StartProductionBatchCommand command, ISender sender) =>
         {
@@ -69,8 +70,8 @@ public static class ProductionEndpoints
                 {
                     Id = br.Batch.Id,
                     Name = string.IsNullOrWhiteSpace(br.Batch.Name)
-                        ? $"Партия #{br.Batch.Id.ToString().Substring(0, 8)} (Выход: {(br.Batch.ActualOutputQuantity > 0 ? br.Batch.ActualOutputQuantity : br.Batch.PlannedOutputQuantity)} кг)"
-                        : $"{br.Batch.Name} (Выход: {(br.Batch.ActualOutputQuantity > 0 ? br.Batch.ActualOutputQuantity : br.Batch.PlannedOutputQuantity)} кг)",
+                        ? $"Party #{br.Batch.Id.ToString().Substring(0, 8)} (Exit: {(br.Batch.ActualOutputQuantity > 0 ? br.Batch.ActualOutputQuantity : br.Batch.PlannedOutputQuantity)} кг)"
+                        : $"{br.Batch.Name} (Exit: {(br.Batch.ActualOutputQuantity > 0 ? br.Batch.ActualOutputQuantity : br.Batch.PlannedOutputQuantity)} kg)",
                     DefaultAgingDays = br.Recipe.DefaultMinAgingDays ?? 0
                 })
                 .ToListAsync(cancellationToken);
@@ -112,7 +113,7 @@ public static class ProductionEndpoints
                     .Where(s => s.WarehouseId == warehouseId && s.ItemId == ingredient.RawMaterialId && s.Quantity > 0)
                     .SumAsync(s => (decimal?)s.Quantity) ?? 0m;
 
-                var matName = rawMaterials.TryGetValue(ingredient.RawMaterialId, out var name) ? name : "Сырье";
+                var matName = rawMaterials.TryGetValue(ingredient.RawMaterialId, out var name) ? name : "Raw materials";
                 var roundedAvailable = Math.Round(availableQty, 3);
                 var isSufficient = (roundedAvailable + 0.001m) >= requiredQty;
 

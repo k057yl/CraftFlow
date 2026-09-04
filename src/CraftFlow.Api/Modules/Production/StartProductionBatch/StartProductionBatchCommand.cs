@@ -1,4 +1,5 @@
-﻿using CraftFlow.SharedKernel.Result;
+﻿using CraftFlow.Api.Common.Behaviors;
+using CraftFlow.SharedKernel.Result;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Production.StartProductionBatch;
@@ -9,4 +10,7 @@ public record StartProductionBatchCommand(
     Guid DestinationWarehouseId,
     decimal PlannedOutputQuantity,
     string? Name = null
-) : IRequest<Result<Guid>>;
+) : IRequest<Result<Guid>>, IRequireQuotaValidation
+{
+    public QuotaType QuotaType => QuotaType.MonthlyBatches;
+}

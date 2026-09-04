@@ -6,5 +6,7 @@ public record BatchCostDto(
     decimal PlannedOutputQuantity,
     decimal ActualOutputQuantity,
     decimal TotalRawMaterialCost,
+    decimal TotalCostWithOverhead,
+    decimal? OverheadPercentage,
     decimal UnitCost
 );

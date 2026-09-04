@@ -7,5 +7,6 @@ public record CompleteProductionBatchCommand(
     Guid BatchId,
     decimal ActualOutputQuantity,
     int UnitsCount,
-    string? BatchNumber = null
+    string? BatchNumber = null,
+    decimal? OverheadPercentage = null
 ) : IRequest<Result<Guid>>;

@@ -3,6 +3,7 @@ using CraftFlow.Api.Modules.Aging.CreateChamber;
 using CraftFlow.Api.Modules.Inventory.AddStockLot;
 using CraftFlow.Api.Modules.Inventory.CreateWarehouse;
 using CraftFlow.Api.Modules.Inventory.GetWarehouses;
+using CraftFlow.SharedKernel.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,30 +13,31 @@ public static class InventoryEndpoints
 {
     public static void MapInventoryEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("api/inventory")
-            .WithTags("Inventory");
+        var group = app.MapGroup("")
+            .WithTags("Inventory")
+            .RequireAuthorization();
 
         // --- WAREHOUSES ---
-        group.MapPost("/warehouses", async (CreateWarehouseCommand command, ISender sender) =>
+        group.MapPost(Endpoints.WAREHOUSES, async (CreateWarehouseCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet("/warehouses", async (ISender sender) =>
+        group.MapGet(Endpoints.WAREHOUSES, async (ISender sender) =>
         {
             var result = await sender.Send(new GetWarehousesQuery());
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
         // --- AGING CHAMBERS ---
-        group.MapPost("/aging-chambers", async (CreateChamberCommand command, ISender sender) =>
+        group.MapPost(Endpoints.AGING_CHAMBERS, async (CreateChamberCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet("/aging-chambers", async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapGet(Endpoints.AGING_CHAMBERS, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
             var chambers = await dbContext.AgingChambers
                 .AsNoTracking()
@@ -46,13 +48,13 @@ public static class InventoryEndpoints
         });
 
         // --- STOCK LOTS ---
-        group.MapPost("/stock-lots", async (AddStockLotCommand command, ISender sender) =>
+        group.MapPost(Endpoints.STOCK_LOTS, async (AddStockLotCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet("/stock-lots", async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapGet(Endpoints.STOCK_LOTS, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
             var lots = await dbContext.StockLots
                 .AsNoTracking()
@@ -63,7 +65,7 @@ public static class InventoryEndpoints
         });
 
         // --- СЫРЬЕВЫЕ ЛОТЫ ДЛЯ ПРЯМОЙ ТРАССИРОВКИ ---
-        group.MapGet("/stock-lots/raw", async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapGet(Endpoints.STOCK_LOTS_RAW, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
             var rawLots = await dbContext.StockLots
                 .AsNoTracking()
@@ -73,7 +75,7 @@ public static class InventoryEndpoints
                     (sl, rm) => new
                     {
                         sl.Id,
-                        Name = rm.Name + " (" + (sl.BatchNumber ?? "Б/Н") + " | Остаток: " + sl.Quantity + ")"
+                        Name = rm.Name + " (" + (sl.BatchNumber ?? "NoN") + " | Remainder: " + sl.Quantity + ")"
                     })
                 .ToListAsync(cancellationToken);
 
@@ -81,7 +83,7 @@ public static class InventoryEndpoints
         });
 
         // --- ЛОТЫ ГОТОВОЙ ПРОДУКЦИИ ДЛЯ ОБРАТНОЙ ТРАССИРОВКИ ---
-        group.MapGet("/stock-lots/products", async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapGet(Endpoints.STOCK_LOTS_PRODUCTS, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
             var productLots = await dbContext.StockLots
                 .AsNoTracking()
@@ -91,7 +93,7 @@ public static class InventoryEndpoints
                     (sl, p) => new
                     {
                         sl.Id,
-                        Name = p.Name + " (" + (sl.BatchNumber ?? "Б/Н") + " | На складе: " + sl.Quantity + " кг)"
+                        Name = p.Name + " (" + (sl.BatchNumber ?? "NoN") + " | In stock: " + sl.Quantity + " kg)"
                     })
                 .ToListAsync(cancellationToken);
 

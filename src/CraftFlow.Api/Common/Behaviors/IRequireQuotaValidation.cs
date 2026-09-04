@@ -2,5 +2,5 @@
 
 public interface IRequireQuotaValidation
 {
-    string QuotaMetricKey { get; }
+    QuotaType QuotaType { get; }
 }

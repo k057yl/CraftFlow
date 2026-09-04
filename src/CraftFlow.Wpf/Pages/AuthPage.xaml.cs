@@ -17,19 +17,48 @@ public partial class AuthPage : Page
         InitializeComponent();
     }
 
+    private async void Login_Click(object sender, RoutedEventArgs e)
+    {
+        var response = await ApiService.Instance.PostAsync(Endpoints.LOGIN, new
+        {
+            Email = LoginEmailTextBox.Text,
+            Password = LoginPasswordBox.Password
+        });
+
+        if (response.IsSuccessStatusCode)
+        {
+            var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
+            if (result != null)
+            {
+                ApiService.Instance.SetAuthToken(result.Token);
+                SetStatus($"{UiConstants.Messages.LOGIN_SUCCESS} LOGGED AS: {result.FullName}", Brushes.Green);
+            }
+        }
+        else
+        {
+            var rawError = await response.Content.ReadAsStringAsync();
+            SetStatus(rawError.Trim('"').Trim(), Brushes.Red);
+        }
+    }
+
     private async void Register_Click(object sender, RoutedEventArgs e)
     {
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.REGISTER, new
         {
             TenantId = Guid.Parse(DEFAULT_TENANT_ID),
-            Email = AuthEmailTextBox.Text,
-            Password = AuthPasswordTextBox.Text,
-            FullName = AuthNameTextBox.Text
+            Email = RegisterEmailTextBox.Text,
+            Password = RegisterPasswordBox.Password,
+            ConfirmPassword = RegisterConfirmPasswordBox.Password,
+            FullName = RegisterNameTextBox.Text
         });
 
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.REGISTER_SUCCESS, Brushes.Green);
+
+            // Автоматом перебрасываем на подгрузку OTP
+            OtpEmailTextBox.Text = RegisterEmailTextBox.Text;
+            AuthTabControl.SelectedIndex = 2;
         }
         else
         {
@@ -37,12 +66,12 @@ public partial class AuthPage : Page
         }
     }
 
-    private async void Login_Click(object sender, RoutedEventArgs e)
+    private async void VerifyOtp_Click(object sender, RoutedEventArgs e)
     {
         var response = await ApiService.Instance.PostAsync(Endpoints.LOGIN, new
         {
-            Email = AuthEmailTextBox.Text,
-            Password = AuthPasswordTextBox.Text
+            Email = OtpEmailTextBox.Text,
+            OtpCode = OtpCodeTextBox.Text
         });
 
         if (response.IsSuccessStatusCode)

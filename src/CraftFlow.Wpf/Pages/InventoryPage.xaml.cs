@@ -24,6 +24,21 @@ public partial class InventoryPage : Page
         Loaded += async (s, e) => await LoadDataAsync();
     }
 
+    private static bool TryParseDecimal(string text, out decimal result)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            result = 0;
+            return false;
+        }
+
+        var normalized = text.Trim().Replace('.', ',');
+        if (decimal.TryParse(normalized, out result)) return true;
+
+        normalized = text.Trim().Replace(',', '.');
+        return decimal.TryParse(normalized, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
+    }
+
     private async Task LoadDataAsync()
     {
         try
@@ -36,60 +51,72 @@ public partial class InventoryPage : Page
             Chambers.Clear();
             chambers?.ForEach(c => Chambers.Add(new LookupItem(c.Id, c.Name)));
 
-            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);
         }
         catch (Exception ex)
         {
-            SetStatus($"{UiConstants.Messages.DATA_LOAD_ERROR}: {ex.Message}", Brushes.Red);
+            SetStatusFormatted("UI_DATA_LOAD_ERROR", Brushes.Red, ex.Message);
         }
     }
 
     private async void CreateWarehouse_Click(object sender, RoutedEventArgs e)
     {
+        var name = WarehouseNameTextBox.Text?.Trim();
+        var address = WarehouseAddressTextBox.Text?.Trim();
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
+            return;
+        }
+
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.WAREHOUSES, new
         {
-            Name = WarehouseNameTextBox.Text,
-            Address = WarehouseAddressTextBox.Text
+            Name = name,
+            Address = address
         });
 
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.WAREHOUSE_CREATED_SUCCESS, Brushes.Green);
+            SetStatus("UI_WAREHOUSE_CREATED_SUCCESS", Brushes.Green);
+            WarehouseNameTextBox.Clear();
+            WarehouseAddressTextBox.Clear();
             await LoadDataAsync();
         }
         else
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatusRaw(contentOrError, Brushes.Red);
         }
     }
 
     private async void CreateChamber_Click(object sender, RoutedEventArgs e)
     {
-        var rawTempText = ChamberTempTextBox.Text.Replace(',', '.');
-        var rawHumidityText = ChamberHumidityTextBox.Text.Replace(',', '.');
+        var name = ChamberNameTextBox.Text?.Trim();
 
-        if (!decimal.TryParse(rawTempText, NumberStyles.Any, CultureInfo.InvariantCulture, out var temp) ||
-            !decimal.TryParse(rawHumidityText, NumberStyles.Any, CultureInfo.InvariantCulture, out var humidity))
+        if (string.IsNullOrWhiteSpace(name) ||
+            !TryParseDecimal(ChamberTempTextBox.Text, out var temp) ||
+            !TryParseDecimal(ChamberHumidityTextBox.Text, out var humidity))
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.AGING_CHAMBERS, new
         {
-            Name = ChamberNameTextBox.Text,
+            Name = name,
             TargetTemperature = temp,
             TargetHumidity = humidity
         });
 
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.AGING_CHAMBER_CREATED_SUCCESS, Brushes.Green);
+            SetStatus("UI_AGING_CHAMBER_CREATED_SUCCESS", Brushes.Green);
+            ChamberNameTextBox.Clear();
             await LoadDataAsync();
         }
         else
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatusRaw(contentOrError, Brushes.Red);
         }
     }
 
@@ -98,7 +125,15 @@ public partial class InventoryPage : Page
         if (sender is Button btn && btn.Tag is Guid id)
         {
             var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{Endpoints.WAREHOUSES}/{id}");
-            if (isSuccess) await LoadDataAsync(); else SetStatus(error, Brushes.Red);
+            if (isSuccess)
+            {
+                SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);
+                await LoadDataAsync();
+            }
+            else
+            {
+                SetStatusRaw(error, Brushes.Red);
+            }
         }
     }
 
@@ -107,13 +142,34 @@ public partial class InventoryPage : Page
         if (sender is Button btn && btn.Tag is Guid id)
         {
             var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{Endpoints.AGING_CHAMBERS}/{id}");
-            if (isSuccess) await LoadDataAsync(); else SetStatus(error, Brushes.Red);
+            if (isSuccess)
+            {
+                SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);
+                await LoadDataAsync();
+            }
+            else
+            {
+                SetStatusRaw(error, Brushes.Red);
+            }
         }
     }
 
-    private void SetStatus(string msg, Brush color)
+    private void SetStatus(string resourceKey, Brush color)
     {
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = LocalizationService.Get(msg);
+        StatusTextBlock.Text = LocalizationService.Get(resourceKey);
+    }
+
+    private void SetStatusFormatted(string resourceKey, Brush color, params object[] args)
+    {
+        StatusTextBlock.Foreground = color;
+        var format = LocalizationService.Get(resourceKey);
+        StatusTextBlock.Text = string.Format(format, args);
+    }
+
+    private void SetStatusRaw(string rawText, Brush color)
+    {
+        StatusTextBlock.Foreground = color;
+        StatusTextBlock.Text = rawText;
     }
 }

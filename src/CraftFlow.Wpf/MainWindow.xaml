@@ -2,37 +2,62 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
-        Title="CRAFTFLOW" Height="720" Width="1280" WindowStartupLocation="CenterScreen">
+        Title="CRAFTFLOW" Height="760" Width="1280" 
+        Background="{DynamicResource AppBackgroundBrush}"
+        WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="230"/>
+            <ColumnDefinition Width="240"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <!-- Sidebar Navigation -->
-        <Border Grid.Column="0" Background="#1E293B" Padding="15">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <StackPanel>
-                    <TextBlock Text="CRAFTFLOW" Foreground="White" FontSize="22" FontWeight="Bold" Margin="0,0,0,25" HorizontalAlignment="Center"/>
+        <Border Grid.Column="0" Background="{DynamicResource CardBackgroundBrush}" Padding="15">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
 
-                    <!-- 1. НОМЕНКЛАТУРА -->
-                    <Button Content="{loc:Loc NAV_DIRECTORY}" Click="NavDirectory_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="CRAFTFLOW" Foreground="{DynamicResource AppForegroundBrush}" FontSize="22" FontWeight="Bold" Margin="0,0,0,25" HorizontalAlignment="Center"/>
 
-                    <!-- 2. ОПЕРАЦИИ -->
-                    <Button Content="{loc:Loc NAV_INVENTORY}" Click="NavInventory_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                    <Button Content="{loc:Loc NAV_PROCUREMENT}" Click="NavProcurement_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                    <Button Content="{loc:Loc NAV_PRODUCTION}" Click="NavProduction_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                    <Button Content="{loc:Loc NAV_SALES}" Click="NavSales_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                        <!-- Кнопки навигации -->
+                        <Button Content="{loc:Loc Key=NAV_DIRECTORY}" Click="NavDirectory_Click" Style="{StaticResource NavButtonStyle}"/>
+                        <Button Content="{loc:Loc Key=NAV_INVENTORY}" Click="NavInventory_Click" Style="{StaticResource NavButtonStyle}"/>
+                        <Button Content="{loc:Loc Key=NAV_PROCUREMENT}" Click="NavProcurement_Click" Style="{StaticResource NavButtonStyle}"/>
+                        <Button Content="{loc:Loc Key=NAV_PRODUCTION}" Click="NavProduction_Click" Style="{StaticResource NavButtonStyle}"/>
+                        <Button Content="{loc:Loc Key=NAV_SALES}" Click="NavSales_Click" Style="{StaticResource NavButtonStyle}"/>
+                        <Button Content="{loc:Loc Key=NAV_TRACEABILITY}" Click="NavTraceability_Click" Style="{StaticResource NavButtonStyle}"/>
+                        <Button Content="{loc:Loc Key=NAV_MRP}" Click="NavMrp_Click" Style="{StaticResource NavButtonStyle}" Margin="0,0,0,20"/>
+                        <Button Content="{loc:Loc Key=NAV_AUTH}" Click="NavAuth_Click" Style="{StaticResource NavButtonStyle}"/>
+                        <Button Content="{loc:Loc Key=NAV_AUDIT}" Click="NavAudit_Click" Style="{StaticResource NavButtonStyle}"/>
+                    </StackPanel>
+                </ScrollViewer>
 
-                    <!-- 3. АНАЛИТИКА И УЧЕТ -->
-                    <Button Content="{loc:Loc NAV_TRACEABILITY}" Click="NavTraceability_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                    <Button Content="{loc:Loc NAV_MRP}" Click="NavMrp_Click" Height="40" Margin="0,0,0,20" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                <!-- Настройки темы и языка -->
+                <StackPanel Grid.Row="1" Margin="0,15,0,0">
+                    <Separator Background="{DynamicResource BorderBrush}" Margin="0,0,0,12"/>
 
-                    <!-- 4. СИСТЕМНЫЕ -->
-                    <Button Content="{loc:Loc NAV_AUTH}" Click="NavAuth_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
-                    <Button Content="{loc:Loc NAV_AUDIT}" Click="NavAudit_Click" Height="40" Margin="0,0,0,5" Background="#334155" Foreground="White" BorderThickness="0" HorizontalContentAlignment="Left" Padding="15,0,0,0"/>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                            <TextBlock Text="Язык / Lang" Foreground="{DynamicResource AppForegroundBrush}" FontSize="10" Margin="0,0,0,3"/>
+                            <ComboBox x:Name="LanguageComboBox" SelectionChanged="LanguageComboBox_SelectionChanged" Height="26"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                            <TextBlock Text="Тема / Theme" Foreground="{DynamicResource AppForegroundBrush}" FontSize="10" Margin="0,0,0,3"/>
+                            <ComboBox x:Name="ThemeComboBox" SelectionChanged="ThemeComboBox_SelectionChanged" Height="26"/>
+                        </StackPanel>
+                    </Grid>
                 </StackPanel>
-            </ScrollViewer>
+            </Grid>
         </Border>
 
         <!-- Main Content Area -->
