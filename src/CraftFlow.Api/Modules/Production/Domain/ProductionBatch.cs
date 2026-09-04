@@ -17,7 +17,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
 
     public decimal PlannedOutputQuantity { get; private set; }
     public decimal ActualOutputQuantity { get; private set; }
-    public BatchState Status { get; private set; }
+    public BatchState State { get; private set; }
 
     public DateTime StartedAt { get; private set; }
     public DateTime? BrewingCompletedAt { get; private set; }
@@ -56,7 +56,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
             PlannedOutputQuantity = plannedOutputQuantity,
             TargetDurationMinutes = targetDurationMinutes > 0 ? targetDurationMinutes : 180,
             ActualOutputQuantity = 0,
-            Status = BatchState.Draft,
+            State = BatchState.Draft,
             StartedAt = DateTime.UtcNow,
             IsTelegramNotified = false
         };
@@ -133,8 +133,8 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
     private void InitStateMachine()
     {
         _stateMachine = new StateMachine<BatchState, BatchTrigger>(
-            () => Status,
-            s => Status = s
+            () => State,
+            s => State = s
         );
 
         _stateMachine.Configure(BatchState.Draft)

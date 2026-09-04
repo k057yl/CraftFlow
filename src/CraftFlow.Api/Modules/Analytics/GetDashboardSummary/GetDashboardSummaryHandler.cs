@@ -20,7 +20,7 @@ namespace CraftFlow.Api.Modules.Analytics.GetDashboardSummary
             var totalProducts = await _dbContext.Products.CountAsync(cancellationToken);
             var totalRecipes = await _dbContext.Recipes.CountAsync(cancellationToken);
             var activeBatches = await _dbContext.ProductionBatches
-                .CountAsync(b => b.Status == BatchState.InProgress, cancellationToken);
+                .CountAsync(b => b.State == BatchState.InProgress, cancellationToken);
             var totalCustomers = await _dbContext.Customers.CountAsync(cancellationToken);
 
             var totalStock = await _dbContext.StockLots

@@ -24,7 +24,7 @@ public class ProductionBatchConfiguration : IEntityTypeConfiguration<ProductionB
         builder.Property(p => p.ActualOutputQuantity)
             .HasPrecision(18, 4);
 
-        builder.Property(p => p.Status)
+        builder.Property(p => p.State)
             .HasConversion<int>()
             .IsRequired();
 

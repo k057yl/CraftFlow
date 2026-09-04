@@ -33,10 +33,10 @@ public sealed class GetActiveBatchesSummaryQueryHandler
                 pb."TargetDurationMinutes" AS TargetDurationMinutes,
                 GREATEST(0, EXTRACT(EPOCH FROM (NOW() - pb."StartedAt")) / 60)::INT AS ElapsedMinutes,
                 (EXTRACT(EPOCH FROM (NOW() - pb."StartedAt")) / 60) >= pb."TargetDurationMinutes" AS IsOverdue,
-                pb."Status"::TEXT AS Status
+                pb."State"::TEXT AS State
             FROM production_batches pb
             JOIN recipes r ON r."Id" = pb."RecipeId"
-            WHERE pb."Status" = 2
+            WHERE pb."State" = 2
               AND pb."TenantId" = @TenantId
             ORDER BY pb."StartedAt" ASC;
             """;

@@ -47,7 +47,7 @@ public static class AgingEndpoints
                       lot => lot.ProductionBatchId,
                       batch => batch.Id,
                       (lot, batch) => new { Lot = lot, Batch = batch })
-                .Where(x => x.Batch.Status == BatchState.InAging)
+                .Where(x => x.Batch.State == BatchState.InAging)
                 .Select(x => new
                 {
                     x.Lot.Id,

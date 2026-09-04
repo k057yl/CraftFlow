@@ -9,5 +9,5 @@ public sealed record ActiveBatchSummaryDto(
     int TargetDurationMinutes,
     int ElapsedMinutes,
     bool IsOverdue,
-    string Status
+    string State
 );

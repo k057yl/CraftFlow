@@ -21,7 +21,7 @@ public sealed class CalculateRequirementsQueryHandler : IRequestHandler<Calculat
     public async Task<Result<MrpReportDto>> Handle(CalculateRequirementsQuery request, CancellationToken cancellationToken)
     {
         var plannedBatches = await _dbContext.ProductionBatches
-            .Where(b => b.Status == BatchState.Draft)
+            .Where(b => b.State == BatchState.Draft)
             .ToListAsync(cancellationToken);
 
         if (plannedBatches.Count == 0)

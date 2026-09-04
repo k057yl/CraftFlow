@@ -58,7 +58,7 @@ public static class ProductionEndpoints
 
             var batches = await dbContext.ProductionBatches
                 .AsNoTracking()
-                .Where(b => (b.Status == BatchState.Completed || b.Status == BatchState.ReadyForAging)
+                .Where(b => (b.State == BatchState.Completed || b.State == BatchState.ReadyForAging)
                          && !existingAgingBatchIds.Contains(b.Id))
                 .Join(dbContext.Recipes,
                       batch => batch.RecipeId,

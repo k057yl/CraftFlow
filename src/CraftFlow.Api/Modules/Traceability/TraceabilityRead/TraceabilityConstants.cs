@@ -17,7 +17,7 @@ public static class TraceabilityConstants
     public const string SQL_GET_FORWARD_BATCHES = $"""
         SELECT 
             pb."Id" AS production_batch_id,
-            pb."Status" AS batch_status_int,
+            pb."State" AS batch_status_int,
             pb."StartedAt" AS started_at,
             pb."CompletedAt" AS completed_at,
             al."Id" AS aging_lot_id,
@@ -39,7 +39,7 @@ public static class TraceabilityConstants
             sl."Quantity" AS actual_quantity,
             sl."UnitPrice" AS unit_price,
             COALESCE(sl."ProductionBatchId", al."ProductionBatchId", pb."Id") AS production_batch_id,
-            pb."Status" AS batch_status_int,
+            pb."State" AS batch_status_int,
             pb."StartedAt" AS started_at,
             pb."CompletedAt" AS completed_at,
             COALESCE(pb."PlannedOutputQuantity", 0) AS planned_quantity,

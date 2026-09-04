@@ -31,7 +31,7 @@ public class ProductionTimerWorker : BackgroundService
                     var now = DateTime.UtcNow;
 
                     var overdueBatches = await dbContext.Set<ProductionBatch>()
-                        .Where(b => b.Status == BatchState.InProgress
+                        .Where(b => b.State == BatchState.InProgress
                                  && !b.IsTelegramNotified
                                  && b.StartedAt.AddMinutes(b.TargetDurationMinutes) <= now)
                         .ToListAsync(stoppingToken);
