@@ -56,7 +56,6 @@ public partial class AuthPage : Page
         {
             SetStatus(UiConstants.Messages.REGISTER_SUCCESS, Brushes.Green);
 
-            // Автоматом перебрасываем на подгрузку OTP
             OtpEmailTextBox.Text = RegisterEmailTextBox.Text;
             AuthTabControl.SelectedIndex = 2;
         }
@@ -68,7 +67,7 @@ public partial class AuthPage : Page
 
     private async void VerifyOtp_Click(object sender, RoutedEventArgs e)
     {
-        var response = await ApiService.Instance.PostAsync(Endpoints.LOGIN, new
+        var response = await ApiService.Instance.PostAsync(Endpoints.VERIFY_OTP, new
         {
             Email = OtpEmailTextBox.Text,
             OtpCode = OtpCodeTextBox.Text

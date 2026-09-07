@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Identity.LoginUser;
 using CraftFlow.Api.Modules.Identity.RegisterUser;
+using CraftFlow.Api.Modules.Identity.VerifyOtp;
 using CraftFlow.SharedKernel.Constants;
 using MediatR;
 
@@ -19,6 +20,12 @@ public static class IdentityEndpoints
         });
 
         group.MapPost(Endpoints.LOGIN, async (LoginUserCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapPost(Endpoints.VERIFY_OTP, async (VerifyOtpCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);

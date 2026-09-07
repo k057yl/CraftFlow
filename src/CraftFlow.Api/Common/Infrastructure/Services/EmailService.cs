@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.Infrastructure.Services;
 using System.Net.Http.Headers;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace CraftFlow.Api.Infrastructure.Services;
@@ -20,8 +21,17 @@ public class EmailService : IEmailService
         _fromEmail = config["Brevo:FromEmail"] ?? throw new ArgumentNullException(nameof(config), "BREVO_FROM_EMAIL_MISSING");
         _fromName = config["Brevo:FromName"] ?? "CraftFlow System";
 
+        // Маскируем API key для безопасного вывода в лог при старте
+        var maskedKey = apiKey.Length > 10 ? $"{apiKey[..8]}...{apiKey[^4..]}" : "***KEY_TOO_SHORT***";
+        _logger.LogInformation("EMAIL_SERVICE_INIT: FromEmail={FromEmail}, FromName={FromName}, ApiKeyMasked={ApiKey}",
+            _fromEmail, _fromName, maskedKey);
+
         _httpClient.BaseAddress = new Uri("https://api.brevo.com/v3/");
+        _httpClient.DefaultRequestHeaders.Accept.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+        // Удаляем старый заголовок если вдруг был и ставим свежий
+        _httpClient.DefaultRequestHeaders.Remove("api-key");
         _httpClient.DefaultRequestHeaders.Add("api-key", apiKey);
     }
 
@@ -35,29 +45,37 @@ public class EmailService : IEmailService
             HtmlContent = htmlContent
         };
 
+        var jsonPayload = JsonSerializer.Serialize(payload);
+        _logger.LogInformation("BREVO_SENDING_ATTEMPT: To={ToEmail}, Subject={Subject}, Payload={Payload}",
+            toEmail, subject, jsonPayload);
+
         try
         {
             var response = await _httpClient.PostAsJsonAsync("smtp/email", payload);
 
+            var responseContent = await response.Content.ReadAsStringAsync();
+
             if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation("EMAIL_SENT_SUCCESSFULLY: {Email}", toEmail);
+                _logger.LogInformation("EMAIL_SENT_SUCCESSFULLY: To={Email}, Status={Status}, Response={Response}",
+                    toEmail, response.StatusCode, responseContent);
                 return true;
             }
 
-            var errorContent = await response.Content.ReadAsStringAsync();
-            _logger.LogError("BREVO_API_ERROR: Status {Status}, Details: {Error}", response.StatusCode, errorContent);
+            _logger.LogError("BREVO_API_ERROR: To={Email}, Status={Status}, Details={Error}",
+                toEmail, response.StatusCode, responseContent);
             return false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "FAILED_TO_SEND_EMAIL: {Email}", toEmail);
+            _logger.LogError(ex, "FAILED_TO_SEND_EMAIL_EXCEPTION: To={Email}", toEmail);
             return false;
         }
     }
 
     public async Task<bool> SendOtpCodeAsync(string toEmail, string otpCode, string culture = "uk-UA")
     {
+        _logger.LogInformation("PREPARING_OTP_EMAIL: To={Email}, Code={Code}, Culture={Culture}", toEmail, otpCode, culture);
         var (subject, htmlContent) = EmailTemplates.GetOtpTemplate(otpCode, culture);
         return await SendEmailAsync(toEmail, subject, htmlContent);
     }

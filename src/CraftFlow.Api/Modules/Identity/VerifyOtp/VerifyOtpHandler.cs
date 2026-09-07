@@ -2,36 +2,50 @@
 using System.Security.Claims;
 using System.Text;
 using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Modules.Identity.LoginUser;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
-namespace CraftFlow.Api.Modules.Identity.LoginUser;
+namespace CraftFlow.Api.Modules.Identity.VerifyOtp;
 
-public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginResponseDto>>
+public class VerifyOtpHandler : IRequestHandler<VerifyOtpCommand, Result<LoginResponseDto>>
 {
     private readonly AppDbContext _dbContext;
     private readonly IConfiguration _configuration;
 
-    public LoginUserHandler(AppDbContext dbContext, IConfiguration configuration)
+    public VerifyOtpHandler(AppDbContext dbContext, IConfiguration configuration)
     {
         _dbContext = dbContext;
         _configuration = configuration;
     }
 
-    public async Task<Result<LoginResponseDto>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
+    public async Task<Result<LoginResponseDto>> Handle(VerifyOtpCommand request, CancellationToken cancellationToken)
     {
-        var email = request.Email.Trim().ToLowerInvariant();
+        var sanitizedEmail = request.Email.Trim().ToLowerInvariant();
 
         var user = await _dbContext.Users
-            .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Email == sanitizedEmail, cancellationToken);
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        if (user == null || string.IsNullOrEmpty(user.OtpCodeHash) || !user.OtpExpiresAtUtc.HasValue)
         {
             return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
         }
+
+        if (user.OtpExpiresAtUtc.Value < DateTime.UtcNow)
+        {
+            return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
+        }
+
+        if (!BCrypt.Net.BCrypt.Verify(request.OtpCode, user.OtpCodeHash))
+        {
+            return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
+        }
+
+        user.ClearOtpCode();
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         var secretKey = _configuration["JWT_SECRET_KEY"]
             ?? _configuration["Jwt:SecretKey"]
