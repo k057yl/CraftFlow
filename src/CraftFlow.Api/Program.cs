@@ -1,4 +1,5 @@
 using CraftFlow.Api;
+using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging;
 using CraftFlow.Api.Modules.Analytics;
@@ -9,6 +10,7 @@ using CraftFlow.Api.Modules.MRP;
 using CraftFlow.Api.Modules.Procurement;
 using CraftFlow.Api.Modules.Production;
 using CraftFlow.Api.Modules.Sales;
+using CraftFlow.Api.Modules.Subscriptions;
 using CraftFlow.Api.Modules.Traceability;
 
 DotNetEnv.Env.Load();
@@ -16,7 +18,6 @@ DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
-
 builder.Services.AddOpenApi();
 builder.Services.AddInfrastructureAndServices(builder.Configuration);
 
@@ -28,6 +29,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<TenantAccessKeyMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -45,5 +48,6 @@ app.MapProcurementEndpoints();
 app.MapAgingEndpoints();
 app.MapTraceabilityEndpoints();
 app.MapMrpEndpoints();
+app.MapSubscriptionsEndpoints();
 
 app.Run();

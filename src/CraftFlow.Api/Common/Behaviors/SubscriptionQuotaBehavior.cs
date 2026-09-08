@@ -1,9 +1,12 @@
-﻿using CraftFlow.Api.Common.MultiTenancy;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
+using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.Api.Modules.Inventory.Domain;
 using CraftFlow.Api.Modules.Production.Domain;
+using CraftFlow.Api.Modules.Subscriptions.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
 using CraftFlow.SharedKernel.Result;
@@ -16,6 +19,8 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
     where TRequest : IRequest<TResponse>, IRequireQuotaValidation
     where TResponse : Result
 {
+    private static readonly ConcurrentDictionary<Type, MethodInfo> FailureMethodCache = new();
+
     private readonly AppDbContext _dbContext;
     private readonly ITenantContext _tenantContext;
 
@@ -29,12 +34,12 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
     {
         var tenantId = _tenantContext.TenantId;
 
-        var subscription = await _dbContext.TenantSubscriptions
+        var subscription = await _dbContext.Set<TenantSubscription>()
             .Include(s => s.Plan)
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.TenantId == tenantId, cancellationToken);
 
-        if (subscription == null || (subscription.ExpiresAtUtc.HasValue && subscription.ExpiresAtUtc < DateTime.UtcNow))
+        if (subscription == null || !IsSubscriptionValid(subscription))
         {
             return BuildFailureResult(ErrorCodes.Saas.SUBSCRIPTION_EXPIRED);
         }
@@ -56,6 +61,14 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
         }
 
         return await next();
+    }
+
+    private static bool IsSubscriptionValid(TenantSubscription subscription)
+    {
+        var isStateActive = subscription.State == SubscriptionState.Active || subscription.State == SubscriptionState.Trial;
+        var isNotExpired = !subscription.ExpiresAtUtc.HasValue || subscription.ExpiresAtUtc.Value > DateTime.UtcNow;
+
+        return isStateActive && isNotExpired;
     }
 
     private async Task<bool> CheckMonthlyBatchesQuotaAsync(Guid tenantId, int maxAllowed, CancellationToken ct)
@@ -92,10 +105,13 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
             return (TResponse)(object)Result.Failure(error);
         }
 
-        var resultType = typeof(TResponse).GetGenericArguments()[0];
-        var failureMethod = typeof(Result<>)
-            .MakeGenericType(resultType)
-            .GetMethod(nameof(Result<object>.Failure), new[] { typeof(Error) })!;
+        var valueType = typeof(TResponse).GetGenericArguments()[0];
+
+        var failureMethod = FailureMethodCache.GetOrAdd(valueType, type =>
+            typeof(Result<>)
+                .MakeGenericType(type)
+                .GetMethod(nameof(Result<object>.Failure), new[] { typeof(Error) })!
+        );
 
         return (TResponse)failureMethod.Invoke(null, new object[] { error })!;
     }

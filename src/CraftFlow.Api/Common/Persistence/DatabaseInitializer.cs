@@ -1,4 +1,4 @@
-﻿using CraftFlow.Api.Common.Domain;
+﻿using CraftFlow.Api.Modules.Subscriptions.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Common.Persistence;
@@ -21,8 +21,7 @@ public static class DatabaseInitializer
 
         if (planConfigs != null && planConfigs.Count > 0)
         {
-            var plans = planConfigs.Select(c => new SubscriptionPlan(
-                Guid.NewGuid(),
+            var plans = planConfigs.Select(c => SubscriptionPlan.Create(
                 c.Code,
                 c.Name,
                 c.MaxMonthlyBatches,

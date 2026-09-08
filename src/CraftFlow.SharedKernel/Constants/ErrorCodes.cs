@@ -56,6 +56,8 @@ public static class ErrorCodes
         public const string USER_ALREADY_EXISTS = "AUTH.USER_ALREADY_EXISTS";
         public const string USER_NOT_FOUND = "AUTH.USER_NOT_FOUND";
         public const string TOKEN_GENERATION_FAILED = "AUTH.TOKEN_GENERATION_FAILED";
+        public const string INVALID_ACCESS_KEY = "AUTH.INVALID_ACCESS_KEY";
+        public const string KEY_REVOKED = "AUTH.KEY_REVOKED";
     }
 
     public static class Notifications
@@ -86,5 +88,6 @@ public static class ErrorCodes
     {
         public const string QUOTA_EXCEEDED = "SAAS.QUOTA_EXCEEDED";
         public const string SUBSCRIPTION_EXPIRED = "SAAS.SUBSCRIPTION_EXPIRED";
+        public const string TENANT_MISMATCH = "SAAS.TENANT_MISMATCH";
     }
 }

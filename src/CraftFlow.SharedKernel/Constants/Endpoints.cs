@@ -40,6 +40,7 @@ public static class Endpoints
     public const string REGISTER = "api/identity/register";
     public const string LOGIN = "api/identity/login";
     public const string VERIFY_OTP = "/api/identity/verify-otp";
+    public const string SUBSCRIPTION_KEYS = "api/subscriptions/keys";
 
     // Procurement
     public const string SUPPLIERS = "api/procurement/suppliers";

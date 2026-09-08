@@ -49,6 +49,12 @@ public class TenantContext : ITenantContext
             return false;
         }
 
+        if (httpContext.Items.TryGetValue("TenantId", out var itemValue) && itemValue is Guid keyTenantId)
+        {
+            tenantId = keyTenantId;
+            return true;
+        }
+
         if (httpContext.Request.Headers.TryGetValue(CoreConstants.MultiTenancy.HEADER_TENANT_ID, out var headerValue) &&
             Guid.TryParse(headerValue, out tenantId))
         {

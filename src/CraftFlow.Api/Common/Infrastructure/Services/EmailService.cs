@@ -21,7 +21,6 @@ public class EmailService : IEmailService
         _fromEmail = config["Brevo:FromEmail"] ?? throw new ArgumentNullException(nameof(config), "BREVO_FROM_EMAIL_MISSING");
         _fromName = config["Brevo:FromName"] ?? "CraftFlow System";
 
-        // Маскируем API key для безопасного вывода в лог при старте
         var maskedKey = apiKey.Length > 10 ? $"{apiKey[..8]}...{apiKey[^4..]}" : "***KEY_TOO_SHORT***";
         _logger.LogInformation("EMAIL_SERVICE_INIT: FromEmail={FromEmail}, FromName={FromName}, ApiKeyMasked={ApiKey}",
             _fromEmail, _fromName, maskedKey);
@@ -30,7 +29,6 @@ public class EmailService : IEmailService
         _httpClient.DefaultRequestHeaders.Accept.Clear();
         _httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-        // Удаляем старый заголовок если вдруг был и ставим свежий
         _httpClient.DefaultRequestHeaders.Remove("api-key");
         _httpClient.DefaultRequestHeaders.Add("api-key", apiKey);
     }
