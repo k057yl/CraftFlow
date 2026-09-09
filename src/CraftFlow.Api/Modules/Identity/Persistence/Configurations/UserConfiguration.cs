@@ -26,5 +26,18 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasIndex(u => u.Email)
             .IsUnique();
+
+        builder.Property(u => u.IsAdmin)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(u => u.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(u => u.OtpCodeHash)
+            .HasMaxLength(100);
+
+        builder.Property(u => u.OtpExpiresAtUtc);
     }
 }

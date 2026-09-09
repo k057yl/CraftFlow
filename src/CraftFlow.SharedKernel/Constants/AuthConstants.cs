@@ -22,6 +22,21 @@ public static class AuthConstants
         public const string API_KEY_SECURITY_SECTION = "ApiKeySecurity";
     }
 
+    public static class Roles
+    {
+        public const string ADMIN = "Admin";
+        public const string USER = "User";
+    }
+
+    public static class Claims
+    {
+        public const string EMAIL = "email";
+        public const string ROLE_SHORT = "role";
+        public const string ROLE_FULL = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
+        public const string TENANT_ID = "tenant_id";
+        public const string FULL_NAME = "full_name";
+    }
+
     public static class ADMIN_CONFIG_KEYS
     {
         public const string ADMIN_EMAIL_KEY = "ADMIN_EMAIL";

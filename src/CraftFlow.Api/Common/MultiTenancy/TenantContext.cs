@@ -1,5 +1,6 @@
-﻿using CraftFlow.Api.Common.Constants;
-using System.Security.Claims;
+﻿using System.Security.Claims;
+using CraftFlow.Api.Common.Constants;
+using CraftFlow.SharedKernel.Constants;
 
 namespace CraftFlow.Api.Common.MultiTenancy;
 
@@ -15,6 +16,7 @@ public class TenantContext : ITenantContext
 
     public Guid TenantId => FetchTenantId();
     public Guid UserId => FetchUserId();
+    public bool IsAdmin => FetchIsAdmin();
     public bool IsResolved => TryFetchTenantId(out _);
 
     private Guid FetchTenantId()
@@ -37,6 +39,19 @@ public class TenantContext : ITenantContext
 
         var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
+    }
+
+    private bool FetchIsAdmin()
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext?.User is null || !httpContext.User.Identity?.IsAuthenticated == true)
+        {
+            return false;
+        }
+
+        return httpContext.User.IsInRole(AuthConstants.Roles.ADMIN) ||
+               httpContext.User.HasClaim(c => (c.Type == ClaimTypes.Role || c.Type == AuthConstants.Claims.ROLE_SHORT) &&
+                                              c.Value.Equals(AuthConstants.Roles.ADMIN, StringComparison.OrdinalIgnoreCase));
     }
 
     private bool TryFetchTenantId(out Guid tenantId)

@@ -327,4 +327,34 @@
 	<data name="TRACE_FORWARD" xml:space="preserve"><value>Прямая (От Сырья)</value></data>
 	<data name="TRACE_BACKWARD" xml:space="preserve"><value>Обратная (От Продукта)</value></data>
 	<data name="RUN_TRACEABILITY" xml:space="preserve"><value>🔍 Выполнить трассировку</value></data>
+
+	<!-- ========================================== -->
+	<!-- API Keys & Device Management               -->
+	<!-- ========================================== -->
+	<data name="NAV_TENANT_KEYS" xml:space="preserve"><value>Мои API Ключи</value></data>
+	<data name="NAV_ADMIN_KEYS" xml:space="preserve"><value>Управление Ключами (Admin)</value></data>
+
+	<data name="LABEL_LANGUAGE" xml:space="preserve"><value>Язык / Lang</value></data>
+	<data name="LABEL_THEME" xml:space="preserve"><value>Тема / Theme</value></data>
+
+	<data name="ADMIN_KEYS_HEADER" xml:space="preserve"><value>Управление API-ключами клиентов (Big Boss Panel)</value></data>
+	<data name="ISSUE_NEW_KEY_TITLE" xml:space="preserve"><value>Выдать новый API-ключ тенанту</value></data>
+	<data name="TENANT_EMAIL_LABEL" xml:space="preserve"><value>E-mail владельца тенанта:</value></data>
+	<data name="DEVICE_NAME_LABEL" xml:space="preserve"><value>Название устройства / ключа:</value></data>
+	<data name="BUTTON_SEND_OTP" xml:space="preserve"><value>Отправить OTP на почту</value></data>
+	<data name="ALL_SYSTEM_KEYS_TITLE" xml:space="preserve"><value>Все выданные ключи в системе:</value></data>
+
+	<data name="DEVICE_ACTIVATION_TITLE" xml:space="preserve"><value>Активация устройства</value></data>
+	<data name="DEVICE_ACTIVATION_DESC" xml:space="preserve"><value>Введите 6-значный OTP-код из письма, полученного от администратора. Код действителен 10 минут.</value></data>
+	<data name="BUTTON_ACTIVATE_KEY" xml:space="preserve"><value>Активировать ключ</value></data>
+	<data name="MY_KEYS_TITLE" xml:space="preserve"><value>Активированные ключи вашего предприятия:</value></data>
+
+	<data name="HEADER_TENANT_EMAIL" xml:space="preserve"><value>Тенант / E-mail</value></data>
+	<data name="HEADER_KEY_NAME" xml:space="preserve"><value>Название ключа</value></data>
+	<data name="HEADER_DEVICE_NAME" xml:space="preserve"><value>Название устройства</value></data>
+	<data name="HEADER_KEY_MASK" xml:space="preserve"><value>Маска ключа</value></data>
+	<data name="HEADER_STATUS" xml:space="preserve"><value>Статус</value></data>
+	<data name="HEADER_ACTIONS" xml:space="preserve"><value>Действия</value></data>
+	<data name="HEADER_CREATED_AT" xml:space="preserve"><value>Дата создания</value></data>
+	<data name="BUTTON_REVOKE" xml:space="preserve"><value>Отозвать</value></data>
 </root>

@@ -1,14 +1,15 @@
 ﻿using CraftFlow.Api.BackgroundWorkers;
 using CraftFlow.Api.Common.BackgroundWorkers;
 using CraftFlow.Api.Common.Behaviors;
+using CraftFlow.Api.Common.Infrastructure.Identity;
+using CraftFlow.Api.Common.Infrastructure.Security;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Common.Infrastructure.Security;
+using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.Api.Modules.Aging.GetActiveAgingLots;
 using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
 using CraftFlow.Api.Modules.Production.GetActiveBatchesSummary;
 using CraftFlow.Api.Modules.Traceability.TraceabilityRead;
-using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
 using MediatR;
@@ -92,6 +93,8 @@ public static class DependencyInjection
         var secretKey = configuration[AuthConstants.JWT_SECRET_CONFIG_PATH] ?? AuthConstants.DEFAULT_JWT_SECRET;
         var keyBytes = Encoding.UTF8.GetBytes(secretKey);
 
+        services.AddScoped<ITokenService, TokenService>();
+
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {
@@ -102,7 +105,8 @@ public static class DependencyInjection
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    RoleClaimType = System.Security.Claims.ClaimTypes.Role
                 };
             });
 

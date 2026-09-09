@@ -25,6 +25,12 @@ public class AppDbContext : DbContext
         _tenantContext = tenantContext;
     }
 
+    public AppDbContext(DbContextOptions<AppDbContext> options)
+        : base(options)
+    {
+        _tenantContext = new DesignTimeTenantContext();
+    }
+
     public DbSet<UnitOfMeasure> UnitsOfMeasure => Set<UnitOfMeasure>();
     public DbSet<RawMaterial> RawMaterials => Set<RawMaterial>();
     public DbSet<Product> Products => Set<Product>();
@@ -95,7 +101,13 @@ public class AppDbContext : DbContext
         {
             if (entry.State == EntityState.Added)
             {
-                entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue = _tenantContext.TenantId;
+                if (entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue is Guid currentTenantId && currentTenantId == Guid.Empty)
+                {
+                    if (_tenantContext.TenantId != Guid.Empty)
+                    {
+                        entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue = _tenantContext.TenantId;
+                    }
+                }
             }
         }
 
@@ -121,13 +133,15 @@ public class AppDbContext : DbContext
     private void SetTenantAndActiveFilter<TEntity>(ModelBuilder modelBuilder)
         where TEntity : Entity, ITenantEntity
     {
-        modelBuilder.Entity<TEntity>().HasQueryFilter(e => e.TenantId == _tenantContext.TenantId && e.IsActive);
+        modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
+            (e.TenantId == _tenantContext.TenantId || e.TenantId == Guid.Empty) && e.IsActive);
     }
 
     private void SetTenantFilter<TEntity>(ModelBuilder modelBuilder)
         where TEntity : class, ITenantEntity
     {
-        modelBuilder.Entity<TEntity>().HasQueryFilter(e => e.TenantId == _tenantContext.TenantId);
+        modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
+            e.TenantId == _tenantContext.TenantId || e.TenantId == Guid.Empty);
     }
 
     private void SetActiveFilter<TEntity>(ModelBuilder modelBuilder)
@@ -135,4 +149,12 @@ public class AppDbContext : DbContext
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(e => e.IsActive);
     }
+}
+
+public class DesignTimeTenantContext : ITenantContext
+{
+    public Guid TenantId => Guid.Empty;
+    public Guid UserId => Guid.Empty;
+    public bool IsAdmin => true;
+    public bool IsResolved => true;
 }

@@ -12,6 +12,9 @@ public sealed class User : AggregateRoot, ITenantEntity
     public string? OtpCodeHash { get; private set; }
     public DateTime? OtpExpiresAtUtc { get; private set; }
 
+    public bool IsAdmin { get; private set; }
+    public bool IsActive { get; private set; } = true;
+
     private User() { }
 
     public static User Create(Guid tenantId, string email, string passwordHash, string fullName)
@@ -22,7 +25,9 @@ public sealed class User : AggregateRoot, ITenantEntity
             TenantId = tenantId,
             Email = email.Trim().ToLowerInvariant(),
             PasswordHash = passwordHash,
-            FullName = fullName.Trim()
+            FullName = fullName.Trim(),
+            IsAdmin = false,
+            IsActive = true
         };
     }
 
@@ -31,12 +36,18 @@ public sealed class User : AggregateRoot, ITenantEntity
         return new User
         {
             Id = Guid.NewGuid(),
-            Email = email,
-            FullName = fullName,
+            TenantId = Guid.Empty,
+            Email = email.Trim().ToLowerInvariant(),
+            FullName = fullName.Trim(),
             PasswordHash = passwordHash,
-            IsActive = true,
-            TenantId = Guid.Empty
+            IsAdmin = true,
+            IsActive = true
         };
+    }
+
+    public void SetAsAdmin()
+    {
+        IsAdmin = true;
     }
 
     public void SetOtpCode(string codeHash, DateTime expiresAtUtc)

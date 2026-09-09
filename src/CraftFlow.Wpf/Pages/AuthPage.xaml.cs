@@ -30,8 +30,7 @@ public partial class AuthPage : Page
             var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
             if (result != null)
             {
-                ApiService.Instance.SetAuthToken(result.Token);
-                SetStatus($"{UiConstants.Messages.LOGIN_SUCCESS} LOGGED AS: {result.FullName}", Brushes.Green);
+                ProcessSuccessfulAuth(result);
             }
         }
         else
@@ -78,14 +77,24 @@ public partial class AuthPage : Page
             var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
             if (result != null)
             {
-                ApiService.Instance.SetAuthToken(result.Token);
-                SetStatus($"{UiConstants.Messages.LOGIN_SUCCESS} LOGGED AS: {result.FullName}", Brushes.Green);
+                ProcessSuccessfulAuth(result);
             }
         }
         else
         {
             var rawError = await response.Content.ReadAsStringAsync();
             SetStatus(rawError.Trim('"').Trim(), Brushes.Red);
+        }
+    }
+
+    private void ProcessSuccessfulAuth(LoginResponseDto result)
+    {
+        ApiService.Instance.SetAuthToken(result.Token);
+        SetStatus($"{UiConstants.Messages.LOGIN_SUCCESS} LOGGED AS: {result.FullName}", Brushes.Green);
+
+        if (Application.Current.MainWindow is MainWindow mainWindow)
+        {
+            mainWindow.UpdateNavigationPermissions();
         }
     }
 

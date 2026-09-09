@@ -31,8 +31,19 @@
                         <Button Content="{loc:Loc Key=NAV_SALES}" Click="NavSales_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_TRACEABILITY}" Click="NavTraceability_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_MRP}" Click="NavMrp_Click" Style="{StaticResource NavButtonStyle}"/>
-                        <Button Content="{loc:Loc Key=NAV_TENANT_KEYS}" Click="NavTenantKeys_Click" Style="{StaticResource NavButtonStyle}"/>
-                        <Button Content="{loc:Loc Key=NAV_ADMIN_KEYS}" Click="NavAdminKeys_Click" Style="{StaticResource NavButtonStyle}" Margin="0,0,0,20"/>
+                        <!-- Кнопки ключей -->
+                        <Button x:Name="NavTenantKeysButton" 
+                            Content="{loc:Loc Key=NAV_TENANT_KEYS}" 
+                            Click="NavTenantKeys_Click" 
+                            Style="{StaticResource NavButtonStyle}" 
+                            Visibility="Collapsed"/>
+
+                        <Button x:Name="NavAdminKeysButton" 
+                            Content="{loc:Loc Key=NAV_ADMIN_KEYS}" 
+                            Click="NavAdminKeys_Click" 
+                            Style="{StaticResource NavButtonStyle}" 
+                            Visibility="Collapsed" 
+                            Margin="0,0,0,20"/>
                         <Button Content="{loc:Loc Key=NAV_AUTH}" Click="NavAuth_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_AUDIT}" Click="NavAudit_Click" Style="{StaticResource NavButtonStyle}"/>
                     </StackPanel>

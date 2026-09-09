@@ -1,9 +1,9 @@
-﻿namespace CraftFlow.Api.Common.MultiTenancy
+﻿namespace CraftFlow.Api.Common.MultiTenancy;
+public interface ITenantContext
 {
-    public interface ITenantContext
-    {
-        Guid TenantId { get; }
-        Guid UserId { get; }
-        bool IsResolved { get; }
-    }
+    Guid TenantId { get; }
+    Guid UserId { get; }
+    bool IsAdmin { get; }
+    bool IsSystemAdmin => TenantId == Guid.Empty && IsAdmin;
+    bool IsResolved { get; }
 }

@@ -1,11 +1,13 @@
 ﻿using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text.Json;
 using System.Windows;
 using CraftFlow.Api.Common.Constants;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Models.Auth;
 
 namespace CraftFlow.Wpf.Services;
 
@@ -16,6 +18,7 @@ public class ApiService
 
     private readonly HttpClient _client;
     public string? JwtToken { get; private set; }
+    public UserProfileDto? CurrentUser { get; private set; }
 
     public bool IsAuthenticated => !string.IsNullOrEmpty(JwtToken);
 
@@ -34,11 +37,14 @@ public class ApiService
             CoreConstants.ApiServiceConstants.BEARER_SCHEME,
             token
         );
+
+        CurrentUser = ParseUserFromJwt(token);
     }
 
     public void ClearAuthToken()
     {
         JwtToken = null;
+        CurrentUser = null;
         _client.DefaultRequestHeaders.Authorization = null;
     }
 
@@ -53,6 +59,62 @@ public class ApiService
         {
             _client.DefaultRequestHeaders.Add(AuthConstants.Headers.SUBSCRIPTION_KEY, apiKey);
         }
+    }
+
+    private UserProfileDto? ParseUserFromJwt(string token)
+    {
+        try
+        {
+            var parts = token.Split('.');
+            if (parts.Length < 2) return null;
+
+            var payload = parts[1];
+            var paddedPayload = payload.PadRight(payload.Length + (4 - payload.Length % 4) % 4, '=');
+            var jsonBytes = Convert.FromBase64String(paddedPayload);
+
+            using var doc = JsonDocument.Parse(jsonBytes);
+            var root = doc.RootElement;
+
+            var user = new UserProfileDto();
+
+            if (root.TryGetProperty(AuthConstants.Claims.EMAIL, out var emailProp))
+            {
+                user.Email = emailProp.GetString() ?? string.Empty;
+            }
+
+            user.IsAdmin = CheckRoleInJwt(root, AuthConstants.Claims.ROLE_SHORT) ||
+                           CheckRoleInJwt(root, AuthConstants.Claims.ROLE_FULL);
+
+            return user;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static bool CheckRoleInJwt(JsonElement root, string propertyName)
+    {
+        if (!root.TryGetProperty(propertyName, out var roleProp)) return false;
+
+        if (roleProp.ValueKind == JsonValueKind.String)
+        {
+            return string.Equals(roleProp.GetString(), AuthConstants.Roles.ADMIN, StringComparison.OrdinalIgnoreCase);
+        }
+
+        if (roleProp.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var element in roleProp.EnumerateArray())
+            {
+                if (element.ValueKind == JsonValueKind.String &&
+                    string.Equals(element.GetString(), AuthConstants.Roles.ADMIN, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public async Task<T?> GetAsync<T>(string endpoint)
@@ -96,7 +158,7 @@ public class ApiService
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 HandleUnauthorized();
-                return (false, "UI_ERROR_UNAUTHORIZED");
+                return (false, UiConstants.Messages.RELEASE_ERROR);
             }
 
             var content = await response.Content.ReadAsStringAsync();
@@ -142,7 +204,7 @@ public class ApiService
             if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 HandleUnauthorized();
-                return (false, "UI_ERROR_UNAUTHORIZED");
+                return (false, UiConstants.Messages.RELEASE_ERROR);
             }
 
             var content = await response.Content.ReadAsStringAsync();

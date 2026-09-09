@@ -33,6 +33,7 @@ public partial class MainWindow : Window
         }
         else
         {
+            UpdateNavigationPermissions();
             MainFrame.Navigate(new ProductionPage());
         }
 
@@ -42,6 +43,33 @@ public partial class MainWindow : Window
     public void NavigateToAuth()
     {
         MainFrame.Navigate(new AuthPage());
+        UpdateNavigationPermissions();
+    }
+
+    public void UpdateNavigationPermissions()
+    {
+        if (NavTenantKeysButton == null || NavAdminKeysButton == null) return;
+
+        if (!ApiService.Instance.IsAuthenticated)
+        {
+            NavTenantKeysButton.Visibility = Visibility.Collapsed;
+            NavAdminKeysButton.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        var currentUser = ApiService.Instance.CurrentUser;
+        bool isAdmin = currentUser?.IsAdmin ?? false;
+
+        if (isAdmin)
+        {
+            NavAdminKeysButton.Visibility = Visibility.Visible;
+            NavTenantKeysButton.Visibility = Visibility.Collapsed;
+        }
+        else
+        {
+            NavTenantKeysButton.Visibility = Visibility.Visible;
+            NavAdminKeysButton.Visibility = Visibility.Collapsed;
+        }
     }
 
     private void InitSettingsControls()
