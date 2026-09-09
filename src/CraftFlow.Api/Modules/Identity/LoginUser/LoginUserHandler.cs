@@ -1,12 +1,13 @@
-﻿using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using CraftFlow.Api.Common.Persistence;
+﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using static CraftFlow.SharedKernel.Constants.AuthConstants;
 
 namespace CraftFlow.Api.Modules.Identity.LoginUser;
 
@@ -26,6 +27,7 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginRe
         var email = request.Email.Trim().ToLowerInvariant();
 
         var user = await _dbContext.Users
+            .IgnoreQueryFilters()
             .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
 
         if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
@@ -39,13 +41,20 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginRe
 
         var key = Encoding.UTF8.GetBytes(secretKey);
 
-        var claims = new[]
+        var adminEmail = Environment.GetEnvironmentVariable(ADMIN_CONFIG_KEYS.ADMIN_EMAIL_KEY);
+
+        var claims = new List<Claim>
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Email, user.Email),
             new Claim("tenant_id", user.TenantId.ToString()),
             new Claim("full_name", user.FullName)
         };
+
+        if (!string.IsNullOrEmpty(adminEmail) && email.Equals(adminEmail.Trim().ToLowerInvariant(), StringComparison.OrdinalIgnoreCase))
+        {
+            claims.Add(new Claim(SYSTEM_SECURITY_CONSTANTS.ADMIN_ROLE_CLAIM_KEY, SYSTEM_SECURITY_CONSTANTS.ADMIN_ROLE_VALUE));
+        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

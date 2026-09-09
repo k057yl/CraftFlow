@@ -2,6 +2,7 @@
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.Api.Modules.Identity.Domain;
+using CraftFlow.Api.Modules.Subscriptions.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
@@ -42,6 +43,26 @@ public class RegisterUserHandler : IRequestHandler<RegisterUserCommand, Result<G
         user.SetOtpCode(otpHash, DateTime.UtcNow.AddMinutes(5));
 
         _dbContext.Users.Add(user);
+
+        var hasSubscription = await _dbContext.Set<TenantSubscription>()
+            .AnyAsync(s => s.TenantId == request.TenantId, cancellationToken);
+
+        if (!hasSubscription)
+        {
+            var trialPlan = await _dbContext.Set<SubscriptionPlan>()
+                .FirstOrDefaultAsync(p => p.Code == "TRIAL", cancellationToken);
+
+            if (trialPlan != null)
+            {
+                var subscription = TenantSubscription.CreateTrial(
+                    request.TenantId,
+                    trialPlan.Id,
+                    DateTime.UtcNow.AddDays(14));
+
+                _dbContext.Set<TenantSubscription>().Add(subscription);
+            }
+        }
+
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         await _emailService.SendOtpCodeAsync(user.Email, rawOtpCode);

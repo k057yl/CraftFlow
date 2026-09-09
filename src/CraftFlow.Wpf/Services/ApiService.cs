@@ -42,6 +42,19 @@ public class ApiService
         _client.DefaultRequestHeaders.Authorization = null;
     }
 
+    public void SetSubscriptionKey(string apiKey)
+    {
+        if (_client.DefaultRequestHeaders.Contains(AuthConstants.Headers.SUBSCRIPTION_KEY))
+        {
+            _client.DefaultRequestHeaders.Remove(AuthConstants.Headers.SUBSCRIPTION_KEY);
+        }
+
+        if (!string.IsNullOrWhiteSpace(apiKey))
+        {
+            _client.DefaultRequestHeaders.Add(AuthConstants.Headers.SUBSCRIPTION_KEY, apiKey);
+        }
+    }
+
     public async Task<T?> GetAsync<T>(string endpoint)
     {
         try

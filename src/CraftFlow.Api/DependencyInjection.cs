@@ -135,6 +135,7 @@ public static class DependencyInjection
     {
         services.AddHostedService<LowStockMonitorWorker>();
         services.AddHostedService<ProductionTimerWorker>();
+        services.AddHostedService<SubscriptionExpirationWorker>();
         return services;
     }
 }

@@ -21,4 +21,17 @@ public static class AuthConstants
     {
         public const string API_KEY_SECURITY_SECTION = "ApiKeySecurity";
     }
+
+    public static class ADMIN_CONFIG_KEYS
+    {
+        public const string ADMIN_EMAIL_KEY = "ADMIN_EMAIL";
+        public const string ADMIN_PASSWORD_KEY = "ADMIN_PASSWORD";
+        public const string ADMIN_NAME_KEY = "ADMIN_NAME";
+    }
+
+    public static class SYSTEM_SECURITY_CONSTANTS
+    {
+        public const string ADMIN_ROLE_CLAIM_KEY = "SYSTEM_ADMIN_ROLE";
+        public const string ADMIN_ROLE_VALUE = "BIG_BOSS";
+    }
 }

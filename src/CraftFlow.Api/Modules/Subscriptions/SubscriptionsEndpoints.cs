@@ -1,4 +1,6 @@
-﻿using CraftFlow.Api.Modules.Subscriptions.GenerateAccessKey;
+﻿using CraftFlow.Api.Modules.Subscriptions.GetAccessKeys;
+using CraftFlow.Api.Modules.Subscriptions.GenerateAccessKey;
+using CraftFlow.Api.Modules.Subscriptions.RevokeAccessKey;
 using CraftFlow.SharedKernel.Constants;
 using MediatR;
 
@@ -16,6 +18,18 @@ public static class SubscriptionsEndpoints
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapGet(Endpoints.SUBSCRIPTION_KEYS, async (ISender sender) =>
+        {
+            var result = await sender.Send(new GetAccessKeysQuery());
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapDelete($"{Endpoints.SUBSCRIPTION_KEYS}/{{keyId:guid}}", async (Guid keyId, ISender sender) =>
+        {
+            var result = await sender.Send(new RevokeAccessKeyCommand(keyId));
+            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result.Error);
         });
     }
 }

@@ -30,7 +30,9 @@
                         <Button Content="{loc:Loc Key=NAV_PRODUCTION}" Click="NavProduction_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_SALES}" Click="NavSales_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_TRACEABILITY}" Click="NavTraceability_Click" Style="{StaticResource NavButtonStyle}"/>
-                        <Button Content="{loc:Loc Key=NAV_MRP}" Click="NavMrp_Click" Style="{StaticResource NavButtonStyle}" Margin="0,0,0,20"/>
+                        <Button Content="{loc:Loc Key=NAV_MRP}" Click="NavMrp_Click" Style="{StaticResource NavButtonStyle}"/>
+                        <Button Content="{loc:Loc Key=NAV_TENANT_KEYS}" Click="NavTenantKeys_Click" Style="{StaticResource NavButtonStyle}"/>
+                        <Button Content="{loc:Loc Key=NAV_ADMIN_KEYS}" Click="NavAdminKeys_Click" Style="{StaticResource NavButtonStyle}" Margin="0,0,0,20"/>
                         <Button Content="{loc:Loc Key=NAV_AUTH}" Click="NavAuth_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_AUDIT}" Click="NavAudit_Click" Style="{StaticResource NavButtonStyle}"/>
                     </StackPanel>
@@ -47,12 +49,12 @@
                         </Grid.ColumnDefinitions>
 
                         <StackPanel Grid.Column="0" Margin="0,0,4,0">
-                            <TextBlock Text="Язык / Lang" Foreground="{DynamicResource AppForegroundBrush}" FontSize="10" Margin="0,0,0,3"/>
+                            <TextBlock Text="{loc:Loc Key=LABEL_LANGUAGE}" Foreground="{DynamicResource AppForegroundBrush}" FontSize="10" Margin="0,0,0,3"/>
                             <ComboBox x:Name="LanguageComboBox" SelectionChanged="LanguageComboBox_SelectionChanged" Height="26"/>
                         </StackPanel>
 
                         <StackPanel Grid.Column="1" Margin="4,0,0,0">
-                            <TextBlock Text="Тема / Theme" Foreground="{DynamicResource AppForegroundBrush}" FontSize="10" Margin="0,0,0,3"/>
+                            <TextBlock Text="{loc:Loc Key=LABEL_THEME}" Foreground="{DynamicResource AppForegroundBrush}" FontSize="10" Margin="0,0,0,3"/>
                             <ComboBox x:Name="ThemeComboBox" SelectionChanged="ThemeComboBox_SelectionChanged" Height="26"/>
                         </StackPanel>
                     </Grid>

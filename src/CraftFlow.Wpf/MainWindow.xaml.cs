@@ -9,6 +9,13 @@ namespace CraftFlow.Wpf;
 
 public partial class MainWindow : Window
 {
+    private const string LANG_RU = "ru-RU";
+    private const string LANG_UA = "uk-UA";
+    private const string LANG_EN = "en-US";
+
+    private const string THEME_LIGHT = "Light";
+    private const string THEME_DARK = "Dark";
+
     private bool _isInitializing = true;
 
     public MainWindow()
@@ -41,9 +48,9 @@ public partial class MainWindow : Window
     {
         LanguageComboBox.ItemsSource = new[]
         {
-            new { Code = "ru-RU", Display = "RU" },
-            new { Code = "uk-UA", Display = "UA" },
-            new { Code = "en-US", Display = "EN" }
+            new { Code = LANG_RU, Display = "RU" },
+            new { Code = LANG_UA, Display = "UA" },
+            new { Code = LANG_EN, Display = "EN" }
         };
         LanguageComboBox.DisplayMemberPath = "Display";
         LanguageComboBox.SelectedValuePath = "Code";
@@ -51,12 +58,12 @@ public partial class MainWindow : Window
 
         ThemeComboBox.ItemsSource = new[]
         {
-            new { Code = "Light", Display = "☀️ Светлая" },
-            new { Code = "Dark", Display = "🌙 Тёмная" }
+            new { Code = THEME_LIGHT, Display = "☀️ Light" },
+            new { Code = THEME_DARK, Display = "🌙 Dark" }
         };
         ThemeComboBox.DisplayMemberPath = "Display";
         ThemeComboBox.SelectedValuePath = "Code";
-        ThemeComboBox.SelectedValue = "Light";
+        ThemeComboBox.SelectedValue = THEME_LIGHT;
     }
 
     private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -76,10 +83,10 @@ public partial class MainWindow : Window
 
     private void RefreshUiContent()
     {
-        if (MainFrame.Content is Page currentPage)
+        if (MainFrame.Content is object currentContent)
         {
-            var pageType = currentPage.GetType();
-            MainFrame.Navigate(Activator.CreateInstance(pageType));
+            var contentType = currentContent.GetType();
+            MainFrame.Navigate(Activator.CreateInstance(contentType));
         }
     }
 
@@ -90,6 +97,8 @@ public partial class MainWindow : Window
     private void NavSales_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new SalesPage());
     private void NavTraceability_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TraceabilityPage());
     private void NavMrp_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new MrpPage());
+    private void NavTenantKeys_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TenantKeysPage());
+    private void NavAdminKeys_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new AdminKeysPage());
     private void NavAuth_Click(object sender, RoutedEventArgs e) => NavigateToAuth();
     private void NavAudit_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new AuditPage());
 }

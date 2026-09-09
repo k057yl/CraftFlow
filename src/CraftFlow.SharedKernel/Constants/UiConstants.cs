@@ -32,10 +32,17 @@ public static class UiConstants
         public const string RELEASE_ERROR = "UI.RELEASE_ERROR";
         public const string SELECT_AGING_LOT = "UI.SELECT_AGING_LOT";
         public const string SELECT_WAREHOUSE = "UI.SELECT_WAREHOUSE";
+        public const string OTP_SENT_SUCCESS = "UI.OTP_SENT_SUCCESS";
+        public const string KEY_REVOKED_SUCCESS = "UI.KEY_REVOKED_SUCCESS";
+        public const string KEY_ACTIVATED_SUCCESS = "UI.KEY_ACTIVATED_SUCCESS";
+        public const string INVALID_OTP_FORMAT = "UI.INVALID_OTP_FORMAT";
     }
 
     public static class Titles
     {
         public const string APP_TITLE = "Craft Flow";
+        public const string SUCCESS = "UI.TITLE_SUCCESS";
+        public const string WARNING = "UI.TITLE_WARNING";
+        public const string ERROR = "UI.TITLE_ERROR";
     }
 }

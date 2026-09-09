@@ -59,4 +59,8 @@ public static class Endpoints
 
     // MRP
     public const string MRP_REQUIREMENTS = "api/mrp/requirements";
+
+    //Sub
+    public const string ACTIVATE_KEY_ENDPOINT = "/api/subscriptions/keys/activate";
+    public const string ACTIVATE_OTP_ENDPOINT = "/api/subscriptions/keys/send-otp";
 }

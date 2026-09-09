@@ -26,6 +26,19 @@ public sealed class User : AggregateRoot, ITenantEntity
         };
     }
 
+    public static User CreateSystemAdmin(string email, string fullName, string passwordHash)
+    {
+        return new User
+        {
+            Id = Guid.NewGuid(),
+            Email = email,
+            FullName = fullName,
+            PasswordHash = passwordHash,
+            IsActive = true,
+            TenantId = Guid.Empty
+        };
+    }
+
     public void SetOtpCode(string codeHash, DateTime expiresAtUtc)
     {
         OtpCodeHash = codeHash;

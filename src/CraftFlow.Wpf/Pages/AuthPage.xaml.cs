@@ -1,10 +1,10 @@
-﻿using System.Net.Http.Json;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Services;
+using System.Net.Http.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using CraftFlow.SharedKernel.Constants;
-using CraftFlow.Wpf.Models;
-using CraftFlow.Wpf.Services;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -43,7 +43,7 @@ public partial class AuthPage : Page
 
     private async void Register_Click(object sender, RoutedEventArgs e)
     {
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.REGISTER, new
+        (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.REGISTER, new
         {
             TenantId = Guid.Parse(DEFAULT_TENANT_ID),
             Email = RegisterEmailTextBox.Text,

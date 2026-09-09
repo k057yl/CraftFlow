@@ -49,7 +49,7 @@ public class TenantAccessKeyMiddleware
             }
             else
             {
-                validationResult = TenantKeyValidationResult.Success(accessKey.TenantId);
+                validationResult = TenantKeyValidationResult.Success(accessKey.TenantId, accessKey.Id);
 
                 var cacheOptions = new MemoryCacheEntryOptions()
                     .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
@@ -67,6 +67,23 @@ public class TenantAccessKeyMiddleware
 
         context.Items["TenantId"] = validationResult.TenantId;
 
+        var lastUsedCacheKey = $"key_last_used_{validationResult.AccessKeyId}";
+        if (!cache.TryGetValue(lastUsedCacheKey, out _))
+        {
+            var keyId = validationResult.AccessKeyId;
+            _ = Task.Run(async () =>
+            {
+                using var scope = context.RequestServices.CreateScope();
+                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+                await db.Set<TenantAccessKey>()
+                    .Where(k => k.Id == keyId)
+                    .ExecuteUpdateAsync(s => s.SetProperty(k => k.LastUsedAtUtc, DateTime.UtcNow));
+            });
+
+            cache.Set(lastUsedCacheKey, true, TimeSpan.FromHours(2));
+        }
+
         await _next(context);
     }
 }
@@ -75,8 +92,12 @@ public record TenantKeyValidationResult
 {
     public bool IsValid { get; init; }
     public Guid TenantId { get; init; }
+    public Guid AccessKeyId { get; init; }
     public string? ErrorCode { get; init; }
 
-    public static TenantKeyValidationResult Success(Guid tenantId) => new() { IsValid = true, TenantId = tenantId };
-    public static TenantKeyValidationResult Failure(string errorCode) => new() { IsValid = false, ErrorCode = errorCode };
+    public static TenantKeyValidationResult Success(Guid tenantId, Guid accessKeyId) =>
+        new() { IsValid = true, TenantId = tenantId, AccessKeyId = accessKeyId };
+
+    public static TenantKeyValidationResult Failure(string errorCode) =>
+        new() { IsValid = false, ErrorCode = errorCode };
 }

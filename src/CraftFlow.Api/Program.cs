@@ -14,7 +14,6 @@ using CraftFlow.Api.Modules.Subscriptions;
 using CraftFlow.Api.Modules.Traceability;
 
 DotNetEnv.Env.Load();
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
@@ -36,6 +35,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 await DatabaseInitializer.SeedSaasPlansAsync(app.Services, app.Configuration);
+await SystemAdminSeeder.SeedBigBossAsync(app.Services);
 
 // Эндпоинты модулей
 app.MapIdentityEndpoints();
