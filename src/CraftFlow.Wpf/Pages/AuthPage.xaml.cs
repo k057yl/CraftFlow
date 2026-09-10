@@ -10,8 +10,6 @@ namespace CraftFlow.Wpf.Pages;
 
 public partial class AuthPage : Page
 {
-    private const string DEFAULT_TENANT_ID = "00000000-0000-0000-0000-000000000001";
-
     public AuthPage()
     {
         InitializeComponent();
@@ -22,7 +20,8 @@ public partial class AuthPage : Page
         var response = await ApiService.Instance.PostAsync(Endpoints.LOGIN, new
         {
             Email = LoginEmailTextBox.Text,
-            Password = LoginPasswordBox.Password
+            Password = LoginPasswordBox.Password,
+            RememberMe = RememberMeCheckBox.IsChecked ?? false
         });
 
         if (response.IsSuccessStatusCode)
@@ -44,19 +43,17 @@ public partial class AuthPage : Page
     {
         (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.REGISTER, new
         {
-            TenantId = Guid.Parse(DEFAULT_TENANT_ID),
-            Email = RegisterEmailTextBox.Text,
-            Password = RegisterPasswordBox.Password,
-            ConfirmPassword = RegisterConfirmPasswordBox.Password,
-            FullName = RegisterNameTextBox.Text
+            CompanyName = RegisterCompanyNameTextBox.Text,
+            OwnerEmail = RegisterEmailTextBox.Text,
+            OwnerPassword = RegisterPasswordBox.Password,
+            OwnerFullName = RegisterNameTextBox.Text
         });
 
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.REGISTER_SUCCESS, Brushes.Green);
-
             OtpEmailTextBox.Text = RegisterEmailTextBox.Text;
-            AuthTabControl.SelectedIndex = 2;
+            SwitchToPanel(OtpPanel);
         }
         else
         {
@@ -87,14 +84,44 @@ public partial class AuthPage : Page
         }
     }
 
+    private async void ResendOtp_Click(object sender, RoutedEventArgs e)
+    {
+        (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.RESEND_OTP, new
+        {
+            Email = OtpEmailTextBox.Text
+        });
+
+        if (isSuccess)
+        {
+            SetStatus("Новый код отправлен на почту", Brushes.Green);
+        }
+        else
+        {
+            SetStatus(contentOrError, Brushes.Red);
+        }
+    }
+
+    private void ShowRegister_Click(object sender, RoutedEventArgs e) => SwitchToPanel(RegisterPanel);
+    private void ShowLogin_Click(object sender, RoutedEventArgs e) => SwitchToPanel(LoginPanel);
+
+    private void SwitchToPanel(StackPanel targetPanel)
+    {
+        LoginPanel.Visibility = Visibility.Collapsed;
+        RegisterPanel.Visibility = Visibility.Collapsed;
+        OtpPanel.Visibility = Visibility.Collapsed;
+
+        targetPanel.Visibility = Visibility.Visible;
+        StatusTextBlock.Text = string.Empty;
+    }
+
     private void ProcessSuccessfulAuth(LoginResponseDto result)
     {
         ApiService.Instance.SetAuthToken(result.Token);
-        SetStatus($"{UiConstants.Messages.LOGIN_SUCCESS} LOGGED AS: {result.FullName}", Brushes.Green);
 
         if (Application.Current.MainWindow is MainWindow mainWindow)
         {
             mainWindow.UpdateNavigationPermissions();
+            mainWindow.MainFrame.Navigate(new DashboardPage());
         }
     }
 

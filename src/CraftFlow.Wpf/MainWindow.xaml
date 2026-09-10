@@ -17,13 +17,13 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <TextBlock Text="CRAFTFLOW" Foreground="{DynamicResource AppForegroundBrush}" FontSize="22" FontWeight="Bold" Margin="0,0,0,25" HorizontalAlignment="Center"/>
 
-                        <!-- Кнопки навигации -->
                         <Button Content="{loc:Loc Key=NAV_DIRECTORY}" Click="NavDirectory_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_INVENTORY}" Click="NavInventory_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_PROCUREMENT}" Click="NavProcurement_Click" Style="{StaticResource NavButtonStyle}"/>
@@ -31,26 +31,34 @@
                         <Button Content="{loc:Loc Key=NAV_SALES}" Click="NavSales_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_TRACEABILITY}" Click="NavTraceability_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_MRP}" Click="NavMrp_Click" Style="{StaticResource NavButtonStyle}"/>
-                        <!-- Кнопки ключей -->
-                        <Button x:Name="NavTenantKeysButton" 
-                            Content="{loc:Loc Key=NAV_TENANT_KEYS}" 
-                            Click="NavTenantKeys_Click" 
-                            Style="{StaticResource NavButtonStyle}" 
-                            Visibility="Collapsed"/>
 
-                        <Button x:Name="NavAdminKeysButton" 
-                            Content="{loc:Loc Key=NAV_ADMIN_KEYS}" 
-                            Click="NavAdminKeys_Click" 
-                            Style="{StaticResource NavButtonStyle}" 
-                            Visibility="Collapsed" 
-                            Margin="0,0,0,20"/>
+                        <Button x:Name="NavTenantKeysButton" Content="{loc:Loc Key=NAV_TENANT_KEYS}" Click="NavTenantKeys_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed"/>
+                        <Button x:Name="NavAdminKeysButton" Content="{loc:Loc Key=NAV_ADMIN_KEYS}" Click="NavAdminKeys_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed" Margin="0,0,0,20"/>
+
                         <Button Content="{loc:Loc Key=NAV_AUTH}" Click="NavAuth_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_AUDIT}" Click="NavAudit_Click" Style="{StaticResource NavButtonStyle}"/>
                     </StackPanel>
                 </ScrollViewer>
 
+                <!-- Левый нижний блок сайдбара -->
+                <StackPanel Grid.Row="1" Margin="0,10,0,10">
+                    <Separator Background="{DynamicResource BorderBrush}" Margin="0,0,0,10"/>
+
+                    <!-- Показываем ТОЛЬКО когда юзер ЗАЛОГИНЕН -->
+                    <StackPanel x:Name="UserProfilePanel" Visibility="Collapsed">
+                        <TextBlock x:Name="UserNameTextBlock" Text="User" Foreground="{DynamicResource AppForegroundBrush}" FontWeight="Bold" FontSize="12"/>
+                        <TextBlock x:Name="UserRoleTextBlock" Text="Role" Foreground="{DynamicResource AccentBrush}" FontSize="10" Margin="0,0,0,6"/>
+                        <Button Content="Выйти" Click="Logout_Click" Height="24" FontSize="10"/>
+                    </StackPanel>
+
+                    <!-- Когда ГОСТЬ — просто лаконичный текст, НИКАКИХ кнопок! -->
+                    <StackPanel x:Name="GuestPanel" Visibility="Visible">
+                        <TextBlock Text="Гость (не авторизован)" Foreground="{DynamicResource AppForegroundBrush}" FontSize="11" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+
                 <!-- Настройки темы и языка -->
-                <StackPanel Grid.Row="1" Margin="0,15,0,0">
+                <StackPanel Grid.Row="2" Margin="0,0,0,0">
                     <Separator Background="{DynamicResource BorderBrush}" Margin="0,0,0,12"/>
 
                     <Grid Margin="0,0,0,8">

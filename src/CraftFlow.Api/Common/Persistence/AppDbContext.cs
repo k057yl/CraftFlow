@@ -31,6 +31,7 @@ public class AppDbContext : DbContext
         _tenantContext = new DesignTimeTenantContext();
     }
 
+    public DbSet<Organization> Organizations => Set<Organization>();
     public DbSet<UnitOfMeasure> UnitsOfMeasure => Set<UnitOfMeasure>();
     public DbSet<RawMaterial> RawMaterials => Set<RawMaterial>();
     public DbSet<Product> Products => Set<Product>();
@@ -101,12 +102,9 @@ public class AppDbContext : DbContext
         {
             if (entry.State == EntityState.Added)
             {
-                if (entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue is Guid currentTenantId && currentTenantId == Guid.Empty)
+                if (!_tenantContext.IsAdmin || entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue is not Guid id || id == Guid.Empty)
                 {
-                    if (_tenantContext.TenantId != Guid.Empty)
-                    {
-                        entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue = _tenantContext.TenantId;
-                    }
+                    entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue = _tenantContext.TenantId;
                 }
             }
         }
@@ -134,14 +132,14 @@ public class AppDbContext : DbContext
         where TEntity : Entity, ITenantEntity
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
-            (e.TenantId == _tenantContext.TenantId || e.TenantId == Guid.Empty) && e.IsActive);
+            (_tenantContext.IsAdmin || e.TenantId == _tenantContext.TenantId) && e.IsActive);
     }
 
     private void SetTenantFilter<TEntity>(ModelBuilder modelBuilder)
         where TEntity : class, ITenantEntity
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
-            e.TenantId == _tenantContext.TenantId || e.TenantId == Guid.Empty);
+            _tenantContext.IsAdmin || e.TenantId == _tenantContext.TenantId);
     }
 
     private void SetActiveFilter<TEntity>(ModelBuilder modelBuilder)

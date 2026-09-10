@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.IO;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
@@ -13,10 +14,15 @@ namespace CraftFlow.Wpf.Services;
 
 public class ApiService
 {
+    private const string TOKEN_FILE_NAME = "auth_token.dat";
+    private const string APP_FOLDER_NAME = "CraftFlow";
+
     private static readonly Lazy<ApiService> _instance = new(() => new ApiService());
     public static ApiService Instance => _instance.Value;
 
     private readonly HttpClient _client;
+    private readonly string _tokenFilePath;
+
     public string? JwtToken { get; private set; }
     public UserProfileDto? CurrentUser { get; private set; }
 
@@ -28,6 +34,13 @@ public class ApiService
         {
             BaseAddress = new Uri(CoreConstants.ApiServiceConstants.API_BASE_URL)
         };
+
+        _tokenFilePath = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            APP_FOLDER_NAME,
+            TOKEN_FILE_NAME);
+
+        LoadSavedToken();
     }
 
     public void SetAuthToken(string token)
@@ -39,6 +52,7 @@ public class ApiService
         );
 
         CurrentUser = ParseUserFromJwt(token);
+        SaveTokenToDisk(token);
     }
 
     public void ClearAuthToken()
@@ -46,6 +60,60 @@ public class ApiService
         JwtToken = null;
         CurrentUser = null;
         _client.DefaultRequestHeaders.Authorization = null;
+        DeleteTokenFromDisk();
+    }
+
+    private void SaveTokenToDisk(string token)
+    {
+        try
+        {
+            var dir = Path.GetDirectoryName(_tokenFilePath);
+            if (!Directory.Exists(dir))
+            {
+                Directory.CreateDirectory(dir!);
+            }
+            File.WriteAllText(_tokenFilePath, token);
+        }
+        catch
+        {
+        }
+    }
+
+    private void DeleteTokenFromDisk()
+    {
+        try
+        {
+            if (File.Exists(_tokenFilePath))
+            {
+                File.Delete(_tokenFilePath);
+            }
+        }
+        catch
+        {
+        }
+    }
+
+    private void LoadSavedToken()
+    {
+        try
+        {
+            if (File.Exists(_tokenFilePath))
+            {
+                var savedToken = File.ReadAllText(_tokenFilePath);
+                if (!string.IsNullOrWhiteSpace(savedToken))
+                {
+                    JwtToken = savedToken;
+                    _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                        CoreConstants.ApiServiceConstants.BEARER_SCHEME,
+                        savedToken
+                    );
+                    CurrentUser = ParseUserFromJwt(savedToken);
+                }
+            }
+        }
+        catch
+        {
+        }
     }
 
     public void SetSubscriptionKey(string apiKey)
@@ -80,6 +148,11 @@ public class ApiService
             if (root.TryGetProperty(AuthConstants.Claims.EMAIL, out var emailProp))
             {
                 user.Email = emailProp.GetString() ?? string.Empty;
+            }
+
+            if (root.TryGetProperty(AuthConstants.Claims.FULL_NAME, out var nameProp))
+            {
+                user.FullName = nameProp.GetString() ?? string.Empty;
             }
 
             user.IsAdmin = CheckRoleInJwt(root, AuthConstants.Claims.ROLE_SHORT) ||

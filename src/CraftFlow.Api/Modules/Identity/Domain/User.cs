@@ -13,7 +13,7 @@ public sealed class User : AggregateRoot, ITenantEntity
     public DateTime? OtpExpiresAtUtc { get; private set; }
 
     public bool IsAdmin { get; private set; }
-    public bool IsActive { get; private set; } = true;
+    public bool IsActive { get; private set; }
 
     private User() { }
 
@@ -27,7 +27,7 @@ public sealed class User : AggregateRoot, ITenantEntity
             PasswordHash = passwordHash,
             FullName = fullName.Trim(),
             IsAdmin = false,
-            IsActive = true
+            IsActive = false
         };
     }
 
@@ -45,9 +45,15 @@ public sealed class User : AggregateRoot, ITenantEntity
         };
     }
 
-    public void SetAsAdmin()
+    public void Activate()
     {
-        IsAdmin = true;
+        IsActive = true;
+        ClearOtpCode();
+    }
+
+    public void Deactivate()
+    {
+        IsActive = false;
     }
 
     public void SetOtpCode(string codeHash, DateTime expiresAtUtc)

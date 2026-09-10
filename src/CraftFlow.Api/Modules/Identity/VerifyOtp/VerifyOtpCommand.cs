@@ -4,4 +4,4 @@ using MediatR;
 
 namespace CraftFlow.Api.Modules.Identity.VerifyOtp;
 
-public record VerifyOtpCommand(string Email, string OtpCode) : IRequest<Result<LoginResponseDto>>;
+public record VerifyOtpCommand(string Email, string OtpCode, bool RememberMe = false) : IRequest<Result<LoginResponseDto>>;

@@ -27,14 +27,14 @@ public partial class MainWindow : Window
 
         LocalizationService.LanguageChanged += RefreshUiContent;
 
-        if (!ApiService.Instance.IsAuthenticated)
+        if (ApiService.Instance.IsAuthenticated)
         {
-            NavigateToAuth();
+            UpdateNavigationPermissions();
+            MainFrame.Navigate(new DashboardPage());
         }
         else
         {
-            UpdateNavigationPermissions();
-            MainFrame.Navigate(new ProductionPage());
+            NavigateToAuth();
         }
 
         _isInitializing = false;
@@ -54,11 +54,20 @@ public partial class MainWindow : Window
         {
             NavTenantKeysButton.Visibility = Visibility.Collapsed;
             NavAdminKeysButton.Visibility = Visibility.Collapsed;
+
+            UserProfilePanel.Visibility = Visibility.Collapsed;
+            GuestPanel.Visibility = Visibility.Visible;
             return;
         }
 
         var currentUser = ApiService.Instance.CurrentUser;
         bool isAdmin = currentUser?.IsAdmin ?? false;
+
+        GuestPanel.Visibility = Visibility.Collapsed;
+        UserProfilePanel.Visibility = Visibility.Visible;
+
+        UserNameTextBlock.Text = currentUser?.FullName ?? string.Empty;
+        UserRoleTextBlock.Text = isAdmin ? AuthConstants.Roles.ADMIN : AuthConstants.Roles.USER;
 
         if (isAdmin)
         {
@@ -70,6 +79,12 @@ public partial class MainWindow : Window
             NavTenantKeysButton.Visibility = Visibility.Visible;
             NavAdminKeysButton.Visibility = Visibility.Collapsed;
         }
+    }
+
+    private void Logout_Click(object sender, RoutedEventArgs e)
+    {
+        ApiService.Instance.ClearAuthToken();
+        NavigateToAuth();
     }
 
     private void InitSettingsControls()

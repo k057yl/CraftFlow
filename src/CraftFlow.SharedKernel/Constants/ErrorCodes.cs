@@ -58,6 +58,9 @@ public static class ErrorCodes
         public const string TOKEN_GENERATION_FAILED = "AUTH.TOKEN_GENERATION_FAILED";
         public const string INVALID_ACCESS_KEY = "AUTH.INVALID_ACCESS_KEY";
         public const string KEY_REVOKED = "AUTH.KEY_REVOKED";
+        public const string ACCOUNT_NOT_ACTIVATED = "AUTH.ACCOUNT_NOT_ACTIVATED";
+        public const string OTP_EXPIRED = "AUTH.OTP_EXPIRED";
+        public const string ALREADY_ACTIVATED = "AUTH.ALREADY_ACTIVATED";
     }
 
     public static class Notifications

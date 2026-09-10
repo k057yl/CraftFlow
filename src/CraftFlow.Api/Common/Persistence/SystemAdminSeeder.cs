@@ -8,9 +8,9 @@ public static class SystemAdminSeeder
 {
     public static async Task SeedBigBossAsync(IServiceProvider serviceProvider)
     {
-        var adminEmail = Environment.GetEnvironmentVariable(ADMIN_CONFIG_KEYS.ADMIN_EMAIL_KEY);
+        var adminEmail = Environment.GetEnvironmentVariable(ADMIN_CONFIG_KEYS.ADMIN_EMAIL_KEY)?.Trim().ToLowerInvariant();
         var adminPassword = Environment.GetEnvironmentVariable(ADMIN_CONFIG_KEYS.ADMIN_PASSWORD_KEY);
-        var adminName = Environment.GetEnvironmentVariable(ADMIN_CONFIG_KEYS.ADMIN_NAME_KEY);
+        var adminName = Environment.GetEnvironmentVariable(ADMIN_CONFIG_KEYS.ADMIN_NAME_KEY)?.Trim();
 
         if (string.IsNullOrEmpty(adminEmail) || string.IsNullOrEmpty(adminPassword))
         {
@@ -30,6 +30,11 @@ public static class SystemAdminSeeder
             var bigBoss = User.CreateSystemAdmin(adminEmail, adminName ?? "Big Boss", passwordHash);
 
             dbContext.Users.Add(bigBoss);
+            await dbContext.SaveChangesAsync();
+        }
+        else if (!existingAdmin.IsActive)
+        {
+            existingAdmin.Activate();
             await dbContext.SaveChangesAsync();
         }
     }

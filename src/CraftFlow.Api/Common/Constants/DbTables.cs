@@ -20,4 +20,5 @@ public static class DbTables
     public const string RECIPE_INGREDIENTS = "recipe_ingredients";
     public const string SALES_ORDER_ITEMS = "sales_order_items";
     public const string UNITS_OF_MEASURE = "units_of_measure";
+    public const string ORGANIZATIONS = "Organizations";
 }

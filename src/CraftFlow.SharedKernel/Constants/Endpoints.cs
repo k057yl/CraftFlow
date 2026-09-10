@@ -39,8 +39,9 @@ public static class Endpoints
     // Identity
     public const string REGISTER = "api/identity/register";
     public const string LOGIN = "api/identity/login";
-    public const string VERIFY_OTP = "/api/identity/verify-otp";
-    public const string SUBSCRIPTION_KEYS = "api/subscriptions/keys";
+    public const string VERIFY_OTP = "api/identity/verify-otp";
+    public const string RESEND_OTP = "api/identity/resend-otp";
+    public const string DELETE_ACCOUNT = "api/identity/account";
 
     // Procurement
     public const string SUPPLIERS = "api/procurement/suppliers";
@@ -60,7 +61,8 @@ public static class Endpoints
     // MRP
     public const string MRP_REQUIREMENTS = "api/mrp/requirements";
 
-    //Sub
-    public const string ACTIVATE_KEY_ENDPOINT = "/api/subscriptions/keys/activate";
-    public const string ACTIVATE_OTP_ENDPOINT = "/api/subscriptions/keys/send-otp";
+    // Subscriptions
+    public const string ACTIVATE_KEY_ENDPOINT = "api/subscriptions/keys/activate";
+    public const string ACTIVATE_OTP_ENDPOINT = "api/subscriptions/keys/send-otp";
+    public const string SUBSCRIPTION_KEYS = "api/subscriptions/keys";
 }

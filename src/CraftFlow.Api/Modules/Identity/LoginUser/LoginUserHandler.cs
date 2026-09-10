@@ -31,8 +31,13 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginRe
             return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
         }
 
+        if (!user.IsActive)
+        {
+            return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.ACCOUNT_NOT_ACTIVATED));
+        }
+
         var tokenString = _tokenService.GenerateJwtToken(user);
 
-        return Result.Success(new LoginResponseDto(tokenString, user.TenantId, user.FullName));
+        return Result.Success(new LoginResponseDto(tokenString, user.TenantId, user.FullName, user.Email, user.IsAdmin));
     }
 }

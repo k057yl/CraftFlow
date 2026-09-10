@@ -5,6 +5,7 @@ using CraftFlow.Api.Common.Infrastructure.Identity;
 using CraftFlow.Api.Common.Infrastructure.Security;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Infrastructure.BackgroundServices.Cleanup;
 using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.Api.Modules.Aging.GetActiveAgingLots;
 using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
@@ -140,6 +141,7 @@ public static class DependencyInjection
         services.AddHostedService<LowStockMonitorWorker>();
         services.AddHostedService<ProductionTimerWorker>();
         services.AddHostedService<SubscriptionExpirationWorker>();
+        services.AddHostedService<UnconfirmedUserCleanupWorker>();
         return services;
     }
 }
