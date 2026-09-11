@@ -53,6 +53,7 @@ public class AppDbContext : DbContext
     public DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
     public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
     public DbSet<TenantAccessKey> TenantAccessKeys => Set<TenantAccessKey>();
+    public DbSet<SubscriptionPayment> SubscriptionPayments => Set<SubscriptionPayment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

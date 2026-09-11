@@ -1,11 +1,11 @@
-﻿using System.Collections.ObjectModel;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Services;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using CraftFlow.SharedKernel.Constants;
-using CraftFlow.Wpf.Models;
-using CraftFlow.Wpf.Services;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -112,6 +112,8 @@ public partial class InventoryPage : Page
         {
             SetStatus("UI_AGING_CHAMBER_CREATED_SUCCESS", Brushes.Green);
             ChamberNameTextBox.Clear();
+            ChamberTempTextBox.Text = "12.0";
+            ChamberHumidityTextBox.Text = "85.0";
             await LoadDataAsync();
         }
         else

@@ -50,6 +50,7 @@ public class TenantSubscription
             .Permit(SubscriptionTrigger.Cancel, SubscriptionState.Cancelled);
 
         _machine.Configure(SubscriptionState.Active)
+            .PermitReentry(SubscriptionTrigger.Activate)
             .Permit(SubscriptionTrigger.Suspend, SubscriptionState.Suspended)
             .Permit(SubscriptionTrigger.Expire, SubscriptionState.Expired)
             .Permit(SubscriptionTrigger.Cancel, SubscriptionState.Cancelled);
@@ -71,6 +72,25 @@ public class TenantSubscription
         EnsureCanFire(SubscriptionTrigger.Activate);
         _machine.Fire(SubscriptionTrigger.Activate);
         ExpiresAtUtc = expiresAtUtc;
+    }
+
+    public void ChangePlan(Guid newPlanId)
+    {
+        PlanId = newPlanId;
+    }
+
+    public void Extend(DateTime newExpirationDateUtc)
+    {
+        ExpiresAtUtc = newExpirationDateUtc;
+
+        if (State == SubscriptionState.Expired && _machine.CanFire(SubscriptionTrigger.Renew))
+        {
+            _machine.Fire(SubscriptionTrigger.Renew);
+        }
+        else if (State == SubscriptionState.Trial && _machine.CanFire(SubscriptionTrigger.Activate))
+        {
+            _machine.Fire(SubscriptionTrigger.Activate);
+        }
     }
 
     public void Expire()

@@ -25,6 +25,7 @@ public class ApiService
 
     public string? JwtToken { get; private set; }
     public UserProfileDto? CurrentUser { get; private set; }
+    public Guid? CurrentTenantId { get; private set; }
 
     public bool IsAuthenticated => !string.IsNullOrEmpty(JwtToken);
 
@@ -52,14 +53,34 @@ public class ApiService
         );
 
         CurrentUser = ParseUserFromJwt(token);
+        SetTenantHeader(CurrentTenantId);
         SaveTokenToDisk(token);
+    }
+
+    public void SetTenantHeader(Guid? tenantId)
+    {
+        CurrentTenantId = tenantId;
+        if (_client.DefaultRequestHeaders.Contains(CoreConstants.MultiTenancy.HEADER_TENANT_ID))
+        {
+            _client.DefaultRequestHeaders.Remove(CoreConstants.MultiTenancy.HEADER_TENANT_ID);
+        }
+
+        if (tenantId.HasValue && tenantId.Value != Guid.Empty)
+        {
+            _client.DefaultRequestHeaders.Add(CoreConstants.MultiTenancy.HEADER_TENANT_ID, tenantId.Value.ToString());
+        }
     }
 
     public void ClearAuthToken()
     {
         JwtToken = null;
         CurrentUser = null;
+        CurrentTenantId = null;
         _client.DefaultRequestHeaders.Authorization = null;
+        if (_client.DefaultRequestHeaders.Contains(CoreConstants.MultiTenancy.HEADER_TENANT_ID))
+        {
+            _client.DefaultRequestHeaders.Remove(CoreConstants.MultiTenancy.HEADER_TENANT_ID);
+        }
         DeleteTokenFromDisk();
     }
 
@@ -153,6 +174,12 @@ public class ApiService
             if (root.TryGetProperty(AuthConstants.Claims.FULL_NAME, out var nameProp))
             {
                 user.FullName = nameProp.GetString() ?? string.Empty;
+            }
+
+            if (root.TryGetProperty(CoreConstants.MultiTenancy.CLAIM_TENANT_ID, out var tenantProp) &&
+                Guid.TryParse(tenantProp.GetString(), out var tenantId))
+            {
+                CurrentTenantId = tenantId;
             }
 
             user.IsAdmin = CheckRoleInJwt(root, AuthConstants.Claims.ROLE_SHORT) ||

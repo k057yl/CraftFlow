@@ -1,27 +1,36 @@
-﻿using CraftFlow.Api.Common.Persistence;
+﻿using CraftFlow.Api.Common.MultiTenancy;
+using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Inventory.Domain;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 
-namespace CraftFlow.Api.Modules.Inventory.CreateWarehouse
+namespace CraftFlow.Api.Modules.Inventory.CreateWarehouse;
+
+public class CreateWarehouseHandler : IRequestHandler<CreateWarehouseCommand, Result<Guid>>
 {
-    public class CreateWarehouseHandler : IRequestHandler<CreateWarehouseCommand, Result<Guid>>
+    private readonly AppDbContext _dbContext;
+    private readonly ITenantContext _tenantContext;
+
+    public CreateWarehouseHandler(AppDbContext dbContext, ITenantContext tenantContext)
     {
-        private readonly AppDbContext _dbContext;
+        _dbContext = dbContext;
+        _tenantContext = tenantContext;
+    }
 
-        public CreateWarehouseHandler(AppDbContext dbContext)
+    public async Task<Result<Guid>> Handle(CreateWarehouseCommand request, CancellationToken cancellationToken)
+    {
+        var tenantId = _tenantContext.TenantId;
+        if (tenantId == Guid.Empty)
         {
-            _dbContext = dbContext;
+            return Result.Failure<Guid>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
         }
 
-        public async Task<Result<Guid>> Handle(CreateWarehouseCommand request, CancellationToken cancellationToken)
-        {
-            var warehouse = Warehouse.Create(request.Name, request.Address);
+        var warehouse = Warehouse.Create(tenantId, request.Name, request.Address);
 
-            _dbContext.Warehouses.Add(warehouse);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+        _dbContext.Warehouses.Add(warehouse);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(warehouse.Id);
-        }
+        return Result.Success(warehouse.Id);
     }
 }

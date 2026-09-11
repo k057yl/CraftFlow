@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Common.Persistence;
+﻿using CraftFlow.Api.Common.MultiTenancy;
+using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
@@ -10,14 +11,22 @@ namespace CraftFlow.Api.Modules.Aging.CreateChamber;
 public class CreateChamberHandler : IRequestHandler<CreateChamberCommand, Result<Guid>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly ITenantContext _tenantContext;
 
-    public CreateChamberHandler(AppDbContext dbContext)
+    public CreateChamberHandler(AppDbContext dbContext, ITenantContext tenantContext)
     {
         _dbContext = dbContext;
+        _tenantContext = tenantContext;
     }
 
     public async Task<Result<Guid>> Handle(CreateChamberCommand request, CancellationToken cancellationToken)
     {
+        var tenantId = _tenantContext.TenantId;
+        if (tenantId == Guid.Empty)
+        {
+            return Result.Failure<Guid>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
+        }
+
         var nameExists = await _dbContext.AgingChambers
             .AnyAsync(c => c.Name == request.Name, cancellationToken);
 
@@ -27,6 +36,7 @@ public class CreateChamberHandler : IRequestHandler<CreateChamberCommand, Result
         }
 
         var chamber = AgingChamber.Create(
+            tenantId,
             request.Name,
             request.TargetTemperature,
             request.TargetHumidity

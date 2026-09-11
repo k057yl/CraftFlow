@@ -11,14 +11,18 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
 
         private Warehouse() { }
 
-        public static Warehouse Create(string name, string? address = null)
+        public static Warehouse Create(Guid tenantId, string name, string? address = null)
         {
+            if (tenantId == Guid.Empty)
+                throw new ArgumentException(ErrorCodes.Auth.INVALID_CREDENTIALS);
+
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException(ErrorCodes.Inventory.WAREHOUSE_NAME_REQUIRED);
 
             return new Warehouse
             {
                 Id = Guid.NewGuid(),
+                TenantId = tenantId,
                 Name = name,
                 Address = address
             };

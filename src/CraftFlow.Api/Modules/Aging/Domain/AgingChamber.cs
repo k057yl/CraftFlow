@@ -12,14 +12,18 @@ public sealed class AgingChamber : AggregateRoot, ITenantEntity
 
     private AgingChamber() { }
 
-    public static AgingChamber Create(string name, decimal targetTemperature, decimal targetHumidity)
+    public static AgingChamber Create(Guid tenantId, string name, decimal targetTemperature, decimal targetHumidity)
     {
+        if (tenantId == Guid.Empty)
+            throw new ArgumentException(ErrorCodes.Auth.INVALID_CREDENTIALS);
+
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException(ErrorCodes.Aging.CHAMBER_NAME_REQUIRED);
 
         return new AgingChamber
         {
             Id = Guid.NewGuid(),
+            TenantId = tenantId,
             Name = name,
             TargetTemperature = targetTemperature,
             TargetHumidity = targetHumidity

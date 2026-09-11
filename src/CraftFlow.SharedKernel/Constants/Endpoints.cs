@@ -10,7 +10,6 @@ public static class Endpoints
 
     // Inventory
     public const string WAREHOUSES = "api/inventory/warehouses";
-    public const string AGING_CHAMBERS = "api/inventory/aging-chambers";
     public const string STOCK_LOTS = "api/inventory/stock-lots";
     public const string STOCK_LOTS_RAW = "api/inventory/stock-lots/raw";
     public const string STOCK_LOTS_PRODUCTS = "api/inventory/stock-lots/products";
@@ -42,6 +41,11 @@ public static class Endpoints
     public const string VERIFY_OTP = "api/identity/verify-otp";
     public const string RESEND_OTP = "api/identity/resend-otp";
     public const string DELETE_ACCOUNT = "api/identity/account";
+    public const string ORGANIZATIONS = "/api/identity/organizations";
+    public const string ORGANIZATIONS_EXTED = "/api/identity/organizations/{id:guid}/extend";
+    public const string ORGANIZATIONS_TOGGLE_STATUS = "/api/identity/organizations/{id:guid}/toggle-status";
+    public const string ORGANIZATIONS_MANAGE = "/api/identity/organizations/{id:guid}/manage";
+    public const string ORGANIZATIONS_PAYMENTS = "/api/identity/organizations/{id:guid}/payments";
 
     // Procurement
     public const string SUPPLIERS = "api/procurement/suppliers";
@@ -49,6 +53,7 @@ public static class Endpoints
     public const string PURCHASE_ORDERS_RECEIVE = "api/procurement/purchase-orders/receive";
 
     // Aging
+    public const string AGING_CHAMBERS = "api/aging/chambers";
     public const string AGING_LOTS_ACTIVE = "api/aging/lots/active";
     public const string AGING_LOTS_TRANSFER = "api/aging/lots/transfer";
     public const string AGING_LOTS_RELEASE = "api/aging/lots/release";

@@ -1,12 +1,18 @@
-﻿using System.Security.Claims;
-using CraftFlow.Api.Modules.Identity.CreateTenantUser;
+﻿using CraftFlow.Api.Modules.Identity.CreateTenantUser;
 using CraftFlow.Api.Modules.Identity.DeleteAccount;
+using CraftFlow.Api.Modules.Identity.Domain;
+using CraftFlow.Api.Modules.Identity.ExtendSubscription;
+using CraftFlow.Api.Modules.Identity.GetOrganizations;
+using CraftFlow.Api.Modules.Identity.GetSubscriptionPayments;
 using CraftFlow.Api.Modules.Identity.LoginUser;
+using CraftFlow.Api.Modules.Identity.ManageSubscription;
 using CraftFlow.Api.Modules.Identity.RegisterOrganization;
 using CraftFlow.Api.Modules.Identity.ResendOtp;
+using CraftFlow.Api.Modules.Identity.ToggleOrganizationStatus;
 using CraftFlow.Api.Modules.Identity.VerifyOtp;
 using CraftFlow.SharedKernel.Constants;
 using MediatR;
+using System.Security.Claims;
 
 namespace CraftFlow.Api.Modules.Identity;
 
@@ -56,6 +62,36 @@ public static class IdentityEndpoints
             }
 
             var result = await sender.Send(new DeleteAccountCommand(userId));
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        }).RequireAuthorization();
+
+        group.MapGet(Endpoints.ORGANIZATIONS, async (ISender sender) =>
+        {
+            var result = await sender.Send(new GetOrganizationsQuery());
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        }).RequireAuthorization();
+
+        group.MapPost(Endpoints.ORGANIZATIONS_EXTED, async (Guid id, ExtendSubscriptionRequest req, ISender sender) =>
+        {
+            var result = await sender.Send(new ExtendSubscriptionCommand(id, req.Days));
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        }).RequireAuthorization();
+
+        group.MapPost(Endpoints.ORGANIZATIONS_TOGGLE_STATUS, async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new ToggleOrganizationStatusCommand(id));
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        }).RequireAuthorization();
+
+        group.MapPost(Endpoints.ORGANIZATIONS_MANAGE, async (Guid id, ManageSubscriptionRequest req, ISender sender) =>
+        {
+            var result = await sender.Send(new ManageSubscriptionCommand(id, req.PlanCode, req.AddDays, req.IsActive));
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        }).RequireAuthorization();
+
+        group.MapGet(Endpoints.ORGANIZATIONS_PAYMENTS, async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new GetSubscriptionPaymentsQuery(id));
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         }).RequireAuthorization();
     }

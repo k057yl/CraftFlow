@@ -48,12 +48,13 @@ public partial class MainWindow : Window
 
     public void UpdateNavigationPermissions()
     {
-        if (NavTenantKeysButton == null || NavAdminKeysButton == null) return;
+        if (NavAdminKeysButton == null || NavAuthButton == null || NavProfileButton == null) return;
 
         if (!ApiService.Instance.IsAuthenticated)
         {
-            NavTenantKeysButton.Visibility = Visibility.Collapsed;
             NavAdminKeysButton.Visibility = Visibility.Collapsed;
+            NavProfileButton.Visibility = Visibility.Collapsed;
+            NavAuthButton.Visibility = Visibility.Visible;
 
             UserProfilePanel.Visibility = Visibility.Collapsed;
             GuestPanel.Visibility = Visibility.Visible;
@@ -69,14 +70,15 @@ public partial class MainWindow : Window
         UserNameTextBlock.Text = currentUser?.FullName ?? string.Empty;
         UserRoleTextBlock.Text = isAdmin ? AuthConstants.Roles.ADMIN : AuthConstants.Roles.USER;
 
+        NavAuthButton.Visibility = Visibility.Collapsed;
+        NavProfileButton.Visibility = Visibility.Visible;
+
         if (isAdmin)
         {
             NavAdminKeysButton.Visibility = Visibility.Visible;
-            NavTenantKeysButton.Visibility = Visibility.Collapsed;
         }
         else
         {
-            NavTenantKeysButton.Visibility = Visibility.Visible;
             NavAdminKeysButton.Visibility = Visibility.Collapsed;
         }
     }
@@ -140,8 +142,8 @@ public partial class MainWindow : Window
     private void NavSales_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new SalesPage());
     private void NavTraceability_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TraceabilityPage());
     private void NavMrp_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new MrpPage());
-    private void NavTenantKeys_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TenantKeysPage());
-    private void NavAdminKeys_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new AdminKeysPage());
+    private void NavAdminKeys_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new AdminPage());
     private void NavAuth_Click(object sender, RoutedEventArgs e) => NavigateToAuth();
+    private void NavProfile_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProfilePage());
     private void NavAudit_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new AuditPage());
 }

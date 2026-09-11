@@ -31,11 +31,13 @@
                         <Button Content="{loc:Loc Key=NAV_SALES}" Click="NavSales_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_TRACEABILITY}" Click="NavTraceability_Click" Style="{StaticResource NavButtonStyle}"/>
                         <Button Content="{loc:Loc Key=NAV_MRP}" Click="NavMrp_Click" Style="{StaticResource NavButtonStyle}"/>
-
-                        <Button x:Name="NavTenantKeysButton" Content="{loc:Loc Key=NAV_TENANT_KEYS}" Click="NavTenantKeys_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed"/>
+                        
                         <Button x:Name="NavAdminKeysButton" Content="{loc:Loc Key=NAV_ADMIN_KEYS}" Click="NavAdminKeys_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed" Margin="0,0,0,20"/>
 
-                        <Button Content="{loc:Loc Key=NAV_AUTH}" Click="NavAuth_Click" Style="{StaticResource NavButtonStyle}"/>
+                        <!-- Динамические кнопки Авторизация / Профиль -->
+                        <Button x:Name="NavAuthButton" Content="{loc:Loc Key=NAV_AUTH}" Click="NavAuth_Click" Style="{StaticResource NavButtonStyle}" Visibility="Visible"/>
+                        <Button x:Name="NavProfileButton" Content="Профиль и Аккаунт" Click="NavProfile_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed"/>
+
                         <Button Content="{loc:Loc Key=NAV_AUDIT}" Click="NavAudit_Click" Style="{StaticResource NavButtonStyle}"/>
                     </StackPanel>
                 </ScrollViewer>
@@ -44,14 +46,12 @@
                 <StackPanel Grid.Row="1" Margin="0,10,0,10">
                     <Separator Background="{DynamicResource BorderBrush}" Margin="0,0,0,10"/>
 
-                    <!-- Показываем ТОЛЬКО когда юзер ЗАЛОГИНЕН -->
                     <StackPanel x:Name="UserProfilePanel" Visibility="Collapsed">
                         <TextBlock x:Name="UserNameTextBlock" Text="User" Foreground="{DynamicResource AppForegroundBrush}" FontWeight="Bold" FontSize="12"/>
                         <TextBlock x:Name="UserRoleTextBlock" Text="Role" Foreground="{DynamicResource AccentBrush}" FontSize="10" Margin="0,0,0,6"/>
                         <Button Content="Выйти" Click="Logout_Click" Height="24" FontSize="10"/>
                     </StackPanel>
 
-                    <!-- Когда ГОСТЬ — просто лаконичный текст, НИКАКИХ кнопок! -->
                     <StackPanel x:Name="GuestPanel" Visibility="Visible">
                         <TextBlock Text="Гость (не авторизован)" Foreground="{DynamicResource AppForegroundBrush}" FontSize="11" HorizontalAlignment="Center"/>
                     </StackPanel>

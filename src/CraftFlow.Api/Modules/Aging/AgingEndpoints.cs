@@ -1,4 +1,6 @@
 ﻿using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Modules.Aging.CreateChamber;
+using CraftFlow.Api.Modules.Aging.DeleteChamber;
 using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Aging.GetActiveAgingLots;
 using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
@@ -31,16 +33,30 @@ public static class AgingEndpoints
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
 
+        // --- AGING CHAMBERS ---
         group.MapGet(Endpoints.AGING_CHAMBERS, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
             var chambers = await dbContext.AgingChambers
                 .AsNoTracking()
-                .Select(c => new { c.Id, Name = c.Name })
+                .Select(c => new { c.Id, c.Name })
                 .ToListAsync(cancellationToken);
 
             return Results.Ok(chambers);
         });
 
+        group.MapPost(Endpoints.AGING_CHAMBERS, async (CreateChamberCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapDelete($"{Endpoints.AGING_CHAMBERS}/{{id:guid}}", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new DeleteChamberCommand(id));
+            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
+        });
+
+        // --- AGING LOTS ---
         group.MapGet(Endpoints.AGING_LOTS_ACTIVE, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
             var activeLots = await dbContext.AgingLots

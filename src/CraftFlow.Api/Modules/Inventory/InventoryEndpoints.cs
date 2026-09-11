@@ -1,7 +1,7 @@
 ﻿using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Modules.Aging.CreateChamber;
 using CraftFlow.Api.Modules.Inventory.AddStockLot;
 using CraftFlow.Api.Modules.Inventory.CreateWarehouse;
+using CraftFlow.Api.Modules.Inventory.DeleteWarehouse;
 using CraftFlow.Api.Modules.Inventory.GetWarehouses;
 using CraftFlow.SharedKernel.Constants;
 using MediatR;
@@ -30,21 +30,10 @@ public static class InventoryEndpoints
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        // --- AGING CHAMBERS ---
-        group.MapPost(Endpoints.AGING_CHAMBERS, async (CreateChamberCommand command, ISender sender) =>
+        group.MapDelete($"{Endpoints.WAREHOUSES}/{{id:guid}}", async (Guid id, ISender sender) =>
         {
-            var result = await sender.Send(command);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        });
-
-        group.MapGet(Endpoints.AGING_CHAMBERS, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
-        {
-            var chambers = await dbContext.AgingChambers
-                .AsNoTracking()
-                .Select(c => new { c.Id, Name = c.Name })
-                .ToListAsync(cancellationToken);
-
-            return Results.Ok(chambers);
+            var result = await sender.Send(new DeleteWarehouseCommand(id));
+            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
 
         // --- STOCK LOTS ---

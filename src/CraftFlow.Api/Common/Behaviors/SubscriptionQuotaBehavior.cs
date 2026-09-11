@@ -34,6 +34,11 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
     {
         var tenantId = _tenantContext.TenantId;
 
+        if (tenantId == Guid.Empty || _tenantContext.IsAdmin)
+        {
+            return await next();
+        }
+
         var subscription = await _dbContext.Set<TenantSubscription>()
             .Include(s => s.Plan)
             .AsNoTracking()
@@ -45,6 +50,10 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
         }
 
         var plan = subscription.Plan;
+        if (plan == null)
+        {
+            return BuildFailureResult(ErrorCodes.Saas.SUBSCRIPTION_EXPIRED);
+        }
 
         var isQuotaExceeded = request.QuotaType switch
         {
@@ -108,10 +117,15 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
         var valueType = typeof(TResponse).GetGenericArguments()[0];
 
         var failureMethod = FailureMethodCache.GetOrAdd(valueType, type =>
-            typeof(Result<>)
-                .MakeGenericType(type)
-                .GetMethod(nameof(Result<object>.Failure), new[] { typeof(Error) })!
-        );
+        {
+            var genericResultType = typeof(Result<>).MakeGenericType(type);
+
+            return genericResultType
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .First(m => m.Name == nameof(Result.Failure)
+                         && m.GetParameters().Length == 1
+                         && m.GetParameters()[0].ParameterType == typeof(Error));
+        });
 
         return (TResponse)failureMethod.Invoke(null, new object[] { error })!;
     }
