@@ -1,6 +1,7 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models.Auth;
 using CraftFlow.Wpf.Services;
+using CraftFlow.Wpf.Windows;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -18,7 +19,7 @@ public partial class ProfilePage : Page
         _ = LoadMyKeysAsync();
     }
 
-    private void LoadUserData()
+    private async void LoadUserData()
     {
         var user = ApiService.Instance.CurrentUser;
         if (user != null)
@@ -26,6 +27,16 @@ public partial class ProfilePage : Page
             NameTextBlock.Text = user.FullName;
             EmailTextBlock.Text = user.Email;
             RoleTextBlock.Text = user.IsAdmin ? "Системный администратор (Big Boss)" : "Владелец сыроварни";
+
+            if (string.IsNullOrWhiteSpace(user.Email))
+            {
+                var profile = await ApiService.Instance.GetAsync<UserProfileDto>("api/identity/profile");
+                if (profile != null && !string.IsNullOrWhiteSpace(profile.Email))
+                {
+                    user.Email = profile.Email;
+                    EmailTextBlock.Text = profile.Email;
+                }
+            }
 
             if (user.IsAdmin)
             {
@@ -76,15 +87,20 @@ public partial class ProfilePage : Page
 
     private async void DeleteAccount_Click(object sender, RoutedEventArgs e)
     {
-        var confirm = MessageBox.Show(
-            "Вы уверены, что хотите навсегда удалить свой аккаунт? Это действие нельзя отменить.",
-            "Подтверждение удаления",
-            MessageBoxButton.YesNo,
-            MessageBoxImage.Warning);
+        var user = ApiService.Instance.CurrentUser;
+        if (user == null) return;
 
-        if (confirm != MessageBoxResult.Yes) return;
+        var dialog = new ConfirmDeleteAccountWindow(user.Email)
+        {
+            Owner = Window.GetWindow(this)
+        };
 
-        (bool isSuccess, string contentOrError) = await ApiService.Instance.DeleteAndReadAsync(Endpoints.DELETE_ACCOUNT);
+        if (dialog.ShowDialog() != true) return;
+
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{Endpoints.DELETE_ACCOUNT}/confirm", new
+        {
+            ConfirmationEmail = dialog.EnteredEmail
+        });
 
         if (isSuccess)
         {

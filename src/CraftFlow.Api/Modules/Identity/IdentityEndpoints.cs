@@ -53,16 +53,10 @@ public static class IdentityEndpoints
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapDelete(Endpoints.DELETE_ACCOUNT, async (ClaimsPrincipal user, ISender sender) =>
+        group.MapPost($"{Endpoints.DELETE_ACCOUNT}/confirm", async (DeleteAccountCommand command, ISender sender) =>
         {
-            var userIdClaim = user.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!Guid.TryParse(userIdClaim, out var userId))
-            {
-                return Results.Unauthorized();
-            }
-
-            var result = await sender.Send(new DeleteAccountCommand(userId));
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         }).RequireAuthorization();
 
         group.MapGet(Endpoints.ORGANIZATIONS, async (ISender sender) =>

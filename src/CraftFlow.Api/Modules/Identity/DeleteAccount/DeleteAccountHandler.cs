@@ -20,18 +20,19 @@ public class DeleteAccountHandler : IRequestHandler<DeleteAccountCommand, Result
 
     public async Task<Result<bool>> Handle(DeleteAccountCommand request, CancellationToken cancellationToken)
     {
+        var userId = _tenantContext.UserId;
+
         var user = await _dbContext.Users
-            .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(u => u.Id == request.UserId, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Id == userId, cancellationToken);
 
         if (user == null)
         {
             return Result.Failure<bool>(Error.NotFound(ErrorCodes.Auth.USER_NOT_FOUND));
         }
 
-        if (!_tenantContext.IsAdmin && user.TenantId != _tenantContext.TenantId)
+        if (!string.Equals(user.Email.Trim(), request.ConfirmationEmail?.Trim(), StringComparison.OrdinalIgnoreCase))
         {
-            return Result.Failure<bool>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
+            return Result.Failure<bool>(Error.Validation("CONFIRMATION_EMAIL_MISMATCH"));
         }
 
         _dbContext.Users.Remove(user);

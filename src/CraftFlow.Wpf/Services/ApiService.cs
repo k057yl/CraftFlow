@@ -166,12 +166,17 @@ public class ApiService
 
             var user = new UserProfileDto();
 
-            if (root.TryGetProperty(AuthConstants.Claims.EMAIL, out var emailProp))
+            if (root.TryGetProperty(AuthConstants.Claims.EMAIL, out var emailProp) ||
+                root.TryGetProperty("email", out emailProp) ||
+                root.TryGetProperty("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", out emailProp) ||
+                root.TryGetProperty("sub", out emailProp))
             {
                 user.Email = emailProp.GetString() ?? string.Empty;
             }
 
-            if (root.TryGetProperty(AuthConstants.Claims.FULL_NAME, out var nameProp))
+            if (root.TryGetProperty(AuthConstants.Claims.FULL_NAME, out var nameProp) ||
+                root.TryGetProperty("name", out nameProp) ||
+                root.TryGetProperty("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name", out nameProp))
             {
                 user.FullName = nameProp.GetString() ?? string.Empty;
             }

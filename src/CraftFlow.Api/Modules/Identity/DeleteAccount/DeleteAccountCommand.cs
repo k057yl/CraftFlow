@@ -3,4 +3,4 @@ using MediatR;
 
 namespace CraftFlow.Api.Modules.Identity.DeleteAccount;
 
-public record DeleteAccountCommand(Guid UserId) : IRequest<Result<bool>>;
+public record DeleteAccountCommand(string ConfirmationEmail) : IRequest<Result<bool>>;
