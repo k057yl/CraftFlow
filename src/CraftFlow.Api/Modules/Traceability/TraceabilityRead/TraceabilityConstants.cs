@@ -43,14 +43,19 @@ public static class TraceabilityConstants
             pb."StartedAt" AS started_at,
             pb."CompletedAt" AS completed_at,
             COALESCE(pb."PlannedOutputQuantity", 0) AS planned_quantity,
-            pb."ActualOutputQuantity" AS brew_output_quantity,
+            COALESCE(pb."ActualOutputQuantity", 0) AS brew_output_quantity,
             COALESCE(EXTRACT(DAY FROM (COALESCE(al."ActualReleaseDate", NOW()) - al."PlacedAt"))::integer, 0) AS aging_days,
-            ach."Name" AS chamber_name
+            ach."Name" AS chamber_name,
+            so."Id" AS sales_order_id,
+            c."Name" AS customer_name
         FROM {DbTables.STOCK_LOTS} sl
         INNER JOIN {DbTables.PRODUCTS} p ON p."Id" = sl."ItemId"
         LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_LOTS} al ON al."ProductId" = p."Id" OR al."ProductionBatchId" = sl."ProductionBatchId"
         LEFT JOIN {DbTables.PRODUCTION_BATCHES} pb ON pb."Id" = COALESCE(sl."ProductionBatchId", al."ProductionBatchId")
         LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_CHAMBERS} ach ON ach."Id" = al."AgingChamberId"
+        LEFT JOIN {DbTables.SALES_ORDER_ITEMS} soi ON soi."StockLotId" = sl."Id"
+        LEFT JOIN {DbTables.SALES_ORDERS} so ON so."Id" = soi."SalesOrderId"
+        LEFT JOIN {DbTables.CUSTOMERS} c ON c."Id" = so."CustomerId"
         WHERE sl."Id" = @ProductStockLotId AND sl."TenantId" = @TenantId
         ORDER BY al."PlacedAt" DESC NULLS LAST
         LIMIT 1;
@@ -63,11 +68,14 @@ public static class TraceabilityConstants
             COALESCE(rm_sl."BatchNumber", 'Б/Н') AS batch_number,
             ci."Quantity" AS quantity_used,
             COALESCE(uom."Code", '') AS unit_of_measure,
-            '—' AS supplier_name
+            COALESCE(sup."Name", '—') AS supplier_name
         FROM {DbTables.CONSUMED_INGREDIENTS} ci
         LEFT JOIN {DbTables.STOCK_LOTS} rm_sl ON rm_sl."Id" = ci."StockLotId"
         LEFT JOIN {DbTables.RAW_MATERIALS} rm ON rm."Id" = ci."RawMaterialId"
         LEFT JOIN {DbTables.UNITS_OF_MEASURE} uom ON uom."Id" = rm."UnitOfMeasureId"
+        LEFT JOIN {DbSchemas.PROCUREMENT}.{DbTables.PURCHASE_ORDER_ITEMS} poi ON poi."RawMaterialId" = rm."Id"
+        LEFT JOIN {DbSchemas.PROCUREMENT}.{DbTables.PURCHASE_ORDERS} po ON po."Id" = poi."PurchaseOrderId"
+        LEFT JOIN {DbSchemas.PROCUREMENT}.{DbTables.SUPPLIERS} sup ON sup."Id" = po."SupplierId"
         WHERE ci."ProductionBatchId" = @BatchId;
         """;
 }

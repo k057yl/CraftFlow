@@ -24,7 +24,6 @@ public partial class MainWindow : Window
         Title = UiConstants.Titles.APP_TITLE;
 
         InitSettingsControls();
-
         LocalizationService.LanguageChanged += RefreshUiContent;
 
         if (ApiService.Instance.IsAuthenticated)
@@ -36,8 +35,6 @@ public partial class MainWindow : Window
         {
             NavigateToAuth();
         }
-
-        _isInitializing = false;
     }
 
     public void NavigateToAuth()

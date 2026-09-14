@@ -142,16 +142,13 @@ public partial class SalesPage : Page
         decimal.TryParse(rawPriceText, NumberStyles.Any, CultureInfo.InvariantCulture, out var basePrice);
         decimal.TryParse(rawDiscountText, NumberStyles.Any, CultureInfo.InvariantCulture, out var discountPercent);
 
-        if (quantity >= 20)
-        {
-            if (discountPercent < 10) discountPercent = 10;
-        }
-        else if (quantity >= 10)
-        {
-            if (discountPercent < 5) discountPercent = 5;
-        }
+        decimal autoDiscount = 0;
+        if (quantity >= 20) autoDiscount = 10;
+        else if (quantity >= 10) autoDiscount = 5;
 
-        var discountedUnitPrice = basePrice * (1m - (discountPercent / 100m));
+        var effectiveDiscount = Math.Max(discountPercent, autoDiscount);
+
+        var discountedUnitPrice = basePrice * (1m - (effectiveDiscount / 100m));
         if (discountedUnitPrice < 0) discountedUnitPrice = 0;
 
         var totalSum = quantity * discountedUnitPrice;
@@ -201,18 +198,12 @@ public partial class SalesPage : Page
         }
 
         var rawQtyText = OrderQuantityTextBox.Text.Replace(',', '.');
-        var rawPriceText = OrderBasePriceTextBox.Text.Replace(',', '.');
-        var rawDiscountText = OrderDiscountTextBox.Text.Replace(',', '.');
 
-        if (!decimal.TryParse(rawQtyText, NumberStyles.Any, CultureInfo.InvariantCulture, out var quantity) ||
-            !decimal.TryParse(rawPriceText, NumberStyles.Any, CultureInfo.InvariantCulture, out var basePrice) ||
-            !decimal.TryParse(rawDiscountText, NumberStyles.Any, CultureInfo.InvariantCulture, out var discountPercent))
+        if (!decimal.TryParse(rawQtyText, NumberStyles.Any, CultureInfo.InvariantCulture, out var quantity))
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
             return;
         }
-
-        var finalUnitPrice = basePrice * (1m - (discountPercent / 100m));
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.ORDERS_SHIP, new
         {
@@ -220,8 +211,12 @@ public partial class SalesPage : Page
             WarehouseId = warehouseId,
             Items = new[]
             {
-                new { ProductId = productId, Quantity = quantity, UnitPrice = finalUnitPrice }
+            new
+            {
+                ProductId = productId,
+                Quantity = quantity
             }
+        }
         });
 
         if (isSuccess)

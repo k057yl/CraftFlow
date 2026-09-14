@@ -1,5 +1,4 @@
-﻿using CraftFlow.Api.Modules.Production.Domain;
-using CraftFlow.Api.Modules.Traceability.Contracts;
+﻿using CraftFlow.Api.Modules.Traceability.Contracts;
 using CraftFlow.SharedKernel.Constants;
 using Dapper;
 using System.Data;
@@ -107,12 +106,13 @@ public sealed class TraceabilityReadService
 
         decimal currentStockQty = Convert.ToDecimal(header.actual_quantity ?? 0m);
         decimal brewOutput = Convert.ToDecimal(header.brew_output_quantity ?? 0m);
-
-        decimal agingLossPercentage = brewOutput > 0 && currentStockQty < brewOutput
-            ? Math.Round(((brewOutput - currentStockQty) / brewOutput) * 100m, 2)
-            : 0m;
-
         int agingDays = Convert.ToInt32(header.aging_days ?? 0);
+        decimal agingLossPercentage = 0m;
+        if (agingDays > 0 && brewOutput > 0 && currentStockQty > 0 && currentStockQty < brewOutput)
+        {
+            agingLossPercentage = Math.Round(((brewOutput - currentStockQty) / brewOutput) * 100m, 2);
+        }
+
         string chamberName = (string)(header.chamber_name ?? string.Empty);
 
         if (agingDays == 0 && string.IsNullOrEmpty(chamberName))

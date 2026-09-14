@@ -39,6 +39,7 @@ public static class ErrorCodes
         public const string RECIPE_INVALID_INGREDIENT_QUANTITY = "CATALOG.RECIPE_INVALID_INGREDIENT_QUANTITY";
         public const string UNIT_OF_MEASURE_NOT_FOUND = "CATALOG.UNIT_OF_MEASURE_NOT_FOUND";
         public const string RECIPE_INVALID_AGING_DAYS = "CATALOG.RECIPE_INVALID_AGING_DAYS";
+        public const string PRODUCT_NOT_FOUND = "CATALOG.PRODUCT_NOT_FOUND";
     }
 
     public static class Sales

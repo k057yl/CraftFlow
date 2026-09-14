@@ -28,18 +28,27 @@ public class CreateAndShipSalesOrderHandler : IRequestHandler<CreateAndShipSales
 
         foreach (var item in request.Items)
         {
-            var lot = await _dbContext.StockLots
-                .FirstOrDefaultAsync(s => s.Id == item.StockLotId && s.WarehouseId == request.WarehouseId, cancellationToken);
+            var activeLots = await _dbContext.StockLots
+                .Where(s => s.WarehouseId == request.WarehouseId && s.ItemId == item.ProductId && s.Quantity > 0)
+                .OrderByDescending(s => s.Quantity)
+                .ToListAsync(cancellationToken);
 
-            if (lot is null)
-                return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Inventory.ITEM_NOT_FOUND));
+            var totalAvailableQuantity = activeLots.Sum(s => s.Quantity);
 
-            if (lot.Quantity < item.Quantity)
+            if (activeLots.Count == 0 || totalAvailableQuantity < item.Quantity)
                 return Result.Failure<Guid>(Error.Validation(ErrorCodes.Sales.INSUFFICIENT_PRODUCT_STOCK));
 
-            lot.AdjustQuantity(-item.Quantity);
+            decimal unitCost = activeLots.Sum(l => l.Quantity * l.UnitPrice) / totalAvailableQuantity;
+            decimal basePrice = unitCost > 0 ? unitCost * 1.40m : 450.00m;
+            decimal discountPercent = 0m;
+            if (item.Quantity >= 20) discountPercent = 10m;
+            else if (item.Quantity >= 10) discountPercent = 5m;
 
-            order.AddItem(lot.Id, item.Quantity, item.UnitPrice);
+            var finalUnitPrice = Math.Round(basePrice * (1m - (discountPercent / 100m)), 2);
+            var primaryLot = activeLots.First();
+            primaryLot.AdjustQuantity(-item.Quantity);
+
+            order.AddItem(primaryLot.Id, item.Quantity, finalUnitPrice);
         }
 
         order.Ship();

@@ -199,7 +199,7 @@ public partial class TraceabilityPage : Page
                     ? "На складе"
                     : traceData.CustomerName;
 
-                var priceInfo = traceData.UnitPrice > 0 ? $" | Цена/С/С: ${traceData.UnitPrice:N2}" : string.Empty;
+                var priceInfo = traceData.UnitPrice > 0 ? $" | Себестоимость: ${traceData.UnitPrice:N2}" : string.Empty;
                 var agingLossInfo = traceData.AgingLossPercentage > 0 ? $" | Усушка: {traceData.AgingLossPercentage:N2}%" : string.Empty;
 
                 var rootNode = new TraceTreeNode
