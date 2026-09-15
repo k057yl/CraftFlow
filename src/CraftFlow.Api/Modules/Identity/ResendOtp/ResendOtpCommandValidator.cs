@@ -1,20 +1,16 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
 
-namespace CraftFlow.Api.Modules.Identity.LoginUser;
+namespace CraftFlow.Api.Modules.Identity.ResendOtp;
 
-public sealed class LoginUserValidator : AbstractValidator<LoginUserCommand>
+public sealed class ResendOtpCommandValidator : AbstractValidator<ResendOtpCommand>
 {
-    public LoginUserValidator()
+    public ResendOtpCommandValidator()
     {
         RuleFor(x => x.Email)
             .NotEmpty()
             .WithErrorCode(ErrorCodes.General.VALUE_REQUIRED)
             .EmailAddress()
             .WithErrorCode(ErrorCodes.Auth.INVALID_CREDENTIALS);
-
-        RuleFor(x => x.Password)
-            .NotEmpty()
-            .WithErrorCode(ErrorCodes.General.VALUE_REQUIRED);
     }
 }

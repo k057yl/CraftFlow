@@ -5,6 +5,7 @@ public static class CoreConstants
     {
         public const string HEADER_TENANT_ID = "X-Tenant-Id";
         public const string CLAIM_TENANT_ID = "tenant_id";
+        public const string TENANT_ID_ITEM_KEY = "TenantId";
         public const string DEFAULT_TENANT_ID_STRING = "00000000-0000-0000-0000-000000000001";
     }
 

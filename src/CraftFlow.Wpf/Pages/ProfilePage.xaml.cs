@@ -105,6 +105,7 @@ public partial class ProfilePage : Page
         if (isSuccess)
         {
             MessageBox.Show("Ваш аккаунт был успешно удален.", "Уведомление", MessageBoxButton.OK, MessageBoxImage.Information);
+
             ApiService.Instance.ClearAuthToken();
 
             if (Application.Current.MainWindow is MainWindow mainWindow)

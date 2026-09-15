@@ -1,24 +1,27 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
 
-namespace CraftFlow.Api.Modules.Identity.VerifyOtp;
+namespace CraftFlow.Api.Modules.Identity.CreateTenantUser;
 
-public sealed class VerifyOtpValidator : AbstractValidator<VerifyOtpCommand>
+public sealed class CreateTenantUserCommandValidator : AbstractValidator<CreateTenantUserCommand>
 {
-    public VerifyOtpValidator()
+    public CreateTenantUserCommandValidator()
     {
+        RuleFor(x => x.FullName)
+            .NotEmpty()
+            .WithErrorCode(ErrorCodes.General.VALUE_REQUIRED)
+            .MaximumLength(150);
+
         RuleFor(x => x.Email)
             .NotEmpty()
             .WithErrorCode(ErrorCodes.General.VALUE_REQUIRED)
             .EmailAddress()
             .WithErrorCode(ErrorCodes.Auth.INVALID_CREDENTIALS);
 
-        RuleFor(x => x.OtpCode)
+        RuleFor(x => x.Password)
             .NotEmpty()
             .WithErrorCode(ErrorCodes.General.VALUE_REQUIRED)
-            .Length(6)
-            .WithErrorCode(ErrorCodes.Auth.INVALID_CREDENTIALS)
-            .Matches(@"^\d{6}$")
+            .MinimumLength(6)
             .WithErrorCode(ErrorCodes.Auth.INVALID_CREDENTIALS);
     }
 }

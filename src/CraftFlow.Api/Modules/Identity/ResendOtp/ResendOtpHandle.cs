@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Identity.ResendOtp;
+
 public class ResendOtpHandler : IRequestHandler<ResendOtpCommand, Result<bool>>
 {
     private readonly AppDbContext _dbContext;
@@ -19,11 +20,11 @@ public class ResendOtpHandler : IRequestHandler<ResendOtpCommand, Result<bool>>
 
     public async Task<Result<bool>> Handle(ResendOtpCommand request, CancellationToken cancellationToken)
     {
-        var sanitizedEmail = request.Email.Trim().ToLowerInvariant();
+        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
 
         var user = await _dbContext.Users
             .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(u => u.Email == sanitizedEmail, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Email == normalizedEmail, cancellationToken);
 
         if (user == null)
         {

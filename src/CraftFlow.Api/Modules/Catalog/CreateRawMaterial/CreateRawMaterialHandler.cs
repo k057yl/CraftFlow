@@ -5,33 +5,32 @@ using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace CraftFlow.Api.Modules.Catalog.CreateRawMaterial
+namespace CraftFlow.Api.Modules.Catalog.CreateRawMaterial;
+
+public class CreateRawMaterialHandler : IRequestHandler<CreateRawMaterialCommand, Result<Guid>>
 {
-    public class CreateRawMaterialHandler : IRequestHandler<CreateRawMaterialCommand, Result<Guid>>
+    private readonly AppDbContext _dbContext;
+
+    public CreateRawMaterialHandler(AppDbContext dbContext)
     {
-        private readonly AppDbContext _dbContext;
+        _dbContext = dbContext;
+    }
 
-        public CreateRawMaterialHandler(AppDbContext dbContext)
+    public async Task<Result<Guid>> Handle(CreateRawMaterialCommand request, CancellationToken cancellationToken)
+    {
+        var unitExists = await _dbContext.UnitsOfMeasure
+            .AnyAsync(u => u.Id == request.UnitOfMeasureId, cancellationToken);
+
+        if (!unitExists)
         {
-            _dbContext = dbContext;
+            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Catalog.UNIT_OF_MEASURE_NOT_FOUND));
         }
 
-        public async Task<Result<Guid>> Handle(CreateRawMaterialCommand request, CancellationToken cancellationToken)
-        {
-            var unitExists = await _dbContext.UnitsOfMeasure
-                .AnyAsync(u => u.Id == request.UnitOfMeasureId, cancellationToken);
+        var rawMaterial = RawMaterial.Create(request.Name, request.UnitOfMeasureId);
 
-            if (!unitExists)
-            {
-                return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Catalog.UNIT_OF_MEASURE_NOT_FOUND));
-            }
+        _dbContext.RawMaterials.Add(rawMaterial);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-            var rawMaterial = RawMaterial.Create(request.Name, request.UnitOfMeasureId);
-
-            _dbContext.RawMaterials.Add(rawMaterial);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return Result.Success(rawMaterial.Id);
-        }
+        return Result.Success(rawMaterial.Id);
     }
 }

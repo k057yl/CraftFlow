@@ -36,6 +36,8 @@ public static class UiConstants
         public const string KEY_REVOKED_SUCCESS = "UI.KEY_REVOKED_SUCCESS";
         public const string KEY_ACTIVATED_SUCCESS = "UI.KEY_ACTIVATED_SUCCESS";
         public const string INVALID_OTP_FORMAT = "UI.INVALID_OTP_FORMAT";
+        public const string EMPTY_TOKEN_ERROR = "UI.EMPTY_TOKEN_ERROR";
+        public const string OTP_RESENT_SUCCESS = "UI.OTP_RESENT_SUCCESS";
     }
 
     public static class Titles

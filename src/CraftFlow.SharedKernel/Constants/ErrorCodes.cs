@@ -94,4 +94,9 @@ public static class ErrorCodes
         public const string SUBSCRIPTION_EXPIRED = "SAAS.SUBSCRIPTION_EXPIRED";
         public const string TENANT_MISMATCH = "SAAS.TENANT_MISMATCH";
     }
+
+    public static class Supplier
+    {
+        public const string PHONE_NUMBER_INVALID_FORMAT = "SUPPLIER.PHONE_NUMBER_INVALID_FORMAT";
+    }
 }

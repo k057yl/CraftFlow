@@ -4,6 +4,7 @@ using CraftFlow.SharedKernel.Result;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Procurement.Suppliers;
+
 public sealed class CreateSupplierCommandHandler : IRequestHandler<CreateSupplierCommand, Result<Guid>>
 {
     private readonly AppDbContext _dbContext;

@@ -26,7 +26,7 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginRe
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(u => u.Email == email, cancellationToken);
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        if (user == null)
         {
             return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
         }
@@ -36,8 +36,12 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginRe
             return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.ACCOUNT_NOT_ACTIVATED));
         }
 
-        var tokenString = _tokenService.GenerateJwtToken(user);
+        if (!BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        {
+            return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
+        }
 
+        var tokenString = _tokenService.GenerateJwtToken(user);
         return Result.Success(new LoginResponseDto(tokenString, user.TenantId, user.FullName, user.Email, user.IsAdmin));
     }
 }

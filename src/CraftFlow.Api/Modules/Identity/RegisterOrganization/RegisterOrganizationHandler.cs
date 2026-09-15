@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using CraftFlow.Api.Common.Persistence;
+﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.Api.Modules.Subscriptions.Domain;
@@ -27,25 +26,22 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
 
     public async Task<Result<Guid>> Handle(RegisterOrganizationCommand request, CancellationToken cancellationToken)
     {
-        var sanitizedEmail = request.OwnerEmail.Trim().ToLowerInvariant();
-        var sanitizedFullName = Regex.Replace(request.OwnerFullName.Trim(), @"[<>]", string.Empty);
-        var sanitizedCompanyName = Regex.Replace(request.CompanyName.Trim(), @"[<>]", string.Empty);
+        var normalizedEmail = request.OwnerEmail.Trim().ToLowerInvariant();
 
         var exists = await _dbContext.Users
-            .AnyAsync(u => u.Email == sanitizedEmail, cancellationToken);
+            .AnyAsync(u => u.Email == normalizedEmail, cancellationToken);
 
         if (exists)
         {
             return Result.Failure<Guid>(Error.Conflict(ErrorCodes.Auth.USER_ALREADY_EXISTS));
         }
 
-        var organization = Organization.Create(sanitizedCompanyName);
+        var organization = Organization.Create(request.CompanyName);
         _dbContext.Organizations.Add(organization);
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.OwnerPassword);
-        var owner = User.Create(organization.Id, sanitizedEmail, passwordHash, sanitizedFullName);
-
-        var rawOtpCode = new Random().Next(100000, 999999).ToString();
+        var owner = User.Create(organization.Id, normalizedEmail, passwordHash, request.OwnerFullName);
+        var rawOtpCode = Random.Shared.Next(100000, 999999).ToString("D6");
         var otpHash = BCrypt.Net.BCrypt.HashPassword(rawOtpCode);
 
         owner.SetOtpCode(otpHash, DateTime.UtcNow.AddMinutes(OTP_EXPIRATION_MINUTES));
@@ -66,7 +62,6 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
-
         await _emailService.SendOtpCodeAsync(owner.Email, rawOtpCode);
 
         return Result.Success(organization.Id);

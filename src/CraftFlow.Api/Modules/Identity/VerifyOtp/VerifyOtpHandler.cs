@@ -21,11 +21,12 @@ public class VerifyOtpHandler : IRequestHandler<VerifyOtpCommand, Result<LoginRe
 
     public async Task<Result<LoginResponseDto>> Handle(VerifyOtpCommand request, CancellationToken cancellationToken)
     {
-        var sanitizedEmail = request.Email.Trim().ToLowerInvariant();
+        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
+        var cleanOtpCode = request.OtpCode?.Trim() ?? string.Empty;
 
         var user = await _dbContext.Users
             .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(u => u.Email == sanitizedEmail, cancellationToken);
+            .FirstOrDefaultAsync(u => u.Email == normalizedEmail, cancellationToken);
 
         if (user == null || string.IsNullOrEmpty(user.OtpCodeHash) || !user.OtpExpiresAtUtc.HasValue)
         {
@@ -37,7 +38,7 @@ public class VerifyOtpHandler : IRequestHandler<VerifyOtpCommand, Result<LoginRe
             return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.OTP_EXPIRED));
         }
 
-        if (!BCrypt.Net.BCrypt.Verify(request.OtpCode, user.OtpCodeHash))
+        if (!BCrypt.Net.BCrypt.Verify(cleanOtpCode, user.OtpCodeHash))
         {
             return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
         }

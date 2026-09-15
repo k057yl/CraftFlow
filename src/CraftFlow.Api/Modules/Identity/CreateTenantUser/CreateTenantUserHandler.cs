@@ -1,5 +1,4 @@
-﻿using System.Text.RegularExpressions;
-using CraftFlow.Api.Common.MultiTenancy;
+﻿using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.SharedKernel.Constants;
@@ -22,11 +21,10 @@ public class CreateTenantUserHandler : IRequestHandler<CreateTenantUserCommand, 
 
     public async Task<Result<Guid>> Handle(CreateTenantUserCommand request, CancellationToken cancellationToken)
     {
-        var sanitizedEmail = request.Email.Trim().ToLowerInvariant();
-        var sanitizedFullName = Regex.Replace(request.FullName.Trim(), @"[<>]", string.Empty);
+        var normalizedEmail = request.Email.Trim().ToLowerInvariant();
 
         var exists = await _dbContext.Users
-            .AnyAsync(u => u.Email == sanitizedEmail, cancellationToken);
+            .AnyAsync(u => u.Email == normalizedEmail, cancellationToken);
 
         if (exists)
         {
@@ -34,7 +32,7 @@ public class CreateTenantUserHandler : IRequestHandler<CreateTenantUserCommand, 
         }
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-        var user = User.Create(_tenantContext.TenantId, sanitizedEmail, passwordHash, sanitizedFullName);
+        var user = User.Create(_tenantContext.TenantId, normalizedEmail, passwordHash, request.FullName);
         user.Activate();
 
         _dbContext.Users.Add(user);

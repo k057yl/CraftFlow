@@ -26,6 +26,13 @@ public partial class MainWindow : Window
         InitSettingsControls();
         LocalizationService.LanguageChanged += RefreshUiContent;
 
+        ApiService.Instance.OnAuthStateChanged += () =>
+        {
+            Dispatcher.Invoke(UpdateNavigationPermissions);
+        };
+
+        _isInitializing = false;
+
         if (ApiService.Instance.IsAuthenticated)
         {
             UpdateNavigationPermissions();
@@ -45,10 +52,11 @@ public partial class MainWindow : Window
 
     public void UpdateNavigationPermissions()
     {
-        if (NavAdminKeysButton == null || NavAuthButton == null || NavProfileButton == null) return;
+        if (NavAdminKeysButton == null || NavAuthButton == null || NavProfileButton == null || MainMenuPanel == null) return;
 
         if (!ApiService.Instance.IsAuthenticated)
         {
+            MainMenuPanel.Visibility = Visibility.Collapsed;
             NavAdminKeysButton.Visibility = Visibility.Collapsed;
             NavProfileButton.Visibility = Visibility.Collapsed;
             NavAuthButton.Visibility = Visibility.Visible;
@@ -57,6 +65,8 @@ public partial class MainWindow : Window
             GuestPanel.Visibility = Visibility.Visible;
             return;
         }
+
+        MainMenuPanel.Visibility = Visibility.Visible;
 
         var currentUser = ApiService.Instance.CurrentUser;
         bool isAdmin = currentUser?.IsAdmin ?? false;
@@ -83,6 +93,7 @@ public partial class MainWindow : Window
     private void Logout_Click(object sender, RoutedEventArgs e)
     {
         ApiService.Instance.ClearAuthToken();
+        ApiService.Instance.ClearTenantHeader();
         NavigateToAuth();
     }
 

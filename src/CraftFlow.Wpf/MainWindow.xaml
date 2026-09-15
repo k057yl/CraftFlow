@@ -24,21 +24,23 @@
                     <StackPanel>
                         <TextBlock Text="CRAFTFLOW" Foreground="{DynamicResource AppForegroundBrush}" FontSize="22" FontWeight="Bold" Margin="0,0,0,25" HorizontalAlignment="Center"/>
 
-                        <Button Content="{loc:Loc Key=NAV_DIRECTORY}" Click="NavDirectory_Click" Style="{StaticResource NavButtonStyle}"/>
-                        <Button Content="{loc:Loc Key=NAV_INVENTORY}" Click="NavInventory_Click" Style="{StaticResource NavButtonStyle}"/>
-                        <Button Content="{loc:Loc Key=NAV_PROCUREMENT}" Click="NavProcurement_Click" Style="{StaticResource NavButtonStyle}"/>
-                        <Button Content="{loc:Loc Key=NAV_PRODUCTION}" Click="NavProduction_Click" Style="{StaticResource NavButtonStyle}"/>
-                        <Button Content="{loc:Loc Key=NAV_SALES}" Click="NavSales_Click" Style="{StaticResource NavButtonStyle}"/>
-                        <Button Content="{loc:Loc Key=NAV_TRACEABILITY}" Click="NavTraceability_Click" Style="{StaticResource NavButtonStyle}"/>
-                        <Button Content="{loc:Loc Key=NAV_MRP}" Click="NavMrp_Click" Style="{StaticResource NavButtonStyle}"/>
-                        
+                        <!-- ОСНОВНОЕ МЕНЮ (Скрыто для неавторизованных) -->
+                        <StackPanel x:Name="MainMenuPanel" Visibility="Collapsed">
+                            <Button Content="{loc:Loc Key=NAV_DIRECTORY}" Click="NavDirectory_Click" Style="{StaticResource NavButtonStyle}"/>
+                            <Button Content="{loc:Loc Key=NAV_INVENTORY}" Click="NavInventory_Click" Style="{StaticResource NavButtonStyle}"/>
+                            <Button Content="{loc:Loc Key=NAV_PROCUREMENT}" Click="NavProcurement_Click" Style="{StaticResource NavButtonStyle}"/>
+                            <Button Content="{loc:Loc Key=NAV_PRODUCTION}" Click="NavProduction_Click" Style="{StaticResource NavButtonStyle}"/>
+                            <Button Content="{loc:Loc Key=NAV_SALES}" Click="NavSales_Click" Style="{StaticResource NavButtonStyle}"/>
+                            <Button Content="{loc:Loc Key=NAV_TRACEABILITY}" Click="NavTraceability_Click" Style="{StaticResource NavButtonStyle}"/>
+                            <Button Content="{loc:Loc Key=NAV_MRP}" Click="NavMrp_Click" Style="{StaticResource NavButtonStyle}"/>
+                            <Button Content="{loc:Loc Key=NAV_AUDIT}" Click="NavAudit_Click" Style="{StaticResource NavButtonStyle}"/>
+                        </StackPanel>
+
                         <Button x:Name="NavAdminKeysButton" Content="{loc:Loc Key=NAV_ADMIN_KEYS}" Click="NavAdminKeys_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed" Margin="0,0,0,20"/>
 
                         <!-- Динамические кнопки Авторизация / Профиль -->
                         <Button x:Name="NavAuthButton" Content="{loc:Loc Key=NAV_AUTH}" Click="NavAuth_Click" Style="{StaticResource NavButtonStyle}" Visibility="Visible"/>
-                        <Button x:Name="NavProfileButton" Content="Профиль и Аккаунт" Click="NavProfile_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed"/>
-
-                        <Button Content="{loc:Loc Key=NAV_AUDIT}" Click="NavAudit_Click" Style="{StaticResource NavButtonStyle}"/>
+                        <Button x:Name="NavProfileButton" Content="{loc:Loc Key=NAV_PROFILE}" Click="NavProfile_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed"/>
                     </StackPanel>
                 </ScrollViewer>
 

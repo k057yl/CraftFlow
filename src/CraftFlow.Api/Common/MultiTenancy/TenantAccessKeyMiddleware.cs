@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Common.Infrastructure.Security;
+﻿using CraftFlow.Api.Common.Constants;
+using CraftFlow.Api.Common.Infrastructure.Security;
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Subscriptions.Domain;
 using CraftFlow.SharedKernel.Constants;
@@ -52,7 +53,7 @@ public class TenantAccessKeyMiddleware
                 validationResult = TenantKeyValidationResult.Success(accessKey.TenantId, accessKey.Id);
 
                 var cacheOptions = new MemoryCacheEntryOptions()
-                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(10));
+                    .SetAbsoluteExpiration(TimeSpan.FromMinutes(AuthConstants.Cache.KEY_EXPIRATION_MINUTES));
 
                 cache.Set(cacheKey, validationResult, cacheOptions);
             }
@@ -65,23 +66,29 @@ public class TenantAccessKeyMiddleware
             return;
         }
 
-        context.Items["TenantId"] = validationResult.TenantId;
+        context.Items[CoreConstants.MultiTenancy.TENANT_ID_ITEM_KEY] = validationResult.TenantId;
 
-        var lastUsedCacheKey = $"key_last_used_{validationResult.AccessKeyId}";
+        var lastUsedCacheKey = $"{AuthConstants.Cache.KEY_LAST_USED_PREFIX}{validationResult.AccessKeyId}";
         if (!cache.TryGetValue(lastUsedCacheKey, out _))
         {
             var keyId = validationResult.AccessKeyId;
             _ = Task.Run(async () =>
             {
-                using var scope = context.RequestServices.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                try
+                {
+                    using var scope = context.RequestServices.CreateScope();
+                    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                await db.Set<TenantAccessKey>()
-                    .Where(k => k.Id == keyId)
-                    .ExecuteUpdateAsync(s => s.SetProperty(k => k.LastUsedAtUtc, DateTime.UtcNow));
+                    await db.Set<TenantAccessKey>()
+                        .Where(k => k.Id == keyId)
+                        .ExecuteUpdateAsync(s => s.SetProperty(k => k.LastUsedAtUtc, DateTime.UtcNow));
+                }
+                catch
+                {
+                }
             });
 
-            cache.Set(lastUsedCacheKey, true, TimeSpan.FromHours(2));
+            cache.Set(lastUsedCacheKey, true, TimeSpan.FromHours(AuthConstants.Cache.KEY_LAST_USED_HOURS));
         }
 
         await _next(context);

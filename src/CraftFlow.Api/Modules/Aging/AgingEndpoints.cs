@@ -1,15 +1,12 @@
-﻿using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Modules.Aging.CreateChamber;
+﻿using CraftFlow.Api.Modules.Aging.CreateChamber;
 using CraftFlow.Api.Modules.Aging.DeleteChamber;
-using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Aging.GetActiveAgingLots;
+using CraftFlow.Api.Modules.Aging.GetAgingChambers;
 using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
 using CraftFlow.Api.Modules.Aging.ReleaseFromAging;
 using CraftFlow.Api.Modules.Aging.TransferToAging;
-using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.SharedKernel.Constants;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Aging;
 
@@ -17,7 +14,7 @@ public static class AgingEndpoints
 {
     public static void MapAgingEndpoints(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("")
+        var group = app.MapGroup(string.Empty)
             .WithTags("Aging")
             .RequireAuthorization();
 
@@ -34,14 +31,10 @@ public static class AgingEndpoints
         });
 
         // --- AGING CHAMBERS ---
-        group.MapGet(Endpoints.AGING_CHAMBERS, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapGet(Endpoints.AGING_CHAMBERS, async (ISender sender) =>
         {
-            var chambers = await dbContext.AgingChambers
-                .AsNoTracking()
-                .Select(c => new { c.Id, c.Name })
-                .ToListAsync(cancellationToken);
-
-            return Results.Ok(chambers);
+            var result = await sender.Send(new GetAgingChambersQuery());
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
         group.MapPost(Endpoints.AGING_CHAMBERS, async (CreateChamberCommand command, ISender sender) =>
@@ -57,26 +50,10 @@ public static class AgingEndpoints
         });
 
         // --- AGING LOTS ---
-        group.MapGet(Endpoints.AGING_LOTS_ACTIVE, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapGet(Endpoints.AGING_LOTS_ACTIVE, async (GetActiveAgingLotsQueryHandler handler) =>
         {
-            var activeLots = await dbContext.AgingLots
-                .AsNoTracking()
-                .Where(l => l.State == AgingState.InChamber)
-                .Join(dbContext.ProductionBatches,
-                      lot => lot.ProductionBatchId,
-                      batch => batch.Id,
-                      (lot, batch) => new { Lot = lot, Batch = batch })
-                .Where(x => x.Batch.State == BatchState.InAging)
-                .Select(x => new
-                {
-                    x.Lot.Id,
-                    Name = string.IsNullOrWhiteSpace(x.Batch.Name)
-                        ? x.Lot.BatchNumber
-                        : $"{x.Batch.Name} ({x.Lot.BatchNumber})"
-                })
-                .ToListAsync(cancellationToken);
-
-            return Results.Ok(activeLots);
+            var result = await handler.HandleAsync();
+            return Results.Ok(result);
         });
 
         group.MapGet(Endpoints.AGING_LOTS_ACTIVE_SUMMARY, async (GetActiveAgingLotsQueryHandler handler) =>

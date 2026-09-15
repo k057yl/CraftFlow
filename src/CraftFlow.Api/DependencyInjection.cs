@@ -122,6 +122,7 @@ public static class DependencyInjection
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
 
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(RequestSanitizationBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(SubscriptionQuotaBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
         });

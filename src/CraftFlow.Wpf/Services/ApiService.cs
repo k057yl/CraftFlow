@@ -29,6 +29,8 @@ public class ApiService
 
     public bool IsAuthenticated => !string.IsNullOrEmpty(JwtToken);
 
+    public event Action? OnAuthStateChanged;
+
     private ApiService()
     {
         _client = new HttpClient
@@ -44,6 +46,26 @@ public class ApiService
         LoadSavedToken();
     }
 
+    public async Task<bool> ValidateAndRefreshCurrentUserAsync()
+    {
+        if (!IsAuthenticated) return false;
+
+        var profile = await GetAsync<UserProfileDto>("api/identity/profile");
+        if (profile == null)
+        {
+            ClearAuthToken();
+            return false;
+        }
+
+        CurrentUser = profile;
+        if (profile.TenantId != Guid.Empty)
+        {
+            SetTenantHeader(profile.TenantId);
+        }
+
+        return true;
+    }
+
     public void SetAuthToken(string token)
     {
         JwtToken = token;
@@ -55,6 +77,8 @@ public class ApiService
         CurrentUser = ParseUserFromJwt(token);
         SetTenantHeader(CurrentTenantId);
         SaveTokenToDisk(token);
+
+        OnAuthStateChanged?.Invoke();
     }
 
     public void SetTenantHeader(Guid? tenantId)
@@ -71,17 +95,20 @@ public class ApiService
         }
     }
 
+    public void ClearTenantHeader()
+    {
+        SetTenantHeader(null);
+    }
+
     public void ClearAuthToken()
     {
         JwtToken = null;
         CurrentUser = null;
-        CurrentTenantId = null;
         _client.DefaultRequestHeaders.Authorization = null;
-        if (_client.DefaultRequestHeaders.Contains(CoreConstants.MultiTenancy.HEADER_TENANT_ID))
-        {
-            _client.DefaultRequestHeaders.Remove(CoreConstants.MultiTenancy.HEADER_TENANT_ID);
-        }
+        ClearTenantHeader();
         DeleteTokenFromDisk();
+
+        OnAuthStateChanged?.Invoke();
     }
 
     private void SaveTokenToDisk(string token)
@@ -95,9 +122,7 @@ public class ApiService
             }
             File.WriteAllText(_tokenFilePath, token);
         }
-        catch
-        {
-        }
+        catch { }
     }
 
     private void DeleteTokenFromDisk()
@@ -109,9 +134,7 @@ public class ApiService
                 File.Delete(_tokenFilePath);
             }
         }
-        catch
-        {
-        }
+        catch { }
     }
 
     private void LoadSavedToken()
@@ -132,9 +155,7 @@ public class ApiService
                 }
             }
         }
-        catch
-        {
-        }
+        catch { }
     }
 
     public void SetSubscriptionKey(string apiKey)
@@ -187,8 +208,11 @@ public class ApiService
                 CurrentTenantId = tenantId;
             }
 
-            user.IsAdmin = CheckRoleInJwt(root, AuthConstants.Claims.ROLE_SHORT) ||
-                           CheckRoleInJwt(root, AuthConstants.Claims.ROLE_FULL);
+            user.IsAdmin = CheckRoleInJwt(root, "role") ||
+                           CheckRoleInJwt(root, "Role") ||
+                           CheckRoleInJwt(root, AuthConstants.Claims.ROLE_SHORT) ||
+                           CheckRoleInJwt(root, AuthConstants.Claims.ROLE_FULL) ||
+                           CheckRoleInJwt(root, "http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
 
             return user;
         }
@@ -228,7 +252,8 @@ public class ApiService
         {
             var response = await _client.GetAsync(endpoint);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
+                response.StatusCode == System.Net.HttpStatusCode.NotFound)
             {
                 HandleUnauthorized();
                 return default;
