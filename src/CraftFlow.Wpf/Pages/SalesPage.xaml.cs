@@ -1,11 +1,17 @@
-﻿using System.Collections.ObjectModel;
+﻿using CraftFlow.Api.Modules.Catalog;
+using CraftFlow.Api.Modules.Inventory;
+using CraftFlow.Api.Modules.Procurement;
+using CraftFlow.Api.Modules.Production;
+using CraftFlow.Api.Modules.Sales;
+using CraftFlow.Api.Modules.Subscriptions;
+using CraftFlow.SharedKernel.Constants;
+using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Services;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using CraftFlow.SharedKernel.Constants;
-using CraftFlow.Wpf.Models;
-using CraftFlow.Wpf.Services;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -39,15 +45,15 @@ public partial class SalesPage : Page
     {
         try
         {
-            var customers = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.CUSTOMERS);
+            var customers = await ApiService.Instance.GetAsync<List<LookupDto>>(SalesConstants.CUSTOMERS);
             Customers.Clear();
             customers?.ForEach(c => Customers.Add(new LookupItem(c.Id, c.Name)));
 
-            var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.WAREHOUSES);
+            var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(InventoryConstants.WAREHOUSES);
             Warehouses.Clear();
             warehouses?.ForEach(w => Warehouses.Add(new LookupItem(w.Id, w.Name)));
 
-            var prods = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.PRODUCTS);
+            var prods = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.PRODUCTS);
             Products.Clear();
             prods?.ForEach(p => Products.Add(new LookupItem(p.Id, p.Name)));
 
@@ -165,7 +171,7 @@ public partial class SalesPage : Page
             return;
         }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.CUSTOMERS, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(SalesConstants.CUSTOMERS, new
         {
             Name = CustomerNameTextBox.Text.Trim(),
             Phone = CustomerPhoneTextBox.Text.Trim()
@@ -205,7 +211,7 @@ public partial class SalesPage : Page
             return;
         }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.ORDERS_SHIP, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(SalesConstants.ORDERS_SHIP, new
         {
             CustomerId = customerId,
             WarehouseId = warehouseId,

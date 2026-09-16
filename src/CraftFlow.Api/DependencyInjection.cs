@@ -142,7 +142,7 @@ public static class DependencyInjection
         services.AddHostedService<LowStockMonitorWorker>();
         services.AddHostedService<ProductionTimerWorker>();
         services.AddHostedService<SubscriptionExpirationWorker>();
-        services.AddHostedService<UnconfirmedUserCleanupWorker>();
+        services.AddHostedService<IdentityCleanupWorker>();
         return services;
     }
 }

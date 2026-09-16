@@ -1,4 +1,5 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Modules.Identity;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
 using System.Net.Http.Json;
@@ -21,7 +22,7 @@ public partial class AuthPage : Page
         {
             bool rememberMe = RememberMeCheckBox.IsChecked ?? false;
 
-            var response = await ApiService.Instance.PostAsync(Endpoints.LOGIN, new
+            var response = await ApiService.Instance.PostAsync(IdentityConstants.LOGIN, new
             {
                 Email = LoginEmailTextBox.Text,
                 Password = LoginPasswordBox.Password,
@@ -48,7 +49,7 @@ public partial class AuthPage : Page
     {
         await ExecuteWithLockAsync(async () =>
         {
-            (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.REGISTER, new
+            (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync(IdentityConstants.REGISTER, new
             {
                 CompanyName = RegisterCompanyNameTextBox.Text,
                 OwnerEmail = RegisterEmailTextBox.Text,
@@ -73,7 +74,7 @@ public partial class AuthPage : Page
     {
         await ExecuteWithLockAsync(async () =>
         {
-            var response = await ApiService.Instance.PostAsync(Endpoints.VERIFY_OTP, new
+            var response = await ApiService.Instance.PostAsync(IdentityConstants.VERIFY_OTP, new
             {
                 Email = OtpEmailTextBox.Text,
                 OtpCode = OtpCodeTextBox.Text
@@ -103,7 +104,7 @@ public partial class AuthPage : Page
     {
         await ExecuteWithLockAsync(async () =>
         {
-            (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.RESEND_OTP, new
+            (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync(IdentityConstants.RESEND_OTP, new
             {
                 Email = OtpEmailTextBox.Text
             });

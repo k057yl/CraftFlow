@@ -5,7 +5,6 @@ using CraftFlow.Api.Modules.Aging.GetAgingChambers;
 using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
 using CraftFlow.Api.Modules.Aging.ReleaseFromAging;
 using CraftFlow.Api.Modules.Aging.TransferToAging;
-using CraftFlow.SharedKernel.Constants;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Aging;
@@ -18,51 +17,51 @@ public static class AgingEndpoints
             .WithTags("Aging")
             .RequireAuthorization();
 
-        group.MapPost(Endpoints.AGING_LOTS_TRANSFER, async (TransferToAgingCommand command, ISender sender) =>
+        group.MapPost(AgingConstants.AGING_LOTS_TRANSFER, async (TransferToAgingCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost(Endpoints.AGING_LOTS_RELEASE, async (ReleaseFromAgingCommand command, ISender sender) =>
+        group.MapPost(AgingConstants.AGING_LOTS_RELEASE, async (ReleaseFromAgingCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
 
         // --- AGING CHAMBERS ---
-        group.MapGet(Endpoints.AGING_CHAMBERS, async (ISender sender) =>
+        group.MapGet(AgingConstants.AGING_CHAMBERS, async (ISender sender) =>
         {
             var result = await sender.Send(new GetAgingChambersQuery());
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost(Endpoints.AGING_CHAMBERS, async (CreateChamberCommand command, ISender sender) =>
+        group.MapPost(AgingConstants.AGING_CHAMBERS, async (CreateChamberCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapDelete($"{Endpoints.AGING_CHAMBERS}/{{id:guid}}", async (Guid id, ISender sender) =>
+        group.MapDelete($"{AgingConstants.AGING_CHAMBERS}/{{id:guid}}", async (Guid id, ISender sender) =>
         {
             var result = await sender.Send(new DeleteChamberCommand(id));
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
 
         // --- AGING LOTS ---
-        group.MapGet(Endpoints.AGING_LOTS_ACTIVE, async (GetActiveAgingLotsQueryHandler handler) =>
+        group.MapGet(AgingConstants.AGING_LOTS_ACTIVE, async (GetActiveAgingLotsQueryHandler handler) =>
         {
             var result = await handler.HandleAsync();
             return Results.Ok(result);
         });
 
-        group.MapGet(Endpoints.AGING_LOTS_ACTIVE_SUMMARY, async (GetActiveAgingLotsQueryHandler handler) =>
+        group.MapGet(AgingConstants.AGING_LOTS_ACTIVE_SUMMARY, async (GetActiveAgingLotsQueryHandler handler) =>
         {
             var result = await handler.HandleAsync();
             return Results.Ok(result);
         });
 
-        group.MapGet($"{Endpoints.AGING_LOTS_ACTIVE}/{{id:guid}}", async (Guid id, GetAgingLotDetailsQueryHandler handler) =>
+        group.MapGet($"{AgingConstants.AGING_LOTS_ACTIVE}/{{id:guid}}", async (Guid id, GetAgingLotDetailsQueryHandler handler) =>
         {
             var result = await handler.HandleAsync(id);
             return result is not null ? Results.Ok(result) : Results.NotFound();

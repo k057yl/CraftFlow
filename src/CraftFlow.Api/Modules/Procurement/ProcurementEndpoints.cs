@@ -1,7 +1,6 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Procurement.PurchaseOrders;
 using CraftFlow.Api.Modules.Procurement.Suppliers;
-using CraftFlow.SharedKernel.Constants;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -16,13 +15,13 @@ public static class ProcurementEndpoints
             .RequireAuthorization();
 
         // --- SUPPLIERS ---
-        group.MapPost(Endpoints.SUPPLIERS, async (CreateSupplierCommand command, ISender sender) =>
+        group.MapPost(ProcurementConstants.SUPPLIERS, async (CreateSupplierCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet(Endpoints.SUPPLIERS, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
+        group.MapGet(ProcurementConstants.SUPPLIERS, async (AppDbContext dbContext, CancellationToken cancellationToken) =>
         {
             var suppliers = await dbContext.Suppliers
                 .AsNoTracking()
@@ -33,7 +32,7 @@ public static class ProcurementEndpoints
         });
 
         // --- RECEIVE GOODS / STOCK LOTS ---
-        group.MapPost(Endpoints.PURCHASE_ORDERS_RECEIVE, async (ReceiveGoodsCommand command, ISender sender) =>
+        group.MapPost(ProcurementConstants.PURCHASE_ORDERS_RECEIVE, async (ReceiveGoodsCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);

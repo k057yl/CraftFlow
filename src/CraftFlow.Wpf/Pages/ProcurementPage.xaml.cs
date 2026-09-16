@@ -1,4 +1,7 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Modules.Catalog;
+using CraftFlow.Api.Modules.Inventory;
+using CraftFlow.Api.Modules.Procurement;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
 using System.Collections.ObjectModel;
@@ -45,7 +48,7 @@ public partial class ProcurementPage : Page
             _isDataLoaded = false;
 
             // Поставщики
-            var suppliers = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.SUPPLIERS) ?? [];
+            var suppliers = await ApiService.Instance.GetAsync<List<LookupDto>>(ProcurementConstants.SUPPLIERS) ?? [];
             FormSuppliers.Clear();
             FilterSuppliers.Clear();
 
@@ -59,7 +62,7 @@ public partial class ProcurementPage : Page
             FilterSupplierComboBox.SelectedIndex = 0;
 
             // Склады
-            var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.WAREHOUSES) ?? [];
+            var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(InventoryConstants.WAREHOUSES) ?? [];
             FormWarehouses.Clear();
             FilterWarehouses.Clear();
 
@@ -73,7 +76,7 @@ public partial class ProcurementPage : Page
             FilterWarehouseComboBox.SelectedIndex = 0;
 
             // Сырьё
-            var raw = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.RAW_MATERIALS) ?? [];
+            var raw = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.RAW_MATERIALS) ?? [];
             RawMaterials.Clear();
             raw.ForEach(r => RawMaterials.Add(new LookupItem(r.Id, r.Name)));
 
@@ -107,7 +110,7 @@ public partial class ProcurementPage : Page
             if (selectedSupplierId.HasValue) queryParams.Add($"supplierId={selectedSupplierId.Value}");
             if (selectedWarehouseId.HasValue) queryParams.Add($"warehouseId={selectedWarehouseId.Value}");
 
-            string queryUrl = $"{Endpoints.STOCK_LOTS}?{string.Join("&", queryParams)}";
+            string queryUrl = $"{InventoryConstants.STOCK_LOTS}?{string.Join("&", queryParams)}";
 
             var lots = await ApiService.Instance.GetAsync<List<StockLotGridDto>>(queryUrl);
             StockLots.Clear();
@@ -183,7 +186,7 @@ public partial class ProcurementPage : Page
 
         DateTime? expirationDate = ExpirationDatePicker.SelectedDate;
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.STOCK_LOTS, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(InventoryConstants.STOCK_LOTS, new
         {
             SupplierId = selectedSupplier.Id,
             WarehouseId = selectedWarehouse.Id,

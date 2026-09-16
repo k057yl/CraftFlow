@@ -1,5 +1,4 @@
 ﻿using CraftFlow.Api.Modules.MRP.CalculateRequirements;
-using CraftFlow.SharedKernel.Constants;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.MRP;
@@ -12,7 +11,7 @@ public static class MrpEndpoints
             .WithTags("MRP")
             .RequireAuthorization();
 
-        group.MapGet(Endpoints.MRP_REQUIREMENTS, async (ISender sender) =>
+        group.MapGet(MrpConstants.MRP_REQUIREMENTS, async (ISender sender) =>
         {
             var result = await sender.Send(new CalculateRequirementsQuery());
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);

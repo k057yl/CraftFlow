@@ -47,7 +47,6 @@
                     <StackPanel>
                         <TextBlock Text="API Ключи терминалов (Тенант)" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
 
-                        <!-- Активация ключа по OTP -->
                         <Grid Margin="0,0,0,15">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -57,7 +56,6 @@
                             <Button Grid.Column="1" Content="Активировать ключ" Click="ActivateOtp_Click" Style="{StaticResource PrimaryButtonStyle}" Padding="15,0"/>
                         </Grid>
 
-                        <!-- Грид привязанных ключей -->
                         <DataGrid x:Name="MyKeysDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Height="180">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="ID Ключа" Binding="{Binding Id}" Width="200"/>
@@ -69,20 +67,29 @@
                 </Border>
 
                 <!-- Опасная зона (Danger Zone) -->
-                <Border x:Name="DangerZoneBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="Red" BorderThickness="1" CornerRadius="8" Padding="20">
+                <Border x:Name="DangerZoneBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="#DC2626" BorderThickness="1" CornerRadius="8" Padding="20">
                     <StackPanel>
-                        <TextBlock Text="Опасная зона" FontSize="16" FontWeight="Bold" Foreground="Red" Margin="0,0,0,10"/>
-                        <TextBlock Text="Удаление аккаунта приведет к безвозвратному удалению вашей учетной записи." 
-                                   Foreground="{DynamicResource AppForegroundBrush}" TextWrapping="Wrap" Margin="0,0,0,15"/>
+                        <TextBlock Text="Опасная зона / Управление подпиской и аккаунтом" FontSize="16" FontWeight="Bold" Foreground="#DC2626" Margin="0,0,0,12"/>
 
-                        <Button Content="Удалить мой аккаунт" 
+                        <TextBlock Text="Вам доступны 2 варианта прекращения работы с сервисом:" 
+                                   Foreground="{DynamicResource AppForegroundBrush}" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+                        <StackPanel Margin="10,0,0,15">
+                            <TextBlock Text="• Заморозка (Деактивация): Остановка доступа к системе. Данные сохраняются. Раз в 6 месяцев приходит предупреждение, а полный снос происходит автоматически через 2 года неуведомленной неактивности." 
+                                       Foreground="{DynamicResource AppForegroundBrush}" TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12"/>
+
+                            <TextBlock Text="• Полное удаление: Моментальное физическое уничтожение всех складов, рецептов, историй партий и данных сыроварни из базы данных без возможности восстановления." 
+                                       Foreground="#DC2626" TextWrapping="Wrap" FontSize="12"/>
+                        </StackPanel>
+
+                        <Button Content="Управление выходом из системы" 
                                 Click="DeleteAccount_Click" 
-                                Background="#DC3545" 
+                                Background="#DC2626" 
                                 Foreground="White" 
                                 FontWeight="Bold" 
                                 Height="36" 
                                 HorizontalAlignment="Left" 
-                                Padding="15,0"/>
+                                Padding="20,0"/>
                     </StackPanel>
                 </Border>
 

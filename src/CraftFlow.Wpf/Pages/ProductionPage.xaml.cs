@@ -1,4 +1,8 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Modules.Aging;
+using CraftFlow.Api.Modules.Catalog;
+using CraftFlow.Api.Modules.Inventory;
+using CraftFlow.Api.Modules.Production;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Models.Productions;
 using CraftFlow.Wpf.Services;
@@ -92,15 +96,15 @@ public partial class ProductionPage : Page
         _isInitializing = true;
         try
         {
-            var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.WAREHOUSES);
+            var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(InventoryConstants.WAREHOUSES);
             Warehouses.Clear();
             warehouses?.ForEach(w => Warehouses.Add(new LookupItem(w.Id, w.Name)));
 
-            var recipes = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.RECIPES);
+            var recipes = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.RECIPES);
             Recipes.Clear();
             recipes?.ForEach(r => Recipes.Add(new LookupItem(r.Id, r.Name)));
 
-            var activeBatches = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.BATCHES_ACTIVE_SUMMARY);
+            var activeBatches = await ApiService.Instance.GetAsync<List<LookupDto>>(ProductionConstants.BATCHES_ACTIVE_SUMMARY);
             ActiveBatches.Clear();
             activeBatches?.ForEach(b => ActiveBatches.Add(new LookupItem(b.Id, b.Name)));
 
@@ -123,21 +127,21 @@ public partial class ProductionPage : Page
             }
             catch { }
 
-            var readyBatches = await ApiService.Instance.GetAsync<List<BatchReadyForAgingDto>>(Endpoints.BATCHES_READY_AGING);
+            var readyBatches = await ApiService.Instance.GetAsync<List<BatchReadyForAgingDto>>(ProductionConstants.BATCHES_READY_AGING);
             CompletedBatches.Clear();
             readyBatches?.ForEach(CompletedBatches.Add);
 
-            var chambers = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.AGING_CHAMBERS);
+            var chambers = await ApiService.Instance.GetAsync<List<LookupDto>>(AgingConstants.AGING_CHAMBERS);
             AgingChambers.Clear();
             chambers?.ForEach(c => AgingChambers.Add(new LookupItem(c.Id, c.Name)));
 
-            var activeLots = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.AGING_LOTS_ACTIVE);
+            var activeLots = await ApiService.Instance.GetAsync<List<LookupDto>>(AgingConstants.AGING_LOTS_ACTIVE);
             ActiveAgingLots.Clear();
             activeLots?.ForEach(l => ActiveAgingLots.Add(new LookupItem(l.Id, l.Name)));
 
             try
             {
-                var activeSummary = await ApiService.Instance.GetAsync<List<AgingLotSummaryDto>>(Endpoints.AGING_LOTS_ACTIVE_SUMMARY);
+                var activeSummary = await ApiService.Instance.GetAsync<List<AgingLotSummaryDto>>(AgingConstants.AGING_LOTS_ACTIVE_SUMMARY);
                 AgingLotsSummary.Clear();
                 activeSummary?.ForEach(AgingLotsSummary.Add);
             }
@@ -197,7 +201,7 @@ public partial class ProductionPage : Page
 
         try
         {
-            var endpoint = $"{Endpoints.PRODUCTION_COSTING}/{selectedBatch.Id}";
+            var endpoint = $"{ProductionConstants.PRODUCTION_COSTING}/{selectedBatch.Id}";
             var costData = await ApiService.Instance.GetAsync<BatchCostDto>(endpoint);
 
             if (costData != null)
@@ -262,7 +266,7 @@ public partial class ProductionPage : Page
 
             try
             {
-                var details = await ApiService.Instance.GetAsync<GetAgingLotDetailsDto>($"{Endpoints.AGING_LOTS_ACTIVE}/{selectedLot.Id}");
+                var details = await ApiService.Instance.GetAsync<GetAgingLotDetailsDto>($"{AgingConstants.AGING_LOTS_ACTIVE}/{selectedLot.Id}");
                 if (details != null)
                 {
                     _selectedLotTotalCost = details.TotalBatchCost;
@@ -337,13 +341,13 @@ public partial class ProductionPage : Page
             var qtyStr = plannedQty.ToString(CultureInfo.InvariantCulture);
 
             var calc = await ApiService.Instance.GetAsync<List<RequirementCalculationDto>>(
-                $"{Endpoints.CALCULATE_REQUIREMENTS}?recipeId={recipeId}&warehouseId={warehouseId}&plannedQty={qtyStr}");
+                $"{ProductionConstants.CALCULATE_REQUIREMENTS}?recipeId={recipeId}&warehouseId={warehouseId}&plannedQty={qtyStr}");
 
             _requirements.Clear();
             calc?.ForEach(_requirements.Add);
 
             var estimatedCost = await ApiService.Instance.GetAsync<decimal>(
-                $"{Endpoints.ESTIMATE_COST}?recipeId={recipeId}&plannedQty={qtyStr}");
+                $"{ProductionConstants.ESTIMATE_COST}?recipeId={recipeId}&plannedQty={qtyStr}");
 
             EstimatedCostTextBlock.Text = $"${estimatedCost:F2}";
         }
@@ -363,7 +367,7 @@ public partial class ProductionPage : Page
 
         var customName = BatchNameTextBox.Text?.Trim();
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.BATCHES_START, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(ProductionConstants.BATCHES_START, new
         {
             RecipeId = recipeId,
             WarehouseId = rawWarehouseId,
@@ -411,7 +415,7 @@ public partial class ProductionPage : Page
 
         var customBatchName = CompleteBatchNameTextBox.Text?.Trim();
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.BATCHES_COMPLETE, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(ProductionConstants.BATCHES_COMPLETE, new
         {
             BatchId = batchId,
             ActualOutputQuantity = actualOutput,
@@ -457,7 +461,7 @@ public partial class ProductionPage : Page
 
         var customLotName = AgingLotNameTextBox.Text?.Trim();
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.AGING_LOTS_TRANSFER, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_TRANSFER, new
         {
             ProductionBatchId = batchId,
             AgingChamberId = chamberId,
@@ -509,7 +513,7 @@ public partial class ProductionPage : Page
         TryParseDecimal(UnitPriceTextBox.Text, out var unitPrice);
         var customLotName = ReleaseLotNameTextBox.Text?.Trim();
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.AGING_LOTS_RELEASE, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_RELEASE, new
         {
             AgingLotId = lotId,
             TargetWarehouseId = warehouseId,
@@ -543,7 +547,7 @@ public partial class ProductionPage : Page
             return;
         }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.BATCHES_DISCARD, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(ProductionConstants.BATCHES_DISCARD, new
         {
             BatchId = batchId,
             Reason = DiscardReasonTextBox.Text.Trim()
@@ -573,7 +577,7 @@ public partial class ProductionPage : Page
         try
         {
             var maxQty = await ApiService.Instance.GetAsync<decimal>(
-                $"{Endpoints.CALCULATE_MAX_OUTPUT}?recipeId={recipeId}&warehouseId={warehouseId}");
+                $"{ProductionConstants.CALCULATE_MAX_OUTPUT}?recipeId={recipeId}&warehouseId={warehouseId}");
 
             if (maxQty > 0)
             {

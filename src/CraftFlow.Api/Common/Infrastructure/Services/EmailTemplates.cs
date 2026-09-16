@@ -48,4 +48,34 @@ public static class EmailTemplates
             </div>"
         )
     };
+
+    public static (string Subject, string HtmlContent) GetRetentionReminderTemplate(string organizationName, string culture = "uk-UA")
+    {
+        const string SUBJECT_UK = "CraftFlow — Ваша організація деактивована";
+        const string SUBJECT_RU = "CraftFlow — Ваша организация деактивирована";
+
+        string subject = culture.StartsWith("uk", StringComparison.OrdinalIgnoreCase) ? SUBJECT_UK : SUBJECT_RU;
+
+        string htmlContent = culture.StartsWith("uk", StringComparison.OrdinalIgnoreCase)
+            ? $@"
+            <div style='font-family: Arial, sans-serif; padding: 20px; color: #333;'>
+                <h2>Вітаємо!</h2>
+                <p>Ваша організація <strong>{organizationName}</strong> у CraftFlow була деактивована понад 6 місяців тому.</p>
+                <p>Згідно з нашою політикою зберігання даних, якщо ви не увійдете в систему протягом наступних 1.5 років, всі дані організації будуть **остаточно видалені без можливості відновлення**.</p>
+                <p>Щоб зберегти свої дані, просто увійдіть до вашого акаунту в системі.</p>
+                <br/>
+                <p>З повагою,<br/>Команда <strong>CraftFlow</strong></p>
+            </div>"
+            : $@"
+            <div style='font-family: Arial, sans-serif; padding: 20px; color: #333;'>
+                <h2>Здравствуйте!</h2>
+                <p>Ваша организация <strong>{organizationName}</strong> в CraftFlow была деактивирована более 6 месяцев назад.</p>
+                <p>Согласно нашей политике хранения данных, если вы не войдете в систему в течение следующих 1.5 лет, все данные организации будут **окончательно удалены без возможности восстановления**.</p>
+                <p>Чтобы сохранить свои данные, просто войдите в ваш аккаунт в системе.</p>
+                <br/>
+                <p>С уважением,<br/>Команда <strong>CraftFlow</strong></p>
+            </div>";
+
+        return (subject, htmlContent);
+    }
 }

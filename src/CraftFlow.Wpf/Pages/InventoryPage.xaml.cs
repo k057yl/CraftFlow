@@ -1,4 +1,6 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Modules.Aging;
+using CraftFlow.Api.Modules.Inventory;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
 using System.Collections.ObjectModel;
@@ -43,11 +45,11 @@ public partial class InventoryPage : Page
     {
         try
         {
-            var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.WAREHOUSES);
+            var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(InventoryConstants.WAREHOUSES);
             Warehouses.Clear();
             warehouses?.ForEach(w => Warehouses.Add(new LookupItem(w.Id, w.Name)));
 
-            var chambers = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.AGING_CHAMBERS);
+            var chambers = await ApiService.Instance.GetAsync<List<LookupDto>>(AgingConstants.AGING_CHAMBERS);
             Chambers.Clear();
             chambers?.ForEach(c => Chambers.Add(new LookupItem(c.Id, c.Name)));
 
@@ -70,7 +72,7 @@ public partial class InventoryPage : Page
             return;
         }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.WAREHOUSES, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(InventoryConstants.WAREHOUSES, new
         {
             Name = name,
             Address = address
@@ -101,7 +103,7 @@ public partial class InventoryPage : Page
             return;
         }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.AGING_CHAMBERS, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_CHAMBERS, new
         {
             Name = name,
             TargetTemperature = temp,
@@ -126,7 +128,7 @@ public partial class InventoryPage : Page
     {
         if (sender is Button btn && btn.Tag is Guid id)
         {
-            var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{Endpoints.WAREHOUSES}/{id}");
+            var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{InventoryConstants.WAREHOUSES}/{id}");
             if (isSuccess)
             {
                 SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);
@@ -143,7 +145,7 @@ public partial class InventoryPage : Page
     {
         if (sender is Button btn && btn.Tag is Guid id)
         {
-            var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{Endpoints.AGING_CHAMBERS}/{id}");
+            var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{AgingConstants.AGING_CHAMBERS}/{id}");
             if (isSuccess)
             {
                 SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);

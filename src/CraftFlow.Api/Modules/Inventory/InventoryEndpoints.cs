@@ -5,7 +5,6 @@ using CraftFlow.Api.Modules.Inventory.GetProductStockLots;
 using CraftFlow.Api.Modules.Inventory.GetRawStockLots;
 using CraftFlow.Api.Modules.Inventory.GetStockLots;
 using CraftFlow.Api.Modules.Inventory.GetWarehouses;
-using CraftFlow.SharedKernel.Constants;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Inventory;
@@ -19,32 +18,32 @@ public static class InventoryEndpoints
             .RequireAuthorization();
 
         // --- WAREHOUSES ---
-        group.MapPost(Endpoints.WAREHOUSES, async (CreateWarehouseCommand command, ISender sender) =>
+        group.MapPost(InventoryConstants.WAREHOUSES, async (CreateWarehouseCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet(Endpoints.WAREHOUSES, async (ISender sender) =>
+        group.MapGet(InventoryConstants.WAREHOUSES, async (ISender sender) =>
         {
             var result = await sender.Send(new GetWarehousesQuery());
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapDelete($"{Endpoints.WAREHOUSES}/{{id:guid}}", async (Guid id, ISender sender) =>
+        group.MapDelete($"{InventoryConstants.WAREHOUSES}/{{id:guid}}", async (Guid id, ISender sender) =>
         {
             var result = await sender.Send(new DeleteWarehouseCommand(id));
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
 
         // --- STOCK LOTS ---
-        group.MapPost(Endpoints.STOCK_LOTS, async (AddStockLotCommand command, ISender sender) =>
+        group.MapPost(InventoryConstants.STOCK_LOTS, async (AddStockLotCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet(Endpoints.STOCK_LOTS, async (
+        group.MapGet(InventoryConstants.STOCK_LOTS, async (
             Guid? warehouseId,
             Guid? supplierId,
             bool? onlyExpiringSoon,
@@ -57,14 +56,14 @@ public static class InventoryEndpoints
         });
 
         // --- СЫРЬЕВЫЕ ЛОТЫ ДЛЯ ПРЯМОЙ ТРАССИРОВКИ ---
-        group.MapGet(Endpoints.STOCK_LOTS_RAW, async (ISender sender) =>
+        group.MapGet(InventoryConstants.STOCK_LOTS_RAW, async (ISender sender) =>
         {
             var result = await sender.Send(new GetRawStockLotsQuery());
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
         // --- ЛОТЫ ГОТОВОЙ ПРОДУКЦИИ ДЛЯ ОБРАТНОЙ ТРАССИРОВКИ ---
-        group.MapGet(Endpoints.STOCK_LOTS_PRODUCTS, async (ISender sender) =>
+        group.MapGet(InventoryConstants.STOCK_LOTS_PRODUCTS, async (ISender sender) =>
         {
             var result = await sender.Send(new GetProductStockLotsQuery());
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);

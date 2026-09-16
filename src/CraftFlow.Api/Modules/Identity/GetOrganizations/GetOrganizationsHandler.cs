@@ -27,6 +27,7 @@ public class GetOrganizationsHandler : IRequestHandler<GetOrganizationsQuery, Re
 
         var orgs = await _dbContext.Organizations
             .IgnoreQueryFilters()
+            .Where(o => o.IsActive)
             .AsNoTracking()
             .Select(o => new
             {

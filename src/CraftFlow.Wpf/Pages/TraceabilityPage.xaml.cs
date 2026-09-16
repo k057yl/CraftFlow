@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using CraftFlow.Api.Modules.Traceability;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
@@ -135,7 +136,7 @@ public partial class TraceabilityPage : Page
     {
         try
         {
-            var endpoint = $"{Endpoints.TRACEABILITY_FORWARD}/{stockLotId}";
+            var endpoint = $"{TraceabilityConstants.TRACEABILITY_FORWARD}/{stockLotId}";
             var traceData = await ApiService.Instance.GetAsync<ForwardTraceabilityDto>(endpoint);
 
             if (traceData != null && !string.IsNullOrEmpty(traceData.RawMaterialName))
@@ -190,7 +191,7 @@ public partial class TraceabilityPage : Page
     {
         try
         {
-            var endpoint = $"{Endpoints.TRACEABILITY_BACKWARD}/{productStockLotId}";
+            var endpoint = $"{TraceabilityConstants.TRACEABILITY_BACKWARD}/{productStockLotId}";
             var traceData = await ApiService.Instance.GetAsync<BackwardTraceabilityDto>(endpoint);
 
             if (traceData != null)

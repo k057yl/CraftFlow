@@ -1,4 +1,6 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Modules.Identity;
+using CraftFlow.Api.Modules.Subscriptions;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models.Auth;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
@@ -51,7 +53,7 @@ public partial class ProfilePage : Page
         var user = ApiService.Instance.CurrentUser;
         if (user?.IsAdmin == true) return;
 
-        var keys = await ApiService.Instance.GetAsync<List<AccessKeyDto>>(Endpoints.SUBSCRIPTION_KEYS);
+        var keys = await ApiService.Instance.GetAsync<List<AccessKeyDto>>(SubscriptionsConstants.SUBSCRIPTION_KEYS);
         if (keys != null)
         {
             MyKeysDataGrid.ItemsSource = keys;
@@ -68,7 +70,7 @@ public partial class ProfilePage : Page
             return;
         }
 
-        (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.ACTIVATE_KEY_ENDPOINT, new
+        (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync(SubscriptionsConstants.ACTIVATE_KEY_ENDPOINT, new
         {
             OtpCode = otpCode
         });
@@ -97,14 +99,22 @@ public partial class ProfilePage : Page
 
         if (dialog.ShowDialog() != true) return;
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{Endpoints.DELETE_ACCOUNT}/confirm", new
+        string targetEndpoint = dialog.ActionType == AccountDeleteAction.Deactivate
+            ? $"{IdentityConstants.DELETE_ACCOUNT}/deactivate"
+            : $"{IdentityConstants.DELETE_ACCOUNT}/confirm";
+
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(targetEndpoint, new
         {
             ConfirmationEmail = dialog.EnteredEmail
         });
 
         if (isSuccess)
         {
-            MessageBox.Show("Ваш аккаунт был успешно удален.", "Уведомление", MessageBoxButton.OK, MessageBoxImage.Information);
+            string message = dialog.ActionType == AccountDeleteAction.Deactivate
+                ? "Ваш аккаунт деактивирован. Вы можете восстановить доступ в любое время."
+                : "Ваш аккаунт и все данные сыроварни были полностью стерты.";
+
+            MessageBox.Show(message, "Уведомление", MessageBoxButton.OK, MessageBoxImage.Information);
 
             ApiService.Instance.ClearAuthToken();
 

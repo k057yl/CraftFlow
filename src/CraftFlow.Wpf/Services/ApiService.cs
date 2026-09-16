@@ -1,14 +1,18 @@
-﻿using System.IO;
+﻿using CraftFlow.Api.Common.Constants;
+using CraftFlow.Api.Modules.Aging;
+using CraftFlow.Api.Modules.MRP;
+using CraftFlow.Api.Modules.Procurement;
+using CraftFlow.Api.Modules.Traceability;
+using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Result;
+using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Models.Auth;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Windows;
-using CraftFlow.Api.Common.Constants;
-using CraftFlow.SharedKernel.Constants;
-using CraftFlow.SharedKernel.Result;
-using CraftFlow.Wpf.Models;
-using CraftFlow.Wpf.Models.Auth;
 
 namespace CraftFlow.Wpf.Services;
 
@@ -376,22 +380,22 @@ public class ApiService
 
     // --- Procurement ---
     public Task<(bool IsSuccess, string ContentOrError)> CreateSupplierAsync(CreateSupplierRequest request) =>
-        PostAndReadAsync(Endpoints.SUPPLIERS, request);
+        PostAndReadAsync(ProcurementConstants.SUPPLIERS, request);
 
     public Task<(bool IsSuccess, string ContentOrError)> ReceiveGoodsAsync(ReceiveGoodsRequest request) =>
-        PostAndReadAsync(Endpoints.PURCHASE_ORDERS_RECEIVE, request);
+        PostAndReadAsync(ProcurementConstants.PURCHASE_ORDERS_RECEIVE, request);
 
     // --- Aging ---
     public Task<(bool IsSuccess, string ContentOrError)> TransferToAgingAsync(TransferToAgingRequest request) =>
-        PostAndReadAsync(Endpoints.AGING_LOTS_TRANSFER, request);
+        PostAndReadAsync(AgingConstants.AGING_LOTS_TRANSFER, request);
 
     public Task<(bool IsSuccess, string ContentOrError)> ReleaseFromAgingAsync(ReleaseFromAgingRequest request) =>
-        PostAndReadAsync(Endpoints.AGING_LOTS_RELEASE, request);
+        PostAndReadAsync(AgingConstants.AGING_LOTS_RELEASE, request);
 
     // --- MRP ---
     public async Task<Result<MrpReportDto>> GetMrpRequirementsAsync()
     {
-        var report = await GetAsync<MrpReportDto>(Endpoints.MRP_REQUIREMENTS);
+        var report = await GetAsync<MrpReportDto>(MrpConstants.MRP_REQUIREMENTS);
         if (report != null)
         {
             return Result.Success(report);

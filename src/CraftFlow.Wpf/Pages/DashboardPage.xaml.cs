@@ -1,7 +1,8 @@
-﻿using System.Windows.Controls;
+﻿using CraftFlow.Api.Modules.Analytics;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
+using System.Windows.Controls;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -15,7 +16,7 @@ public partial class DashboardPage : Page
 
     private async Task LoadDashboardAsync()
     {
-        var summary = await ApiService.Instance.GetAsync<DashboardSummaryDto>(Endpoints.DASHBOARD);
+        var summary = await ApiService.Instance.GetAsync<DashboardSummaryDto>(AnalyticConstants.DASHBOARD);
         if (summary != null)
         {
             ProductsCountTextBlock.Text = $"{summary.TotalProducts} / {summary.TotalRecipes}";

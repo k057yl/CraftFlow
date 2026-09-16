@@ -1,4 +1,6 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Modules.Catalog;
+using CraftFlow.Api.Modules.Inventory;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
 using System.Collections.ObjectModel;
@@ -56,19 +58,19 @@ public partial class CatalogPage : Page
     {
         try
         {
-            var uoms = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.UOM);
+            var uoms = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.UOM);
             UnitsOfMeasure.Clear();
             uoms?.ForEach(u => UnitsOfMeasure.Add(new LookupItem(u.Id, u.Name, u.Code)));
 
-            var raw = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.RAW_MATERIALS);
+            var raw = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.RAW_MATERIALS);
             RawMaterials.Clear();
             raw?.ForEach(r => RawMaterials.Add(new LookupItem(r.Id, r.Name)));
 
-            var prods = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.PRODUCTS);
+            var prods = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.PRODUCTS);
             Products.Clear();
             prods?.ForEach(p => Products.Add(new LookupItem(p.Id, p.Name)));
 
-            var recs = await ApiService.Instance.GetAsync<List<LookupDto>>(Endpoints.RECIPES);
+            var recs = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.RECIPES);
             Recipes.Clear();
             recs?.ForEach(r => Recipes.Add(new LookupItem(r.Id, r.Name)));
 
@@ -107,7 +109,7 @@ public partial class CatalogPage : Page
             return;
         }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.UOM, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(CatalogConstants.UOM, new
         {
             Name = name,
             Code = code
@@ -133,7 +135,7 @@ public partial class CatalogPage : Page
             return;
         }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.RAW_MATERIALS, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(CatalogConstants.RAW_MATERIALS, new
         {
             Name = RawMaterialNameTextBox.Text.Trim(),
             UnitOfMeasureId = uomId
@@ -158,7 +160,7 @@ public partial class CatalogPage : Page
             return;
         }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.PRODUCTS, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(CatalogConstants.PRODUCTS, new
         {
             Name = ProductNameTextBox.Text.Trim(),
             UnitOfMeasureId = uomId
@@ -193,7 +195,7 @@ public partial class CatalogPage : Page
             .Select(i => new { RawMaterialId = i.RawMaterialId, Quantity = i.Quantity })
             .ToArray();
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(Endpoints.RECIPES, new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(CatalogConstants.RECIPES, new
         {
             ProductId = productId,
             Name = RecipeNameTextBox.Text.Trim(),
@@ -221,7 +223,7 @@ public partial class CatalogPage : Page
     {
         if (sender is Button btn && btn.Tag is Guid id)
         {
-            await ApiService.Instance.DeleteAsync($"{Endpoints.UOM}/{id}");
+            await ApiService.Instance.DeleteAsync($"{CatalogConstants.UOM}/{id}");
             await LoadDataAsync();
         }
     }
@@ -230,7 +232,7 @@ public partial class CatalogPage : Page
     {
         if (sender is Button btn && btn.Tag is Guid id)
         {
-            await ApiService.Instance.DeleteAsync($"{Endpoints.RAW_MATERIALS}/{id}");
+            await ApiService.Instance.DeleteAsync($"{CatalogConstants.RAW_MATERIALS}/{id}");
             await LoadDataAsync();
         }
     }
@@ -239,7 +241,7 @@ public partial class CatalogPage : Page
     {
         if (sender is Button btn && btn.Tag is Guid id)
         {
-            await ApiService.Instance.DeleteAsync($"{Endpoints.PRODUCTS}/{id}");
+            await ApiService.Instance.DeleteAsync($"{CatalogConstants.PRODUCTS}/{id}");
             await LoadDataAsync();
         }
     }
@@ -248,7 +250,7 @@ public partial class CatalogPage : Page
     {
         if (sender is Button btn && btn.Tag is Guid id)
         {
-            await ApiService.Instance.DeleteAsync($"{Endpoints.RECIPES}/{id}");
+            await ApiService.Instance.DeleteAsync($"{CatalogConstants.RECIPES}/{id}");
             await LoadDataAsync();
         }
     }

@@ -3,6 +3,7 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using CraftFlow.Api.Modules.Analytics;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Services;
 
@@ -24,7 +25,7 @@ public partial class AuditPage : Page
     {
         try
         {
-            var logs = await ApiService.Instance.GetAsync<List<AuditLogDto>>(Endpoints.AUDIT_LOGS);
+            var logs = await ApiService.Instance.GetAsync<List<AuditLogDto>>(AnalyticConstants.AUDIT_LOGS);
             _currentLogs = logs ?? [];
             AuditDataGrid.ItemsSource = _currentLogs;
 
