@@ -15,13 +15,20 @@ public partial class SplashWindow : Window
     {
         try
         {
-            UpdateProgress(20, "Проверка авторизации...");
-            bool isAuthenticated = ApiService.Instance.IsAuthenticated;
+            UpdateProgress(10, "Проверка локального токена...");
 
-            if (isAuthenticated)
+            bool hasSavedToken = ApiService.Instance.IsAuthenticated;
+            bool isValidSession = false;
+
+            if (hasSavedToken)
             {
-                UpdateProgress(50, "Загрузка дашборда и справочников...");
+                UpdateProgress(30, "Валидация сессии на сервере...");
+                isValidSession = await ApiService.Instance.ValidateAndRefreshCurrentUserAsync();
+            }
 
+            if (isValidSession)
+            {
+                UpdateProgress(70, "Загрузка данных дашборда...");
                 await ApiService.Instance.GetAsync<object>("api/dashboard/stats");
             }
 
@@ -29,8 +36,13 @@ public partial class SplashWindow : Window
             await Task.Delay(150);
 
             var mainWindow = new MainWindow();
-            mainWindow.Show();
 
+            if (!isValidSession)
+            {
+                mainWindow.NavigateToAuth();
+            }
+
+            mainWindow.Show();
             Close();
         }
         catch (Exception ex)
@@ -38,7 +50,8 @@ public partial class SplashWindow : Window
             StatusTextBlock.Text = $"Ошибка загрузки: {ex.Message}";
             StatusTextBlock.Foreground = System.Windows.Media.Brushes.Red;
 
-            await Task.Delay(2000);
+            await Task.Delay(1500);
+
             var mainWindow = new MainWindow();
             mainWindow.NavigateToAuth();
             mainWindow.Show();
@@ -48,7 +61,10 @@ public partial class SplashWindow : Window
 
     private void UpdateProgress(int percent, string status)
     {
-        LoadingProgressBar.Value = percent;
-        StatusTextBlock.Text = status;
+        Dispatcher.Invoke(() =>
+        {
+            LoadingProgressBar.Value = percent;
+            StatusTextBlock.Text = status;
+        });
     }
 }

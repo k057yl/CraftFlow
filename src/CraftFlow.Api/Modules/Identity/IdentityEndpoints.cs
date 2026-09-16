@@ -29,7 +29,7 @@ public static class IdentityEndpoints
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost("/api/identity/users", async (CreateTenantUserCommand command, ISender sender) =>
+        group.MapPost(Endpoints.USERS, async (CreateTenantUserCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);

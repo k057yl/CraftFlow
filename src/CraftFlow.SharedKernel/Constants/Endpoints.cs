@@ -38,6 +38,7 @@ public static class Endpoints
     // Identity
     public const string REGISTER = "api/identity/register";
     public const string LOGIN = "api/identity/login";
+    public const string USERS = "/api/identity/users";
     public const string VERIFY_OTP = "api/identity/verify-otp";
     public const string RESEND_OTP = "api/identity/resend-otp";
     public const string DELETE_ACCOUNT = "api/identity/account";

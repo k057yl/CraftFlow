@@ -47,4 +47,12 @@ public static class UiConstants
         public const string WARNING = "UI.TITLE_WARNING";
         public const string ERROR = "UI.TITLE_ERROR";
     }
+
+    public static class SortConstants
+    {
+        public const string EXPIRATION_ASC = "EXPIRATION_ASC";
+        public const string EXPIRATION_DESC = "EXPIRATION_DESC";
+        public const string QUANTITY_DESC = "QUANTITY_DESC";
+        public const string SUPPLIER = "SUPPLIER";
+    }
 }

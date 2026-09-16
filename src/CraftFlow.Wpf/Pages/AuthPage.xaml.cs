@@ -19,11 +19,13 @@ public partial class AuthPage : Page
     {
         await ExecuteWithLockAsync(async () =>
         {
+            bool rememberMe = RememberMeCheckBox.IsChecked ?? false;
+
             var response = await ApiService.Instance.PostAsync(Endpoints.LOGIN, new
             {
                 Email = LoginEmailTextBox.Text,
                 Password = LoginPasswordBox.Password,
-                RememberMe = RememberMeCheckBox.IsChecked ?? false
+                RememberMe = rememberMe
             });
 
             if (response.IsSuccessStatusCode)
@@ -31,7 +33,7 @@ public partial class AuthPage : Page
                 var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
                 if (result != null)
                 {
-                    ProcessSuccessfulAuth(result);
+                    ProcessSuccessfulAuth(result, rememberMe);
                 }
             }
             else
@@ -82,7 +84,7 @@ public partial class AuthPage : Page
                 var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
                 if (result != null && !string.IsNullOrEmpty(result.Token))
                 {
-                    ProcessSuccessfulAuth(result);
+                    ProcessSuccessfulAuth(result, true);
                 }
                 else
                 {
@@ -130,14 +132,14 @@ public partial class AuthPage : Page
         StatusTextBlock.Text = string.Empty;
     }
 
-    private void ProcessSuccessfulAuth(LoginResponseDto result)
+    private void ProcessSuccessfulAuth(LoginResponseDto result, bool rememberMe)
     {
         if (result.TenantId != Guid.Empty)
         {
             ApiService.Instance.SetTenantHeader(result.TenantId);
         }
 
-        ApiService.Instance.SetAuthToken(result.Token);
+        ApiService.Instance.SetAuthToken(result.Token, rememberMe);
 
         NavigationService?.Navigate(new DashboardPage());
     }

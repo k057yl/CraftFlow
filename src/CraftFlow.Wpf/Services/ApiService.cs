@@ -50,23 +50,23 @@ public class ApiService
     {
         if (!IsAuthenticated) return false;
 
-        var profile = await GetAsync<UserProfileDto>("api/identity/profile");
-        if (profile == null)
+        if (CurrentUser == null)
         {
             ClearAuthToken();
-            return false;
+            return await Task.FromResult(false);
         }
 
-        CurrentUser = profile;
-        if (profile.TenantId != Guid.Empty)
+        if (CurrentTenantId.HasValue && CurrentTenantId.Value != Guid.Empty)
         {
-            SetTenantHeader(profile.TenantId);
+            SetTenantHeader(CurrentTenantId.Value);
         }
 
-        return true;
+        OnAuthStateChanged?.Invoke();
+
+        return await Task.FromResult(true);
     }
 
-    public void SetAuthToken(string token)
+    public void SetAuthToken(string token, bool rememberMe = true)
     {
         JwtToken = token;
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
@@ -76,7 +76,15 @@ public class ApiService
 
         CurrentUser = ParseUserFromJwt(token);
         SetTenantHeader(CurrentTenantId);
-        SaveTokenToDisk(token);
+
+        if (rememberMe)
+        {
+            SaveTokenToDisk(token);
+        }
+        else
+        {
+            DeleteTokenFromDisk();
+        }
 
         OnAuthStateChanged?.Invoke();
     }

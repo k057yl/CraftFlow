@@ -7,7 +7,9 @@ public record AddStockLotCommand(
     Guid WarehouseId,
     Guid ItemId,
     decimal Quantity,
-    int UnitsCount,
     decimal UnitPrice,
-    string? BatchNumber
+    string? BatchNumber,
+    int? UnitsCount = null,
+    Guid? SupplierId = null,
+    DateTime? ExpirationDate = null
 ) : IRequest<Result<Guid>>;

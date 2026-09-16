@@ -5,40 +5,47 @@ using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace CraftFlow.Api.Modules.Inventory.AddStockLot
+namespace CraftFlow.Api.Modules.Inventory.AddStockLot;
+
+public class AddStockLotHandler : IRequestHandler<AddStockLotCommand, Result<Guid>>
 {
-    public class AddStockLotHandler : IRequestHandler<AddStockLotCommand, Result<Guid>>
+    private readonly AppDbContext _dbContext;
+
+    public AddStockLotHandler(AppDbContext dbContext)
     {
-        private readonly AppDbContext _dbContext;
+        _dbContext = dbContext;
+    }
 
-        public AddStockLotHandler(AppDbContext dbContext)
+    public async Task<Result<Guid>> Handle(AddStockLotCommand request, CancellationToken cancellationToken)
+    {
+        var warehouseExists = await _dbContext.Warehouses
+            .AnyAsync(w => w.Id == request.WarehouseId, cancellationToken);
+
+        if (!warehouseExists)
         {
-            _dbContext = dbContext;
+            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Inventory.WAREHOUSE_NOT_FOUND));
         }
 
-        public async Task<Result<Guid>> Handle(AddStockLotCommand request, CancellationToken cancellationToken)
-        {
-            var warehouseExists = await _dbContext.Warehouses
-                .AnyAsync(w => w.Id == request.WarehouseId, cancellationToken);
+        DateTime? utcExpirationDate = request.ExpirationDate.HasValue
+            ? DateTime.SpecifyKind(request.ExpirationDate.Value, DateTimeKind.Utc)
+            : null;
 
-            if (!warehouseExists)
-            {
-                return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Inventory.WAREHOUSE_NOT_FOUND));
-            }
+        int finalUnitsCount = request.UnitsCount ?? 1;
 
-            var stockLot = StockLot.Create(
-                warehouseId: request.WarehouseId,
-                itemId: request.ItemId,
-                initialQuantity: request.Quantity,
-                unitsCount: request.UnitsCount > 0 ? request.UnitsCount : 1,
-                unitPrice: request.UnitPrice,
-                batchNumber: request.BatchNumber
-            );
+        var stockLot = StockLot.Create(
+            warehouseId: request.WarehouseId,
+            itemId: request.ItemId,
+            initialQuantity: request.Quantity,
+            unitsCount: finalUnitsCount,
+            unitPrice: request.UnitPrice,
+            batchNumber: request.BatchNumber,
+            supplierId: request.SupplierId,
+            expirationDate: utcExpirationDate
+        );
 
-            _dbContext.StockLots.Add(stockLot);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+        _dbContext.StockLots.Add(stockLot);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(stockLot.Id);
-        }
+        return Result.Success(stockLot.Id);
     }
 }

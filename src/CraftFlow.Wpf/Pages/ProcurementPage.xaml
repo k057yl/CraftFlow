@@ -14,79 +14,132 @@
         <TextBlock Text="{loc:Loc Key=TITLE_PROCUREMENT}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
 
         <TabControl Grid.Row="1">
-            <!-- 1. Оприходование -->
-            <TabItem Header="{loc:Loc Key=TAB_GOODS_RECEIPT}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
-                    <StackPanel MaxWidth="920" HorizontalAlignment="Left" Width="920">
-                        <GroupBox Header="{loc:Loc Key=GROUP_RECEIVE_STOCK_LOT}" Padding="12">
-                            <StackPanel>
-                                <!-- Выбор поставщика, склада и сырья в 3 колонки -->
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+            <!-- 1. Закупки и Остатки Сырья -->
+            <TabItem Header="Оприходование и Остатки">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                        <TextBlock Text="{loc:Loc Key=LABEL_SELECT_SUPPLIER}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <ComboBox x:Name="StockSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
-                                    </StackPanel>
+                    <!-- Форма оприходования -->
+                    <GroupBox Grid.Row="0" Header="{loc:Loc Key=GROUP_RECEIVE_STOCK_LOT}" Padding="10" Margin="0,0,0,15">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                                    <StackPanel Grid.Column="1" Margin="4,0,4,0">
-                                        <TextBlock Text="{loc:Loc Key=SELECT_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <ComboBox x:Name="StockWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
-                                    </StackPanel>
+                                <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                    <TextBlock Text="{loc:Loc Key=LABEL_SELECT_SUPPLIER}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <ComboBox x:Name="StockSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="4,3"/>
+                                </StackPanel>
 
-                                    <StackPanel Grid.Column="2" Margin="8,0,0,0">
-                                        <TextBlock Text="{loc:Loc Key=SELECT_RAW_MATERIAL}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <ComboBox x:Name="StockRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
-                                    </StackPanel>
-                                </Grid>
+                                <StackPanel Grid.Column="1" Margin="3,0,3,0">
+                                    <TextBlock Text="{loc:Loc Key=SELECT_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <ComboBox x:Name="StockWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="4,3"/>
+                                </StackPanel>
 
-                                <!-- Количество, Цена и Номер партии -->
-                                <Grid Margin="0,0,0,12">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                                <StackPanel Grid.Column="2" Margin="6,0,0,0">
+                                    <TextBlock Text="{loc:Loc Key=SELECT_RAW_MATERIAL}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <ComboBox x:Name="StockRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="4,3"/>
+                                </StackPanel>
+                            </Grid>
 
-                                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                        <TextBlock Text="{loc:Loc Key=LOT_QUANTITY}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <TextBox x:Name="StockQuantityTextBox" Text="500" Padding="5,4"/>
-                                    </StackPanel>
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                                    <StackPanel Grid.Column="1" Margin="4,0,4,0">
-                                        <TextBlock Text="{loc:Loc Key=UNIT_PRICE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <TextBox x:Name="StockUnitPriceTextBox" Text="25.00" Padding="5,4"/>
-                                    </StackPanel>
+                                <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                    <TextBlock Text="{loc:Loc Key=LOT_QUANTITY}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <TextBox x:Name="StockQuantityTextBox" Text="500" Padding="4,3"/>
+                                </StackPanel>
 
-                                    <StackPanel Grid.Column="2" Margin="8,0,0,0">
-                                        <TextBlock Text="{loc:Loc Key=BATCH_NUMBER}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <TextBox x:Name="StockBatchTextBox" Text="BATCH-2026-001" Padding="5,4"/>
-                                    </StackPanel>
-                                </Grid>
+                                <StackPanel Grid.Column="1" Margin="4,0,4,0">
+                                    <TextBlock Text="Кол-во тар / мест (опц.)" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <TextBox x:Name="StockUnitsCountTextBox" Padding="4,3"/>
+                                </StackPanel>
 
-                                <Button Content="{loc:Loc Key=ADD_STOCK_LOT}" 
-								        Click="AddStockLot_Click" 
-								        Height="32" 
-								        Width="180" 
-								        HorizontalAlignment="Left" 
-								        FontWeight="Bold" 
-								        Background="#0284C7" 
-								        Foreground="White"/>
+                                <StackPanel Grid.Column="2" Margin="4,0,4,0">
+                                    <TextBlock Text="{loc:Loc Key=UNIT_PRICE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <TextBox x:Name="StockUnitPriceTextBox" Text="25.00" Padding="4,3"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="3" Margin="4,0,4,0">
+                                    <TextBlock Text="{loc:Loc Key=BATCH_NUMBER}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <TextBox x:Name="StockBatchTextBox" Text="BATCH-2026-001" Padding="4,3"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="4" Margin="4,0,0,0">
+                                    <TextBlock Text="Срок годности" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <DatePicker x:Name="ExpirationDatePicker" Padding="4,1"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Button Content="{loc:Loc Key=ADD_STOCK_LOT}" 
+                                    Click="AddStockLot_Click" 
+                                    Height="28" 
+                                    Width="160" 
+                                    HorizontalAlignment="Left" 
+                                    FontWeight="Bold" 
+                                    Background="#0284C7" 
+                                    Foreground="White"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <!-- Панель остатков с фильтрами -->
+                    <GroupBox Grid.Row="1" Header="Текущие остатки сырья на складах" Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                                <TextBlock Text="Поставщик:" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11"/>
+                                <ComboBox x:Name="FilterSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="160" SelectionChanged="FilterStockLots_Changed"/>
+
+                                <TextBlock Text="Склад:" VerticalAlignment="Center" Margin="12,0,4,0" FontSize="11"/>
+                                <ComboBox x:Name="FilterWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="160" SelectionChanged="FilterStockLots_Changed"/>
+
+                                <CheckBox x:Name="FilterExpiringCheckBox" Content="Только скоро просрочится" VerticalAlignment="Center" Margin="12,0,0,0" Click="FilterStockLots_Changed"/>
+
+                                <Button Content="Обновить" Click="RefreshStockLots_Click" Margin="12,0,0,0" Padding="8,2"/>
                             </StackPanel>
-                        </GroupBox>
-                    </StackPanel>
-                </ScrollViewer>
+
+                            <DataGrid Grid.Row="1" 
+                                      x:Name="StockLotsDataGrid" 
+                                      AutoGenerateColumns="False" 
+                                      IsReadOnly="True" 
+                                      GridLinesVisibility="Horizontal" 
+                                      HeadersVisibility="Column">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Сырьё / Материал" Binding="{Binding ItemName}" Width="*"/>
+                                    <DataGridTextColumn Header="Склад" Binding="{Binding WarehouseName}" Width="120"/>
+                                    <DataGridTextColumn Header="Поставщик" Binding="{Binding SupplierName}" Width="130"/>
+                                    <DataGridTextColumn Header="Остаток" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="85"/>
+                                    <DataGridTextColumn Header="Цена за ед." Binding="{Binding UnitPrice, StringFormat={}{0:C2}}" Width="85"/>
+                                    <DataGridTextColumn Header="Партия" Binding="{Binding BatchNumber}" Width="110"/>
+                                    <DataGridTextColumn Header="Срок годности" Binding="{Binding ExpirationDate, StringFormat={}{0:dd.MM.yyyy}}" Width="100"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
             </TabItem>
 
             <!-- 2. Поставщики -->
             <TabItem Header="{loc:Loc Key=TAB_SUPPLIERS}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
-                    <StackPanel MaxWidth="920" HorizontalAlignment="Left" Width="920">
-                        <GroupBox Header="{loc:Loc Key=HEADER_SUPPLIERS}" Padding="12" MaxWidth="600" HorizontalAlignment="Left" Width="600">
+                    <StackPanel MaxWidth="600" HorizontalAlignment="Left" Width="600">
+                        <GroupBox Header="{loc:Loc Key=HEADER_SUPPLIERS}" Padding="12">
                             <StackPanel>
                                 <Grid Margin="0,0,0,10">
                                     <Grid.ColumnDefinitions>
@@ -111,11 +164,11 @@
                                 </StackPanel>
 
                                 <Button Content="{loc:Loc Key=CREATE_SUPPLIER}" 
-								        Width="180" 
-								        Height="32"
-								        HorizontalAlignment="Left" 
-								        FontWeight="Bold"
-								        Click="CreateSupplier_Click"/>
+                                        Width="180" 
+                                        Height="32"
+                                        HorizontalAlignment="Left" 
+                                        FontWeight="Bold"
+                                        Click="CreateSupplier_Click"/>
                             </StackPanel>
                         </GroupBox>
                     </StackPanel>

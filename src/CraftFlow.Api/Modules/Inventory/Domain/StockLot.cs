@@ -8,12 +8,14 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
         public Guid TenantId { get; private set; }
         public Guid WarehouseId { get; private set; }
         public Guid ItemId { get; private set; }
+        public Guid? SupplierId { get; private set; }
         public decimal Quantity { get; private set; }
         public int UnitsCount { get; private set; }
         public decimal UnitPrice { get; private set; }
         public string? BatchNumber { get; private set; }
         public Guid? ProductionBatchId { get; private set; }
         public DateTime CreatedDate { get; private set; }
+        public DateTime? ExpirationDate { get; private set; }
 
         private StockLot() { }
 
@@ -25,7 +27,9 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
             decimal unitPrice,
             string? batchNumber = null,
             Guid tenantId = default,
-            Guid? productionBatchId = null)
+            Guid? productionBatchId = null,
+            Guid? supplierId = null,
+            DateTime? expirationDate = null)
         {
             if (initialQuantity < 0)
                 throw new ArgumentException(ErrorCodes.Inventory.STOCK_LOT_NEGATIVE_QUANTITY);
@@ -38,13 +42,15 @@ namespace CraftFlow.Api.Modules.Inventory.Domain
                 Id = Guid.NewGuid(),
                 WarehouseId = warehouseId,
                 ItemId = itemId,
+                SupplierId = supplierId,
                 Quantity = initialQuantity,
                 UnitsCount = unitsCount,
                 UnitPrice = unitPrice,
                 BatchNumber = batchNumber,
                 TenantId = tenantId,
                 ProductionBatchId = productionBatchId,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = DateTime.UtcNow,
+                ExpirationDate = expirationDate
             };
         }
 
