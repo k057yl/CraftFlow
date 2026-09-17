@@ -10,6 +10,7 @@ using CraftFlow.Api.Modules.Catalog.GetProducts;
 using CraftFlow.Api.Modules.Catalog.GetRawMaterials;
 using CraftFlow.Api.Modules.Catalog.GetRecipes;
 using CraftFlow.Api.Modules.Catalog.GetUnitsOfMeasure;
+using CraftFlow.Api.Modules.Catalog.SeedUnitsOfMeasure;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Catalog;
@@ -42,6 +43,12 @@ public static class CatalogEndpoints
         });
 
         group.MapPost(CatalogConstants.RECIPES, async (CreateRecipeCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapPost($"{CatalogConstants.UOM}/seed", async (SeedUnitsOfMeasureCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);

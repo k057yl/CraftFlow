@@ -1,8 +1,9 @@
-﻿using System.Windows;
-using System.Windows.Controls;
-using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Pages;
 using CraftFlow.Wpf.Services;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace CraftFlow.Wpf;
 
@@ -17,7 +18,9 @@ public partial class MainWindow : Window
 
     private bool _isInitializing = true;
 
-    public MainWindow()
+    public MainWindow() : this(null) { }
+
+    public MainWindow(DashboardSummaryDto? initialSummary)
     {
         InitializeComponent();
         Title = UiConstants.Titles.APP_TITLE;
@@ -35,7 +38,7 @@ public partial class MainWindow : Window
         if (ApiService.Instance.IsAuthenticated)
         {
             UpdateNavigationPermissions();
-            MainFrame.Navigate(new DashboardPage());
+            MainFrame.Navigate(new DashboardPage(initialSummary));
         }
         else
         {

@@ -26,15 +26,27 @@
                         <WrapPanel VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
                                 <TextBlock Text="{loc:Loc Key=UOM_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                <TextBox x:Name="UomNameTextBox" Width="180"/>
+                                <TextBox x:Name="UomNameTextBox" Width="160"/>
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
                                 <TextBlock Text="{loc:Loc Key=UOM_CODE}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                <TextBox x:Name="UomCodeTextBox" Width="90"/>
+                                <TextBox x:Name="UomCodeTextBox" Width="80"/>
                             </StackPanel>
 
-                            <Button Content="{loc:Loc Key=CREATE_UOM}" Click="CreateUom_Click" Style="{StaticResource PrimaryButtonStyle}" Width="130" Height="28" Margin="0,0,0,5"/>
+                            <Button Content="{loc:Loc Key=CREATE_UOM}" Click="CreateUom_Click" Style="{StaticResource PrimaryButtonStyle}" Width="120" Height="28" Margin="0,0,10,5"/>
+
+                            <!-- Кнопка вызова пресетов с ContextMenu -->
+                            <Button Content="⚡ Auto-Seed Presets ▾" Click="SeedUomPreset_Click" Background="#0EA5E9" Foreground="White" FontWeight="SemiBold" Height="28" Padding="10,0" Margin="0,0,0,5">
+                                <Button.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="🇪🇺 Metric (kg, g, l, ml, pcs)" Click="SeedMetric_Click"/>
+                                        <MenuItem Header="🇺🇸 Imperial (lb, oz, gal, fl oz, pcs)" Click="SeedImperial_Click"/>
+                                        <Separator/>
+                                        <MenuItem Header="🌐 Full Set (Metric + Imperial)" Click="SeedFull_Click"/>
+                                    </ContextMenu>
+                                </Button.ContextMenu>
+                            </Button>
                         </WrapPanel>
                     </GroupBox>
 

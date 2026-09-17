@@ -1,6 +1,4 @@
 ﻿using CraftFlow.Api.Modules.Catalog;
-using CraftFlow.Api.Modules.Inventory;
-using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
 using System.Collections.ObjectModel;
@@ -254,6 +252,38 @@ public partial class CatalogPage : Page
             await LoadDataAsync();
         }
     }
+
+    // --- АВТОСИДИНГ ПРЕСЕТОВ ЕД. ИЗМЕРЕНИЯ ---
+
+    private void SeedUomPreset_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.ContextMenu != null)
+        {
+            btn.ContextMenu.IsOpen = true;
+        }
+    }
+
+    private async Task ExecuteUomSeedAsync(int presetType)
+    {
+        var (isSuccess, response) = await ApiService.Instance.PostAndReadAsync($"{CatalogConstants.UOM}/seed", new
+        {
+            Preset = presetType
+        });
+
+        if (isSuccess)
+        {
+            await LoadDataAsync();
+            SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);
+        }
+        else
+        {
+            SetStatusRaw(response, Brushes.Red);
+        }
+    }
+
+    private async void SeedMetric_Click(object sender, RoutedEventArgs e) => await ExecuteUomSeedAsync(0);   // Metric
+    private async void SeedImperial_Click(object sender, RoutedEventArgs e) => await ExecuteUomSeedAsync(1); // Imperial
+    private async void SeedFull_Click(object sender, RoutedEventArgs e) => await ExecuteUomSeedAsync(2);     // Full
 
     private void SetStatus(string resourceKey, Brush color)
     {

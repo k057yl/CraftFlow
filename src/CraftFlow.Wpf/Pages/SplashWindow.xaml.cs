@@ -1,5 +1,7 @@
-﻿using System.Windows;
+﻿using CraftFlow.Api.Modules.Analytics;
+using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
+using System.Windows;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -15,27 +17,28 @@ public partial class SplashWindow : Window
     {
         try
         {
-            UpdateProgress(10, "Проверка локального токена...");
+            UpdateProgress(20, "Проверка авторизации...");
 
             bool hasSavedToken = ApiService.Instance.IsAuthenticated;
             bool isValidSession = false;
 
             if (hasSavedToken)
             {
-                UpdateProgress(30, "Валидация сессии на сервере...");
+                UpdateProgress(40, "Валидация сессии...");
                 isValidSession = await ApiService.Instance.ValidateAndRefreshCurrentUserAsync();
             }
+
+            DashboardSummaryDto? initialSummary = null;
 
             if (isValidSession)
             {
                 UpdateProgress(70, "Загрузка данных дашборда...");
-                await ApiService.Instance.GetAsync<object>("api/dashboard/stats");
+                initialSummary = await ApiService.Instance.GetAsync<DashboardSummaryDto>(AnalyticConstants.DASHBOARD);
             }
 
-            UpdateProgress(100, "Готово!");
-            await Task.Delay(150);
+            UpdateProgress(100, "Открытие системы...");
 
-            var mainWindow = new MainWindow();
+            var mainWindow = new MainWindow(initialSummary);
 
             if (!isValidSession)
             {
@@ -52,7 +55,7 @@ public partial class SplashWindow : Window
 
             await Task.Delay(1500);
 
-            var mainWindow = new MainWindow();
+            var mainWindow = new MainWindow(null);
             mainWindow.NavigateToAuth();
             mainWindow.Show();
             Close();

@@ -8,10 +8,18 @@ namespace CraftFlow.Wpf.Pages;
 
 public partial class DashboardPage : Page
 {
-    public DashboardPage()
+    public DashboardPage(DashboardSummaryDto? initialSummary = null)
     {
         InitializeComponent();
-        Loaded += async (s, e) => await LoadDashboardAsync();
+
+        if (initialSummary != null)
+        {
+            BindData(initialSummary);
+        }
+        else
+        {
+            Loaded += async (s, e) => await LoadDashboardAsync();
+        }
     }
 
     private async Task LoadDashboardAsync()
@@ -19,11 +27,16 @@ public partial class DashboardPage : Page
         var summary = await ApiService.Instance.GetAsync<DashboardSummaryDto>(AnalyticConstants.DASHBOARD);
         if (summary != null)
         {
-            ProductsCountTextBlock.Text = $"{summary.TotalProducts} / {summary.TotalRecipes}";
-            ActiveBatchesTextBlock.Text = summary.ActiveBatchesCount.ToString();
-            CustomersCountTextBlock.Text = summary.TotalCustomers.ToString();
-            TotalStockTextBlock.Text = summary.TotalStockQuantity.ToString("F2");
-            TotalRevenueTextBlock.Text = $"${summary.TotalSalesRevenue:F2}";
+            BindData(summary);
         }
+    }
+
+    private void BindData(DashboardSummaryDto summary)
+    {
+        ProductsCountTextBlock.Text = $"{summary.TotalProducts} / {summary.TotalRecipes}";
+        ActiveBatchesTextBlock.Text = summary.ActiveBatchesCount.ToString();
+        CustomersCountTextBlock.Text = summary.TotalCustomers.ToString();
+        TotalStockTextBlock.Text = summary.TotalStockQuantity.ToString("F2");
+        TotalRevenueTextBlock.Text = $"${summary.TotalSalesRevenue:F2}";
     }
 }
