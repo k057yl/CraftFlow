@@ -46,14 +46,20 @@ public class ExtendSubscriptionHandler : IRequestHandler<ExtendSubscriptionComma
         if (subscription == null)
         {
             var defaultPlan = await _dbContext.SubscriptionPlans
-                .FirstOrDefaultAsync(cancellationToken);
+                .FirstOrDefaultAsync(p => p.Code == "FREE", cancellationToken)
+                ?? await _dbContext.SubscriptionPlans.FirstOrDefaultAsync(cancellationToken);
 
             if (defaultPlan == null)
             {
                 return Result.Failure<bool>(Error.NotFound("PLAN_NOT_FOUND"));
             }
 
-            subscription = TenantSubscription.CreateTrial(organization.Id, defaultPlan.Id, now.AddDays(request.Days));
+            subscription = TenantSubscription.CreateFree(organization.Id, defaultPlan.Id);
+            if (request.Days > 0)
+            {
+                subscription.Activate(now.AddDays(request.Days));
+            }
+
             _dbContext.TenantSubscriptions.Add(subscription);
         }
         else

@@ -73,6 +73,7 @@ public partial class MainWindow : Window
 
         var currentUser = ApiService.Instance.CurrentUser;
         bool isSuperAdmin = currentUser?.Role == TenantRole.SuperAdmin;
+        bool isOwner = currentUser?.Role == TenantRole.Owner;
 
         GuestPanel.Visibility = Visibility.Collapsed;
         UserProfilePanel.Visibility = Visibility.Visible;
@@ -89,10 +90,8 @@ public partial class MainWindow : Window
         };
 
         NavAuthButton.Visibility = Visibility.Collapsed;
-
-        bool canViewProfile = currentUser?.Role == TenantRole.Owner || isSuperAdmin;
-        NavProfileButton.Visibility = canViewProfile ? Visibility.Visible : Visibility.Collapsed;
         NavAdminKeysButton.Visibility = isSuperAdmin ? Visibility.Visible : Visibility.Collapsed;
+        NavProfileButton.Visibility = (isOwner || isSuperAdmin) ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void Logout_Click(object sender, RoutedEventArgs e)

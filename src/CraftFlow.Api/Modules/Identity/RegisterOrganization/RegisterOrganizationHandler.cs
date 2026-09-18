@@ -1,4 +1,5 @@
 ﻿using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.Api.Modules.Subscriptions.Domain;
 using CraftFlow.SharedKernel.Constants;
@@ -11,10 +12,12 @@ namespace CraftFlow.Api.Modules.Identity.RegisterOrganization;
 public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationCommand, Result<Guid>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly IEmailService _emailService;
 
-    public RegisterOrganizationHandler(AppDbContext dbContext)
+    public RegisterOrganizationHandler(AppDbContext dbContext, IEmailService emailService)
     {
         _dbContext = dbContext;
+        _emailService = emailService;
     }
 
     public async Task<Result<Guid>> Handle(RegisterOrganizationCommand request, CancellationToken cancellationToken)
@@ -42,8 +45,9 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
             role: TenantRole.Owner
         );
 
-        ownerUser.Activate();
-        organization.Activate();
+        var rawOtpCode = new Random().Next(100000, 999999).ToString();
+        var otpHash = BCrypt.Net.BCrypt.HashPassword(rawOtpCode);
+        ownerUser.SetOtpCode(otpHash, DateTime.UtcNow.AddMinutes(10));
 
         _dbContext.Users.Add(ownerUser);
 
@@ -58,6 +62,8 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await _emailService.SendOtpCodeAsync(ownerUser.Email, rawOtpCode);
 
         return Result.Success(organization.Id);
     }

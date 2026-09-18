@@ -23,7 +23,7 @@ public class TokenService : ITokenService
         var isSystemAdmin = user.Role == TenantRole.SuperAdmin || (!string.IsNullOrEmpty(adminEmail) &&
                       user.Email.Equals(adminEmail.Trim().ToLowerInvariant(), StringComparison.OrdinalIgnoreCase));
 
-        var roleName = isSystemAdmin ? TenantRole.SuperAdmin.ToString() : user.Role.ToString();
+        var effectiveRole = isSystemAdmin ? TenantRole.SuperAdmin : user.Role;
 
         var claims = new List<Claim>
         {
@@ -31,8 +31,9 @@ public class TokenService : ITokenService
             new(ClaimTypes.Email, user.Email),
             new(AuthConstants.Claims.TENANT_ID, user.TenantId.ToString()),
             new(AuthConstants.Claims.FULL_NAME, user.FullName),
-            new(ClaimTypes.Role, roleName),
-            new(AuthConstants.Claims.ROLE_SHORT, roleName),
+            new(ClaimTypes.Role, effectiveRole.ToString()),
+            new("role_id", ((int)effectiveRole).ToString()),
+            new(AuthConstants.Claims.ROLE_SHORT, effectiveRole.ToString()),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

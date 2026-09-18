@@ -67,7 +67,7 @@ public partial class ProfilePage : Page
                 }
             }
 
-            bool isOwner = user.Role == TenantRole.Owner || user.Role == TenantRole.SuperAdmin;
+            bool isOwner = user.Role == TenantRole.Owner;
 
             TeamManagementBorder.Visibility = isOwner ? Visibility.Visible : Visibility.Collapsed;
             DangerZoneBorder.Visibility = isOwner ? Visibility.Visible : Visibility.Collapsed;

@@ -38,17 +38,12 @@ public class GenerateAccessKeyHandler : IRequestHandler<GenerateAccessKeyCommand
         if (subscription == null)
         {
             var plan = await _dbContext.Set<SubscriptionPlan>()
-                .FirstOrDefaultAsync(p => p.Code == "TRIAL", ct);
-
-            if (plan == null)
-            {
-                plan = await _dbContext.Set<SubscriptionPlan>().FirstOrDefaultAsync(ct);
-            }
+                .FirstOrDefaultAsync(p => p.Code == "FREE", ct)
+                ?? await _dbContext.Set<SubscriptionPlan>().FirstOrDefaultAsync(ct);
 
             if (plan != null)
             {
-                subscription = TenantSubscription.CreateTrial(tenantId, plan.Id, DateTime.UtcNow.AddYears(100));
-                subscription.Activate(DateTime.UtcNow.AddYears(100));
+                subscription = TenantSubscription.CreateFree(tenantId, plan.Id);
                 _dbContext.Set<TenantSubscription>().Add(subscription);
 
                 await _dbContext.SaveChangesAsync(ct);

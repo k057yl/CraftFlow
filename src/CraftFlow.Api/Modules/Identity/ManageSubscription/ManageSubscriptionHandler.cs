@@ -56,7 +56,11 @@ public class ManageSubscriptionHandler : IRequestHandler<ManageSubscriptionComma
 
         if (subscription == null)
         {
-            subscription = TenantSubscription.CreateTrial(organization.Id, targetPlan.Id, now.AddDays(request.AddDays));
+            subscription = TenantSubscription.CreateFree(organization.Id, targetPlan.Id);
+            if (request.AddDays > 0)
+            {
+                subscription.Activate(now.AddDays(request.AddDays));
+            }
             _dbContext.TenantSubscriptions.Add(subscription);
         }
         else

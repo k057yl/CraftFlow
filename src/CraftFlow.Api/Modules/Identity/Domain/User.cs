@@ -17,12 +17,16 @@ public sealed class User : AggregateRoot, ITenantEntity
 
     private User() { }
 
-    public static User Create(Guid tenantId, string email, string passwordHash, string fullName, TenantRole role = TenantRole.Owner)
+    public static User Create(
+        Guid tenantId,
+        string email,
+        string passwordHash,
+        string fullName,
+        TenantRole role = TenantRole.Owner)
     {
-        if (role == TenantRole.SuperAdmin && tenantId != Guid.Empty)
-        {
-            role = TenantRole.Owner;
-        }
+        var actualRole = (role == TenantRole.SuperAdmin && tenantId != Guid.Empty)
+            ? TenantRole.Owner
+            : role;
 
         return new User
         {
@@ -32,7 +36,7 @@ public sealed class User : AggregateRoot, ITenantEntity
             PasswordHash = passwordHash,
             FullName = fullName.Trim(),
             IsActive = false,
-            Role = role
+            Role = actualRole
         };
     }
 

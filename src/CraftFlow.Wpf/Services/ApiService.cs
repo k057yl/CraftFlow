@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Modules.Aging;
+using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.Api.Modules.MRP;
 using CraftFlow.Api.Modules.Procurement;
 using CraftFlow.Api.Modules.Traceability;
@@ -220,11 +221,7 @@ public class ApiService
                 CurrentTenantId = tenantId;
             }
 
-            user.IsAdmin = CheckRoleInJwt(root, "role") ||
-                           CheckRoleInJwt(root, "Role") ||
-                           CheckRoleInJwt(root, AuthConstants.Claims.ROLE_SHORT) ||
-                           CheckRoleInJwt(root, AuthConstants.Claims.ROLE_FULL) ||
-                           CheckRoleInJwt(root, "http://schemas.microsoft.com/ws/2008/06/identity/claims/role");
+            user.Role = ExtractRoleFromJwt(root);
 
             return user;
         }
@@ -232,6 +229,43 @@ public class ApiService
         {
             return null;
         }
+    }
+
+    private static TenantRole ExtractRoleFromJwt(JsonElement root)
+    {
+        string[] roleClaimNames =
+        {
+        "role",
+        "Role",
+        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+        AuthConstants.Claims.ROLE_SHORT
+    };
+
+        foreach (var claimName in roleClaimNames)
+        {
+            if (!root.TryGetProperty(claimName, out var roleProp)) continue;
+
+            if (roleProp.ValueKind == JsonValueKind.Number && roleProp.TryGetInt32(out int roleInt))
+            {
+                return (TenantRole)roleInt;
+            }
+
+            if (roleProp.ValueKind == JsonValueKind.String)
+            {
+                var roleStr = roleProp.GetString();
+                if (int.TryParse(roleStr, out int parsedInt))
+                {
+                    return (TenantRole)parsedInt;
+                }
+
+                if (Enum.TryParse<TenantRole>(roleStr, ignoreCase: true, out var parsedRole))
+                {
+                    return parsedRole;
+                }
+            }
+        }
+
+        return TenantRole.None;
     }
 
     private static bool CheckRoleInJwt(JsonElement root, string propertyName)
