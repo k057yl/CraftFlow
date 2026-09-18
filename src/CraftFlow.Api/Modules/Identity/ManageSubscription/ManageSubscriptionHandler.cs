@@ -21,7 +21,7 @@ public class ManageSubscriptionHandler : IRequestHandler<ManageSubscriptionComma
 
     public async Task<Result<bool>> Handle(ManageSubscriptionCommand request, CancellationToken cancellationToken)
     {
-        if (!_tenantContext.IsAdmin)
+        if (!_tenantContext.IsSuperAdmin)
         {
             return Result.Failure<bool>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
         }

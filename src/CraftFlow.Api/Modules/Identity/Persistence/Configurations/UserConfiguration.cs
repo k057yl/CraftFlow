@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Modules.Identity.Domain;
+using CraftFlow.SharedKernel.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -27,9 +28,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasIndex(u => u.Email)
             .IsUnique();
 
-        builder.Property(u => u.IsAdmin)
+        builder.Property(u => u.Role)
             .IsRequired()
-            .HasDefaultValue(false);
+            .HasConversion<int>()
+            .HasDefaultValue(TenantRole.Owner);
 
         builder.Property(u => u.IsActive)
             .IsRequired()

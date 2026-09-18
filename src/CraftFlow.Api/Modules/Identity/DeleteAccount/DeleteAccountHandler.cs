@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -19,6 +20,11 @@ public class DeleteAccountHandler : IRequestHandler<DeleteAccountCommand, Result
 
     public async Task<Result<bool>> Handle(DeleteAccountCommand request, CancellationToken cancellationToken)
     {
+        if (_tenantContext.Role != TenantRole.Owner && !_tenantContext.IsSuperAdmin)
+        {
+            return Result.Failure<bool>(Error.Validation("ONLY_OWNER_CAN_DELETE_ACCOUNT"));
+        }
+
         var userId = _tenantContext.UserId;
         var tenantId = _tenantContext.TenantId;
 

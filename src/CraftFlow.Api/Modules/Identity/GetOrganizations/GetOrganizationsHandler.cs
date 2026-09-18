@@ -20,7 +20,7 @@ public class GetOrganizationsHandler : IRequestHandler<GetOrganizationsQuery, Re
 
     public async Task<Result<List<OrganizationAdminDto>>> Handle(GetOrganizationsQuery request, CancellationToken cancellationToken)
     {
-        if (!_tenantContext.IsAdmin)
+        if (!_tenantContext.IsSuperAdmin)
         {
             return Result.Failure<List<OrganizationAdminDto>>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
         }

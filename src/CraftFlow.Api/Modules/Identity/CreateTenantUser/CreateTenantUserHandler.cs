@@ -21,6 +21,11 @@ public class CreateTenantUserHandler : IRequestHandler<CreateTenantUserCommand, 
 
     public async Task<Result<Guid>> Handle(CreateTenantUserCommand request, CancellationToken cancellationToken)
     {
+        if (_tenantContext.Role != TenantRole.Owner && !_tenantContext.IsSuperAdmin)
+        {
+            return Result.Failure<Guid>(Error.Validation("ONLY_OWNER_CAN_CREATE_USERS"));
+        }
+
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
 
         var exists = await _dbContext.Users
@@ -32,7 +37,7 @@ public class CreateTenantUserHandler : IRequestHandler<CreateTenantUserCommand, 
         }
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
-        var user = User.Create(_tenantContext.TenantId, normalizedEmail, passwordHash, request.FullName);
+        var user = User.Create(_tenantContext.TenantId, normalizedEmail, passwordHash, request.FullName, request.Role);
         user.Activate();
 
         _dbContext.Users.Add(user);

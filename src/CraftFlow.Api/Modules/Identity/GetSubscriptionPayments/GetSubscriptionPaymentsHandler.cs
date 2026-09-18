@@ -21,7 +21,7 @@ public class GetSubscriptionPaymentsHandler : IRequestHandler<GetSubscriptionPay
 
     public async Task<Result<List<PaymentDto>>> Handle(GetSubscriptionPaymentsQuery request, CancellationToken cancellationToken)
     {
-        if (!_tenantContext.IsAdmin)
+        if (!_tenantContext.IsSuperAdmin)
         {
             return Result.Failure<List<PaymentDto>>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
         }

@@ -27,28 +27,21 @@ public class TenantSubscription
         ConfigureStateMachine();
     }
 
-    public static TenantSubscription CreateTrial(Guid tenantId, Guid planId, DateTime expiresAtUtc)
+    public static TenantSubscription CreateFree(Guid tenantId, Guid planId)
     {
-        var subscription = new TenantSubscription
+        return new TenantSubscription
         {
             Id = Guid.NewGuid(),
             TenantId = tenantId,
             PlanId = planId,
-            State = SubscriptionState.Trial,
+            State = SubscriptionState.Active,
             StartedAtUtc = DateTime.UtcNow,
-            ExpiresAtUtc = expiresAtUtc
+            ExpiresAtUtc = null
         };
-
-        return subscription;
     }
 
     private void ConfigureStateMachine()
     {
-        _machine.Configure(SubscriptionState.Trial)
-            .Permit(SubscriptionTrigger.Activate, SubscriptionState.Active)
-            .Permit(SubscriptionTrigger.Expire, SubscriptionState.Expired)
-            .Permit(SubscriptionTrigger.Cancel, SubscriptionState.Cancelled);
-
         _machine.Configure(SubscriptionState.Active)
             .PermitReentry(SubscriptionTrigger.Activate)
             .Permit(SubscriptionTrigger.Suspend, SubscriptionState.Suspended)
@@ -86,10 +79,6 @@ public class TenantSubscription
         if (State == SubscriptionState.Expired && _machine.CanFire(SubscriptionTrigger.Renew))
         {
             _machine.Fire(SubscriptionTrigger.Renew);
-        }
-        else if (State == SubscriptionState.Trial && _machine.CanFire(SubscriptionTrigger.Activate))
-        {
-            _machine.Fire(SubscriptionTrigger.Activate);
         }
     }
 

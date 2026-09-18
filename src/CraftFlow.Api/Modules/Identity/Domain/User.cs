@@ -12,13 +12,18 @@ public sealed class User : AggregateRoot, ITenantEntity
     public string? OtpCodeHash { get; private set; }
     public DateTime? OtpExpiresAtUtc { get; private set; }
 
-    public bool IsAdmin { get; private set; }
     public bool IsActive { get; private set; }
+    public TenantRole Role { get; private set; }
 
     private User() { }
 
-    public static User Create(Guid tenantId, string email, string passwordHash, string fullName)
+    public static User Create(Guid tenantId, string email, string passwordHash, string fullName, TenantRole role = TenantRole.Owner)
     {
+        if (role == TenantRole.SuperAdmin && tenantId != Guid.Empty)
+        {
+            role = TenantRole.Owner;
+        }
+
         return new User
         {
             Id = Guid.NewGuid(),
@@ -26,23 +31,19 @@ public sealed class User : AggregateRoot, ITenantEntity
             Email = email.Trim().ToLowerInvariant(),
             PasswordHash = passwordHash,
             FullName = fullName.Trim(),
-            IsAdmin = false,
-            IsActive = false
+            IsActive = false,
+            Role = role
         };
     }
 
-    public static User CreateSystemAdmin(string email, string fullName, string passwordHash)
+    public void ChangeRole(TenantRole newRole)
     {
-        return new User
+        if (newRole == TenantRole.SuperAdmin && TenantId != Guid.Empty)
         {
-            Id = Guid.NewGuid(),
-            TenantId = Guid.Empty,
-            Email = email.Trim().ToLowerInvariant(),
-            FullName = fullName.Trim(),
-            PasswordHash = passwordHash,
-            IsAdmin = true,
-            IsActive = true
-        };
+            return;
+        }
+
+        Role = newRole;
     }
 
     public void Activate()
@@ -51,10 +52,7 @@ public sealed class User : AggregateRoot, ITenantEntity
         ClearOtpCode();
     }
 
-    public void Deactivate()
-    {
-        IsActive = false;
-    }
+    public void Deactivate() => IsActive = false;
 
     public void SetOtpCode(string codeHash, DateTime expiresAtUtc)
     {

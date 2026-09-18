@@ -8,7 +8,7 @@
             <StackPanel MaxWidth="800" HorizontalAlignment="Left">
                 <TextBlock Text="Управление аккаунтом и организацией" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,20"/>
 
-                <!-- Карточка текущего пользователя -->
+                <!-- Данные профиля -->
                 <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
                     <StackPanel>
                         <TextBlock Text="Данные профиля" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
@@ -42,7 +42,38 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Блок управления API-ключами устройства/терминалов -->
+                <!-- Управление сотрудниками организации (Создание/Управление) -->
+                <Border x:Name="TeamManagementBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="Управление сотрудниками организации" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
+
+                        <WrapPanel Margin="0,0,0,15" VerticalAlignment="Center">
+                            <StackPanel Margin="0,0,10,5">
+                                <TextBlock Text="ФИО:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="NewUserFullNameTextBox" Width="150" Height="28"/>
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,10,5">
+                                <TextBlock Text="Email:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="NewUserEmailTextBox" Width="150" Height="28"/>
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,10,5">
+                                <TextBlock Text="Пароль:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <PasswordBox x:Name="NewUserPasswordBox" Width="120" Height="28"/>
+                            </StackPanel>
+
+                            <StackPanel Margin="0,0,10,5">
+                                <TextBlock Text="Роль:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <ComboBox x:Name="NewUserRoleComboBox" Width="140" Height="28"/>
+                            </StackPanel>
+
+                            <Button Content="Добавить сотрудника" Click="CreateTeamUser_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Padding="12,0" VerticalAlignment="Bottom" Margin="0,0,0,5"/>
+                        </WrapPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- API Ключи терминалов -->
                 <Border x:Name="TenantKeysBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
                     <StackPanel>
                         <TextBlock Text="API Ключи терминалов (Тенант)" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
@@ -66,7 +97,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Опасная зона (Danger Zone) -->
+                <!-- Danger Zone -->
                 <Border x:Name="DangerZoneBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="#DC2626" BorderThickness="1" CornerRadius="8" Padding="20">
                     <StackPanel>
                         <TextBlock Text="Опасная зона / Управление подпиской и аккаунтом" FontSize="16" FontWeight="Bold" Foreground="#DC2626" Margin="0,0,0,12"/>

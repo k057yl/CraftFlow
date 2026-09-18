@@ -34,7 +34,7 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
     {
         var tenantId = _tenantContext.TenantId;
 
-        if (tenantId == Guid.Empty || _tenantContext.IsAdmin)
+        if (tenantId == Guid.Empty || _tenantContext.IsSuperAdmin)
         {
             return await next();
         }

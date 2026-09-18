@@ -1,6 +1,9 @@
 ﻿using CraftFlow.Api.Modules.Identity;
+using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.Api.Modules.Subscriptions;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Dtos;
+using CraftFlow.SharedKernel.Dtos.Auth;
 using CraftFlow.Wpf.Models.Auth;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
@@ -17,8 +20,22 @@ public partial class ProfilePage : Page
     public ProfilePage()
     {
         InitializeComponent();
+        InitRoleComboBox();
         LoadUserData();
         _ = LoadMyKeysAsync();
+    }
+
+    private void InitRoleComboBox()
+    {
+        NewUserRoleComboBox.ItemsSource = new[]
+        {
+            new { Role = TenantRole.Technologist, Display = "Технолог" },
+            new { Role = TenantRole.Storekeeper, Display = "Кладовщик" },
+            new { Role = TenantRole.SalesManager, Display = "Менеджер / Продажи" }
+        };
+        NewUserRoleComboBox.DisplayMemberPath = "Display";
+        NewUserRoleComboBox.SelectedValuePath = "Role";
+        NewUserRoleComboBox.SelectedIndex = 0;
     }
 
     private async void LoadUserData()
@@ -28,7 +45,16 @@ public partial class ProfilePage : Page
         {
             NameTextBlock.Text = user.FullName;
             EmailTextBlock.Text = user.Email;
-            RoleTextBlock.Text = user.IsAdmin ? "Системный администратор (Big Boss)" : "Владелец сыроварни";
+
+            RoleTextBlock.Text = user.Role switch
+            {
+                TenantRole.SuperAdmin => "Системный администратор (Big Boss)",
+                TenantRole.Owner => "Владелец сыроварни",
+                TenantRole.Technologist => "Главный технолог",
+                TenantRole.Storekeeper => "Кладовщик",
+                TenantRole.SalesManager => "Менеджер по продажам",
+                _ => "Сотрудник"
+            };
 
             if (string.IsNullOrWhiteSpace(user.Email))
             {
@@ -36,22 +62,58 @@ public partial class ProfilePage : Page
                 if (profile != null && !string.IsNullOrWhiteSpace(profile.Email))
                 {
                     user.Email = profile.Email;
+                    user.Role = profile.Role;
                     EmailTextBlock.Text = profile.Email;
                 }
             }
 
-            if (user.IsAdmin)
+            bool isOwner = user.Role == TenantRole.Owner || user.Role == TenantRole.SuperAdmin;
+
+            TeamManagementBorder.Visibility = isOwner ? Visibility.Visible : Visibility.Collapsed;
+            DangerZoneBorder.Visibility = isOwner ? Visibility.Visible : Visibility.Collapsed;
+
+            if (user.Role == TenantRole.SuperAdmin)
             {
-                DangerZoneBorder.Visibility = Visibility.Collapsed;
                 TenantKeysBorder.Visibility = Visibility.Collapsed;
             }
+        }
+    }
+
+    private async void CreateTeamUser_Click(object sender, RoutedEventArgs e)
+    {
+        var fullName = NewUserFullNameTextBox.Text.Trim();
+        var email = NewUserEmailTextBox.Text.Trim();
+        var password = NewUserPasswordBox.Password;
+
+        if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
+        {
+            MessageBox.Show("Заполните все поля для создания нового сотрудника!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var selectedRole = (TenantRole)(NewUserRoleComboBox.SelectedValue ?? TenantRole.Technologist);
+
+        var requestPayload = new CreateTenantUserRequest(email, password, fullName, selectedRole);
+
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(IdentityConstants.USERS, requestPayload);
+
+        if (isSuccess)
+        {
+            MessageBox.Show($"Сотрудник {fullName} успешно создан!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            NewUserFullNameTextBox.Clear();
+            NewUserEmailTextBox.Clear();
+            NewUserPasswordBox.Clear();
+        }
+        else
+        {
+            MessageBox.Show(contentOrError, "Ошибка при создании", MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
     private async Task LoadMyKeysAsync()
     {
         var user = ApiService.Instance.CurrentUser;
-        if (user?.IsAdmin == true) return;
+        if (user?.Role == TenantRole.SuperAdmin) return;
 
         var keys = await ApiService.Instance.GetAsync<List<AccessKeyDto>>(SubscriptionsConstants.SUBSCRIPTION_KEYS);
         if (keys != null)

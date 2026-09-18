@@ -103,7 +103,9 @@ public class AppDbContext : DbContext
         {
             if (entry.State == EntityState.Added)
             {
-                if (!_tenantContext.IsAdmin || entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue is not Guid id || id == Guid.Empty)
+                var currentTenantId = entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue as Guid?;
+
+                if (!_tenantContext.IsSuperAdmin || !currentTenantId.HasValue || currentTenantId.Value == Guid.Empty)
                 {
                     entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue = _tenantContext.TenantId;
                 }
@@ -133,14 +135,14 @@ public class AppDbContext : DbContext
         where TEntity : Entity, ITenantEntity
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
-            (_tenantContext.IsAdmin || e.TenantId == _tenantContext.TenantId) && e.IsActive);
+            (_tenantContext.IsSuperAdmin || e.TenantId == _tenantContext.TenantId) && e.IsActive);
     }
 
     private void SetTenantFilter<TEntity>(ModelBuilder modelBuilder)
         where TEntity : class, ITenantEntity
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
-            _tenantContext.IsAdmin || e.TenantId == _tenantContext.TenantId);
+            _tenantContext.IsSuperAdmin || e.TenantId == _tenantContext.TenantId);
     }
 
     private void SetActiveFilter<TEntity>(ModelBuilder modelBuilder)
@@ -154,6 +156,6 @@ public class DesignTimeTenantContext : ITenantContext
 {
     public Guid TenantId => Guid.Empty;
     public Guid UserId => Guid.Empty;
-    public bool IsAdmin => true;
+    public TenantRole Role => TenantRole.SuperAdmin;
     public bool IsResolved => true;
 }

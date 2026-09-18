@@ -42,6 +42,13 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginRe
         }
 
         var tokenString = _tokenService.GenerateJwtToken(user);
-        return Result.Success(new LoginResponseDto(tokenString, user.TenantId, user.FullName, user.Email, user.IsAdmin));
+
+        return Result.Success(new LoginResponseDto(
+            tokenString,
+            user.TenantId,
+            user.FullName,
+            user.Email,
+            user.Role
+        ));
     }
 }

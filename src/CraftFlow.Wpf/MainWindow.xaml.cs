@@ -1,4 +1,5 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Modules.Identity.Domain;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Pages;
 using CraftFlow.Wpf.Services;
@@ -71,25 +72,27 @@ public partial class MainWindow : Window
         MainMenuPanel.Visibility = Visibility.Visible;
 
         var currentUser = ApiService.Instance.CurrentUser;
-        bool isAdmin = currentUser?.IsAdmin ?? false;
+        bool isSuperAdmin = currentUser?.Role == TenantRole.SuperAdmin;
 
         GuestPanel.Visibility = Visibility.Collapsed;
         UserProfilePanel.Visibility = Visibility.Visible;
 
         UserNameTextBlock.Text = currentUser?.FullName ?? string.Empty;
-        UserRoleTextBlock.Text = isAdmin ? AuthConstants.Roles.ADMIN : AuthConstants.Roles.USER;
+        UserRoleTextBlock.Text = currentUser?.Role switch
+        {
+            TenantRole.SuperAdmin => "SuperAdmin (SaaS)",
+            TenantRole.Owner => "Владелец",
+            TenantRole.Technologist => "Технолог",
+            TenantRole.Storekeeper => "Кладовщик",
+            TenantRole.SalesManager => "Менеджер продаж",
+            _ => "Сотрудник"
+        };
 
         NavAuthButton.Visibility = Visibility.Collapsed;
-        NavProfileButton.Visibility = Visibility.Visible;
 
-        if (isAdmin)
-        {
-            NavAdminKeysButton.Visibility = Visibility.Visible;
-        }
-        else
-        {
-            NavAdminKeysButton.Visibility = Visibility.Collapsed;
-        }
+        bool canViewProfile = currentUser?.Role == TenantRole.Owner || isSuperAdmin;
+        NavProfileButton.Visibility = canViewProfile ? Visibility.Visible : Visibility.Collapsed;
+        NavAdminKeysButton.Visibility = isSuperAdmin ? Visibility.Visible : Visibility.Collapsed;
     }
 
     private void Logout_Click(object sender, RoutedEventArgs e)

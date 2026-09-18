@@ -1,5 +1,4 @@
 ﻿using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.Api.Modules.Subscriptions.Domain;
 using CraftFlow.SharedKernel.Constants;
@@ -11,27 +10,22 @@ namespace CraftFlow.Api.Modules.Identity.RegisterOrganization;
 
 public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationCommand, Result<Guid>>
 {
-    private const string DEFAULT_TRIAL_PLAN_CODE = "TRIAL";
-    private const int DEFAULT_TRIAL_DAYS = 14;
-    private const int OTP_EXPIRATION_MINUTES = 5;
-
     private readonly AppDbContext _dbContext;
-    private readonly IEmailService _emailService;
 
-    public RegisterOrganizationHandler(AppDbContext dbContext, IEmailService emailService)
+    public RegisterOrganizationHandler(AppDbContext dbContext)
     {
         _dbContext = dbContext;
-        _emailService = emailService;
     }
 
     public async Task<Result<Guid>> Handle(RegisterOrganizationCommand request, CancellationToken cancellationToken)
     {
         var normalizedEmail = request.OwnerEmail.Trim().ToLowerInvariant();
 
-        var exists = await _dbContext.Users
-            .AnyAsync(u => u.Email == normalizedEmail, cancellationToken);
+        var existingUser = await _dbContext.Users
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Email == normalizedEmail, cancellationToken);
 
-        if (exists)
+        if (existingUser != null)
         {
             return Result.Failure<Guid>(Error.Conflict(ErrorCodes.Auth.USER_ALREADY_EXISTS));
         }
@@ -40,29 +34,30 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
         _dbContext.Organizations.Add(organization);
 
         var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.OwnerPassword);
-        var owner = User.Create(organization.Id, normalizedEmail, passwordHash, request.OwnerFullName);
-        var rawOtpCode = Random.Shared.Next(100000, 999999).ToString("D6");
-        var otpHash = BCrypt.Net.BCrypt.HashPassword(rawOtpCode);
+        var ownerUser = User.Create(
+            tenantId: organization.Id,
+            email: normalizedEmail,
+            passwordHash: passwordHash,
+            fullName: request.OwnerFullName,
+            role: TenantRole.Owner
+        );
 
-        owner.SetOtpCode(otpHash, DateTime.UtcNow.AddMinutes(OTP_EXPIRATION_MINUTES));
+        ownerUser.Activate();
+        organization.Activate();
 
-        _dbContext.Users.Add(owner);
+        _dbContext.Users.Add(ownerUser);
 
-        var trialPlan = await _dbContext.SubscriptionPlans
-            .FirstOrDefaultAsync(p => p.Code == DEFAULT_TRIAL_PLAN_CODE, cancellationToken);
+        var freePlan = await _dbContext.SubscriptionPlans
+            .FirstOrDefaultAsync(p => p.Code == "FREE", cancellationToken)
+            ?? await _dbContext.SubscriptionPlans.FirstOrDefaultAsync(cancellationToken);
 
-        if (trialPlan != null)
+        if (freePlan != null)
         {
-            var subscription = TenantSubscription.CreateTrial(
-                organization.Id,
-                trialPlan.Id,
-                DateTime.UtcNow.AddDays(DEFAULT_TRIAL_DAYS));
-
-            _dbContext.TenantSubscriptions.Add(subscription);
+            var freeSubscription = TenantSubscription.CreateFree(organization.Id, freePlan.Id);
+            _dbContext.TenantSubscriptions.Add(freeSubscription);
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
-        await _emailService.SendOtpCodeAsync(owner.Email, rawOtpCode);
 
         return Result.Success(organization.Id);
     }

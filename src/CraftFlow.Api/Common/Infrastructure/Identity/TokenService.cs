@@ -20,8 +20,10 @@ public class TokenService : ITokenService
     public string GenerateJwtToken(User user)
     {
         var adminEmail = Environment.GetEnvironmentVariable(AuthConstants.ADMIN_CONFIG_KEYS.ADMIN_EMAIL_KEY);
-        var isAdmin = user.IsAdmin || (!string.IsNullOrEmpty(adminEmail) &&
+        var isSystemAdmin = user.Role == TenantRole.SuperAdmin || (!string.IsNullOrEmpty(adminEmail) &&
                       user.Email.Equals(adminEmail.Trim().ToLowerInvariant(), StringComparison.OrdinalIgnoreCase));
+
+        var roleName = isSystemAdmin ? TenantRole.SuperAdmin.ToString() : user.Role.ToString();
 
         var claims = new List<Claim>
         {
@@ -29,19 +31,10 @@ public class TokenService : ITokenService
             new(ClaimTypes.Email, user.Email),
             new(AuthConstants.Claims.TENANT_ID, user.TenantId.ToString()),
             new(AuthConstants.Claims.FULL_NAME, user.FullName),
+            new(ClaimTypes.Role, roleName),
+            new(AuthConstants.Claims.ROLE_SHORT, roleName),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
-
-        if (isAdmin)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, AuthConstants.Roles.ADMIN));
-            claims.Add(new Claim(AuthConstants.Claims.ROLE_SHORT, AuthConstants.Roles.ADMIN));
-        }
-        else
-        {
-            claims.Add(new Claim(ClaimTypes.Role, AuthConstants.Roles.USER));
-            claims.Add(new Claim(AuthConstants.Claims.ROLE_SHORT, AuthConstants.Roles.USER));
-        }
 
         var secretKey = _config["Jwt:SecretKey"]
             ?? _config["JWT_SECRET_KEY"]

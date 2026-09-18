@@ -1,6 +1,7 @@
-﻿using System.Security.Claims;
-using CraftFlow.Api.Common.Constants;
+﻿using CraftFlow.Api.Common.Constants;
+using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.SharedKernel.Constants;
+using System.Security.Claims;
 
 namespace CraftFlow.Api.Common.MultiTenancy;
 
@@ -16,7 +17,7 @@ public class TenantContext : ITenantContext
 
     public Guid TenantId => FetchTenantId();
     public Guid UserId => FetchUserId();
-    public bool IsAdmin => FetchIsAdmin();
+    public TenantRole Role => FetchRole();
     public bool IsResolved => TryFetchTenantId(out _);
 
     private Guid FetchTenantId()
@@ -41,17 +42,30 @@ public class TenantContext : ITenantContext
         return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
     }
 
-    private bool FetchIsAdmin()
+    private TenantRole FetchRole()
     {
         var httpContext = _httpContextAccessor.HttpContext;
         if (httpContext?.User is null || !httpContext.User.Identity?.IsAuthenticated == true)
         {
-            return false;
+            return TenantRole.Storekeeper;
         }
 
-        return httpContext.User.IsInRole(AuthConstants.Roles.ADMIN) ||
-               httpContext.User.HasClaim(c => (c.Type == ClaimTypes.Role || c.Type == AuthConstants.Claims.ROLE_SHORT) &&
-                                              c.Value.Equals(AuthConstants.Roles.ADMIN, StringComparison.OrdinalIgnoreCase));
+        if (httpContext.User.IsInRole(AuthConstants.Roles.ADMIN) ||
+            httpContext.User.HasClaim(c => (c.Type == ClaimTypes.Role || c.Type == AuthConstants.Claims.ROLE_SHORT) &&
+                                           c.Value.Equals(AuthConstants.Roles.ADMIN, StringComparison.OrdinalIgnoreCase)))
+        {
+            return TenantRole.SuperAdmin;
+        }
+
+        var roleClaim = httpContext.User.FindFirst(ClaimTypes.Role)?.Value
+                        ?? httpContext.User.FindFirst(AuthConstants.Claims.ROLE_SHORT)?.Value;
+
+        if (!string.IsNullOrWhiteSpace(roleClaim) && Enum.TryParse<TenantRole>(roleClaim, true, out var parsedRole))
+        {
+            return parsedRole;
+        }
+
+        return TenantRole.Owner;
     }
 
     private bool TryFetchTenantId(out Guid tenantId)

@@ -27,7 +27,9 @@ public static class SystemAdminSeeder
         if (existingAdmin == null)
         {
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(adminPassword);
-            var bigBoss = User.CreateSystemAdmin(adminEmail, adminName ?? "Big Boss", passwordHash);
+
+            var bigBoss = User.Create(Guid.Empty, adminEmail, passwordHash, adminName ?? "Big Boss", TenantRole.SuperAdmin);
+            bigBoss.Activate();
 
             dbContext.Users.Add(bigBoss);
             await dbContext.SaveChangesAsync();
