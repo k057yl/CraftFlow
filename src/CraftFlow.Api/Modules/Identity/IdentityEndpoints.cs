@@ -3,11 +3,13 @@ using CraftFlow.Api.Modules.Identity.DeleteAccount;
 using CraftFlow.Api.Modules.Identity.ExtendSubscription;
 using CraftFlow.Api.Modules.Identity.GetOrganizations;
 using CraftFlow.Api.Modules.Identity.GetSubscriptionPayments;
+using CraftFlow.Api.Modules.Identity.GetTenantUsers;
 using CraftFlow.Api.Modules.Identity.LoginUser;
 using CraftFlow.Api.Modules.Identity.ManageSubscription;
 using CraftFlow.Api.Modules.Identity.RegisterOrganization;
 using CraftFlow.Api.Modules.Identity.ResendOtp;
 using CraftFlow.Api.Modules.Identity.ToggleOrganizationStatus;
+using CraftFlow.Api.Modules.Identity.ToggleUserStatus;
 using CraftFlow.Api.Modules.Identity.VerifyOtp;
 using MediatR;
 
@@ -29,6 +31,12 @@ public static class IdentityEndpoints
         group.MapPost(IdentityConstants.USERS, async (CreateTenantUserCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        }).RequireAuthorization();
+
+        group.MapGet(IdentityConstants.USERS, async (ISender sender) =>
+        {
+            var result = await sender.Send(new GetTenantUsersQuery());
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         }).RequireAuthorization();
 
@@ -83,6 +91,12 @@ public static class IdentityEndpoints
         group.MapGet(IdentityConstants.ORGANIZATIONS_PAYMENTS, async (Guid id, ISender sender) =>
         {
             var result = await sender.Send(new GetSubscriptionPaymentsQuery(id));
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        }).RequireAuthorization();
+
+        group.MapPost($"{IdentityConstants.USERS}/{{id:guid}}/toggle-status", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new ToggleUserStatusCommand(id));
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         }).RequireAuthorization();
     }

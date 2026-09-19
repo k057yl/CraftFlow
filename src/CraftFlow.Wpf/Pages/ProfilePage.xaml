@@ -42,7 +42,7 @@
                     </StackPanel>
                 </Border>
 
-                <!-- Управление сотрудниками организации (Создание/Управление) -->
+                <!-- Управление сотрудниками организации -->
                 <Border x:Name="TeamManagementBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
                     <StackPanel>
                         <TextBlock Text="Управление сотрудниками организации" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
@@ -70,28 +70,28 @@
 
                             <Button Content="Добавить сотрудника" Click="CreateTeamUser_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Padding="12,0" VerticalAlignment="Bottom" Margin="0,0,0,5"/>
                         </WrapPanel>
-                    </StackPanel>
-                </Border>
 
-                <!-- API Ключи терминалов -->
-                <Border x:Name="TenantKeysBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
-                    <StackPanel>
-                        <TextBlock Text="API Ключи терминалов (Тенант)" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
-
-                        <Grid Margin="0,0,0,15">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox x:Name="OtpInputTextBox" Height="32" Margin="0,0,10,0" VerticalContentAlignment="Center"/>
-                            <Button Grid.Column="1" Content="Активировать ключ" Click="ActivateOtp_Click" Style="{StaticResource PrimaryButtonStyle}" Padding="15,0"/>
-                        </Grid>
-
-                        <DataGrid x:Name="MyKeysDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Height="180">
+                        <!-- Список сотрудников -->
+                        <TextBlock Text="Список сотрудников:" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,10,0,10"/>
+                        <DataGrid x:Name="TeamUsersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Height="220">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="ID Ключа" Binding="{Binding Id}" Width="200"/>
-                                <DataGridTextColumn Header="Статус" Binding="{Binding Status}" Width="100"/>
-                                <DataGridTextColumn Header="Создан" Binding="{Binding CreatedAtUtc}" Width="*"/>
+                                <DataGridTextColumn Header="ФИО" Binding="{Binding FullName}" Width="160"/>
+                                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="180"/>
+                                <DataGridTextColumn Header="Роль" Binding="{Binding RoleDisplay}" Width="150"/>
+                                <DataGridTextColumn Header="Статус" Binding="{Binding StatusDisplay}" Width="110"/>
+
+                                <!-- Колонка с кнопкой управления -->
+                                <DataGridTemplateColumn Header="Действия" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="{Binding ActionButtonText}" 
+                                                Click="ToggleUserStatus_Click" 
+                                                Tag="{Binding Id}"
+                                                IsEnabled="{Binding CanToggle}"
+                                                Height="24" Padding="8,0" FontSize="11" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>

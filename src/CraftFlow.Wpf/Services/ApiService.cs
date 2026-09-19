@@ -1,10 +1,11 @@
 ﻿using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Modules.Aging;
+using CraftFlow.Api.Modules.Identity;
 using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.Api.Modules.MRP;
 using CraftFlow.Api.Modules.Procurement;
-using CraftFlow.Api.Modules.Traceability;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Dtos.Auth;
 using CraftFlow.SharedKernel.Result;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Models.Auth;
@@ -235,11 +236,11 @@ public class ApiService
     {
         string[] roleClaimNames =
         {
-        "role",
-        "Role",
-        "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
-        AuthConstants.Claims.ROLE_SHORT
-    };
+            "role",
+            "Role",
+            "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+            AuthConstants.Claims.ROLE_SHORT
+        };
 
         foreach (var claimName in roleClaimNames)
         {
@@ -266,30 +267,6 @@ public class ApiService
         }
 
         return TenantRole.None;
-    }
-
-    private static bool CheckRoleInJwt(JsonElement root, string propertyName)
-    {
-        if (!root.TryGetProperty(propertyName, out var roleProp)) return false;
-
-        if (roleProp.ValueKind == JsonValueKind.String)
-        {
-            return string.Equals(roleProp.GetString(), AuthConstants.Roles.ADMIN, StringComparison.OrdinalIgnoreCase);
-        }
-
-        if (roleProp.ValueKind == JsonValueKind.Array)
-        {
-            foreach (var element in roleProp.EnumerateArray())
-            {
-                if (element.ValueKind == JsonValueKind.String &&
-                    string.Equals(element.GetString(), AuthConstants.Roles.ADMIN, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
     }
 
     public async Task<T?> GetAsync<T>(string endpoint)
@@ -411,6 +388,16 @@ public class ApiService
             }
         });
     }
+
+    // --- Identity ---
+    public async Task<List<TenantUserDto>> GetTenantUsersAsync()
+    {
+        var users = await GetAsync<List<TenantUserDto>>(IdentityConstants.USERS);
+        return users ?? new List<TenantUserDto>();
+    }
+
+    public Task<(bool IsSuccess, string ContentOrError)> ToggleUserStatusAsync(Guid userId) =>
+        PostAndReadAsync($"{IdentityConstants.USERS}/{userId}/toggle-status", new { });
 
     // --- Procurement ---
     public Task<(bool IsSuccess, string ContentOrError)> CreateSupplierAsync(CreateSupplierRequest request) =>

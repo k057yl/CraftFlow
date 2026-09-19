@@ -1,8 +1,5 @@
 ﻿using CraftFlow.Api.Modules.Identity;
 using CraftFlow.Api.Modules.Identity.Domain;
-using CraftFlow.Api.Modules.Subscriptions;
-using CraftFlow.SharedKernel.Constants;
-using CraftFlow.SharedKernel.Dtos;
 using CraftFlow.SharedKernel.Dtos.Auth;
 using CraftFlow.Wpf.Models.Auth;
 using CraftFlow.Wpf.Services;
@@ -15,14 +12,11 @@ namespace CraftFlow.Wpf.Pages;
 
 public partial class ProfilePage : Page
 {
-    private const int OTP_CODE_LENGTH = 6;
-
     public ProfilePage()
     {
         InitializeComponent();
         InitRoleComboBox();
         LoadUserData();
-        _ = LoadMyKeysAsync();
     }
 
     private void InitRoleComboBox()
@@ -46,15 +40,7 @@ public partial class ProfilePage : Page
             NameTextBlock.Text = user.FullName;
             EmailTextBlock.Text = user.Email;
 
-            RoleTextBlock.Text = user.Role switch
-            {
-                TenantRole.SuperAdmin => "Системный администратор (Big Boss)",
-                TenantRole.Owner => "Владелец сыроварни",
-                TenantRole.Technologist => "Главный технолог",
-                TenantRole.Storekeeper => "Кладовщик",
-                TenantRole.SalesManager => "Менеджер по продажам",
-                _ => "Сотрудник"
-            };
+            RoleTextBlock.Text = GetRoleDisplayName(user.Role);
 
             if (string.IsNullOrWhiteSpace(user.Email))
             {
@@ -72,9 +58,46 @@ public partial class ProfilePage : Page
             TeamManagementBorder.Visibility = isOwner ? Visibility.Visible : Visibility.Collapsed;
             DangerZoneBorder.Visibility = isOwner ? Visibility.Visible : Visibility.Collapsed;
 
-            if (user.Role == TenantRole.SuperAdmin)
+            if (isOwner)
             {
-                TenantKeysBorder.Visibility = Visibility.Collapsed;
+                await LoadTeamUsersAsync();
+            }
+        }
+    }
+
+    private async Task LoadTeamUsersAsync()
+    {
+        var users = await ApiService.Instance.GetTenantUsersAsync();
+        var currentUserId = ApiService.Instance.CurrentUser?.Email;
+
+        var viewModels = users
+            .Where(u => u.Role != TenantRole.SuperAdmin)
+            .Select(u => new
+            {
+                u.Id,
+                u.FullName,
+                u.Email,
+                RoleDisplay = GetRoleDisplayName(u.Role),
+                StatusDisplay = u.IsActive ? "Активен" : "Заблокирован",
+                ActionButtonText = u.IsActive ? "Деактивировать" : "Активировать",
+                CanToggle = u.Role != TenantRole.Owner && u.Email != currentUserId
+            }).ToList();
+
+        TeamUsersDataGrid.ItemsSource = viewModels;
+    }
+
+    private async void ToggleUserStatus_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is Guid userId)
+        {
+            var (isSuccess, contentOrError) = await ApiService.Instance.ToggleUserStatusAsync(userId);
+            if (isSuccess)
+            {
+                await LoadTeamUsersAsync();
+            }
+            else
+            {
+                MessageBox.Show(contentOrError, "Ошибка смены статуса", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
@@ -103,6 +126,7 @@ public partial class ProfilePage : Page
             NewUserFullNameTextBox.Clear();
             NewUserEmailTextBox.Clear();
             NewUserPasswordBox.Clear();
+            await LoadTeamUsersAsync();
         }
         else
         {
@@ -110,44 +134,14 @@ public partial class ProfilePage : Page
         }
     }
 
-    private async Task LoadMyKeysAsync()
+    private static string GetRoleDisplayName(TenantRole role) => role switch
     {
-        var user = ApiService.Instance.CurrentUser;
-        if (user?.Role == TenantRole.SuperAdmin) return;
-
-        var keys = await ApiService.Instance.GetAsync<List<AccessKeyDto>>(SubscriptionsConstants.SUBSCRIPTION_KEYS);
-        if (keys != null)
-        {
-            MyKeysDataGrid.ItemsSource = keys;
-        }
-    }
-
-    private async void ActivateOtp_Click(object sender, RoutedEventArgs e)
-    {
-        var otpCode = OtpInputTextBox.Text.Trim();
-
-        if (string.IsNullOrWhiteSpace(otpCode) || otpCode.Length != OTP_CODE_LENGTH)
-        {
-            MessageBox.Show(LocalizationService.Get(UiConstants.Messages.INVALID_OTP_FORMAT), LocalizationService.Get(UiConstants.Titles.WARNING), MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync(SubscriptionsConstants.ACTIVATE_KEY_ENDPOINT, new
-        {
-            OtpCode = otpCode
-        });
-
-        if (isSuccess)
-        {
-            MessageBox.Show(LocalizationService.Get(UiConstants.Messages.KEY_ACTIVATED_SUCCESS), LocalizationService.Get(UiConstants.Titles.SUCCESS), MessageBoxButton.OK, MessageBoxImage.Information);
-            OtpInputTextBox.Clear();
-            await LoadMyKeysAsync();
-        }
-        else
-        {
-            MessageBox.Show(contentOrError, LocalizationService.Get(UiConstants.Titles.ERROR), MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
+        TenantRole.Owner => "Владелец сыроварни",
+        TenantRole.Technologist => "Главный технолог",
+        TenantRole.Storekeeper => "Кладовщик",
+        TenantRole.SalesManager => "Менеджер по продажам",
+        _ => "Сотрудник"
+    };
 
     private async void DeleteAccount_Click(object sender, RoutedEventArgs e)
     {
