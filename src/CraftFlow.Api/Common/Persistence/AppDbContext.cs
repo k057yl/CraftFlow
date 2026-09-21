@@ -111,9 +111,12 @@ public class AppDbContext : DbContext
             {
                 var currentTenantId = entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue as Guid?;
 
-                if (!_tenantContext.IsSuperAdmin || !currentTenantId.HasValue || currentTenantId.Value == Guid.Empty)
+                if (!currentTenantId.HasValue || currentTenantId.Value == Guid.Empty)
                 {
-                    entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue = _tenantContext.TenantId;
+                    if (_tenantContext.TenantId != Guid.Empty)
+                    {
+                        entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue = _tenantContext.TenantId;
+                    }
                 }
             }
         }

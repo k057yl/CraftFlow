@@ -22,13 +22,26 @@ public class CreateChamberHandler : IRequestHandler<CreateChamberCommand, Result
     public async Task<Result<Guid>> Handle(CreateChamberCommand request, CancellationToken cancellationToken)
     {
         var tenantId = _tenantContext.TenantId;
+
         if (tenantId == Guid.Empty)
         {
-            return Result.Failure<Guid>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
+            var user = await _dbContext.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == _tenantContext.UserId, cancellationToken);
+
+            if (user != null && user.TenantId != Guid.Empty)
+            {
+                tenantId = user.TenantId;
+            }
+        }
+
+        if (tenantId == Guid.Empty)
+        {
+            return Result.Failure<Guid>(Error.Validation(ErrorCodes.Auth.ACCESS_DENIED));
         }
 
         var nameExists = await _dbContext.AgingChambers
-            .AnyAsync(c => c.Name == request.Name, cancellationToken);
+            .AnyAsync(c => c.Name == request.Name && c.TenantId == tenantId, cancellationToken);
 
         if (nameExists)
         {

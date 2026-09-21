@@ -114,12 +114,29 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
             return (TResponse)(object)Result.Failure(error);
         }
 
-        var valueType = typeof(TResponse).GetGenericArguments()[0];
+        var genericArgs = typeof(TResponse).GetGenericArguments();
+        if (genericArgs.Length == 0)
+        {
+            return (TResponse)(object)Result.Failure(error);
+        }
+
+        var valueType = genericArgs[0];
 
         var failureMethod = FailureMethodCache.GetOrAdd(valueType, type =>
         {
-            var genericResultType = typeof(Result<>).MakeGenericType(type);
+            var genericMethod = typeof(Result)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .FirstOrDefault(m => m.Name == nameof(Result.Failure)
+                                  && m.IsGenericMethodDefinition
+                                  && m.GetParameters().Length == 1
+                                  && m.GetParameters()[0].ParameterType == typeof(Error));
 
+            if (genericMethod != null)
+            {
+                return genericMethod.MakeGenericMethod(type);
+            }
+
+            var genericResultType = typeof(Result<>).MakeGenericType(type);
             return genericResultType
                 .GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .First(m => m.Name == nameof(Result.Failure)

@@ -36,7 +36,6 @@
 
                             <Button Content="{loc:Loc Key=CREATE_UOM}" Click="CreateUom_Click" Style="{StaticResource PrimaryButtonStyle}" Width="120" Height="28" Margin="0,0,10,5"/>
 
-                            <!-- Кнопка вызова пресетов с ContextMenu -->
                             <Button Content="⚡ Auto-Seed Presets ▾" Click="SeedUomPreset_Click" Background="#0EA5E9" Foreground="White" FontWeight="SemiBold" Height="28" Padding="10,0" Margin="0,0,0,5">
                                 <Button.ContextMenu>
                                     <ContextMenu>

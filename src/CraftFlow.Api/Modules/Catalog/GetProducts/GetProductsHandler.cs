@@ -3,25 +3,29 @@ using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace CraftFlow.Api.Modules.Catalog.GetProducts
+namespace CraftFlow.Api.Modules.Catalog.GetProducts;
+
+public class GetProductsHandler : IRequestHandler<GetProductsQuery, Result<List<ProductDto>>>
 {
-    public class GetProductsHandler : IRequestHandler<GetProductsQuery, Result<List<ProductDto>>>
+    private readonly AppDbContext _dbContext;
+
+    public GetProductsHandler(AppDbContext dbContext)
     {
-        private readonly AppDbContext _dbContext;
+        _dbContext = dbContext;
+    }
 
-        public GetProductsHandler(AppDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
+    public async Task<Result<List<ProductDto>>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
+    {
+        var products = await _dbContext.Products
+            .AsNoTracking()
+            .Join(
+                _dbContext.UnitsOfMeasure.AsNoTracking(),
+                prod => prod.UnitOfMeasureId,
+                uom => uom.Id,
+                (prod, uom) => new ProductDto(prod.Id, prod.Name, prod.UnitOfMeasureId, uom.Code)
+            )
+            .ToListAsync(cancellationToken);
 
-        public async Task<Result<List<ProductDto>>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
-        {
-            var products = await _dbContext.Products
-                .AsNoTracking()
-                .Select(p => new ProductDto(p.Id, p.Name, p.UnitOfMeasureId))
-                .ToListAsync(cancellationToken);
-
-            return Result.Success(products);
-        }
+        return Result.Success(products);
     }
 }

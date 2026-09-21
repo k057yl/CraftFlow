@@ -60,13 +60,21 @@ public partial class CatalogPage : Page
             UnitsOfMeasure.Clear();
             uoms?.ForEach(u => UnitsOfMeasure.Add(new LookupItem(u.Id, u.Name, u.Code)));
 
-            var raw = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.RAW_MATERIALS);
+            var raw = await ApiService.Instance.GetAsync<List<RawMaterialDto>>(CatalogConstants.RAW_MATERIALS);
             RawMaterials.Clear();
-            raw?.ForEach(r => RawMaterials.Add(new LookupItem(r.Id, r.Name)));
+            raw?.ForEach(r =>
+            {
+                var displayName = !string.IsNullOrWhiteSpace(r.UnitOfMeasureCode) ? $"{r.Name} ({r.UnitOfMeasureCode})" : r.Name;
+                RawMaterials.Add(new LookupItem(r.Id, displayName, r.UnitOfMeasureCode));
+            });
 
-            var prods = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.PRODUCTS);
+            var prods = await ApiService.Instance.GetAsync<List<ProductDto>>(CatalogConstants.PRODUCTS);
             Products.Clear();
-            prods?.ForEach(p => Products.Add(new LookupItem(p.Id, p.Name)));
+            prods?.ForEach(p =>
+            {
+                var displayName = !string.IsNullOrWhiteSpace(p.UnitOfMeasureCode) ? $"{p.Name} ({p.UnitOfMeasureCode})" : p.Name;
+                Products.Add(new LookupItem(p.Id, displayName, p.UnitOfMeasureCode));
+            });
 
             var recs = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.RECIPES);
             Recipes.Clear();
@@ -85,7 +93,8 @@ public partial class CatalogPage : Page
         if (RecipeRawMaterialComboBox.SelectedItem is LookupItem rawItem &&
             TryParseDecimal(RecipeIngredientQuantityTextBox.Text, out var qty) && qty > 0)
         {
-            _selectedIngredients.Add(new IngredientItemDto(rawItem.Id, rawItem.Name, string.Empty, qty));
+            var uomCode = rawItem.Code ?? string.Empty;
+            _selectedIngredients.Add(new IngredientItemDto(rawItem.Id, rawItem.Name, uomCode, qty));
             RecipeIngredientQuantityTextBox.Text = "1";
         }
         else

@@ -33,8 +33,17 @@ public sealed class RequestSanitizationBehavior<TRequest, TResponse>
         if (type.IsValueType || type == typeof(string) || type.Assembly.IsDynamic)
             return;
 
+        if (obj is System.Collections.IEnumerable enumerable)
+        {
+            foreach (var item in enumerable)
+            {
+                SanitizeObject(item);
+            }
+            return;
+        }
+
         var properties = type.GetProperties(BindingFlags.Instance | BindingFlags.Public)
-            .Where(p => p.CanRead);
+            .Where(p => p.CanRead && p.GetIndexParameters().Length == 0);
 
         foreach (var property in properties)
         {
@@ -56,7 +65,7 @@ public sealed class RequestSanitizationBehavior<TRequest, TResponse>
                     }
                 }
             }
-            else if (property.PropertyType.IsClass && property.PropertyType != typeof(string))
+            else if (property.PropertyType.IsClass)
             {
                 var nestedObject = property.GetValue(obj);
                 SanitizeObject(nestedObject);
