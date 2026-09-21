@@ -12,6 +12,7 @@ public static class ErrorCodes
         public const string INVALID_FORMAT = "GENERAL.INVALID_FORMAT";
         public const string ALREADY_EXISTS = "GENERAL.ALREADY_EXISTS";
         public const string VALIDATION_ERROR = "GENERAL.VALIDATION_ERROR";
+        public const string MAX_LENGTH_EXCEEDED = "GENERAL.MAX_LENGTH_EXCEEDED";
     }
 
     public static class Production
@@ -32,6 +33,12 @@ public static class ErrorCodes
         public const string WAREHOUSE_NOT_FOUND = "INVENTORY.WAREHOUSE_NOT_FOUND";
         public const string WAREHOUSE_NAME_REQUIRED = "INVENTORY.WAREHOUSE_NAME_REQUIRED";
         public const string ITEM_NOT_FOUND = "INVENTORY.ITEM_NOT_FOUND";
+        public const string LOCATION_NAME_REQUIRED = "INVENTORY.LOCATION_NAME_REQUIRED";
+        public const string LOCATION_TYPE_REQUIRED = "INVENTORY.LOCATION_TYPE_REQUIRED";
+        public const string INVALID_CAPACITY = "INVENTORY.INVALID_CAPACITY";
+        public const string PARENT_CONTAINER_REQUIRED = "INVENTORY.PARENT_CONTAINER_REQUIRED";
+        public const string STOCK_LOT_NOT_FOUND = "INVENTORY.STOCK_LOT_NOT_FOUND";
+        public const string LOCATION_NOT_FOUND = "INVENTORY.LOCATION_NOT_FOUND";
     }
 
     public static class Catalog

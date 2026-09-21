@@ -1,5 +1,4 @@
 ﻿using CraftFlow.Api.Common.Persistence;
-using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,65 +16,67 @@ public class GetStockLotsHandler : IRequestHandler<GetStockLotsQuery, Result<Lis
 
     public async Task<Result<List<StockLotDto>>> Handle(GetStockLotsQuery request, CancellationToken cancellationToken)
     {
-        var rawMaterialIds = await _dbContext.RawMaterials
+        var lots = await _dbContext.StockLots
             .AsNoTracking()
-            .Select(r => r.Id)
+            .Include(sl => sl.StorageLocations)
             .ToListAsync(cancellationToken);
 
-        var query = _dbContext.StockLots
-            .AsNoTracking()
-            .Where(x => x.Quantity > 0 && rawMaterialIds.Contains(x.ItemId));
-
-        if (request.WarehouseId.HasValue && request.WarehouseId.Value != Guid.Empty)
-        {
-            query = query.Where(x => x.WarehouseId == request.WarehouseId.Value);
-        }
-
-        if (request.SupplierId.HasValue && request.SupplierId.Value != Guid.Empty)
-        {
-            query = query.Where(x => x.SupplierId == request.SupplierId.Value);
-        }
+        var rawMaterialsMap = await _dbContext.RawMaterials.AsNoTracking().ToDictionaryAsync(r => r.Id, r => r.Name, cancellationToken);
+        var productsMap = await _dbContext.Products.AsNoTracking().ToDictionaryAsync(p => p.Id, p => p.Name, cancellationToken);
+        var warehousesMap = await _dbContext.Warehouses.AsNoTracking().ToDictionaryAsync(w => w.Id, w => w.Name, cancellationToken);
+        var suppliersMap = await _dbContext.Suppliers.AsNoTracking().ToDictionaryAsync(s => s.Id, s => s.Name, cancellationToken);
+        var storageLocationsMap = await _dbContext.StorageLocations.AsNoTracking().ToDictionaryAsync(sl => sl.Id, sl => sl.Name, cancellationToken);
 
         var now = DateTime.UtcNow;
-        var warningThreshold = now.AddDays(7);
+        var soonThreshold = now.AddDays(7);
+
+        var result = new List<StockLotDto>();
+
+        foreach (var lot in lots)
+        {
+            string itemName = rawMaterialsMap.TryGetValue(lot.ItemId, out var rmName)
+                ? rmName
+                : (productsMap.TryGetValue(lot.ItemId, out var pName) ? pName : "—");
+
+            string warehouseName = warehousesMap.TryGetValue(lot.WarehouseId, out var wName) ? wName : "—";
+            string? supplierName = lot.SupplierId.HasValue && suppliersMap.TryGetValue(lot.SupplierId.Value, out var sName) ? sName : null;
+
+            var isExpired = lot.ExpirationDate.HasValue && lot.ExpirationDate.Value <= now;
+            var isExpiringSoon = lot.ExpirationDate.HasValue && !isExpired && lot.ExpirationDate.Value <= soonThreshold;
+            var locInfoList = lot.StorageLocations
+                .Where(sl => storageLocationsMap.ContainsKey(sl.StorageLocationId))
+                .Select(sl => $"{storageLocationsMap[sl.StorageLocationId]} ({sl.AllocatedQuantity:N0} л)")
+                .ToList();
+
+            string? locationsInfo = locInfoList.Count > 0 ? string.Join(", ", locInfoList) : "—";
+
+            result.Add(new StockLotDto(
+                lot.Id,
+                itemName,
+                warehouseName,
+                supplierName,
+                lot.Quantity,
+                lot.UnitPrice,
+                lot.BatchNumber,
+                lot.CreatedDate,
+                lot.ExpirationDate,
+                isExpired,
+                isExpiringSoon,
+                locationsInfo
+            ));
+        }
+
+        if (request.WarehouseId.HasValue)
+            result = result.Where(r => lots.Any(l => l.Id == r.Id && l.WarehouseId == request.WarehouseId.Value)).ToList();
+
+        if (request.SupplierId.HasValue)
+            result = result.Where(r => lots.Any(l => l.Id == r.Id && l.SupplierId == request.SupplierId.Value)).ToList();
+
+        if (request.OnlyExpiringSoon == true)
+            result = result.Where(r => r.IsExpiringSoon).ToList();
 
         if (request.OnlyExpired == true)
-        {
-            query = query.Where(x => x.ExpirationDate.HasValue && x.ExpirationDate.Value < now);
-        }
-        else if (request.OnlyExpiringSoon == true)
-        {
-            query = query.Where(x => x.ExpirationDate.HasValue && x.ExpirationDate.Value >= now && x.ExpirationDate.Value <= warningThreshold);
-        }
-
-        query = request.SortBy switch
-        {
-            UiConstants.SortConstants.EXPIRATION_ASC => query.OrderBy(x => x.ExpirationDate),
-            UiConstants.SortConstants.EXPIRATION_DESC => query.OrderByDescending(x => x.ExpirationDate),
-            UiConstants.SortConstants.QUANTITY_DESC => query.OrderByDescending(x => x.Quantity),
-            UiConstants.SortConstants.SUPPLIER => query.OrderBy(x => x.SupplierId),
-            _ => query.OrderByDescending(x => x.CreatedDate)
-        };
-
-        var rawItems = await query.ToListAsync(cancellationToken);
-
-        var rawMaterialsMap = await _dbContext.RawMaterials.AsNoTracking().ToDictionaryAsync(x => x.Id, x => x.Name, cancellationToken);
-        var warehousesMap = await _dbContext.Warehouses.AsNoTracking().ToDictionaryAsync(x => x.Id, x => x.Name, cancellationToken);
-        var suppliersMap = await _dbContext.Suppliers.AsNoTracking().ToDictionaryAsync(x => x.Id, x => x.Name, cancellationToken);
-
-        var result = rawItems.Select(x => new StockLotDto(
-            Id: x.Id,
-            ItemName: rawMaterialsMap.GetValueOrDefault(x.ItemId, string.Empty),
-            WarehouseName: warehousesMap.GetValueOrDefault(x.WarehouseId, string.Empty),
-            SupplierName: x.SupplierId.HasValue ? suppliersMap.GetValueOrDefault(x.SupplierId.Value, string.Empty) : null,
-            Quantity: x.Quantity,
-            UnitPrice: x.UnitPrice,
-            BatchNumber: x.BatchNumber,
-            CreatedDate: x.CreatedDate,
-            ExpirationDate: x.ExpirationDate,
-            IsExpired: x.ExpirationDate.HasValue && x.ExpirationDate.Value < now,
-            IsExpiringSoon: x.ExpirationDate.HasValue && x.ExpirationDate.Value >= now && x.ExpirationDate.Value <= warningThreshold
-        )).ToList();
+            result = result.Where(r => r.IsExpired).ToList();
 
         return Result.Success(result);
     }

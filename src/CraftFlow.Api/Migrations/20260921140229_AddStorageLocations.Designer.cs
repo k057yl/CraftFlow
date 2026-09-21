@@ -3,6 +3,7 @@ using System;
 using CraftFlow.Api.Common.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CraftFlow.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260921140229_AddStorageLocations")]
+    partial class AddStorageLocations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -316,7 +319,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("organizations", "public");
+                    b.ToTable("Organizations", "public");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Identity.Domain.User", b =>
@@ -374,7 +377,8 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("BatchNumber")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone");
@@ -395,6 +399,9 @@ namespace CraftFlow.Api.Migrations
                         .HasPrecision(18, 4)
                         .HasColumnType("numeric(18,4)");
 
+                    b.Property<Guid?>("StorageLocationId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid?>("SupplierId")
                         .HasColumnType("uuid");
 
@@ -402,8 +409,7 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("numeric(18,4)");
+                        .HasColumnType("numeric");
 
                     b.Property<int>("UnitsCount")
                         .HasColumnType("integer");
@@ -422,9 +428,6 @@ namespace CraftFlow.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<int>("BatchesProcessedCount")
-                        .HasColumnType("integer");
-
                     b.Property<decimal?>("Capacity")
                         .HasPrecision(18, 4)
                         .HasColumnType("numeric(18,4)");
@@ -432,14 +435,11 @@ namespace CraftFlow.Api.Migrations
                     b.Property<Guid?>("ChamberId")
                         .HasColumnType("uuid");
 
-                    b.Property<decimal>("CurrentVolume")
-                        .HasColumnType("numeric");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<DateTime?>("LastWashedAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<bool>("IsOccupied")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("LocationType")
                         .IsRequired()
@@ -451,17 +451,11 @@ namespace CraftFlow.Api.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<DateTime?>("NextWashDueDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid?>("WarehouseId")
                         .HasColumnType("uuid");
-
-                    b.Property<int>("WashCycleBatchInterval")
-                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -958,32 +952,6 @@ namespace CraftFlow.Api.Migrations
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("CraftFlow.Api.Modules.Inventory.Domain.StockLot", b =>
-                {
-                    b.OwnsMany("CraftFlow.Api.Modules.Inventory.Domain.StockLotStorageLocation", "StorageLocations", b1 =>
-                        {
-                            b1.Property<Guid>("StockLotId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<Guid>("StorageLocationId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid");
-
-                            b1.Property<decimal>("AllocatedQuantity")
-                                .HasPrecision(18, 4)
-                                .HasColumnType("numeric(18,4)");
-
-                            b1.HasKey("StockLotId", "StorageLocationId");
-
-                            b1.ToTable("stock_lot_storage_locations", "public");
-
-                            b1.WithOwner()
-                                .HasForeignKey("StockLotId");
-                        });
-
-                    b.Navigation("StorageLocations");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Inventory.Domain.StorageLocation", b =>

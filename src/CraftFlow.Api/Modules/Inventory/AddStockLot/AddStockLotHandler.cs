@@ -43,6 +43,34 @@ public class AddStockLotHandler : IRequestHandler<AddStockLotCommand, Result<Gui
             expirationDate: utcExpirationDate
         );
 
+        if (request.StorageLocationIds != null && request.StorageLocationIds.Count > 0)
+        {
+            var locations = await _dbContext.StorageLocations
+                .Where(l => request.StorageLocationIds.Contains(l.Id))
+                .ToListAsync(cancellationToken);
+
+            decimal remainingQuantity = request.Quantity;
+
+            foreach (var location in locations)
+            {
+                if (remainingQuantity <= 0) break;
+
+                decimal freeCapacity = location.Capacity.HasValue
+                    ? Math.Max(0, location.Capacity.Value - location.CurrentVolume)
+                    : remainingQuantity;
+
+                decimal fillAmount = Math.Min(remainingQuantity, freeCapacity);
+
+                if (fillAmount > 0)
+                {
+                    location.AddVolume(fillAmount);
+                    location.RegisterBatchProcessed();
+                    stockLot.AssignStorageLocation(location.Id, fillAmount);
+                    remainingQuantity -= fillAmount;
+                }
+            }
+        }
+
         _dbContext.StockLots.Add(stockLot);
         await _dbContext.SaveChangesAsync(cancellationToken);
 

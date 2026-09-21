@@ -169,6 +169,112 @@
                     </DataGrid>
                 </Grid>
             </TabItem>
+
+            <!-- 3. Ёмкости / Стеллажи -->
+            <TabItem Header="Ёмкости / Стеллажи">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <GroupBox Header="Создать ёмкость / стеллаж" 
+                              Foreground="{DynamicResource AppForegroundBrush}" 
+                              Margin="0,0,0,10" 
+                              Padding="10">
+                        <WrapPanel VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
+                                <TextBlock Text="Название:" 
+                                           VerticalAlignment="Center" 
+                                           Margin="0,0,8,0" 
+                                           FontSize="11" 
+                                           Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="LocationNameTextBox" Width="140" Padding="5,3"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
+                                <TextBlock Text="Тип:" 
+                                           VerticalAlignment="Center" 
+                                           Margin="0,0,8,0" 
+                                           FontSize="11" 
+                                           Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <ComboBox x:Name="LocationTypeComboBox" Width="130" SelectedIndex="0" Padding="5,3">
+                                    <ComboBoxItem Content="Ванна / Танк" Tag="VAT_TANK"/>
+                                    <ComboBoxItem Content="Стеллаж / Полка" Tag="RACK_SHELF"/>
+                                    <ComboBoxItem Content="Бочка" Tag="BARREL"/>
+                                    <ComboBoxItem Content="Контейнер" Tag="CONTAINER"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
+                                <TextBlock Text="Склад:" 
+                                           VerticalAlignment="Center" 
+                                           Margin="0,0,8,0" 
+                                           FontSize="11" 
+                                           Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <ComboBox x:Name="LocationWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="130" Padding="5,3"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
+                                <TextBlock Text="или Камера:" 
+                                           VerticalAlignment="Center" 
+                                           Margin="0,0,8,0" 
+                                           FontSize="11" 
+                                           Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <ComboBox x:Name="LocationChamberComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="130" Padding="5,3"/>
+                            </StackPanel>
+
+                            <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
+                                <TextBlock Text="Вместимость:" 
+                                           VerticalAlignment="Center" 
+                                           Margin="0,0,8,0" 
+                                           FontSize="11" 
+                                           Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="LocationCapacityTextBox" Width="70" Padding="5,3"/>
+                            </StackPanel>
+
+                            <Button Content="Создать" 
+                                    Click="CreateStorageLocation_Click" 
+                                    Width="100" 
+                                    Height="28" 
+                                    Margin="0,0,0,5" 
+                                    FontWeight="SemiBold"
+                                    Background="#0284C7"
+                                    Foreground="White"/>
+                        </WrapPanel>
+                    </GroupBox>
+
+                    <DataGrid Grid.Row="1" 
+                              x:Name="StorageLocationsDataGrid" 
+                              AutoGenerateColumns="False" 
+                              IsReadOnly="True" 
+                              CanUserAddRows="False"
+                              GridLinesVisibility="Horizontal"
+                              HeadersVisibility="Column"
+                              Background="Transparent">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="*"/>
+                            <DataGridTextColumn Header="Тип" Binding="{Binding LocationType}" Width="130"/>
+                            <DataGridTextColumn Header="Вместимость" Binding="{Binding Capacity}" Width="110"/>
+                            <DataGridCheckBoxColumn Header="Занято" Binding="{Binding IsOccupied}" Width="80"/>
+                            <DataGridTemplateColumn Width="60">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="❌" 
+                                                Click="DeleteStorageLocation_Click" 
+                                                Tag="{Binding Id}" 
+                                                Background="Transparent" 
+                                                BorderThickness="0" 
+                                                Foreground="#DC2626" 
+                                                FontWeight="Bold" 
+                                                HorizontalAlignment="Center"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
         </TabControl>
 
         <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="#0284C7" FontWeight="Bold" Margin="0,10,0,0"/>

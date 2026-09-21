@@ -1,4 +1,5 @@
 ﻿namespace CraftFlow.Api.Common.Constants;
+
 public static class DbTables
 {
     public const string AUDIT_LOGS = "audit_logs";
@@ -8,7 +9,9 @@ public static class DbTables
     public const string PRODUCTS = "products";
     public const string USERS = "users";
     public const string STOCK_LOTS = "stock_lots";
+    public const string STOCK_LOT_STORAGE_LOCATIONS = "stock_lot_storage_locations";
     public const string WAREHOUSES = "warehouses";
+    public const string STORAGE_LOCATIONS = "storage_locations";
     public const string PURCHASE_ORDERS = "purchase_orders";
     public const string PURCHASE_ORDER_ITEMS = "purchase_order_items";
     public const string SUPPLIERS = "suppliers";
@@ -20,7 +23,7 @@ public static class DbTables
     public const string RECIPE_INGREDIENTS = "recipe_ingredients";
     public const string SALES_ORDER_ITEMS = "sales_order_items";
     public const string UNITS_OF_MEASURE = "units_of_measure";
-    public const string ORGANIZATIONS = "Organizations";
+    public const string ORGANIZATIONS = "organizations";
     public const string SUBSCRIPTION_PAYMENTS = "subscription_payments";
     public const string SUBSCRIPTION_PLANS = "subscription_plans";
     public const string TENANT_ACCESS_KEYS = "tenant_access_keys";

@@ -1,4 +1,5 @@
 ﻿namespace CraftFlow.Api.Modules.Inventory.GetStockLots;
+
 public record StockLotDto(
     Guid Id,
     string ItemName,
@@ -10,5 +11,6 @@ public record StockLotDto(
     DateTime CreatedDate,
     DateTime? ExpirationDate,
     bool IsExpired,
-    bool IsExpiringSoon
+    bool IsExpiringSoon,
+    string? StorageLocationsInfo
 );

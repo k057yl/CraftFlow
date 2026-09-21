@@ -11,5 +11,6 @@ public record AddStockLotCommand(
     string? BatchNumber,
     int? UnitsCount = null,
     Guid? SupplierId = null,
-    DateTime? ExpirationDate = null
+    DateTime? ExpirationDate = null,
+    List<Guid>? StorageLocationIds = null
 ) : IRequest<Result<Guid>>;

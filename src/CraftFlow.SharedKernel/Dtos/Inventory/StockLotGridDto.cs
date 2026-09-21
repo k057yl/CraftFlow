@@ -10,5 +10,6 @@ public record StockLotGridDto(
     DateTime CreatedDate,
     DateTime? ExpirationDate,
     bool IsExpired,
-    bool IsExpiringSoon
+    bool IsExpiringSoon,
+    string? StorageLocationsInfo
 );

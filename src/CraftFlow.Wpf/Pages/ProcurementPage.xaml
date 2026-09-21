@@ -39,7 +39,7 @@
 
                                 <StackPanel Grid.Column="1" Margin="3,0,3,0">
                                     <TextBlock Text="{loc:Loc Key=SELECT_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                    <ComboBox x:Name="StockWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="4,3"/>
+                                    <ComboBox x:Name="StockWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="4,3" SelectionChanged="StockWarehouseComboBox_SelectionChanged"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="2" Margin="6,0,0,0">
@@ -48,7 +48,7 @@
                                 </StackPanel>
                             </Grid>
 
-                            <Grid Margin="0,0,0,10">
+                            <Grid Margin="0,0,0,8">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
@@ -59,7 +59,7 @@
 
                                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
                                     <TextBlock Text="{loc:Loc Key=LOT_QUANTITY}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                    <TextBox x:Name="StockQuantityTextBox" Text="500" Padding="4,3"/>
+                                    <TextBox x:Name="StockQuantityTextBox" Text="500" Padding="4,3" TextChanged="StockQuantityTextBox_TextChanged"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1" Margin="4,0,4,0">
@@ -83,18 +83,86 @@
                                 </StackPanel>
                             </Grid>
 
-                            <Button Content="{loc:Loc Key=ADD_STOCK_LOT}" 
-                                    Click="AddStockLot_Click" 
-                                    Height="28" 
-                                    Width="160" 
-                                    HorizontalAlignment="Left" 
-                                    FontWeight="Bold" 
-                                    Background="#0284C7" 
-                                    Foreground="White"/>
+                            <!-- Блок двух списков: Доступные и Выбранные Ёмкости -->
+                            <Grid Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Доступные емкости -->
+                                <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                    <TextBlock Text="Доступные ёмкости на складе (нажмите +, чтобы добавить):" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
+                                    <ListBox x:Name="AvailableLocationsListBox" Height="90" Background="#F8FAFC">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="2">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="0,0,6,0"/>
+                                                        <TextBlock Text="[Свободно: " Foreground="#64748B"/>
+                                                        <TextBlock Text="{Binding FreeCapacity, StringFormat={}{0:N0}}" Foreground="#0EA5E9" FontWeight="SemiBold"/>
+                                                        <TextBlock Text=" из " Foreground="#64748B"/>
+                                                        <TextBlock Text="{Binding Capacity, StringFormat={}{0:N0}}" Foreground="#64748B"/>
+                                                        <TextBlock Text=" л]" Foreground="#64748B"/>
+                                                    </StackPanel>
+                                                    <Button Grid.Column="1" Content="➕" Click="AddLocationToSelected_Click" Padding="4,1" Margin="6,0,0,0" Background="#0EA5E9" Foreground="White"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </StackPanel>
+
+                                <!-- Выбранные емкости -->
+                                <StackPanel Grid.Column="1" Margin="6,0,0,0">
+                                    <TextBlock Text="Выбранные ёмкости под эту партию:" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
+                                    <ListBox x:Name="SelectedLocationsListBox" Height="90" Background="#F1F5F9">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="2">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,6,0"/>
+                                                        <TextBlock Text="[Доступно под приход: " Foreground="#64748B"/>
+                                                        <TextBlock Text="{Binding FreeCapacity, StringFormat={}{0:N0}}" Foreground="#16A34A" FontWeight="Bold"/>
+                                                        <TextBlock Text=" из " Foreground="#64748B"/>
+                                                        <TextBlock Text="{Binding Capacity, StringFormat={}{0:N0}}" Foreground="#64748B"/>
+                                                        <TextBlock Text=" л]" Foreground="#64748B"/>
+                                                    </StackPanel>
+                                                    <Button Grid.Column="1" Content="❌" Click="RemoveLocationFromSelected_Click" Padding="4,1" Margin="6,0,0,0" Background="Transparent" Foreground="#DC2626" BorderThickness="0" FontWeight="Bold"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Предупреждение о вместимости и кнопка -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                                <Button x:Name="AddStockLotButton"
+                                        Content="{loc:Loc Key=ADD_STOCK_LOT}" 
+                                        Click="AddStockLot_Click" 
+                                        Height="28" 
+                                        Width="160" 
+                                        FontWeight="Bold" 
+                                        Background="#0284C7" 
+                                        Foreground="White"/>
+                                <TextBlock x:Name="CapacityWarningTextBlock" 
+                                           VerticalAlignment="Center" 
+                                           Margin="15,0,0,0" 
+                                           FontWeight="SemiBold" 
+                                           FontSize="12"/>
+                            </StackPanel>
                         </StackPanel>
                     </GroupBox>
 
-                    <!-- Панель остатков с фильтрами -->
+                    <!-- Панель остатков с колонкой "Емкости" -->
                     <GroupBox Grid.Row="1" Header="Текущие остатки сырья на складах" Padding="10">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -121,9 +189,10 @@
                                       GridLinesVisibility="Horizontal" 
                                       HeadersVisibility="Column">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Сырьё / Материал" Binding="{Binding ItemName}" Width="*"/>
-                                    <DataGridTextColumn Header="Склад" Binding="{Binding WarehouseName}" Width="120"/>
-                                    <DataGridTextColumn Header="Поставщик" Binding="{Binding SupplierName}" Width="130"/>
+                                    <DataGridTextColumn Header="Сырьё / Материал" Binding="{Binding ItemName}" Width="150"/>
+                                    <DataGridTextColumn Header="Склад" Binding="{Binding WarehouseName}" Width="110"/>
+                                    <DataGridTextColumn Header="Емкости хранения" Binding="{Binding StorageLocationsInfo}" Width="*"/>
+                                    <DataGridTextColumn Header="Поставщик" Binding="{Binding SupplierName}" Width="120"/>
                                     <DataGridTextColumn Header="Остаток" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="85"/>
                                     <DataGridTextColumn Header="Цена за ед." Binding="{Binding UnitPrice, StringFormat={}{0:C2}}" Width="85"/>
                                     <DataGridTextColumn Header="Партия" Binding="{Binding BatchNumber}" Width="110"/>

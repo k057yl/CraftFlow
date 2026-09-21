@@ -1,70 +1,77 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
 
-namespace CraftFlow.Api.Modules.Inventory.Domain
+namespace CraftFlow.Api.Modules.Inventory.Domain;
+
+public sealed class StockLot : AggregateRoot, ITenantEntity
 {
-    public sealed class StockLot : AggregateRoot, ITenantEntity
+    public Guid TenantId { get; private set; }
+    public Guid WarehouseId { get; private set; }
+    public Guid ItemId { get; private set; }
+    public Guid? SupplierId { get; private set; }
+    public decimal Quantity { get; private set; }
+    public int UnitsCount { get; private set; }
+    public decimal UnitPrice { get; private set; }
+    public string? BatchNumber { get; private set; }
+    public Guid? ProductionBatchId { get; private set; }
+    public DateTime CreatedDate { get; private set; }
+    public DateTime? ExpirationDate { get; private set; }
+
+    private readonly List<StockLotStorageLocation> _storageLocations = [];
+    public IReadOnlyCollection<StockLotStorageLocation> StorageLocations => _storageLocations.AsReadOnly();
+
+    private StockLot() { }
+
+    public static StockLot Create(
+        Guid warehouseId,
+        Guid itemId,
+        decimal initialQuantity,
+        int unitsCount,
+        decimal unitPrice,
+        string? batchNumber = null,
+        Guid tenantId = default,
+        Guid? productionBatchId = null,
+        Guid? supplierId = null,
+        DateTime? expirationDate = null)
     {
-        public Guid TenantId { get; private set; }
-        public Guid WarehouseId { get; private set; }
-        public Guid ItemId { get; private set; }
-        public Guid? SupplierId { get; private set; }
-        public decimal Quantity { get; private set; }
-        public int UnitsCount { get; private set; }
-        public decimal UnitPrice { get; private set; }
-        public string? BatchNumber { get; private set; }
-        public Guid? ProductionBatchId { get; private set; }
-        public DateTime CreatedDate { get; private set; }
-        public DateTime? ExpirationDate { get; private set; }
+        if (initialQuantity < 0)
+            throw new ArgumentException(ErrorCodes.Inventory.STOCK_LOT_NEGATIVE_QUANTITY);
 
-        private StockLot() { }
+        if (unitPrice < 0)
+            throw new ArgumentException(ErrorCodes.Inventory.UNIT_LOT_NEGATIVE_QUANTITY);
 
-        public static StockLot Create(
-            Guid warehouseId,
-            Guid itemId,
-            decimal initialQuantity,
-            int unitsCount,
-            decimal unitPrice,
-            string? batchNumber = null,
-            Guid tenantId = default,
-            Guid? productionBatchId = null,
-            Guid? supplierId = null,
-            DateTime? expirationDate = null)
+        return new StockLot
         {
-            if (initialQuantity < 0)
-                throw new ArgumentException(ErrorCodes.Inventory.STOCK_LOT_NEGATIVE_QUANTITY);
+            Id = Guid.NewGuid(),
+            WarehouseId = warehouseId,
+            ItemId = itemId,
+            SupplierId = supplierId,
+            Quantity = initialQuantity,
+            UnitsCount = unitsCount,
+            UnitPrice = unitPrice,
+            BatchNumber = batchNumber,
+            TenantId = tenantId,
+            ProductionBatchId = productionBatchId,
+            CreatedDate = DateTime.UtcNow,
+            ExpirationDate = expirationDate
+        };
+    }
 
-            if (unitPrice < 0)
-                throw new ArgumentException(ErrorCodes.Inventory.UNIT_LOT_NEGATIVE_QUANTITY);
+    public void AssignStorageLocation(Guid storageLocationId, decimal allocatedQuantity)
+    {
+        _storageLocations.Add(StockLotStorageLocation.Create(Id, storageLocationId, allocatedQuantity));
+    }
 
-            return new StockLot
-            {
-                Id = Guid.NewGuid(),
-                WarehouseId = warehouseId,
-                ItemId = itemId,
-                SupplierId = supplierId,
-                Quantity = initialQuantity,
-                UnitsCount = unitsCount,
-                UnitPrice = unitPrice,
-                BatchNumber = batchNumber,
-                TenantId = tenantId,
-                ProductionBatchId = productionBatchId,
-                CreatedDate = DateTime.UtcNow,
-                ExpirationDate = expirationDate
-            };
-        }
+    public void AdjustQuantity(decimal delta)
+    {
+        if (Quantity + delta < 0)
+            throw new InvalidOperationException(ErrorCodes.Inventory.STOCK_LOT_NEGATIVE_QUANTITY);
 
-        public void AdjustQuantity(decimal delta)
-        {
-            if (Quantity + delta < 0)
-                throw new InvalidOperationException(ErrorCodes.Inventory.STOCK_LOT_NEGATIVE_QUANTITY);
+        Quantity += delta;
+    }
 
-            Quantity += delta;
-        }
-
-        public void SetProductionOrigin(Guid productionBatchId)
-        {
-            ProductionBatchId = productionBatchId;
-        }
+    public void SetProductionOrigin(Guid productionBatchId)
+    {
+        ProductionBatchId = productionBatchId;
     }
 }
