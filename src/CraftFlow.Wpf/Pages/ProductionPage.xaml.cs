@@ -104,10 +104,6 @@ public partial class ProductionPage : Page
             Recipes.Clear();
             recipes?.ForEach(r => Recipes.Add(new LookupItem(r.Id, r.Name)));
 
-            var activeBatches = await ApiService.Instance.GetAsync<List<LookupDto>>(ProductionConstants.BATCHES_ACTIVE_SUMMARY);
-            ActiveBatches.Clear();
-            activeBatches?.ForEach(b => ActiveBatches.Add(new LookupItem(b.Id, b.Name)));
-
             try
             {
                 var summaryList = await ApiService.Instance.GetAsync<List<ActiveBatchSummaryDto>>("api/production/batches/active-summary");
@@ -120,7 +116,6 @@ public partial class ProductionPage : Page
                     {
                         b.CurrentElapsed = now - b.StartedAt;
                         ActiveBatchesSummary.Add(b);
-
                         ActiveBatches.Add(new LookupItem(b.Id, b.BatchName));
                     }
                 }
@@ -135,15 +130,20 @@ public partial class ProductionPage : Page
             AgingChambers.Clear();
             chambers?.ForEach(c => AgingChambers.Add(new LookupItem(c.Id, c.Name)));
 
-            var activeLots = await ApiService.Instance.GetAsync<List<LookupDto>>(AgingConstants.AGING_LOTS_ACTIVE);
             ActiveAgingLots.Clear();
-            activeLots?.ForEach(l => ActiveAgingLots.Add(new LookupItem(l.Id, l.Name)));
+            AgingLotsSummary.Clear();
 
             try
             {
                 var activeSummary = await ApiService.Instance.GetAsync<List<AgingLotSummaryDto>>(AgingConstants.AGING_LOTS_ACTIVE_SUMMARY);
-                AgingLotsSummary.Clear();
-                activeSummary?.ForEach(AgingLotsSummary.Add);
+                if (activeSummary != null && activeSummary.Count > 0)
+                {
+                    foreach (var lot in activeSummary)
+                    {
+                        AgingLotsSummary.Add(lot);
+                        ActiveAgingLots.Add(new LookupItem(lot.LotId, lot.BatchNumber));
+                    }
+                }
             }
             catch { }
 
@@ -260,13 +260,24 @@ public partial class ProductionPage : Page
 
     private async void ActiveAgingLotsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (ActiveAgingLotsComboBox.SelectedValue is not Guid lotId || lotId == Guid.Empty)
+        {
+            ReleaseLotNameTextBox.Clear();
+            ActualFinalQuantityTextBox.Clear();
+            ReleaseUnitsCountTextBox.Text = "1";
+            UnitPriceTextBox.Clear();
+            CalculatedUnitCostTextBlock.Text = "$ 0.00";
+            _selectedLotTotalCost = 0;
+            return;
+        }
+
         if (ActiveAgingLotsComboBox.SelectedItem is LookupItem selectedLot)
         {
             ReleaseLotNameTextBox.Text = $"{selectedLot.Name} ({LocalizationService.Get("GROUP_RELEASE_AGING")})";
 
             try
             {
-                var details = await ApiService.Instance.GetAsync<GetAgingLotDetailsDto>($"{AgingConstants.AGING_LOTS_ACTIVE}/{selectedLot.Id}");
+                var details = await ApiService.Instance.GetAsync<GetAgingLotDetailsDto>($"{AgingConstants.AGING_LOTS_ACTIVE}/{lotId}");
                 if (details != null)
                 {
                     _selectedLotTotalCost = details.TotalBatchCost;
@@ -285,18 +296,6 @@ public partial class ProductionPage : Page
                 }
             }
             catch { }
-        }
-        else
-        {
-            ReleaseLotNameTextBox.Clear();
-            ActualFinalQuantityTextBox.Clear();
-            ReleaseUnitsCountTextBox.Text = "1";
-            UnitPriceTextBox.Clear();
-            CalculatedUnitCostTextBlock.Text = "$ 0.00";
-            _selectedLotTotalCost = 0;
-
-            CalculatedCostLabelTextBlock.Text = string.Format(LocalizationService.Get("LABEL_CALCULATED_UNIT_COST"), FormattingConstants.DEFAULT_WEIGHT_UNIT);
-            UnitPriceLabelTextBlock.Text = string.Format(LocalizationService.Get("LABEL_SELLING_PRICE_PER_UNIT"), FormattingConstants.DEFAULT_WEIGHT_UNIT);
         }
     }
 

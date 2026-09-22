@@ -162,15 +162,35 @@
                         </StackPanel>
                     </GroupBox>
 
-                    <!-- Панель остатков с колонкой "Емкости" -->
+                    <!-- Панель остатков со списанием -->
                     <GroupBox Grid.Row="1" Header="Текущие остатки сырья на складах" Padding="10">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                            <!-- Форма ручного списания -->
+                            <Border Grid.Row="0" Background="#FEF2F2" BorderBrush="#FECACA" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,10">
+                                <WrapPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Списание порчи / брака:" FontWeight="Bold" Foreground="#991B1B" VerticalAlignment="Center" Margin="0,0,10,0"/>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,10,0">
+                                        <TextBlock Text="Партия:" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11"/>
+                                        <ComboBox x:Name="WriteOffStockLotComboBox" DisplayMemberPath="BatchNumber" SelectedValuePath="Id" Width="180" Padding="4,2"/>
+                                    </StackPanel>
+
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,10,0">
+                                        <TextBlock Text="Кол-во:" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11"/>
+                                        <TextBox x:Name="WriteOffQuantityTextBox" Width="70" Padding="4,2"/>
+                                    </StackPanel>
+
+                                    <Button Content="Списать" Click="WriteOffStockLot_Click" Background="#DC2626" Foreground="White" FontWeight="Bold" Padding="12,3"/>
+                                </WrapPanel>
+                            </Border>
+
+                            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
                                 <TextBlock Text="Поставщик:" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11"/>
                                 <ComboBox x:Name="FilterSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="160" SelectionChanged="FilterStockLots_Changed"/>
 
@@ -182,7 +202,7 @@
                                 <Button Content="Обновить" Click="RefreshStockLots_Click" Margin="12,0,0,0" Padding="8,2"/>
                             </StackPanel>
 
-                            <DataGrid Grid.Row="1" 
+                            <DataGrid Grid.Row="2" 
                                       x:Name="StockLotsDataGrid" 
                                       AutoGenerateColumns="False" 
                                       IsReadOnly="True" 
@@ -197,6 +217,18 @@
                                     <DataGridTextColumn Header="Цена за ед." Binding="{Binding UnitPrice, StringFormat={}{0:C2}}" Width="85"/>
                                     <DataGridTextColumn Header="Партия" Binding="{Binding BatchNumber}" Width="110"/>
                                     <DataGridTextColumn Header="Срок годности" Binding="{Binding ExpirationDate, StringFormat={}{0:dd.MM.yyyy}}" Width="100"/>
+                                    <DataGridTemplateColumn Width="50">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="🗑️" 
+                                                        Click="WriteOffRow_Click" 
+                                                        Tag="{Binding Id}" 
+                                                        Background="Transparent" 
+                                                        BorderThickness="0" 
+                                                        ToolTip="Списать полностью"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>

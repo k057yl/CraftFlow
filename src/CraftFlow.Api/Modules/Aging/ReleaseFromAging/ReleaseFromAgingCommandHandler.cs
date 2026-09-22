@@ -36,6 +36,17 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
         }
 
+        if (lot.StorageLocationId.HasValue)
+        {
+            var location = await _dbContext.StorageLocations
+                .FirstOrDefaultAsync(s => s.Id == lot.StorageLocationId.Value, cancellationToken);
+
+            if (location != null)
+            {
+                location.AddVolume(-lot.CurrentQuantity);
+            }
+        }
+
         lot.RegisterLoss(request.ActualFinalQuantity, request.UnitsCount);
         lot.Release();
 

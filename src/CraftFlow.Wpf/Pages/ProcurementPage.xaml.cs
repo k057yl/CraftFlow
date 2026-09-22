@@ -45,6 +45,8 @@ public partial class ProcurementPage : Page
         AvailableLocationsListBox.ItemsSource = AvailableLocations;
         SelectedLocationsListBox.ItemsSource = SelectedLocations;
 
+        WriteOffStockLotComboBox.ItemsSource = StockLots;
+
         Loaded += async (s, e) => await LoadDataAsync();
     }
 
@@ -297,6 +299,58 @@ public partial class ProcurementPage : Page
             {
                 await LoadLocationsForWarehouseAsync(selectedWarehouse.Id);
             }
+        }
+        else
+        {
+            SetStatus(contentOrError, Brushes.Red);
+        }
+    }
+
+    // --- ОБРАБОТКА СПИСАНИЯ СО СКЛАДА ---
+    private async void WriteOffStockLot_Click(object sender, RoutedEventArgs e)
+    {
+        if (WriteOffStockLotComboBox.SelectedItem is not StockLotGridDto selectedLot)
+        {
+            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
+
+        var rawQuantityText = WriteOffQuantityTextBox.Text.Replace(',', '.');
+        if (!decimal.TryParse(rawQuantityText, NumberStyles.Any, CultureInfo.InvariantCulture, out var qty) || qty <= 0)
+        {
+            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
+
+        await ExecuteWriteOffAsync(selectedLot.Id, qty);
+    }
+
+    private async void WriteOffRow_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is Guid lotId)
+        {
+            var lot = StockLots.FirstOrDefault(l => l.Id == lotId);
+            if (lot != null)
+            {
+                await ExecuteWriteOffAsync(lot.Id, lot.Quantity);
+            }
+        }
+    }
+
+    private async Task ExecuteWriteOffAsync(Guid stockLotId, decimal quantity)
+    {
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{InventoryConstants.STOCK_LOTS}/write-off", new
+        {
+            StockLotId = stockLotId,
+            QuantityToWriteOff = quantity
+        });
+
+        if (isSuccess)
+        {
+            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            WriteOffQuantityTextBox.Clear();
+            WriteOffStockLotComboBox.SelectedIndex = -1;
+            await LoadStockLotsAsync();
         }
         else
         {

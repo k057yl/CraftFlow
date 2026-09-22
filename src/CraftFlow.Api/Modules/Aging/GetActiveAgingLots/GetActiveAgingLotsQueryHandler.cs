@@ -20,17 +20,19 @@ public class GetActiveAgingLotsQueryHandler
     {
         const string sql = $"""
             SELECT 
-                al."Id" AS LotId,
-                al."BatchNumber" AS BatchNumber,
-                ach."Name" AS ChamberName,
-                al."UnitsCount" AS UnitsCount,
-                al."CurrentQuantity" AS InitialQuantity,
-                EXTRACT(DAY FROM (NOW() - al."PlacedAt"))::integer AS DaysInChamber,
-                EXTRACT(DAY FROM (al."TargetReleaseDate" - al."PlacedAt"))::integer AS TargetDays,
-                (NOW() >= al."TargetReleaseDate") AS IsReadyForRelease
-            FROM {DbSchemas.AGING}.{DbTables.AGING_LOTS} al
-            JOIN {DbSchemas.AGING}.{DbTables.AGING_CHAMBERS} ach ON ach."Id" = al."AgingChamberId"
-            WHERE al."State" = 1 AND al."TenantId" = @TenantId
+                al."Id" AS "LotId",
+                al."Id" AS "Id",
+                al."BatchNumber" AS "BatchNumber",
+                al."BatchNumber" AS "Name",
+                ach."Name" AS "ChamberName",
+                al."UnitsCount" AS "UnitsCount",
+                al."CurrentQuantity" AS "InitialQuantity",
+                EXTRACT(DAY FROM (NOW() - al."PlacedAt"))::integer AS "DaysInChamber",
+                EXTRACT(DAY FROM (al."TargetReleaseDate" - al."PlacedAt"))::integer AS "TargetDays",
+                (NOW() >= al."TargetReleaseDate") AS "IsReadyForRelease"
+            FROM aging.aging_lots al
+            JOIN aging.aging_chambers ach ON ach."Id" = al."AgingChamberId"
+            WHERE al."TenantId" = @TenantId AND (al."State" = 1 OR al."State" = 2)
             ORDER BY al."PlacedAt" ASC;
             """;
 

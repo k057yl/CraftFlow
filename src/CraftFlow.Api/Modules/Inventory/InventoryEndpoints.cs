@@ -5,9 +5,10 @@ using CraftFlow.Api.Modules.Inventory.DeleteStorageLocation;
 using CraftFlow.Api.Modules.Inventory.DeleteWarehouse;
 using CraftFlow.Api.Modules.Inventory.GetProductStockLots;
 using CraftFlow.Api.Modules.Inventory.GetRawStockLots;
-using CraftFlow.Api.Modules.Inventory.GetStorageLocations;
 using CraftFlow.Api.Modules.Inventory.GetStockLots;
+using CraftFlow.Api.Modules.Inventory.GetStorageLocations;
 using CraftFlow.Api.Modules.Inventory.GetWarehouses;
+using CraftFlow.Api.Modules.Inventory.WriteOffStockLot;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Inventory;
@@ -88,6 +89,13 @@ public static class InventoryEndpoints
         group.MapGet(InventoryConstants.STOCK_LOTS_PRODUCTS, async (ISender sender) =>
         {
             var result = await sender.Send(new GetProductStockLotsQuery());
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        // --- СПИСАНИЕ СКЛАДСКОГО ЛОТА ---
+        group.MapPost($"{InventoryConstants.STOCK_LOTS}/write-off", async (WriteOffStockLotCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
     }

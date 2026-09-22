@@ -114,10 +114,15 @@ public sealed class TraceabilityReadService
         }
 
         string chamberName = (string)(header.chamber_name ?? string.Empty);
+        string locationName = (string)(header.location_name ?? string.Empty);
 
-        if (agingDays == 0 && string.IsNullOrEmpty(chamberName))
+        string displayLocation = !string.IsNullOrWhiteSpace(locationName)
+            ? (!string.IsNullOrWhiteSpace(chamberName) ? $"{chamberName} ({locationName})" : locationName)
+            : chamberName;
+
+        if (agingDays == 0 && string.IsNullOrEmpty(displayLocation))
         {
-            chamberName = FormattingConstants.CONST_DEFAULT_CHAMBER_NAME;
+            displayLocation = FormattingConstants.CONST_DEFAULT_CHAMBER_NAME;
         }
 
         Guid? salesOrderId = (Guid?)header.sales_order_id;
@@ -132,7 +137,7 @@ public sealed class TraceabilityReadService
             Convert.ToDecimal(header.unit_price ?? 0m),
             agingDays,
             agingLossPercentage,
-            chamberName,
+            displayLocation,
             originBatch
         );
     }

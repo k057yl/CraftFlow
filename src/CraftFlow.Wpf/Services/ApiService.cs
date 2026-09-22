@@ -275,8 +275,7 @@ public class ApiService
         {
             var response = await _client.GetAsync(endpoint);
 
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized ||
-                response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
             {
                 HandleUnauthorized();
                 return default;

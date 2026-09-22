@@ -23,11 +23,13 @@ public static class TraceabilityConstants
             al."Id" AS aging_lot_id,
             al."BatchNumber" AS aging_batch_number,
             ach."Name" AS chamber_name,
+            sloc."Name" AS location_name,
             al."State"::text AS aging_status
         FROM {DbTables.CONSUMED_INGREDIENTS} ci
         JOIN {DbTables.PRODUCTION_BATCHES} pb ON pb."Id" = ci."ProductionBatchId"
-        LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_LOTS} al ON al."ProductionBatchId" = pb."Id"
-        LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_CHAMBERS} ach ON ach."Id" = al."AgingChamberId"
+        LEFT JOIN aging.aging_lots al ON al."ProductionBatchId" = pb."Id"
+        LEFT JOIN aging.aging_chambers ach ON ach."Id" = al."AgingChamberId"
+        LEFT JOIN {DbTables.STORAGE_LOCATIONS} sloc ON sloc."Id" = al."StorageLocationId"
         WHERE ci."StockLotId" = @StockLotId AND pb."TenantId" = @TenantId;
         """;
 
@@ -46,13 +48,15 @@ public static class TraceabilityConstants
             COALESCE(pb."ActualOutputQuantity", 0) AS brew_output_quantity,
             COALESCE(EXTRACT(DAY FROM (COALESCE(al."ActualReleaseDate", NOW()) - al."PlacedAt"))::integer, 0) AS aging_days,
             ach."Name" AS chamber_name,
+            sloc."Name" AS location_name,
             so."Id" AS sales_order_id,
             c."Name" AS customer_name
         FROM {DbTables.STOCK_LOTS} sl
         INNER JOIN {DbTables.PRODUCTS} p ON p."Id" = sl."ItemId"
-        LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_LOTS} al ON al."ProductId" = p."Id" OR al."ProductionBatchId" = sl."ProductionBatchId"
+        LEFT JOIN aging.aging_lots al ON al."ProductId" = p."Id" OR al."ProductionBatchId" = sl."ProductionBatchId"
         LEFT JOIN {DbTables.PRODUCTION_BATCHES} pb ON pb."Id" = COALESCE(sl."ProductionBatchId", al."ProductionBatchId")
-        LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_CHAMBERS} ach ON ach."Id" = al."AgingChamberId"
+        LEFT JOIN aging.aging_chambers ach ON ach."Id" = al."AgingChamberId"
+        LEFT JOIN {DbTables.STORAGE_LOCATIONS} sloc ON sloc."Id" = al."StorageLocationId"
         LEFT JOIN {DbTables.SALES_ORDER_ITEMS} soi ON soi."StockLotId" = sl."Id"
         LEFT JOIN {DbTables.SALES_ORDERS} so ON so."Id" = soi."SalesOrderId"
         LEFT JOIN {DbTables.CUSTOMERS} c ON c."Id" = so."CustomerId"
@@ -73,9 +77,9 @@ public static class TraceabilityConstants
         LEFT JOIN {DbTables.STOCK_LOTS} rm_sl ON rm_sl."Id" = ci."StockLotId"
         LEFT JOIN {DbTables.RAW_MATERIALS} rm ON rm."Id" = ci."RawMaterialId"
         LEFT JOIN {DbTables.UNITS_OF_MEASURE} uom ON uom."Id" = rm."UnitOfMeasureId"
-        LEFT JOIN {DbSchemas.PROCUREMENT}.{DbTables.PURCHASE_ORDER_ITEMS} poi ON poi."RawMaterialId" = rm."Id"
-        LEFT JOIN {DbSchemas.PROCUREMENT}.{DbTables.PURCHASE_ORDERS} po ON po."Id" = poi."PurchaseOrderId"
-        LEFT JOIN {DbSchemas.PROCUREMENT}.{DbTables.SUPPLIERS} sup ON sup."Id" = po."SupplierId"
+        LEFT JOIN procurement.purchase_order_items poi ON poi."RawMaterialId" = rm."Id"
+        LEFT JOIN procurement.purchase_orders po ON po."Id" = poi."PurchaseOrderId"
+        LEFT JOIN procurement.suppliers sup ON sup."Id" = po."SupplierId"
         WHERE ci."ProductionBatchId" = @BatchId;
         """;
 }

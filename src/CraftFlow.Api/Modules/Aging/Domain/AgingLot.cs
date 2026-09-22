@@ -12,6 +12,7 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
     public Guid ProductionBatchId { get; private set; }
     public Guid ProductId { get; private set; }
     public Guid AgingChamberId { get; private set; }
+    public Guid? StorageLocationId { get; private set; }
     public string BatchNumber { get; private set; } = null!;
     public int UnitsCount { get; private set; }
 
@@ -32,7 +33,8 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
         string batchNumber,
         decimal initialQuantity,
         int unitsCount,
-        int minAgingDays)
+        int minAgingDays,
+        Guid? storageLocationId = null)
     {
         if (initialQuantity <= 0 || unitsCount <= 0)
             throw new ArgumentException(ErrorCodes.General.VALUE_REQUIRED);
@@ -45,6 +47,7 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
             ProductionBatchId = productionBatchId,
             ProductId = productId,
             AgingChamberId = agingChamberId,
+            StorageLocationId = storageLocationId,
             BatchNumber = batchNumber,
             UnitsCount = unitsCount,
             InitialQuantity = initialQuantity,
