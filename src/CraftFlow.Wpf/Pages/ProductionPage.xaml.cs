@@ -3,6 +3,7 @@ using CraftFlow.Api.Modules.Catalog;
 using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.Api.Modules.Production;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Models.Productions;
 using CraftFlow.Wpf.Services;
@@ -26,6 +27,7 @@ public partial class ProductionPage : Page
     public ObservableCollection<LookupItem> AgingChambers { get; } = [];
     public ObservableCollection<LookupItem> ActiveAgingLots { get; } = [];
     public ObservableCollection<AgingLotSummaryDto> AgingLotsSummary { get; } = [];
+    public ObservableCollection<StorageLocationDto> TargetStorageLocations { get; } = [];
 
     private readonly ObservableCollection<RequirementCalculationDto> _requirements = [];
     private readonly DispatcherTimer _uiTimer = new();
@@ -51,9 +53,12 @@ public partial class ProductionPage : Page
         RequirementsListBox.ItemsSource = _requirements;
         AgingChambersComboBox.ItemsSource = AgingChambers;
         ActiveAgingLotsComboBox.ItemsSource = ActiveAgingLots;
+        TargetStorageLocationsListBox.ItemsSource = TargetStorageLocations;
 
         AgingLotsDataGrid.ItemsSource = AgingLotsSummary;
         ActiveBatchesDataGrid.ItemsSource = ActiveBatchesSummary;
+
+        DiscardAgingLotsDataGrid.ItemsSource = AgingLotsSummary;
 
         _uiTimer.Interval = TimeSpan.FromSeconds(1);
         _uiTimer.Tick += UiTimer_Tick;
@@ -168,6 +173,20 @@ public partial class ProductionPage : Page
         {
             _isInitializing = false;
             BatchInputs_Changed(this, null!);
+        }
+    }
+
+    private async void TargetWarehousesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        TargetStorageLocations.Clear();
+        if (TargetWarehousesComboBox.SelectedValue is Guid warehouseId && warehouseId != Guid.Empty)
+        {
+            try
+            {
+                var locations = await ApiService.Instance.GetAsync<List<StorageLocationDto>>($"{InventoryConstants.WAREHOUSES}/locations?warehouseId={warehouseId}");
+                locations?.ForEach(TargetStorageLocations.Add);
+            }
+            catch { }
         }
     }
 
@@ -512,6 +531,11 @@ public partial class ProductionPage : Page
         TryParseDecimal(UnitPriceTextBox.Text, out var unitPrice);
         var customLotName = ReleaseLotNameTextBox.Text?.Trim();
 
+        var selectedStorageLocationIds = TargetStorageLocationsListBox.SelectedItems
+            .OfType<StorageLocationDto>()
+            .Select(l => l.Id)
+            .ToList();
+
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_RELEASE, new
         {
             AgingLotId = lotId,
@@ -519,7 +543,8 @@ public partial class ProductionPage : Page
             ActualFinalQuantity = actualQty,
             UnitsCount = unitsCount,
             UnitPrice = unitPrice,
-            CustomBatchNumber = string.IsNullOrWhiteSpace(customLotName) ? null : customLotName
+            CustomBatchNumber = string.IsNullOrWhiteSpace(customLotName) ? null : customLotName,
+            StorageLocationIds = selectedStorageLocationIds.Count > 0 ? selectedStorageLocationIds : null
         });
 
         if (isSuccess)
@@ -529,6 +554,7 @@ public partial class ProductionPage : Page
             ReleaseUnitsCountTextBox.Clear();
             UnitPriceTextBox.Clear();
             ReleaseLotNameTextBox.Clear();
+            TargetStorageLocations.Clear();
             await LoadDataAsync();
         }
         else
@@ -650,6 +676,42 @@ public partial class ProductionPage : Page
         if (AgingLotsDataGrid.SelectedItem is AgingLotSummaryDto selectedLot)
         {
             ActiveAgingLotsComboBox.SelectedValue = selectedLot.LotId;
+        }
+    }
+
+    private async void DiscardAgingLotRow_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is Guid lotId)
+        {
+            var lot = AgingLotsSummary.FirstOrDefault(l => l.LotId == lotId);
+            if (lot != null)
+            {
+                var dialog = new WriteOffDialog(lot.BatchNumber, lot.ChamberName, lot.InitialQuantity)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+
+                if (dialog.ShowDialog() == true)
+                {
+                    var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{AgingConstants.AGING_LOTS_ACTIVE}/discard", new
+                    {
+                        AgingLotId = lotId,
+                        Quantity = dialog.QuantityToWriteOff,
+                        UnitsToRemove = 1,
+                        Reason = dialog.Reason
+                    });
+
+                    if (isSuccess)
+                    {
+                        SetStatus("UI_BATCH_COMPLETED_SUCCESS", Brushes.OrangeRed);
+                        await LoadDataAsync();
+                    }
+                    else
+                    {
+                        SetStatusRaw(contentOrError, Brushes.Red);
+                    }
+                }
+            }
         }
     }
 

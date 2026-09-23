@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Aging.CreateChamber;
 using CraftFlow.Api.Modules.Aging.DeleteChamber;
+using CraftFlow.Api.Modules.Aging.DiscardAgingLot;
 using CraftFlow.Api.Modules.Aging.GetActiveAgingLots;
 using CraftFlow.Api.Modules.Aging.GetAgingChambers;
 using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
@@ -24,6 +25,13 @@ public static class AgingEndpoints
         });
 
         group.MapPost(AgingConstants.AGING_LOTS_RELEASE, async (ReleaseFromAgingCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
+        });
+
+        // --- НОВЫЙ ЭНДПОИНТ ДЛЯ СПИСАНИЯ ЛОТА С ВЫДЕРЖКИ ---
+        group.MapPost($"{AgingConstants.AGING_LOTS_ACTIVE}/discard", async (DiscardAgingLotCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);

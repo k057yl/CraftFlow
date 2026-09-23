@@ -41,11 +41,10 @@ public partial class ProcurementPage : Page
 
         StockRawMaterialComboBox.ItemsSource = RawMaterials;
         StockLotsDataGrid.ItemsSource = StockLots;
+        WriteOffDataGrid.ItemsSource = StockLots;
 
         AvailableLocationsListBox.ItemsSource = AvailableLocations;
         SelectedLocationsListBox.ItemsSource = SelectedLocations;
-
-        WriteOffStockLotComboBox.ItemsSource = StockLots;
 
         Loaded += async (s, e) => await LoadDataAsync();
     }
@@ -306,25 +305,7 @@ public partial class ProcurementPage : Page
         }
     }
 
-    // --- ОБРАБОТКА СПИСАНИЯ СО СКЛАДА ---
-    private async void WriteOffStockLot_Click(object sender, RoutedEventArgs e)
-    {
-        if (WriteOffStockLotComboBox.SelectedItem is not StockLotGridDto selectedLot)
-        {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-            return;
-        }
-
-        var rawQuantityText = WriteOffQuantityTextBox.Text.Replace(',', '.');
-        if (!decimal.TryParse(rawQuantityText, NumberStyles.Any, CultureInfo.InvariantCulture, out var qty) || qty <= 0)
-        {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-            return;
-        }
-
-        await ExecuteWriteOffAsync(selectedLot.Id, qty);
-    }
-
+    // --- ТОЧЕЧНОЕ Списание ИЗ ТАБЛИЦЫ ---
     private async void WriteOffRow_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.Tag is Guid lotId)
@@ -332,7 +313,15 @@ public partial class ProcurementPage : Page
             var lot = StockLots.FirstOrDefault(l => l.Id == lotId);
             if (lot != null)
             {
-                await ExecuteWriteOffAsync(lot.Id, lot.Quantity);
+                var dialog = new WriteOffDialog(lot.ItemName, lot.BatchNumber, lot.Quantity)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+
+                if (dialog.ShowDialog() == true)
+                {
+                    await ExecuteWriteOffAsync(lot.Id, dialog.QuantityToWriteOff);
+                }
             }
         }
     }
@@ -348,8 +337,6 @@ public partial class ProcurementPage : Page
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
-            WriteOffQuantityTextBox.Clear();
-            WriteOffStockLotComboBox.SelectedIndex = -1;
             await LoadStockLotsAsync();
         }
         else

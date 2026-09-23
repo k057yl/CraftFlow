@@ -12,27 +12,44 @@ public static class DatabaseInitializer
 
         await dbContext.Database.MigrateAsync();
 
-        if (await dbContext.SubscriptionPlans.AnyAsync())
+        var planConfigs = configuration.GetSection("SaasOptions:DefaultPlans").Get<List<PlanConfigDto>>();
+
+        if (planConfigs == null || planConfigs.Count == 0)
         {
             return;
         }
 
-        var planConfigs = configuration.GetSection("SaasOptions:DefaultPlans").Get<List<PlanConfigDto>>();
+        var existingPlans = await dbContext.SubscriptionPlans.ToListAsync();
 
-        if (planConfigs != null && planConfigs.Count > 0)
+        foreach (var config in planConfigs)
         {
-            var plans = planConfigs.Select(c => SubscriptionPlan.Create(
-                c.Code,
-                c.Name,
-                c.MaxMonthlyBatches,
-                c.MaxWarehouses,
-                c.MaxChambers,
-                c.MaxUsers
-            )).ToList();
+            var existingPlan = existingPlans.FirstOrDefault(p => p.Code == config.Code);
 
-            await dbContext.SubscriptionPlans.AddRangeAsync(plans);
-            await dbContext.SaveChangesAsync();
+            if (existingPlan != null)
+            {
+                existingPlan.UpdateLimits(
+                    config.MaxMonthlyBatches,
+                    config.MaxWarehouses,
+                    config.MaxChambers,
+                    config.MaxUsers
+                );
+            }
+            else
+            {
+                var newPlan = SubscriptionPlan.Create(
+                    config.Code,
+                    config.Name,
+                    config.MaxMonthlyBatches,
+                    config.MaxWarehouses,
+                    config.MaxChambers,
+                    config.MaxUsers
+                );
+
+                await dbContext.SubscriptionPlans.AddAsync(newPlan);
+            }
         }
+
+        await dbContext.SaveChangesAsync();
     }
 
     private record PlanConfigDto(

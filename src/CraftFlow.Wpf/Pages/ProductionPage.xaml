@@ -77,7 +77,6 @@
                                             FontWeight="SemiBold"/>
                                 </Grid>
 
-                                <!-- Интерактивный калькулятор сырья -->
                                 <GroupBox Header="{loc:Loc Key=GROUP_RAW_REQUIREMENTS}" Margin="0,5,0,10" Padding="8" Background="#F8FAFC">
                                     <StackPanel>
                                         <ListBox x:Name="RequirementsListBox" Height="90" DisplayMemberPath="DisplayInfo" BorderThickness="0" Background="Transparent"/>
@@ -109,7 +108,7 @@
                             </StackPanel>
                         </GroupBox>
 
-                        <!-- ⏱ ТЕКУЩИЕ ВАРКИ В РАБОТЕ (ЖИВОЙ МОНИТОР) -->
+                        <!-- ТЕКУЩИЕ ВАРКИ В РАБОТЕ -->
                         <GroupBox Header="Текущие варки в процессе" Margin="0,0,0,12" Padding="8">
                             <DataGrid x:Name="ActiveBatchesDataGrid" 
                                       AutoGenerateColumns="False" 
@@ -123,10 +122,9 @@
                                       SelectionChanged="ActiveBatchesDataGrid_SelectionChanged">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Партия" Binding="{Binding BatchName}" Width="1.5*"/>
-                                    <DataGridTextColumn Header="Рецептурный состав" Binding="{Binding RecipeName}" Width="2*"/>
+                                    <DataGridTextColumn Header="Рецептура" Binding="{Binding RecipeName}" Width="2*"/>
                                     <DataGridTextColumn Header="План (кг/л)" Binding="{Binding PlannedOutputQuantity, StringFormat={}{0:F2}}" Width="1*"/>
                                     <DataGridTextColumn Header="Старт" Binding="{Binding StartedAt, StringFormat={}{0:HH:mm}}" Width="0.8*"/>
-
                                     <DataGridTemplateColumn Header="В работе" Width="1.2*">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
@@ -148,21 +146,12 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-
                                     <DataGridTextColumn Header="План (мин)" Binding="{Binding TargetDurationMinutes}" Width="0.8*"/>
-
-                                    <DataGridTemplateColumn Header="Готовность" Width="Auto">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <CheckBox IsChecked="{Binding IsOverdueStatus, Mode=OneWay}" IsHitTestVisible="False" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
 
-                        <!-- 2. Завершение варки и Анализ -->
+                        <!-- Завершение варки и Анализ -->
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="3*"/>
@@ -194,14 +183,12 @@
                                         </StackPanel>
                                     </Grid>
 
-                                    <!-- Выбор накладных расходов -->
                                     <Grid Margin="0,0,0,12">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="80"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-
                                         <CheckBox x:Name="UseOverheadCheckBox" Grid.Column="0" Content="Накладные расходы" VerticalAlignment="Center" Margin="0,0,8,0" Click="CostInputs_Changed"/>
                                         <TextBox x:Name="OverheadPercentageTextBox" Grid.Column="1" Text="15" Padding="5,4" IsEnabled="{Binding IsChecked, ElementName=UseOverheadCheckBox}" TextChanged="CostInputs_Changed"/>
                                         <TextBlock Grid.Column="2" Text="%" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="#475569" FontWeight="Bold"/>
@@ -219,7 +206,6 @@
                                 </StackPanel>
                             </GroupBox>
 
-                            <!-- ПОНЯТНАЯ И ДИНАМИЧЕСКАЯ ПАНЕЛЬ АНАЛИЗА СЕБЕСТОИМОСТИ -->
                             <GroupBox Grid.Column="1" Header="Расчет себестоимости партии" Padding="12" Background="#F8FAFC">
                                 <StackPanel VerticalAlignment="Center">
                                     <Grid Margin="0,0,0,6">
@@ -331,6 +317,7 @@
                             </DataGrid>
                         </GroupBox>
 
+                        <!-- Извлечение из камеры созревания С ВЫБОРОМ ЕМКОСТИ / СТЕЛЛАЖА -->
                         <GroupBox Header="{loc:Loc Key=GROUP_RELEASE_AGING}" Padding="10">
                             <StackPanel>
                                 <Grid Margin="0,0,0,8">
@@ -346,9 +333,26 @@
 
                                     <StackPanel Grid.Column="1">
                                         <TextBlock Text="{loc:Loc Key=LABEL_TARGET_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <ComboBox x:Name="TargetWarehousesComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
+                                        <ComboBox x:Name="TargetWarehousesComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4" SelectionChanged="TargetWarehousesComboBox_SelectionChanged"/>
                                     </StackPanel>
                                 </Grid>
+
+                                <!-- Выбор стеллажей/емкостей складского назначения -->
+                                <StackPanel Margin="0,0,0,10">
+                                    <TextBlock Text="Стеллажи / ячейки приемного склада:" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
+                                    <ListBox x:Name="TargetStorageLocationsListBox" Height="80" Background="#F8FAFC" SelectionMode="Multiple">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Margin="2">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="0,0,8,0"/>
+                                                    <TextBlock Text="[Свободно: " Foreground="#64748B"/>
+                                                    <TextBlock Text="{Binding FreeCapacity, StringFormat={}{0:N0}}" Foreground="#16A34A" FontWeight="Bold"/>
+                                                    <TextBlock Text=" л/кг]" Foreground="#64748B"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                </StackPanel>
 
                                 <Grid Margin="0,0,0,8">
                                     <StackPanel>
@@ -399,30 +403,75 @@
                 </ScrollViewer>
             </TabItem>
 
-            <!-- Вкладка 3: Брак и Списание -->
-            <TabItem Header="{loc:Loc Key=TAB_DISCARD}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
-                    <StackPanel MaxWidth="600" HorizontalAlignment="Left" Width="600">
-                        <GroupBox Header="{loc:Loc Key=GROUP_DISCARD}" Padding="10">
-                            <StackPanel>
-                                <TextBlock Text="{loc:Loc Key=LABEL_DISCARD_BATCH}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                <ComboBox x:Name="DiscardBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,10" Padding="5,4"/>
+            <!-- Вкладка 3: Брак варки и Акт списания -->
+            <TabItem Header="Забраковка и Акт списания">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                                <TextBlock Text="{loc:Loc Key=LABEL_DISCARD_REASON}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                <TextBox x:Name="DiscardReasonTextBox" Text="Закисание партии при формовании" Margin="0,0,0,15" Padding="5,4"/>
+                    <!-- Форма браковки выбранной активной варки -->
+                    <GroupBox Grid.Row="0" Header="Забраковка активной варки (в котле)" Padding="10" Margin="0,0,0,15">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="2*"/>
+                                </Grid.ColumnDefinitions>
 
-                                <Button Content="{loc:Loc Key=BTN_DISCARD_BATCH}" 
-                                        Click="DiscardBatch_Click" 
-                                        Height="35" 
-                                        HorizontalAlignment="Left"
-                                        Padding="15,0"
-                                        Background="#DC2626" 
-                                        Foreground="White" 
-                                        FontWeight="Bold"/>
-                            </StackPanel>
-                        </GroupBox>
-                    </StackPanel>
-                </ScrollViewer>
+                                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                                    <TextBlock Text="Выберите варку в процессе:" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <ComboBox x:Name="DiscardBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
+                                </StackPanel>
+
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Причина забраковки:" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <TextBox x:Name="DiscardReasonTextBox" Text="Закисание партии при формовании" Padding="5,4"/>
+                                </StackPanel>
+                            </Grid>
+
+                            <Button Content="🗑️ Списать варку в брак" 
+                                    Click="DiscardBatch_Click" 
+                                    Height="32" 
+                                    HorizontalAlignment="Left"
+                                    Padding="15,0"
+                                    Background="#DC2626" 
+                                    Foreground="White" 
+                                    FontWeight="Bold"/>
+                        </StackPanel>
+                    </GroupBox>
+
+                    <!-- Таблица лотов на созревании для браковки -->
+                    <GroupBox Grid.Row="1" Header="Забраковка лотов из камер созревания (плесень, порча, брак флипа)" Padding="10">
+                        <DataGrid x:Name="DiscardAgingLotsDataGrid" 
+                                  AutoGenerateColumns="False" 
+                                  IsReadOnly="True" 
+                                  GridLinesVisibility="Horizontal" 
+                                  HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Лот / Партия" Binding="{Binding BatchNumber}" Width="2*"/>
+                                <DataGridTextColumn Header="Камера" Binding="{Binding ChamberName}" Width="*"/>
+                                <DataGridTextColumn Header="Текущий вес (кг)" Binding="{Binding InitialQuantity, StringFormat={}{0:N2}}" Width="*"/>
+                                <DataGridTextColumn Header="Дней на выдержке" Binding="{Binding DaysInChamber}" Width="*"/>
+                                <DataGridTemplateColumn Header="Действие" Width="130">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="🗑️ В брак" 
+                                                    Click="DiscardAgingLotRow_Click" 
+                                                    Tag="{Binding LotId}" 
+                                                    Background="#FEE2E2" 
+                                                    Foreground="#991B1B" 
+                                                    BorderBrush="#FCA5A5" 
+                                                    FontWeight="Bold" 
+                                                    Padding="6,2"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
             </TabItem>
 
         </TabControl>

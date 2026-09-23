@@ -14,8 +14,8 @@
         <TextBlock Text="{loc:Loc Key=TITLE_PROCUREMENT}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
 
         <TabControl Grid.Row="1">
-            <!-- 1. Закупки и Остатки Сырья -->
-            <TabItem Header="Оприходование и Остатки">
+            <!-- 1. Приход и Остатки Сырья -->
+            <TabItem Header="Приход и Остатки сырья">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -83,14 +83,13 @@
                                 </StackPanel>
                             </Grid>
 
-                            <!-- Блок двух списков: Доступные и Выбранные Ёмкости -->
+                            <!-- Емкости хранилища -->
                             <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <!-- Доступные емкости -->
                                 <StackPanel Grid.Column="0" Margin="0,0,6,0">
                                     <TextBlock Text="Доступные ёмкости на складе (нажмите +, чтобы добавить):" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
                                     <ListBox x:Name="AvailableLocationsListBox" Height="90" Background="#F8FAFC">
@@ -116,7 +115,6 @@
                                     </ListBox>
                                 </StackPanel>
 
-                                <!-- Выбранные емкости -->
                                 <StackPanel Grid.Column="1" Margin="6,0,0,0">
                                     <TextBlock Text="Выбранные ёмкости под эту партию:" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
                                     <ListBox x:Name="SelectedLocationsListBox" Height="90" Background="#F1F5F9">
@@ -143,8 +141,7 @@
                                 </StackPanel>
                             </Grid>
 
-                            <!-- Предупреждение о вместимости и кнопка -->
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,0">
+                            <StackPanel Orientation="Horizontal">
                                 <Button x:Name="AddStockLotButton"
                                         Content="{loc:Loc Key=ADD_STOCK_LOT}" 
                                         Click="AddStockLot_Click" 
@@ -162,35 +159,15 @@
                         </StackPanel>
                     </GroupBox>
 
-                    <!-- Панель остатков со списанием -->
+                    <!-- Панель текущих остатков -->
                     <GroupBox Grid.Row="1" Header="Текущие остатки сырья на складах" Padding="10">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
 
-                            <!-- Форма ручного списания -->
-                            <Border Grid.Row="0" Background="#FEF2F2" BorderBrush="#FECACA" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,10">
-                                <WrapPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Списание порчи / брака:" FontWeight="Bold" Foreground="#991B1B" VerticalAlignment="Center" Margin="0,0,10,0"/>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,10,0">
-                                        <TextBlock Text="Партия:" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11"/>
-                                        <ComboBox x:Name="WriteOffStockLotComboBox" DisplayMemberPath="BatchNumber" SelectedValuePath="Id" Width="180" Padding="4,2"/>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,10,0">
-                                        <TextBlock Text="Кол-во:" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11"/>
-                                        <TextBox x:Name="WriteOffQuantityTextBox" Width="70" Padding="4,2"/>
-                                    </StackPanel>
-
-                                    <Button Content="Списать" Click="WriteOffStockLot_Click" Background="#DC2626" Foreground="White" FontWeight="Bold" Padding="12,3"/>
-                                </WrapPanel>
-                            </Border>
-
-                            <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
                                 <TextBlock Text="Поставщик:" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11"/>
                                 <ComboBox x:Name="FilterSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="160" SelectionChanged="FilterStockLots_Changed"/>
 
@@ -202,7 +179,7 @@
                                 <Button Content="Обновить" Click="RefreshStockLots_Click" Margin="12,0,0,0" Padding="8,2"/>
                             </StackPanel>
 
-                            <DataGrid Grid.Row="2" 
+                            <DataGrid Grid.Row="1" 
                                       x:Name="StockLotsDataGrid" 
                                       AutoGenerateColumns="False" 
                                       IsReadOnly="True" 
@@ -217,18 +194,6 @@
                                     <DataGridTextColumn Header="Цена за ед." Binding="{Binding UnitPrice, StringFormat={}{0:C2}}" Width="85"/>
                                     <DataGridTextColumn Header="Партия" Binding="{Binding BatchNumber}" Width="110"/>
                                     <DataGridTextColumn Header="Срок годности" Binding="{Binding ExpirationDate, StringFormat={}{0:dd.MM.yyyy}}" Width="100"/>
-                                    <DataGridTemplateColumn Width="50">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Button Content="🗑️" 
-                                                        Click="WriteOffRow_Click" 
-                                                        Tag="{Binding Id}" 
-                                                        Background="Transparent" 
-                                                        BorderThickness="0" 
-                                                        ToolTip="Списать полностью"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>
@@ -236,7 +201,42 @@
                 </Grid>
             </TabItem>
 
-            <!-- 2. Поставщики -->
+            <!-- 2. Списание / Акты Потерь -->
+            <TabItem Header="Списание и Потери">
+                <Grid Margin="10">
+                    <GroupBox Header="Выбор партии сырья для списания (промывка, увар, брак, пропажа)" Padding="10">
+                        <DataGrid x:Name="WriteOffDataGrid" 
+                      AutoGenerateColumns="False" 
+                      IsReadOnly="True" 
+                      GridLinesVisibility="Horizontal" 
+                      HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Сырьё" Binding="{Binding ItemName}" Width="150"/>
+                                <DataGridTextColumn Header="Склад" Binding="{Binding WarehouseName}" Width="120"/>
+                                <DataGridTextColumn Header="Емкость" Binding="{Binding StorageLocationsInfo}" Width="*"/>
+                                <DataGridTextColumn Header="Текущий остаток" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="120"/>
+                                <DataGridTextColumn Header="Номер партии" Binding="{Binding BatchNumber}" Width="130"/>
+                                <DataGridTemplateColumn Header="Действие" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="🗑️ Списать" 
+                                        Click="WriteOffRow_Click" 
+                                        Tag="{Binding Id}" 
+                                        Background="#FEE2E2" 
+                                        Foreground="#991B1B" 
+                                        BorderBrush="#FCA5A5" 
+                                        FontWeight="SemiBold" 
+                                        Padding="8,3"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
+            </TabItem>
+
+            <!-- 3. Поставщики -->
             <TabItem Header="{loc:Loc Key=TAB_SUPPLIERS}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
                     <StackPanel MaxWidth="600" HorizontalAlignment="Left" Width="600">

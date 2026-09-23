@@ -32,4 +32,22 @@ public class SubscriptionPlan
             MaxUsers = maxUsers
         };
     }
+
+    public void UpdateLimits(
+        int maxMonthlyBatches,
+        int maxWarehouses,
+        int maxChambers,
+        int maxUsers,
+        string? name = null)
+    {
+        MaxMonthlyBatches = maxMonthlyBatches;
+        MaxWarehouses = maxWarehouses;
+        MaxChambers = maxChambers;
+        MaxUsers = maxUsers;
+
+        if (!string.IsNullOrWhiteSpace(name))
+        {
+            Name = name;
+        }
+    }
 }
