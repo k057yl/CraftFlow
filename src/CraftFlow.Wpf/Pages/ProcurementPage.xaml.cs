@@ -313,7 +313,7 @@ public partial class ProcurementPage : Page
             var lot = StockLots.FirstOrDefault(l => l.Id == lotId);
             if (lot != null)
             {
-                var dialog = new WriteOffDialog(lot.ItemName, lot.BatchNumber, lot.Quantity)
+                var dialog = new WriteOffDialog(lot.ItemName, lot.BatchNumber, lot.Quantity, items: null)
                 {
                     Owner = Window.GetWindow(this)
                 };

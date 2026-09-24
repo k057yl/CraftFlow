@@ -3,6 +3,7 @@ using CraftFlow.Api.Modules.Catalog;
 using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.Api.Modules.Production;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Dtos.Aging;
 using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Models.Productions;
@@ -685,22 +686,41 @@ public partial class ProductionPage : Page
         if (sender is Button btn && btn.Tag is Guid lotId)
         {
             var lot = AgingLotsSummary.FirstOrDefault(l => l.LotId == lotId);
-            if (lot != null)
+            if (lot == null) return;
+
+            try
             {
-                var dialog = new WriteOffDialog(lot.BatchNumber, lot.ChamberName, lot.InitialQuantity, lot.UnitsCount)
+                var items = await ApiService.Instance.GetAsync<List<GetAgingLotItemDto>>($"{AgingConstants.AGING_LOTS_ACTIVE}/{lotId}/items");
+                var dialog = new WriteOffDialog(lot.BatchNumber, lot.ChamberName, lot.InitialQuantity, items)
                 {
                     Owner = Window.GetWindow(this)
                 };
 
                 if (dialog.ShowDialog() == true)
                 {
-                    var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{AgingConstants.AGING_LOTS_ACTIVE}/discard", new
+                    bool isSuccess;
+                    string contentOrError;
+
+                    if (dialog.SelectedItemIds.Count > 0)
                     {
-                        AgingLotId = lotId,
-                        Quantity = dialog.QuantityToWriteOff,
-                        UnitsToRemove = dialog.UnitsToRemove,
-                        Reason = dialog.Reason
-                    });
+                        (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{AgingConstants.AGING_LOTS_ACTIVE}/discard-items", new
+                        {
+                            AgingLotId = lotId,
+                            ItemIds = dialog.SelectedItemIds,
+                            Reason = dialog.Reason
+                        });
+                    }
+
+                    else
+                    {
+                        (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{AgingConstants.AGING_LOTS_ACTIVE}/discard", new
+                        {
+                            AgingLotId = lotId,
+                            Quantity = dialog.QuantityToWriteOff,
+                            UnitsToRemove = 0,
+                            Reason = dialog.Reason
+                        });
+                    }
 
                     if (isSuccess)
                     {
@@ -712,6 +732,10 @@ public partial class ProductionPage : Page
                         SetStatusRaw(contentOrError, Brushes.Red);
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                SetStatusFormatted("UI_API_ERROR_PREFIX", Brushes.Red, ex.Message);
             }
         }
     }

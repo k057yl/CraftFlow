@@ -1,9 +1,11 @@
 ﻿using CraftFlow.Api.Modules.Aging.CreateChamber;
 using CraftFlow.Api.Modules.Aging.DeleteChamber;
 using CraftFlow.Api.Modules.Aging.DiscardAgingLot;
+using CraftFlow.Api.Modules.Aging.DiscardSpecificAgingItems;
 using CraftFlow.Api.Modules.Aging.GetActiveAgingLots;
 using CraftFlow.Api.Modules.Aging.GetAgingChambers;
 using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
+using CraftFlow.Api.Modules.Aging.GetAgingLotItems;
 using CraftFlow.Api.Modules.Aging.ReleaseFromAging;
 using CraftFlow.Api.Modules.Aging.TransferToAging;
 using MediatR;
@@ -30,8 +32,15 @@ public static class AgingEndpoints
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
 
-        // --- НОВЫЙ ЭНДПОИНТ ДЛЯ СПИСАНИЯ ЛОТА С ВЫДЕРЖКИ ---
+        // Списание всей массы / усушка
         group.MapPost($"{AgingConstants.AGING_LOTS_ACTIVE}/discard", async (DiscardAgingLotCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
+        });
+
+        // ТОЧЕЧНОЕ Списание штук
+        group.MapPost(AgingConstants.AGING_LOTS_DISCARD_ITEMS, async (DiscardSpecificAgingItemsCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
@@ -73,6 +82,13 @@ public static class AgingEndpoints
         {
             var result = await handler.HandleAsync(id);
             return result is not null ? Results.Ok(result) : Results.NotFound();
+        });
+
+        // СПИСОК ГОЛОВОК ДЛЯ ДИАЛОГА (Fix 404)
+        group.MapGet($"{AgingConstants.AGING_LOTS_ACTIVE}/{{id:guid}}/items", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new GetAgingLotItemsQuery(id));
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.NotFound(result.Error);
         });
     }
 }

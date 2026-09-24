@@ -115,6 +115,30 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
         }
     }
 
+    public void DiscardSpecificItems(IEnumerable<Guid> itemIds, string reason)
+    {
+        EnsureMachine();
+
+        if (_stateMachine!.State != AgingState.InChamber && _stateMachine!.State != AgingState.ReadyForRelease)
+            throw new InvalidOperationException(ErrorCodes.Aging.INVALID_LOT_STATE);
+
+        var targetIds = itemIds.ToHashSet();
+        var itemsToDiscard = _items
+            .Where(i => targetIds.Contains(i.Id) && i.State == AgingItemState.InChamber)
+            .ToList();
+
+        foreach (var item in itemsToDiscard)
+        {
+            item.Discard(reason);
+        }
+
+        if (_items.Count > 0 && _items.All(i => i.State == AgingItemState.Discarded))
+        {
+            ActualReleaseDate = DateTime.UtcNow;
+            _stateMachine!.Fire(AgingTrigger.Discard);
+        }
+    }
+
     public void RegisterLoss(decimal actualQuantity, int actualUnitsCount)
     {
         EnsureMachine();

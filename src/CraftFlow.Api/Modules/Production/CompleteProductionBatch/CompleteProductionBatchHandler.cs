@@ -1,4 +1,5 @@
 ﻿using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Production.Events;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
@@ -33,11 +34,47 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
             batch.UpdateName(request.BatchNumber);
         }
 
-        batch.Complete(
-            actualOutputQuantity: request.ActualOutputQuantity,
-            unitsCount: request.UnitsCount,
-            overheadPercentage: request.OverheadPercentage
-        );
+        int unitsCount = request.UnitsCount > 0 ? request.UnitsCount : 1;
+
+        if (request.RequiresAging)
+        {
+            if (!request.AgingChamberId.HasValue)
+            {
+                return Result.Failure<Guid>(Error.Validation(ErrorCodes.General.VALUE_REQUIRED));
+            }
+
+            var chamberExists = await _dbContext.Set<AgingChamber>()
+                .AnyAsync(c => c.Id == request.AgingChamberId.Value, cancellationToken);
+
+            if (!chamberExists)
+            {
+                return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Aging.CHAMBER_NOT_FOUND));
+            }
+
+            batch.MarkReadyForAging(request.ActualOutputQuantity, unitsCount);
+            batch.MarkAsTransferredToAging();
+
+            var agingLot = AgingLot.Create(
+                productionBatchId: batch.Id,
+                productId: batch.TargetProductId,
+                agingChamberId: request.AgingChamberId.Value,
+                batchNumber: batch.Name,
+                initialQuantity: request.ActualOutputQuantity,
+                unitsCount: unitsCount,
+                minAgingDays: request.MinAgingDays ?? 0,
+                storageLocationId: request.StorageLocationId
+            );
+
+            await _dbContext.Set<AgingLot>().AddAsync(agingLot, cancellationToken);
+        }
+        else
+        {
+            batch.Complete(
+                actualOutputQuantity: request.ActualOutputQuantity,
+                unitsCount: unitsCount,
+                overheadPercentage: request.OverheadPercentage
+            );
+        }
 
         await _publisher.Publish(
             new ProductionBatchCompletedEvent(
@@ -45,7 +82,7 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
                 batch.RecipeId,
                 batch.WarehouseId,
                 batch.ActualOutputQuantity,
-                request.UnitsCount
+                unitsCount
             ),
             cancellationToken
         );

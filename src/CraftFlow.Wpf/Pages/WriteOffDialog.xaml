@@ -2,67 +2,76 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Списание / Забраковка лота" 
-        Height="380" Width="460"
+        Height="520" Width="480"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="#F8FAFC">
 
-    <Grid Margin="20">
+    <Grid Margin="18">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
         <!-- Шапка -->
-        <StackPanel Grid.Row="0" Margin="0,0,0,15">
+        <StackPanel Grid.Row="0" Margin="0,0,0,12">
             <TextBlock x:Name="LotTitleTextBlock" 
                        FontWeight="Bold" 
                        FontSize="15" 
                        Foreground="#0F172A" 
-                       TextWrapping="Wrap" 
-                       LineHeight="20"/>
+                       TextWrapping="Wrap"/>
 
             <TextBlock x:Name="CurrentQuantityTextBlock" 
                        FontSize="12" 
                        Foreground="#0EA5E9" 
                        FontWeight="SemiBold" 
-                       Margin="0,4,0,0"/>
+                       Margin="0,3,0,0"/>
         </StackPanel>
 
-        <!-- Поля ввода -->
-        <StackPanel Grid.Row="1">
-            <Grid Margin="0,0,0,12">
+        <!-- Список конкретных головок партии -->
+        <GroupBox x:Name="ItemsGroupBox" Grid.Row="1" Header="Выберите конкретные головки для списания:" Margin="0,0,0,10" Padding="6">
+            <ListBox x:Name="ItemsListBox" Background="Transparent" BorderThickness="0">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <CheckBox Content="{Binding DisplayInfo}" 
+                                  IsChecked="{Binding IsSelected, Mode=TwoWay}"
+                                  FontSize="12"
+                                  Margin="2,3"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </GroupBox>
+
+        <!-- Ввод массы / усушки и причины -->
+        <StackPanel Grid.Row="2">
+            <Grid Margin="0,0,0,8">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="2*"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
-                <!-- Вес -->
-                <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                    <TextBlock Text="Списываемый вес (кг):" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
-                    <TextBox x:Name="QuantityTextBox" Padding="8,6" FontSize="13"/>
+                <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                    <TextBlock Text="Списываемая масса / Усушка (кг):" FontSize="11" Foreground="#475569" Margin="0,0,0,3"/>
+                    <TextBox x:Name="QuantityTextBox" Padding="6,4" FontSize="12"/>
                 </StackPanel>
 
-                <!-- Штуки (ДОБАВЛЕН x:Name) -->
-                <StackPanel x:Name="UnitsStackPanel" Grid.Column="1">
-                    <TextBlock Text="Списать штук:" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
-                    <TextBox x:Name="UnitsTextBox" Text="0" Padding="8,6" FontSize="13"/>
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Выбрано штук:" FontSize="11" Foreground="#475569" Margin="0,0,0,3"/>
+                    <TextBox x:Name="SelectedCountTextBox" Text="0 шт." IsReadOnly="True" Background="#E2E8F0" Padding="6,4" FontSize="12" FontWeight="Bold" Foreground="#0F172A"/>
                 </StackPanel>
             </Grid>
 
-            <TextBlock Text="* Если списывается усушка или чистка (без убавления головок) — укажите 0 штук." 
-                       FontSize="10" Foreground="#64748B" FontStyle="Italic" Margin="0,0,0,10" TextWrapping="Wrap"/>
+            <TextBlock Text="* Если это усушка/чистка сыра без брака головок — укажите только вес." 
+                       FontSize="10" Foreground="#64748B" FontStyle="Italic" Margin="0,0,0,8" TextWrapping="Wrap"/>
 
-            <TextBlock Text="Причина списания / комментарий:" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
-            <TextBox x:Name="ReasonTextBox" Padding="8,6" FontSize="12" Text="Промывка / Технические потери"/>
+            <TextBlock Text="Причина списания / комментарий:" FontSize="11" Foreground="#475569" Margin="0,0,0,3"/>
+            <TextBox x:Name="ReasonTextBox" Padding="6,4" FontSize="12" Text="Промывка / Технические потери"/>
         </StackPanel>
 
-        <Grid Grid.Row="2"/>
-
         <!-- Кнопки -->
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
             <Button Content="Отмена" Click="Cancel_Click" Width="90" Height="32" Margin="0,0,10,0" Background="#E2E8F0" BorderThickness="0" FontWeight="SemiBold"/>
             <Button Content="Списать" Click="Confirm_Click" Width="100" Height="32" Background="#DC2626" Foreground="White" FontWeight="Bold" BorderThickness="0"/>
         </StackPanel>
