@@ -38,6 +38,7 @@ public class StartProductionBatchHandler : IRequestHandler<StartProductionBatchC
             var requiredQuantity = recipeIngredient.Quantity * multiplier;
 
             var stockLots = await _dbContext.StockLots
+                .Include(s => s.StorageLocations)
                 .Where(s => s.WarehouseId == request.WarehouseId && s.ItemId == recipeIngredient.RawMaterialId && s.Quantity > 0)
                 .OrderBy(s => s.CreatedDate)
                 .ToListAsync(cancellationToken);
@@ -83,6 +84,27 @@ public class StartProductionBatchHandler : IRequestHandler<StartProductionBatchC
 
                 lot.AdjustQuantity(-deduct);
                 remainingToDeduct -= deduct;
+
+                if (lot.StorageLocations.Count > 0)
+                {
+                    var locationIds = lot.StorageLocations.Select(sl => sl.StorageLocationId).ToList();
+                    var locations = await _dbContext.StorageLocations
+                        .Where(sl => locationIds.Contains(sl.Id))
+                        .ToListAsync(cancellationToken);
+
+                    decimal remainingToFree = deduct;
+                    foreach (var stockLoc in lot.StorageLocations)
+                    {
+                        if (remainingToFree <= 0) break;
+                        var loc = locations.FirstOrDefault(l => l.Id == stockLoc.StorageLocationId);
+                        if (loc != null)
+                        {
+                            decimal amountToFree = Math.Min(stockLoc.AllocatedQuantity, remainingToFree);
+                            loc.AddVolume(-amountToFree);
+                            remainingToFree -= amountToFree;
+                        }
+                    }
+                }
 
                 var consumed = ConsumedIngredient.Create(
                     batch.Id,

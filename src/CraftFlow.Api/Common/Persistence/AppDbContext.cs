@@ -51,6 +51,7 @@ public class AppDbContext : DbContext
     public DbSet<PurchaseOrderItem> PurchaseOrderItems => Set<PurchaseOrderItem>();
     public DbSet<AgingChamber> AgingChambers => Set<AgingChamber>();
     public DbSet<AgingLot> AgingLots => Set<AgingLot>();
+    public DbSet<AgingLotItem> AgingLotItems => Set<AgingLotItem>();
     public DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
     public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
     public DbSet<TenantAccessKey> TenantAccessKeys => Set<TenantAccessKey>();
@@ -166,12 +167,13 @@ public class AppDbContext : DbContext
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(e => e.IsActive);
     }
-}
 
-public class DesignTimeTenantContext : ITenantContext
-{
-    public Guid TenantId => Guid.Empty;
-    public Guid UserId => Guid.Empty;
-    public TenantRole Role => TenantRole.SuperAdmin;
-    public bool IsResolved => true;
+    private sealed class DesignTimeTenantContext : ITenantContext
+    {
+        public Guid TenantId => Guid.Empty;
+        public Guid UserId => Guid.Empty;
+        public TenantRole Role => TenantRole.SuperAdmin;
+        public bool IsResolved => true;
+        public bool IsSuperAdmin => true;
+    }
 }

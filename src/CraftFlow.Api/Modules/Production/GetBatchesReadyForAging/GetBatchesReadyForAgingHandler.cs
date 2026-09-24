@@ -36,7 +36,8 @@ public class GetBatchesReadyForAgingHandler : IRequestHandler<GetBatchesReadyFor
                 string.IsNullOrWhiteSpace(br.Batch.Name)
                     ? $"Party #{br.Batch.Id.ToString().Substring(0, 8)} (Exit: {(br.Batch.ActualOutputQuantity > 0 ? br.Batch.ActualOutputQuantity : br.Batch.PlannedOutputQuantity)} кг)"
                     : $"{br.Batch.Name} (Exit: {(br.Batch.ActualOutputQuantity > 0 ? br.Batch.ActualOutputQuantity : br.Batch.PlannedOutputQuantity)} kg)",
-                br.Recipe.DefaultMinAgingDays ?? 0
+                br.Recipe.DefaultMinAgingDays ?? 0,
+                br.Batch.UnitsCount
             ))
             .ToListAsync(cancellationToken);
 

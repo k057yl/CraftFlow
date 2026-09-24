@@ -18,25 +18,17 @@ public class DiscardAgingLotHandler : IRequestHandler<DiscardAgingLotCommand, Re
     public async Task<Result> Handle(DiscardAgingLotCommand request, CancellationToken cancellationToken)
     {
         var lot = await _dbContext.AgingLots
-            .FirstOrDefaultAsync(l => l.Id == request.AgingLotId, cancellationToken);
+            .IgnoreQueryFilters()
+            .Where(l => l.Id == request.AgingLotId)
+            .Include(l => l.Items)
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (lot is null)
         {
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
         }
 
-        int unitsToRemove = request.UnitsToRemove > 0 ? request.UnitsToRemove : 1;
-        int newUnitsCount = lot.UnitsCount - unitsToRemove;
-        decimal newQuantity = lot.CurrentQuantity - request.Quantity;
-
-        if (newUnitsCount <= 0 || newQuantity <= 0)
-        {
-            lot.Discard();
-        }
-        else
-        {
-            lot.RegisterLoss(newQuantity, newUnitsCount);
-        }
+        lot.DiscardUnits(request.Quantity, request.UnitsToRemove, request.Reason);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         return Result.Success();

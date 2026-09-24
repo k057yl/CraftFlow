@@ -12,10 +12,27 @@ public sealed class AgingLotConfiguration : IEntityTypeConfiguration<AgingLot>
         builder.ToTable(DbTables.AGING_LOTS, DbSchemas.AGING);
 
         builder.HasKey(l => l.Id);
-        builder.Property(l => l.BatchNumber).HasMaxLength(100).IsRequired();
-        builder.Property(l => l.InitialQuantity).HasPrecision(18, 4);
-        builder.Property(l => l.CurrentQuantity).HasPrecision(18, 4);
-        builder.Property(l => l.State).HasConversion<int>();
+
+        builder.Property(l => l.BatchNumber)
+            .HasMaxLength(100)
+            .IsRequired();
+
+        builder.Property(l => l.InitialQuantity)
+            .HasPrecision(18, 4);
+
+        builder.Property(l => l.State)
+            .HasConversion<int>();
+
+        builder.Ignore(l => l.CurrentQuantity);
+        builder.Ignore(l => l.UnitsCount);
+
+        builder.HasMany(l => l.Items)
+            .WithOne()
+            .HasForeignKey(i => i.AgingLotId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(l => l.Items)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.HasQueryFilter(l => l.TenantId != Guid.Empty);
     }

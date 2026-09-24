@@ -29,7 +29,12 @@ public record RequirementCalculationDto(
     );
 }
 
-public record BatchReadyForAgingDto(Guid Id, string Name, int DefaultAgingDays);
+public record BatchReadyForAgingDto(
+    Guid Id,
+    string Name,
+    int DefaultAgingDays,
+    int UnitsCount = 1
+);
 
 public record AgingLotSummaryDto(
     Guid LotId,

@@ -1,6 +1,5 @@
 ﻿using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Inventory.Domain;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.SharedKernel.Constants;
@@ -28,7 +27,8 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             return Result.Failure(Error.Validation(ErrorCodes.General.VALUE_REQUIRED));
         }
 
-        var lot = await _dbContext.Set<AgingLot>()
+        var lot = await _dbContext.AgingLots
+            .Include(l => l.Items)
             .FirstOrDefaultAsync(l => l.Id == request.AgingLotId, cancellationToken);
 
         if (lot is null)
@@ -47,7 +47,6 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             }
         }
 
-        lot.RegisterLoss(request.ActualFinalQuantity, request.UnitsCount);
         lot.Release();
 
         var batch = await _dbContext.Set<ProductionBatch>()

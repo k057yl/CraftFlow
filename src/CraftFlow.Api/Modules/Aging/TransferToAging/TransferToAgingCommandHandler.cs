@@ -45,7 +45,7 @@ public sealed class TransferToAgingCommandHandler : IRequestHandler<TransferToAg
             ? batch.ActualOutputQuantity
             : batch.PlannedOutputQuantity;
 
-        const int defaultUnitsCount = 1;
+        int unitsCount = request.UnitsCount > 0 ? request.UnitsCount : 1;
 
         var agingLot = AgingLot.Create(
             batch.Id,
@@ -53,7 +53,7 @@ public sealed class TransferToAgingCommandHandler : IRequestHandler<TransferToAg
             request.AgingChamberId,
             finalLotNumber,
             initialQuantity,
-            defaultUnitsCount,
+            unitsCount,
             request.MinAgingDays
         );
 

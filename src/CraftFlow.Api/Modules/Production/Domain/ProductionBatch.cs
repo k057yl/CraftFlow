@@ -28,6 +28,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
     public int TargetDurationMinutes { get; private set; }
     public bool IsTelegramNotified { get; private set; }
     public string? DiscardReason { get; private set; }
+    public int UnitsCount { get; private set; } = 1;
 
     private ProductionBatch() { }
 
@@ -72,10 +73,11 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         _stateMachine!.Fire(BatchTrigger.Start);
     }
 
-    public void Complete(decimal actualOutputQuantity, decimal? overheadPercentage = null)
+    public void Complete(decimal actualOutputQuantity, int unitsCount = 1, decimal? overheadPercentage = null)
     {
         EnsureMachine();
         ActualOutputQuantity = actualOutputQuantity;
+        UnitsCount = unitsCount > 0 ? unitsCount : 1;
         SetOverheadPercentage(overheadPercentage);
         BrewingCompletedAt = DateTime.UtcNow;
         CompletedAt = DateTime.UtcNow;
@@ -101,10 +103,11 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         return rawMaterialCost * multiplier;
     }
 
-    public void MarkReadyForAging(decimal actualOutputQuantity)
+    public void MarkReadyForAging(decimal actualOutputQuantity, int unitsCount = 1)
     {
         EnsureMachine();
         ActualOutputQuantity = actualOutputQuantity;
+        UnitsCount = unitsCount > 0 ? unitsCount : 1;
         BrewingCompletedAt = DateTime.UtcNow;
         _stateMachine!.Fire(BatchTrigger.Complete);
     }

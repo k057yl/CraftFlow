@@ -469,7 +469,7 @@ public partial class ProductionPage : Page
 
     private async void TransferToAging_Click(object sender, RoutedEventArgs e)
     {
-        if (CompletedBatchesComboBox.SelectedValue is not Guid batchId ||
+        if (CompletedBatchesComboBox.SelectedItem is not BatchReadyForAgingDto selectedBatch ||
             AgingChambersComboBox.SelectedValue is not Guid chamberId ||
             !int.TryParse(MinAgingDaysTextBox.Text.Trim(), out var minDays))
         {
@@ -481,9 +481,10 @@ public partial class ProductionPage : Page
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_TRANSFER, new
         {
-            ProductionBatchId = batchId,
+            ProductionBatchId = selectedBatch.Id,
             AgingChamberId = chamberId,
             MinAgingDays = minDays,
+            UnitsCount = selectedBatch.UnitsCount,
             CustomBatchNumber = string.IsNullOrWhiteSpace(customLotName) ? null : customLotName
         });
 
@@ -686,7 +687,7 @@ public partial class ProductionPage : Page
             var lot = AgingLotsSummary.FirstOrDefault(l => l.LotId == lotId);
             if (lot != null)
             {
-                var dialog = new WriteOffDialog(lot.BatchNumber, lot.ChamberName, lot.InitialQuantity)
+                var dialog = new WriteOffDialog(lot.BatchNumber, lot.ChamberName, lot.InitialQuantity, lot.UnitsCount)
                 {
                     Owner = Window.GetWindow(this)
                 };
@@ -697,7 +698,7 @@ public partial class ProductionPage : Page
                     {
                         AgingLotId = lotId,
                         Quantity = dialog.QuantityToWriteOff,
-                        UnitsToRemove = 1,
+                        UnitsToRemove = dialog.UnitsToRemove,
                         Reason = dialog.Reason
                     });
 

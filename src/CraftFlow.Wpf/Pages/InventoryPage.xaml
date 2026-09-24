@@ -225,7 +225,7 @@
                             </StackPanel>
 
                             <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                <TextBlock Text="Вместимость:" 
+                                <TextBlock Text="Вместимость (л/кг):" 
                                            VerticalAlignment="Center" 
                                            Margin="0,0,8,0" 
                                            FontSize="11" 
@@ -253,21 +253,21 @@
                               HeadersVisibility="Column"
                               Background="Transparent">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="*"/>
-                            <DataGridTextColumn Header="Тип" Binding="{Binding LocationType}" Width="130"/>
-                            <DataGridTextColumn Header="Вместимость" Binding="{Binding Capacity}" Width="110"/>
-                            <DataGridCheckBoxColumn Header="Занято" Binding="{Binding IsOccupied}" Width="80"/>
+                            <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="160"/>
+                            <DataGridTextColumn Header="Тип" Binding="{Binding LocationType}" Width="120"/>
+                            <DataGridTextColumn Header="Загрузка / Объём" Binding="{Binding VolumeInfo}" Width="*"/>
+                            <DataGridTextColumn Header="Статус мойки" Binding="{Binding WashStatus}" Width="110"/>
                             <DataGridTemplateColumn Width="60">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Button Content="❌" 
-                                                Click="DeleteStorageLocation_Click" 
-                                                Tag="{Binding Id}" 
-                                                Background="Transparent" 
-                                                BorderThickness="0" 
-                                                Foreground="#DC2626" 
-                                                FontWeight="Bold" 
-                                                HorizontalAlignment="Center"/>
+                                    Click="DeleteStorageLocation_Click" 
+                                    Tag="{Binding Id}" 
+                                    Background="Transparent" 
+                                    BorderThickness="0" 
+                                    Foreground="#DC2626" 
+                                    FontWeight="Bold" 
+                                    HorizontalAlignment="Center"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

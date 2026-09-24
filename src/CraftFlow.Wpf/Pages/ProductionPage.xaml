@@ -295,6 +295,7 @@
                             </StackPanel>
                         </GroupBox>
 
+                        <!-- ТАБЛИЦА: ТЕКУЩИЕ ПАРТИИ В КАМЕРАХ СОЗРЕВАНИЯ -->
                         <GroupBox Header="Текущие партии в камерах созревания" Margin="0,0,0,12" Padding="8">
                             <DataGrid x:Name="AgingLotsDataGrid" 
                                       AutoGenerateColumns="False" 
@@ -309,7 +310,8 @@
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Лот / Партия" Binding="{Binding BatchNumber}" Width="2*"/>
                                     <DataGridTextColumn Header="Камера" Binding="{Binding ChamberName}" Width="*"/>
-                                    <DataGridTextColumn Header="Вес закладываемый (кг)" Binding="{Binding InitialQuantity, StringFormat={}{0:N2}}" Width="*"/>
+                                    <DataGridTextColumn Header="Текущий остаток (кг)" Binding="{Binding InitialQuantity, StringFormat={}{0:N2}}" Width="1.2*"/>
+                                    <DataGridTextColumn Header="Головок (шт)" Binding="{Binding UnitsCount}" Width="0.8*"/>
                                     <DataGridTextColumn Header="Дней в камере" Binding="{Binding DaysInChamber}" Width="*"/>
                                     <DataGridTextColumn Header="План (дней)" Binding="{Binding TargetDays}" Width="*"/>
                                     <DataGridCheckBoxColumn Header="Готов" Binding="{Binding IsReadyForRelease}" Width="Auto"/>
@@ -317,7 +319,7 @@
                             </DataGrid>
                         </GroupBox>
 
-                        <!-- Извлечение из камеры созревания С ВЫБОРОМ ЕМКОСТИ / СТЕЛЛАЖА -->
+                        <!-- Извлечение из камеры созревания -->
                         <GroupBox Header="{loc:Loc Key=GROUP_RELEASE_AGING}" Padding="10">
                             <StackPanel>
                                 <Grid Margin="0,0,0,8">
@@ -337,7 +339,6 @@
                                     </StackPanel>
                                 </Grid>
 
-                                <!-- Выбор стеллажей/емкостей складского назначения -->
                                 <StackPanel Margin="0,0,0,10">
                                     <TextBlock Text="Стеллажи / ячейки приемного склада:" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
                                     <ListBox x:Name="TargetStorageLocationsListBox" Height="80" Background="#F8FAFC" SelectionMode="Multiple">
@@ -411,7 +412,6 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Форма браковки выбранной активной варки -->
                     <GroupBox Grid.Row="0" Header="Забраковка активной варки (в котле)" Padding="10" Margin="0,0,0,15">
                         <StackPanel>
                             <Grid Margin="0,0,0,8">
@@ -442,7 +442,7 @@
                         </StackPanel>
                     </GroupBox>
 
-                    <!-- Таблица лотов на созревании для браковки -->
+                    <!-- ТАБЛИЦА ЛОТОВ ДЛЯ БРАКОВКИ С ШТУКАМИ -->
                     <GroupBox Grid.Row="1" Header="Забраковка лотов из камер созревания (плесень, порча, брак флипа)" Padding="10">
                         <DataGrid x:Name="DiscardAgingLotsDataGrid" 
                                   AutoGenerateColumns="False" 
@@ -452,7 +452,8 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Лот / Партия" Binding="{Binding BatchNumber}" Width="2*"/>
                                 <DataGridTextColumn Header="Камера" Binding="{Binding ChamberName}" Width="*"/>
-                                <DataGridTextColumn Header="Текущий вес (кг)" Binding="{Binding InitialQuantity, StringFormat={}{0:N2}}" Width="*"/>
+                                <DataGridTextColumn Header="Текущий остаток (кг)" Binding="{Binding InitialQuantity, StringFormat={}{0:N2}}" Width="1.2*"/>
+                                <DataGridTextColumn Header="Головок (шт)" Binding="{Binding UnitsCount}" Width="0.8*"/>
                                 <DataGridTextColumn Header="Дней на выдержке" Binding="{Binding DaysInChamber}" Width="*"/>
                                 <DataGridTemplateColumn Header="Действие" Width="130">
                                     <DataGridTemplateColumn.CellTemplate>

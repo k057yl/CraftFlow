@@ -5,6 +5,7 @@ public static class DbTables
     public const string AUDIT_LOGS = "audit_logs";
     public const string AGING_CHAMBERS = "aging_chambers";
     public const string AGING_LOTS = "aging_lots";
+    public const string AGING_LOT_ITEMS = "aging_lot_items";
     public const string RECIPES = "recipes";
     public const string PRODUCTS = "products";
     public const string USERS = "users";

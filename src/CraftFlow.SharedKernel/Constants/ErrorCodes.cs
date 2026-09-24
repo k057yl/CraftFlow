@@ -95,6 +95,8 @@ public static class ErrorCodes
         public const string CHAMBER_NAME_REQUIRED = "AGING.CHAMBER_NAME_REQUIRED";
         public const string INVALID_LOT_STATE = "AGING.INVALID_LOT_STATE";
         public const string INSUFFICIENT_AGING_CAPACITY = "AGING.INSUFFICIENT_AGING_CAPACITY";
+        public const string DISCARD_REASON_MANUAL_DISCARD = "AGING.DISCARD_REASON_MANUAL_DISCARD";
+        public const string DISCARD_REASON_INVENTORY_LOSS = "AGING.DISCARD_REASON_INVENTORY_LOSS";
     }
 
     public static class Saas

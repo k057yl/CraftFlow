@@ -15,5 +15,9 @@ public record StorageLocationDto(
     string MaintenanceStatus
 )
 {
-    public decimal FreeCapacity => Capacity.HasValue ? Math.Max(0, Capacity.Value - CurrentVolume) : 0;
+    public decimal FreeCapacity => Capacity.HasValue ? Math.Max(0m, Capacity.Value - CurrentVolume) : 0m;
+
+    public string VolumeInfo => Capacity.HasValue && Capacity.Value > 0
+        ? $"{CurrentVolume:N0} / {Capacity.Value:N0} л (Свободно: {FreeCapacity:N0} л)"
+        : $"{CurrentVolume:N0} л";
 }

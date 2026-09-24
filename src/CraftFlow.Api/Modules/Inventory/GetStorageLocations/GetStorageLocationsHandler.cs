@@ -29,27 +29,23 @@ public class GetStorageLocationsHandler : IRequestHandler<GetStorageLocationsQue
             query = query.Where(l => l.ChamberId == request.ChamberId.Value);
         }
 
-        var locations = await query
-            .Select(l => new StorageLocationDto(
-                l.Id,
-                l.Name,
-                l.LocationType,
-                l.WarehouseId,
-                l.ChamberId,
-                l.Capacity,
-                l.CurrentVolume,
-                l.IsOccupied,
-                l.BatchesProcessedCount,
-                l.WashCycleBatchInterval,
-                l.LastWashedAt,
-                l.BatchesProcessedCount >= l.WashCycleBatchInterval ? "WASH_REQUIRED" : "OK"
-            ))
-            .ToListAsync(cancellationToken);
+        var locations = await query.ToListAsync(cancellationToken);
 
-        var availableLocations = locations
-            .Where(l => !l.Capacity.HasValue || l.FreeCapacity > 0)
-            .ToList();
+        var result = locations.Select(l => new StorageLocationDto(
+            l.Id,
+            l.Name,
+            l.LocationType,
+            l.WarehouseId,
+            l.ChamberId,
+            l.Capacity,
+            l.CurrentVolume,
+            l.IsOccupied,
+            l.BatchesProcessedCount,
+            l.WashCycleBatchInterval,
+            l.LastWashedAt,
+            l.BatchesProcessedCount >= l.WashCycleBatchInterval ? "WASH_REQUIRED" : "OK"
+        )).ToList();
 
-        return Result.Success(availableLocations);
+        return Result.Success(result);
     }
 }

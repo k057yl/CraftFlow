@@ -3,5 +3,6 @@
 public record BatchReadyForAgingDto(
     Guid Id,
     string Name,
-    int DefaultAgingDays
+    int DefaultAgingDays,
+    int UnitsCount
 );
