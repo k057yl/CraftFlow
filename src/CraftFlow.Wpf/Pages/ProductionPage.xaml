@@ -347,7 +347,7 @@
                                                 <StackPanel Orientation="Horizontal" Margin="2">
                                                     <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="0,0,8,0"/>
                                                     <TextBlock Text="[Свободно: " Foreground="#64748B"/>
-                                                    <TextBlock Text="{Binding FreeCapacity, StringFormat={}{0:N0}}" Foreground="#16A34A" FontWeight="Bold"/>
+                                                    <TextBlock Text="{Binding FreeCapacityDisplay}" Foreground="#16A34A" FontWeight="Bold"/>
                                                     <TextBlock Text=" л/кг]" Foreground="#64748B"/>
                                                 </StackPanel>
                                             </DataTemplate>

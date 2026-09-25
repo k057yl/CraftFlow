@@ -1,10 +1,11 @@
-﻿using CraftFlow.SharedKernel.Result;
+﻿using CraftFlow.SharedKernel.Dtos.Sale;
+using CraftFlow.SharedKernel.Result;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Sales.CreateAndShipSalesOrder;
-public record CreateAndShipSalesOrderCommand(
-    Guid ProductId,
+
+public sealed record CreateAndShipSalesOrderCommand(
     Guid CustomerId,
     Guid WarehouseId,
-    List<OrderItemRequest> Items
+    List<SalesOrderItemRequestDto> Items
 ) : IRequest<Result<Guid>>;

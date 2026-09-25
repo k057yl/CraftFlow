@@ -18,6 +18,11 @@ public class CreateAndShipSalesOrderHandler : IRequestHandler<CreateAndShipSales
 
     public async Task<Result<Guid>> Handle(CreateAndShipSalesOrderCommand request, CancellationToken cancellationToken)
     {
+        if (request.CustomerId == Guid.Empty || request.WarehouseId == Guid.Empty || request.Items.Count == 0)
+        {
+            return Result.Failure<Guid>(Error.Validation(ErrorCodes.General.VALUE_REQUIRED));
+        }
+
         var customerExists = await _dbContext.Customers
             .AnyAsync(c => c.Id == request.CustomerId, cancellationToken);
 
@@ -26,29 +31,25 @@ public class CreateAndShipSalesOrderHandler : IRequestHandler<CreateAndShipSales
 
         var order = SalesOrder.Create(request.CustomerId, request.WarehouseId);
 
+        var lotIds = request.Items.Select(i => i.StockLotId).ToList();
+        var stockLots = await _dbContext.StockLots
+            .Where(s => lotIds.Contains(s.Id) && s.IsActive)
+            .ToDictionaryAsync(s => s.Id, cancellationToken);
+
         foreach (var item in request.Items)
         {
-            var activeLots = await _dbContext.StockLots
-                .Where(s => s.WarehouseId == request.WarehouseId && s.ItemId == item.ProductId && s.Quantity > 0)
-                .OrderByDescending(s => s.Quantity)
-                .ToListAsync(cancellationToken);
+            if (!stockLots.TryGetValue(item.StockLotId, out var lot))
+            {
+                return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Inventory.STOCK_LOT_NOT_FOUND));
+            }
 
-            var totalAvailableQuantity = activeLots.Sum(s => s.Quantity);
-
-            if (activeLots.Count == 0 || totalAvailableQuantity < item.Quantity)
+            if (lot.Quantity < item.Quantity)
+            {
                 return Result.Failure<Guid>(Error.Validation(ErrorCodes.Sales.INSUFFICIENT_PRODUCT_STOCK));
+            }
 
-            decimal unitCost = activeLots.Sum(l => l.Quantity * l.UnitPrice) / totalAvailableQuantity;
-            decimal basePrice = unitCost > 0 ? unitCost * 1.40m : 450.00m;
-            decimal discountPercent = 0m;
-            if (item.Quantity >= 20) discountPercent = 10m;
-            else if (item.Quantity >= 10) discountPercent = 5m;
-
-            var finalUnitPrice = Math.Round(basePrice * (1m - (discountPercent / 100m)), 2);
-            var primaryLot = activeLots.First();
-            primaryLot.AdjustQuantity(-item.Quantity);
-
-            order.AddItem(primaryLot.Id, item.Quantity, finalUnitPrice);
+            lot.AdjustQuantity(-item.Quantity);
+            order.AddItem(lot.Id, item.Quantity, item.UnitPrice);
         }
 
         order.Ship();

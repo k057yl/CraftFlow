@@ -8,5 +8,6 @@ public sealed record ReleaseFromAgingCommand(
     Guid TargetWarehouseId,
     decimal ActualFinalQuantity,
     int UnitsCount,
-    decimal UnitPrice
+    decimal UnitPrice,
+    List<Guid>? StorageLocationIds = null
 ) : IRequest<Result>;

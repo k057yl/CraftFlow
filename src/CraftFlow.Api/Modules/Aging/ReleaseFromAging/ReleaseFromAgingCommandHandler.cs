@@ -38,12 +38,12 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
 
         if (lot.StorageLocationId.HasValue)
         {
-            var location = await _dbContext.StorageLocations
+            var oldLocation = await _dbContext.StorageLocations
                 .FirstOrDefaultAsync(s => s.Id == lot.StorageLocationId.Value, cancellationToken);
 
-            if (location != null)
+            if (oldLocation != null)
             {
-                location.AddVolume(-lot.CurrentQuantity);
+                oldLocation.AddVolume(-lot.CurrentQuantity);
             }
         }
 
@@ -73,6 +73,20 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             tenantId: _tenantContext.TenantId,
             productionBatchId: lot.ProductionBatchId
         );
+
+        if (request.StorageLocationIds != null && request.StorageLocationIds.Count > 0)
+        {
+            var targetLocations = await _dbContext.StorageLocations
+                .Where(s => request.StorageLocationIds.Contains(s.Id))
+                .ToListAsync(cancellationToken);
+
+            decimal qtyPerLocation = request.ActualFinalQuantity / targetLocations.Count;
+
+            foreach (var loc in targetLocations)
+            {
+                loc.AddVolume(qtyPerLocation);
+            }
+        }
 
         await _dbContext.Set<StockLot>().AddAsync(stockLot, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);

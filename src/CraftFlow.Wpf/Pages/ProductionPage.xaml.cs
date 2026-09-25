@@ -309,8 +309,12 @@ public partial class ProductionPage : Page
                     var priceFormat = LocalizationService.Get("LABEL_SELLING_PRICE_PER_UNIT");
                     UnitPriceLabelTextBlock.Text = string.Format(priceFormat, _selectedLotUnitName);
 
+                    ActualFinalQuantityTextBox.TextChanged -= ActualFinalQuantityTextBox_TextChanged;
+
                     ActualFinalQuantityTextBox.Text = details.InitialQuantity.ToString("F2", CultureInfo.InvariantCulture);
                     ReleaseUnitsCountTextBox.Text = details.UnitsCount > 0 ? details.UnitsCount.ToString() : "1";
+
+                    ActualFinalQuantityTextBox.TextChanged += ActualFinalQuantityTextBox_TextChanged;
 
                     RecalculateUnitPrice();
                 }
@@ -326,12 +330,17 @@ public partial class ProductionPage : Page
 
     private void RecalculateUnitPrice()
     {
-        if (TryParseDecimal(ActualFinalQuantityTextBox.Text, out var actualQty) && actualQty > 0 && _selectedLotTotalCost > 0)
+        if (CalculatedUnitCostTextBlock == null || UnitPriceTextBox == null) return;
+
+        if (TryParseDecimal(ActualFinalQuantityTextBox.Text, out var actualQty) && actualQty > 0)
         {
-            var calculatedUnitCost = _selectedLotTotalCost / actualQty;
+            var calculatedUnitCost = _selectedLotTotalCost > 0
+                ? _selectedLotTotalCost / actualQty
+                : 0m;
+
             CalculatedUnitCostTextBlock.Text = $"${calculatedUnitCost:F2}";
 
-            if (string.IsNullOrWhiteSpace(UnitPriceTextBox.Text) || UnitPriceTextBox.Text == "0.00")
+            if (string.IsNullOrWhiteSpace(UnitPriceTextBox.Text) || UnitPriceTextBox.Text == "0.00" || UnitPriceTextBox.Text == "0")
             {
                 UnitPriceTextBox.Text = calculatedUnitCost.ToString("F2", CultureInfo.InvariantCulture);
             }

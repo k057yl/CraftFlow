@@ -14,121 +14,149 @@
         <TextBlock Text="{loc:Loc Key=SALES_HEADER}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
 
         <TabControl Grid.Row="1" x:Name="SalesTabControl">
-            <!-- Вкладка 1: Оформление заказа -->
+            <!-- Вкладка 1: Оформление заказа и Накладной -->
             <TabItem Header="{loc:Loc Key=TAB_SALES_SHIPMENT}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
-                    <StackPanel MaxWidth="920" HorizontalAlignment="Left" Width="920">
-                        <GroupBox Header="{loc:Loc Key=GROUP_SALES_ORDER}" Padding="12">
-                            <StackPanel>
-                                <!-- Выбор покупателя, склада и продукта в 3 колонки -->
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                        <TextBlock Text="{loc:Loc Key=LABEL_SELECT_CUSTOMER}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <ComboBox x:Name="OrderCustomerComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
-                                    </StackPanel>
+                    <!-- Шапка заказа: Покупатель и Склад -->
+                    <Border Grid.Row="0" Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,12">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="15"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                                    <StackPanel Grid.Column="1" Margin="4,0,4,0">
-                                        <TextBlock Text="{loc:Loc Key=LABEL_FINISHED_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <ComboBox x:Name="OrderWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4" SelectionChanged="OrderWarehouse_SelectionChanged"/>
-                                    </StackPanel>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{loc:Loc Key=LABEL_SELECT_CUSTOMER}" Margin="0,0,0,3" FontSize="11" Foreground="#475569" FontWeight="Bold"/>
+                                <ComboBox x:Name="OrderCustomerComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
+                            </StackPanel>
 
-                                    <StackPanel Grid.Column="2" Margin="8,0,0,0">
-                                        <TextBlock Text="{loc:Loc Key=LABEL_SELECT_PRODUCT}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <ComboBox x:Name="OrderProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4" SelectionChanged="OrderProduct_SelectionChanged"/>
-                                    </StackPanel>
-                                </Grid>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="{loc:Loc Key=LABEL_FINISHED_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569" FontWeight="Bold"/>
+                                <ComboBox x:Name="OrderWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4" SelectionChanged="OrderWarehouse_SelectionChanged"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
 
-                                <!-- Информационная плашка: Остаток и Себестоимость -->
-                                <Border Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" Padding="10,8" Margin="0,0,0,12" CornerRadius="4">
+                    <!-- Основное тело: Партии складов vs Формируемая накладная -->
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="1.2*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Слева: Доступные Партии и Головы на Складе -->
+                        <GroupBox Grid.Column="0" Header="{loc:Loc Key=LABEL_SELECT_PRODUCT}">
+                            <Grid Margin="5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <DataGrid Grid.Row="0" x:Name="AvailableLotsDataGrid" 
+                                          AutoGenerateColumns="False" 
+                                          IsReadOnly="True" 
+                                          SelectionMode="Single"
+                                          RowDetailsVisibilityMode="VisibleWhenSelected"
+                                          MouseDoubleClick="AvailableLotsDataGrid_MouseDoubleClick">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Партия" Binding="{Binding BatchNumber}" Width="*"/>
+                                        <DataGridTextColumn Header="Товар" Binding="{Binding ProductName}" Width="*"/>
+                                        <DataGridTextColumn Header="Головок" Binding="{Binding UnitsCount}" Width="65"/>
+                                        <DataGridTextColumn Header="Вес (кг)" Binding="{Binding Quantity, StringFormat={}{0:F2}}" Width="75"/>
+                                        <DataGridTextColumn Header="Себест./кг" Binding="{Binding UnitPrice, StringFormat={}${0:F2}}" Width="75"/>
+                                    </DataGrid.Columns>
+
+                                    <!-- Выпадающая детализация головок партии -->
+                                    <DataGrid.RowDetailsTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" Padding="8" Margin="4">
+                                                <StackPanel>
+                                                    <TextBlock Text="Состав партии (головки):" FontWeight="Bold" FontSize="11" Margin="0,0,0,5" Foreground="#334155"/>
+                                                    <ItemsControl ItemsSource="{Binding Items}">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <StackPanel Orientation="Horizontal" Margin="0,2">
+                                                                    <CheckBox IsChecked="{Binding IsSelected, Mode=TwoWay}" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                                                    <TextBlock Text="{Binding ItemNumber}" FontWeight="SemiBold" Width="100" VerticalAlignment="Center"/>
+                                                                    <TextBlock Text="{Binding CurrentWeight, StringFormat={}{0:F2} кг}" Foreground="#0284C7" VerticalAlignment="Center"/>
+                                                                </StackPanel>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                    <Button Content="Добавить выбранные головы" 
+                                                            Click="AddSelectedUnitsToInvoice_Click" 
+                                                            Tag="{Binding}" 
+                                                            Margin="0,8,0,0" 
+                                                            Height="25" 
+                                                            FontSize="11" 
+                                                            Background="#0284C7" 
+                                                            Foreground="White"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </DataTemplate>
+                                    </DataGrid.RowDetailsTemplate>
+                                </DataGrid>
+
+                                <TextBlock Grid.Row="1" 
+                                           Text="* Двойной клик — добавить ВСЮ партию. Кликните по строке для выбора отдельных голов." 
+                                           FontSize="10" 
+                                           Foreground="#64748B" 
+                                           Margin="0,5,0,0" 
+                                           FontStyle="Italic"/>
+                            </Grid>
+                        </GroupBox>
+
+                        <!-- Справа: Позиции Накладной -->
+                        <GroupBox Grid.Column="2" Header="{loc:Loc Key=GROUP_SALES_ORDER}">
+                            <Grid Margin="5">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="*"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <DataGrid Grid.Row="0" x:Name="InvoiceItemsDataGrid" 
+                                          AutoGenerateColumns="False" 
+                                          CanUserDeleteRows="True">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Партия" Binding="{Binding BatchNumber}" IsReadOnly="True" Width="*"/>
+                                        <DataGridTextColumn Header="Кол-во (кг)" Binding="{Binding Quantity, UpdateSourceTrigger=PropertyChanged}" Width="85"/>
+                                        <DataGridTextColumn Header="Цена/кг ($)" Binding="{Binding SellingPrice, UpdateSourceTrigger=PropertyChanged}" Width="85"/>
+                                        <DataGridTextColumn Header="Сумма ($)" Binding="{Binding TotalSum, StringFormat={}{0:F2}}" IsReadOnly="True" Width="85"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+
+                                <!-- Итоговая сумма -->
+                                <Border Grid.Row="1" Background="#F1F5F9" Padding="10" Margin="0,10,0,10" CornerRadius="4">
                                     <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                            <TextBlock Text="{loc:Loc Key=LABEL_AVAILABLE_STOCK}" Foreground="#475569" Margin="0,0,5,0"/>
-                                            <TextBlock x:Name="ProductStockTextBlock" Text="0.00" FontWeight="Bold" Foreground="#1E3A8A"/>
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                            <TextBlock Text="{loc:Loc Key=LABEL_UNIT_COST_CALC}" Foreground="#475569" Margin="0,0,5,0"/>
-                                            <TextBlock x:Name="ProductCostTextBlock" Text="$0.00" FontWeight="Bold" Foreground="#065F46"/>
-                                        </StackPanel>
+                                        <TextBlock Text="{loc:Loc Key=LABEL_TOTAL_ORDER_SUM}" Foreground="#475569" FontSize="12" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <TextBlock x:Name="TotalOrderSumTextBlock" Text="$0.00" FontWeight="Bold" FontSize="18" Foreground="#0284C7" HorizontalAlignment="Right" VerticalAlignment="Center"/>
                                     </Grid>
                                 </Border>
 
-                                <!-- Количество, Базовая цена, Скидка -->
-                                <Grid Margin="0,0,0,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                        <TextBlock Text="{loc:Loc Key=LABEL_QTY_KG}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <TextBox x:Name="OrderQuantityTextBox" Text="5" TextChanged="CalculationInputs_Changed" Padding="5,4"/>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Column="1" Margin="4,0,4,0">
-                                        <TextBlock Text="{loc:Loc Key=LABEL_PRICE_PER_KG}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <TextBox x:Name="OrderBasePriceTextBox" Text="0.00" TextChanged="CalculationInputs_Changed" Padding="5,4"/>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Column="2" Margin="8,0,0,0">
-                                        <TextBlock Text="{loc:Loc Key=LABEL_DISCOUNT_PERCENT}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <TextBox x:Name="OrderDiscountTextBox" Text="0" TextChanged="CalculationInputs_Changed" Padding="5,4"/>
-                                    </StackPanel>
-                                </Grid>
-
-                                <TextBlock x:Name="PricingNoticeTextBlock" Text="{loc:Loc Key=NOTICE_MARKUP_APPLIED}" Foreground="#D97706" FontSize="11" Margin="0,0,0,10" Visibility="Collapsed"/>
-
-                                <!-- Финальный расчет цены и общей суммы -->
-                                <Border Background="#F1F5F9" Padding="12" Margin="0,5,0,15" CornerRadius="6">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                                            <TextBlock Text="{loc:Loc Key=LABEL_DISCOUNTED_PRICE_UNIT}" Foreground="Gray" FontSize="11"/>
-                                            <TextBlock x:Name="FinalUnitPriceTextBlock" Text="$0.00" FontWeight="Bold" FontSize="16"/>
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Center">
-                                            <TextBlock Text="{loc:Loc Key=LABEL_TOTAL_ORDER_SUM}" Foreground="Gray" FontSize="11"/>
-                                            <TextBlock x:Name="TotalOrderSumTextBlock" Text="$0.00" FontWeight="Bold" FontSize="18" Foreground="#1E3A8A"/>
-                                        </StackPanel>
-                                    </Grid>
-                                </Border>
-
-                                <Button Content="{loc:Loc Key=BTN_SHIP_ORDER}" 
+                                <Button Grid.Row="2" Content="{loc:Loc Key=BTN_SHIP_ORDER}" 
                                         Click="ShipOrder_Click" 
-                                        Height="35" 
-                                        Width="200"
-                                        HorizontalAlignment="Left"
+                                        Height="38" 
                                         FontWeight="Bold" 
                                         Background="#0284C7" 
                                         Foreground="White"/>
-                            </StackPanel>
+                            </Grid>
                         </GroupBox>
-                    </StackPanel>
-                </ScrollViewer>
+                    </Grid>
+                </Grid>
             </TabItem>
 
             <!-- Вкладка 2: Клиенты и Покупатели -->
             <TabItem Header="{loc:Loc Key=TAB_CUSTOMERS}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
                     <StackPanel MaxWidth="920" HorizontalAlignment="Left" Width="920">
-                        <!-- Создание нового клиента -->
                         <GroupBox Header="{loc:Loc Key=GROUP_REGISTER_CUSTOMER}" Padding="12" Margin="0,0,0,15" MaxWidth="600" HorizontalAlignment="Left" Width="600">
                             <StackPanel>
                                 <Grid Margin="0,0,0,12">
@@ -157,7 +185,6 @@
                             </StackPanel>
                         </GroupBox>
 
-                        <!-- Список контрагентов -->
                         <GroupBox Header="{loc:Loc Key=GROUP_ACTIVE_CUSTOMERS}" Padding="10">
                             <ListBox x:Name="CustomersListBox" DisplayMemberPath="Name" BorderThickness="0" MinHeight="150" MaxHeight="300"/>
                         </GroupBox>

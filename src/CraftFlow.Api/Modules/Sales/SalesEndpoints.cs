@@ -2,6 +2,7 @@
 using CraftFlow.Api.Modules.Sales.CreateCustomer;
 using CraftFlow.Api.Modules.Sales.GetCustomers;
 using CraftFlow.Api.Modules.Sales.GetSalesStockInfo;
+using CraftFlow.Api.Modules.Sales.GetStockLotDetails;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Sales;
@@ -35,6 +36,12 @@ public static class SalesEndpoints
         group.MapGet(SalesConstants.SALES_STOCK_INFO, async (Guid warehouseId, Guid productId, ISender sender) =>
         {
             var result = await sender.Send(new GetSalesStockInfoQuery(warehouseId, productId));
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapGet(SalesConstants.SALES_STOCK_DETAIL_INFO, async (Guid lotId, ISender sender) =>
+        {
+            var result = await sender.Send(new GetStockLotDetailsQuery(lotId));
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
     }
