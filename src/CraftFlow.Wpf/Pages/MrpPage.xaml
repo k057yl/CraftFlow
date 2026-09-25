@@ -2,29 +2,71 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
-      Title="{loc:Loc TITLE_MRP}">
+      Title="{loc:Loc Key=TITLE_MRP}">
 
-	<Grid Margin="20">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="Auto"/>
-		</Grid.RowDefinitions>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-		<TextBlock Text="{loc:Loc TITLE_MRP}" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+        <TextBlock Text="{loc:Loc Key=TITLE_MRP}" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
 
-		<Button Content="{loc:Loc CALCULATE_MRP}" Click="CalculateMrp_Click" Grid.Row="1" Width="200" HorizontalAlignment="Left" Margin="0,0,0,15" Padding="10,5"/>
+        <!-- Панель управления и параметров закупки -->
+        <Border Grid.Row="1" Background="#F8FAFC" BorderBrush="#CBD5E1" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="200"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-		<DataGrid Grid.Row="2" x:Name="MrpDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,0,0,15">
-			<DataGrid.Columns>
-				<DataGridTextColumn Header="{loc:Loc RAW_MATERIAL_NAME}" Binding="{Binding RawMaterialName}" Width="*"/>
-				<DataGridTextColumn Header="{loc:Loc QUANTITY}" Binding="{Binding TotalRequiredQuantity, StringFormat={}{0:N2}}" Width="140"/>
-				<DataGridTextColumn Header="{loc:Loc AVAILABLE_STOCK}" Binding="{Binding CurrentStockQuantity, StringFormat={}{0:N2}}" Width="140"/>
-				<DataGridTextColumn Header="{loc:Loc CALCULATED_REQUIREMENTS}" Binding="{Binding ShortageQuantity, StringFormat={}{0:N2}}" Width="160"/>
-			</DataGrid.Columns>
-		</DataGrid>
+                <Button Content="{loc:Loc Key=CALCULATE_MRP}" 
+                        Click="CalculateMrp_Click" 
+                        Grid.Column="0" 
+                        Width="180" 
+                        Height="32" 
+                        Margin="0,0,15,0" 
+                        FontWeight="Bold" 
+                        Background="#0284C7" 
+                        Foreground="White"/>
 
-		<TextBlock x:Name="StatusTextBlock" Grid.Row="3" Text="READY" Foreground="Blue" FontWeight="Bold"/>
-	</Grid>
+                <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                    <TextBlock Text="Поставщик:" FontSize="10" Foreground="#475569" Margin="0,0,0,2"/>
+                    <ComboBox x:Name="SupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="4,3"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="2" Margin="0,0,15,0">
+                    <TextBlock Text="Склад приёмки сырья:" FontSize="10" Foreground="#475569" Margin="0,0,0,2"/>
+                    <ComboBox x:Name="WarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="4,3"/>
+                </StackPanel>
+
+                <Button Content="Сформировать Заказ Поставщику" 
+                        Click="CreatePurchaseOrder_Click" 
+                        Grid.Column="3" 
+                        Height="32" 
+                        HorizontalAlignment="Right" 
+                        Padding="15,0" 
+                        FontWeight="Bold" 
+                        Background="#16A34A" 
+                        Foreground="White"/>
+            </Grid>
+        </Border>
+
+        <!-- Таблица потребностей -->
+        <DataGrid Grid.Row="2" x:Name="MrpDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Margin="0,0,0,15">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="{loc:Loc Key=RAW_MATERIAL_NAME}" Binding="{Binding RawMaterialName}" Width="*"/>
+                <DataGridTextColumn Header="{loc:Loc Key=QUANTITY}" Binding="{Binding TotalRequiredQuantity, StringFormat={}{0:N2}}" Width="140"/>
+                <DataGridTextColumn Header="{loc:Loc Key=AVAILABLE_STOCK}" Binding="{Binding CurrentStockQuantity, StringFormat={}{0:N2}}" Width="140"/>
+                <DataGridTextColumn Header="{loc:Loc Key=CALCULATED_REQUIREMENTS}" Binding="{Binding ShortageQuantity, StringFormat={}{0:N2}}" Width="160"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="4" Text="{loc:Loc Key=STATUS_READY}" Foreground="Blue" FontWeight="Bold"/>
+    </Grid>
 </Page>

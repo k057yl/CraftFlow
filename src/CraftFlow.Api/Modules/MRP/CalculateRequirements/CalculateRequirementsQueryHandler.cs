@@ -7,20 +7,20 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.MRP.CalculateRequirements;
+
 public sealed class CalculateRequirementsQueryHandler : IRequestHandler<CalculateRequirementsQuery, Result<MrpReportDto>>
 {
     private readonly AppDbContext _dbContext;
-    private readonly ITenantContext _tenantContext;
 
-    public CalculateRequirementsQueryHandler(AppDbContext dbContext, ITenantContext tenantContext)
+    public CalculateRequirementsQueryHandler(AppDbContext dbContext)
     {
         _dbContext = dbContext;
-        _tenantContext = tenantContext;
     }
 
     public async Task<Result<MrpReportDto>> Handle(CalculateRequirementsQuery request, CancellationToken cancellationToken)
     {
         var plannedBatches = await _dbContext.ProductionBatches
+            .AsNoTracking()
             .Where(b => b.State == BatchState.Draft)
             .ToListAsync(cancellationToken);
 
@@ -32,6 +32,7 @@ public sealed class CalculateRequirementsQueryHandler : IRequestHandler<Calculat
         var recipeIds = plannedBatches.Select(b => b.RecipeId).Distinct().ToList();
 
         var recipes = await _dbContext.Recipes
+            .AsNoTracking()
             .Include(r => r.Ingredients)
             .Where(r => recipeIds.Contains(r.Id))
             .ToDictionaryAsync(r => r.Id, cancellationToken);
@@ -45,7 +46,7 @@ public sealed class CalculateRequirementsQueryHandler : IRequestHandler<Calculat
 
             var multiplier = recipe.TargetOutputQuantity > 0
                 ? batch.PlannedOutputQuantity / recipe.TargetOutputQuantity
-                : 1;
+                : 1m;
 
             foreach (var ingredient in recipe.Ingredients)
             {
@@ -65,12 +66,14 @@ public sealed class CalculateRequirementsQueryHandler : IRequestHandler<Calculat
         var rawMaterialIds = rawMaterialNeeds.Keys.ToList();
 
         var stockBalances = await _dbContext.StockLots
-            .Where(sl => rawMaterialIds.Contains(sl.ItemId))
+            .AsNoTracking()
+            .Where(sl => rawMaterialIds.Contains(sl.ItemId) && sl.IsActive && sl.Quantity > 0)
             .GroupBy(sl => sl.ItemId)
             .Select(g => new { RawMaterialId = g.Key, TotalQuantity = g.Sum(x => x.Quantity) })
             .ToDictionaryAsync(x => x.RawMaterialId, x => x.TotalQuantity, cancellationToken);
 
         var rawMaterials = await _dbContext.RawMaterials
+            .AsNoTracking()
             .Where(rm => rawMaterialIds.Contains(rm.Id))
             .ToDictionaryAsync(rm => rm.Id, rm => rm.Name, cancellationToken);
 
@@ -79,11 +82,12 @@ public sealed class CalculateRequirementsQueryHandler : IRequestHandler<Calculat
         foreach (var (rawMaterialId, totalRequired) in rawMaterialNeeds)
         {
             stockBalances.TryGetValue(rawMaterialId, out var currentStock);
-            var shortage = Math.Max(0, totalRequired - currentStock);
+
+            var shortage = Math.Max(0m, totalRequired - currentStock);
 
             requirements.Add(new MaterialRequirementDto(
                 rawMaterialId,
-                rawMaterials.GetValueOrDefault(rawMaterialId, string.Empty),
+                rawMaterials.GetValueOrDefault(rawMaterialId, "UNKNOWN_MATERIAL"),
                 totalRequired,
                 currentStock,
                 shortage,
