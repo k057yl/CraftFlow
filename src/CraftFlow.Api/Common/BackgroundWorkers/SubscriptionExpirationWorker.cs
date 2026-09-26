@@ -6,6 +6,7 @@ namespace CraftFlow.Api.Common.BackgroundWorkers;
 
 public class SubscriptionExpirationWorker : BackgroundService
 {
+    private const int CHECK_INTERVAL_HOURS = 1;
     private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<SubscriptionExpirationWorker> _logger;
 
@@ -26,29 +27,25 @@ public class SubscriptionExpirationWorker : BackgroundService
                 using var scope = _serviceProvider.CreateScope();
                 var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-                var expiredSubscriptions = await dbContext.Set<TenantSubscription>()
+                var nowUtc = DateTime.UtcNow;
+
+                var expiredCount = await dbContext.Set<TenantSubscription>()
                     .Where(s => (s.State == SubscriptionState.Active || s.State == SubscriptionState.Trial)
                              && s.ExpiresAtUtc.HasValue
-                             && s.ExpiresAtUtc.Value <= DateTime.UtcNow)
-                    .ToListAsync(stoppingToken);
+                             && s.ExpiresAtUtc.Value <= nowUtc)
+                    .ExecuteUpdateAsync(s => s.SetProperty(x => x.State, SubscriptionState.Expired), stoppingToken);
 
-                foreach (var subscription in expiredSubscriptions)
+                if (expiredCount > 0)
                 {
-                    subscription.Expire();
-                }
-
-                if (expiredSubscriptions.Count > 0)
-                {
-                    await dbContext.SaveChangesAsync(stoppingToken);
-                    _logger.LogInformation("Просрочено {Count} подписок", expiredSubscriptions.Count);
+                    _logger.LogInformation("SUBSCRIPTION_EXPIRATION_BATCH_COMPLETED: ExpiredCount={Count}", expiredCount);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Ошибка при проверке истечения срока подписок");
+                _logger.LogError(ex, "SUBSCRIPTION_EXPIRATION_CHECK_FAILED");
             }
 
-            await Task.Delay(TimeSpan.FromHours(1), stoppingToken);
+            await Task.Delay(TimeSpan.FromHours(CHECK_INTERVAL_HOURS), stoppingToken);
         }
     }
 }

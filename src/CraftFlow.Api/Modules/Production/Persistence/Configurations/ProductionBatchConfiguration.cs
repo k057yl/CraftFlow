@@ -29,5 +29,8 @@ public class ProductionBatchConfiguration : IEntityTypeConfiguration<ProductionB
             .IsRequired();
 
         builder.HasQueryFilter(p => p.TenantId == EF.Property<Guid>(p, "TenantId"));
+
+        builder.HasIndex(b => new { b.State, b.IsTelegramNotified, b.StartedAt })
+            .HasDatabaseName(DbIndexes.Production.IX_PRODUCTION_BATCHES_TIMER_MONITORING);
     }
 }

@@ -12,6 +12,7 @@ using CraftFlow.SharedKernel.Domain;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace CraftFlow.Api.Common.Behaviors;
 
@@ -19,15 +20,23 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
     where TRequest : IRequest<TResponse>, IRequireQuotaValidation
     where TResponse : Result
 {
+    private const int UNLIMITED_QUOTA = -1;
+    private const int CACHE_EXPIRATION_MINUTES = 15;
+
     private static readonly ConcurrentDictionary<Type, MethodInfo> FailureMethodCache = new();
 
     private readonly AppDbContext _dbContext;
     private readonly ITenantContext _tenantContext;
+    private readonly IMemoryCache _cache;
 
-    public SubscriptionQuotaBehavior(AppDbContext dbContext, ITenantContext tenantContext)
+    public SubscriptionQuotaBehavior(
+        AppDbContext dbContext,
+        ITenantContext tenantContext,
+        IMemoryCache cache)
     {
         _dbContext = dbContext;
         _tenantContext = tenantContext;
+        _cache = cache;
     }
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
@@ -82,13 +91,20 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
 
     private async Task<bool> CheckMonthlyBatchesQuotaAsync(Guid tenantId, int maxAllowed, CancellationToken ct)
     {
-        if (maxAllowed == -1) return false;
+        if (maxAllowed == UNLIMITED_QUOTA) return false;
 
-        var startOfMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+        var cacheKey = $"quota:batches:{tenantId}:{DateTime.UtcNow:yyyyMM}";
 
-        var currentCount = await _dbContext.Set<ProductionBatch>()
-            .AsNoTracking()
-            .CountAsync(b => b.TenantId == tenantId && b.StartedAt >= startOfMonth, ct);
+        var currentCount = await _cache.GetOrCreateAsync(cacheKey, async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CACHE_EXPIRATION_MINUTES);
+
+            var startOfMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
+
+            return await _dbContext.Set<ProductionBatch>()
+                .AsNoTracking()
+                .CountAsync(b => b.TenantId == tenantId && b.StartedAt >= startOfMonth, ct);
+        });
 
         return currentCount >= maxAllowed;
     }
@@ -96,11 +112,18 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
     private async Task<bool> CheckCountQuotaAsync<TEntity>(Guid tenantId, int maxAllowed, CancellationToken ct)
         where TEntity : class, ITenantEntity
     {
-        if (maxAllowed == -1) return false;
+        if (maxAllowed == UNLIMITED_QUOTA) return false;
 
-        var currentCount = await _dbContext.Set<TEntity>()
-            .AsNoTracking()
-            .CountAsync(e => e.TenantId == tenantId, ct);
+        var cacheKey = $"quota:count:{typeof(TEntity).Name}:{tenantId}";
+
+        var currentCount = await _cache.GetOrCreateAsync(cacheKey, async entry =>
+        {
+            entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(CACHE_EXPIRATION_MINUTES);
+
+            return await _dbContext.Set<TEntity>()
+                .AsNoTracking()
+                .CountAsync(e => e.TenantId == tenantId, ct);
+        });
 
         return currentCount >= maxAllowed;
     }
@@ -140,7 +163,6 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
             return genericResultType
                 .GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .First(m => m.Name == nameof(Result.Failure)
-                         && m.GetParameters().Length == 1
                          && m.GetParameters()[0].ParameterType == typeof(Error));
         });
 

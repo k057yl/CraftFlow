@@ -21,7 +21,7 @@ public class IdentityCleanupWorker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _logger.LogInformation("IdentityCleanupWorker started.");
+        _logger.LogInformation("IDENTITY_CLEANUP_WORKER_STARTED");
 
         while (!stoppingToken.IsCancellationRequested)
         {
@@ -32,7 +32,7 @@ public class IdentityCleanupWorker : BackgroundService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error during identity cleanup execution.");
+                _logger.LogError(ex, "IDENTITY_CLEANUP_EXECUTION_FAILED");
             }
 
             await Task.Delay(TimeSpan.FromHours(CLEANUP_INTERVAL_HOURS), stoppingToken);
@@ -52,7 +52,7 @@ public class IdentityCleanupWorker : BackgroundService
 
         if (deletedCount > 0)
         {
-            _logger.LogInformation("Cleanup completed. Unconfirmed users sent to hell: {Count}", deletedCount);
+            _logger.LogInformation("UNCONFIRMED_USERS_PURGED: Count={Count}", deletedCount);
         }
     }
 
@@ -65,6 +65,7 @@ public class IdentityCleanupWorker : BackgroundService
         var nowUtc = DateTime.UtcNow;
         var sixMonthsAgo = nowUtc.AddMonths(-6);
         var twoYearsAgo = nowUtc.AddYears(-2);
+
         var expiredTenantIds = await dbContext.Organizations
             .IgnoreQueryFilters()
             .Where(o => !o.IsActive && o.IsSelfDeactivated && o.DeactivatedAtUtc <= twoYearsAgo)
@@ -73,7 +74,7 @@ public class IdentityCleanupWorker : BackgroundService
 
         foreach (var tenantId in expiredTenantIds)
         {
-            _logger.LogWarning("Retention Policy: Purging deactivated tenant {TenantId} (Inactive > 2 years)", tenantId);
+            _logger.LogWarning("RETENTION_POLICY_PURGING_TENANT: TenantId={TenantId}", tenantId);
             await DeleteAccountHandler.HardDeleteTenantDataAsync(tenantId, dbContext, cancellationToken);
         }
 
@@ -93,7 +94,7 @@ public class IdentityCleanupWorker : BackgroundService
 
             if (ownerUser != null && !string.IsNullOrWhiteSpace(ownerUser.Email))
             {
-                _logger.LogInformation("Retention Policy: Sending reminder to tenant {TenantId} ({Email})", org.Id, ownerUser.Email);
+                _logger.LogInformation("RETENTION_POLICY_SENDING_NOTICE: TenantId={TenantId}, Email={Email}", org.Id, ownerUser.Email);
 
                 var (subject, htmlContent) = EmailTemplates.GetRetentionReminderTemplate(org.Name);
                 bool isSent = await emailService.SendEmailAsync(ownerUser.Email, subject, htmlContent);

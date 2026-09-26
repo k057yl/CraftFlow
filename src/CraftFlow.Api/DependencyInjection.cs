@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.BackgroundWorkers;
 using CraftFlow.Api.Common.BackgroundWorkers;
 using CraftFlow.Api.Common.Behaviors;
+using CraftFlow.Api.Common.Infrastructure.Converters;
 using CraftFlow.Api.Common.Infrastructure.Identity;
 using CraftFlow.Api.Common.Infrastructure.Security;
 using CraftFlow.Api.Common.MultiTenancy;
@@ -29,6 +30,12 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddControllers()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new TrimStringJsonConverter());
+            });
+
         services
             .AddTenantServices()
             .AddSecurityAndCaching(configuration)
@@ -122,7 +129,6 @@ public static class DependencyInjection
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
 
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(RequestSanitizationBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(SubscriptionQuotaBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
         });

@@ -29,6 +29,7 @@ public class CreateTenantUserHandler : IRequestHandler<CreateTenantUserCommand, 
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
 
         var exists = await _dbContext.Users
+            .IgnoreQueryFilters()
             .AnyAsync(u => u.Email == normalizedEmail, cancellationToken);
 
         if (exists)
