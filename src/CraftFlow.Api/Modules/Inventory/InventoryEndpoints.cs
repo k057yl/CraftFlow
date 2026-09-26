@@ -41,7 +41,7 @@ public static class InventoryEndpoints
         });
 
         // --- STORAGE LOCATIONS (ЁМКОСТИ / СТЕЛЛАЖИ / ТАНКИ) ---
-        group.MapPost($"{InventoryConstants.WAREHOUSES}/locations", async (CreateStorageLocationCommand command, ISender sender) =>
+        group.MapPost($"{InventoryConstants.WAREHOUSES}/locations", async (CreateStorageLocation.CreateStorageLocationCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);

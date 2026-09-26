@@ -16,67 +16,46 @@ public class GetStockLotsHandler : IRequestHandler<GetStockLotsQuery, Result<Lis
 
     public async Task<Result<List<StockLotDto>>> Handle(GetStockLotsQuery request, CancellationToken cancellationToken)
     {
-        var lots = await _dbContext.StockLots
-            .AsNoTracking()
-            .Include(sl => sl.StorageLocations)
-            .ToListAsync(cancellationToken);
-
-        var rawMaterialsMap = await _dbContext.RawMaterials.AsNoTracking().ToDictionaryAsync(r => r.Id, r => r.Name, cancellationToken);
-        var productsMap = await _dbContext.Products.AsNoTracking().ToDictionaryAsync(p => p.Id, p => p.Name, cancellationToken);
-        var warehousesMap = await _dbContext.Warehouses.AsNoTracking().ToDictionaryAsync(w => w.Id, w => w.Name, cancellationToken);
-        var suppliersMap = await _dbContext.Suppliers.AsNoTracking().ToDictionaryAsync(s => s.Id, s => s.Name, cancellationToken);
-        var storageLocationsMap = await _dbContext.StorageLocations.AsNoTracking().ToDictionaryAsync(sl => sl.Id, sl => sl.Name, cancellationToken);
-
         var now = DateTime.UtcNow;
         var soonThreshold = now.AddDays(7);
 
-        var result = new List<StockLotDto>();
+        var query = _dbContext.StockLots
+            .AsNoTracking()
+            .AsQueryable();
 
-        foreach (var lot in lots)
-        {
-            string itemName = rawMaterialsMap.TryGetValue(lot.ItemId, out var rmName)
-                ? rmName
-                : (productsMap.TryGetValue(lot.ItemId, out var pName) ? pName : "—");
+        if (request.WarehouseId.HasValue)
+            query = query.Where(l => l.WarehouseId == request.WarehouseId.Value);
 
-            string warehouseName = warehousesMap.TryGetValue(lot.WarehouseId, out var wName) ? wName : "—";
-            string? supplierName = lot.SupplierId.HasValue && suppliersMap.TryGetValue(lot.SupplierId.Value, out var sName) ? sName : null;
+        if (request.SupplierId.HasValue)
+            query = query.Where(l => l.SupplierId == request.SupplierId.Value);
 
-            var isExpired = lot.ExpirationDate.HasValue && lot.ExpirationDate.Value <= now;
-            var isExpiringSoon = lot.ExpirationDate.HasValue && !isExpired && lot.ExpirationDate.Value <= soonThreshold;
-            var locInfoList = lot.StorageLocations
-                .Where(sl => storageLocationsMap.ContainsKey(sl.StorageLocationId))
-                .Select(sl => $"{storageLocationsMap[sl.StorageLocationId]} ({sl.AllocatedQuantity:N0} л)")
-                .ToList();
+        if (request.OnlyExpiringSoon == true)
+            query = query.Where(l => l.ExpirationDate.HasValue && l.ExpirationDate.Value > now && l.ExpirationDate.Value <= soonThreshold);
 
-            string? locationsInfo = locInfoList.Count > 0 ? string.Join(", ", locInfoList) : "—";
+        if (request.OnlyExpired == true)
+            query = query.Where(l => l.ExpirationDate.HasValue && l.ExpirationDate.Value <= now);
 
-            result.Add(new StockLotDto(
+        var result = await query
+            .Select(lot => new StockLotDto(
                 lot.Id,
-                itemName,
-                warehouseName,
-                supplierName,
+                _dbContext.RawMaterials.Where(r => r.Id == lot.ItemId).Select(r => r.Name).FirstOrDefault()
+                    ?? _dbContext.Products.Where(p => p.Id == lot.ItemId).Select(p => p.Name).FirstOrDefault()
+                    ?? "—",
+                _dbContext.Warehouses.Where(w => w.Id == lot.WarehouseId).Select(w => w.Name).FirstOrDefault() ?? "—",
+                lot.SupplierId.HasValue
+                    ? _dbContext.Suppliers.Where(s => s.Id == lot.SupplierId.Value).Select(s => s.Name).FirstOrDefault()
+                    : null,
                 lot.Quantity,
                 lot.UnitPrice,
                 lot.BatchNumber,
                 lot.CreatedDate,
                 lot.ExpirationDate,
-                isExpired,
-                isExpiringSoon,
-                locationsInfo
-            ));
-        }
-
-        if (request.WarehouseId.HasValue)
-            result = result.Where(r => lots.Any(l => l.Id == r.Id && l.WarehouseId == request.WarehouseId.Value)).ToList();
-
-        if (request.SupplierId.HasValue)
-            result = result.Where(r => lots.Any(l => l.Id == r.Id && l.SupplierId == request.SupplierId.Value)).ToList();
-
-        if (request.OnlyExpiringSoon == true)
-            result = result.Where(r => r.IsExpiringSoon).ToList();
-
-        if (request.OnlyExpired == true)
-            result = result.Where(r => r.IsExpired).ToList();
+                lot.ExpirationDate.HasValue && lot.ExpirationDate.Value <= now,
+                lot.ExpirationDate.HasValue && lot.ExpirationDate.Value > now && lot.ExpirationDate.Value <= soonThreshold,
+                string.Join(", ", lot.StorageLocations.Select(sl =>
+                    _dbContext.StorageLocations.Where(loc => loc.Id == sl.StorageLocationId).Select(loc => loc.Name).FirstOrDefault() + " (" + sl.AllocatedQuantity + " л)"))
+            ))
+            .ToListAsync(cancellationToken);
 
         return Result.Success(result);
     }

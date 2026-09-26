@@ -1,13 +1,15 @@
-﻿using CraftFlow.Api.Modules.Subscriptions.Domain;
+﻿using CraftFlow.Api.Common.Constants;
+using CraftFlow.Api.Modules.Subscriptions.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CraftFlow.Api.Common.Persistence.Configurations;
+
 public class TenantAccessKeyConfiguration : IEntityTypeConfiguration<TenantAccessKey>
 {
     public void Configure(EntityTypeBuilder<TenantAccessKey> builder)
     {
-        builder.ToTable("tenant_access_keys");
+        builder.ToTable(DbTables.TENANT_ACCESS_KEYS, DbSchemas.SAAS);
         builder.HasKey(x => x.Id);
 
         builder.HasIndex(x => x.KeyHash).IsUnique();

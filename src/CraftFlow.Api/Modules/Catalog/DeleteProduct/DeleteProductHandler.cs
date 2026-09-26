@@ -17,14 +17,14 @@ public class DeleteProductHandler : IRequestHandler<DeleteProductCommand, Result
 
     public async Task<Result> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
     {
-        var product = await _dbContext.Products
-            .FirstOrDefaultAsync(p => p.Id == request.Id, cancellationToken);
+        var rowsAffected = await _dbContext.Products
+            .Where(p => p.Id == request.Id)
+            .ExecuteUpdateAsync(s => s.SetProperty(p => p.IsActive, false), cancellationToken);
 
-        if (product is null)
+        if (rowsAffected == 0)
+        {
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
-
-        product.Archive();
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        }
 
         return Result.Success();
     }

@@ -26,16 +26,21 @@ public class CalculateMaxOutputHandler : IRequestHandler<CalculateMaxOutputQuery
             return Result.Success(0m);
         }
 
+        var rawMaterialIds = recipe.Ingredients.Select(i => i.RawMaterialId).ToList();
+        var stockSummary = await _dbContext.StockLots
+            .AsNoTracking()
+            .Where(s => s.WarehouseId == request.WarehouseId && rawMaterialIds.Contains(s.ItemId) && s.Quantity > 0)
+            .GroupBy(s => s.ItemId)
+            .Select(g => new { ItemId = g.Key, TotalQuantity = g.Sum(s => s.Quantity) })
+            .ToDictionaryAsync(g => g.ItemId, g => g.TotalQuantity, cancellationToken);
+
         decimal maxPossibleMultiplier = decimal.MaxValue;
 
         foreach (var ingredient in recipe.Ingredients)
         {
             if (ingredient.Quantity <= 0) continue;
 
-            var availableStock = await _dbContext.StockLots
-                .AsNoTracking()
-                .Where(s => s.WarehouseId == request.WarehouseId && s.ItemId == ingredient.RawMaterialId && s.Quantity > 0)
-                .SumAsync(s => s.Quantity, cancellationToken);
+            stockSummary.TryGetValue(ingredient.RawMaterialId, out var availableStock);
 
             if (availableStock <= 0)
             {
@@ -50,13 +55,7 @@ public class CalculateMaxOutputHandler : IRequestHandler<CalculateMaxOutputQuery
             }
         }
 
-        if (maxPossibleMultiplier == decimal.MaxValue || maxPossibleMultiplier <= 0)
-        {
-            return Result.Success(0m);
-        }
-
         var maxPlannedOutput = Math.Floor(recipe.TargetOutputQuantity * maxPossibleMultiplier * 100m) / 100m;
-
         return Result.Success(maxPlannedOutput);
     }
 }

@@ -9,7 +9,7 @@ public class TenantSubscriptionConfiguration : IEntityTypeConfiguration<TenantSu
 {
     public void Configure(EntityTypeBuilder<TenantSubscription> builder)
     {
-        builder.ToTable(DbTables.TENANT_SUBSCRIPTIONS);
+        builder.ToTable(DbTables.TENANT_SUBSCRIPTIONS, DbSchemas.SAAS);
 
         builder.HasKey(s => s.Id);
 

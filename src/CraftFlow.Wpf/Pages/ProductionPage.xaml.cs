@@ -141,7 +141,7 @@ public partial class ProductionPage : Page
 
             try
             {
-                var activeSummary = await ApiService.Instance.GetAsync<List<AgingLotSummaryDto>>(AgingConstants.AGING_LOTS_ACTIVE_SUMMARY);
+                var activeSummary = await ApiService.Instance.GetAsync<List<AgingLotSummaryDto>>(AgingConstants.AGING_LOTS_ACTIVE);
                 if (activeSummary != null && activeSummary.Count > 0)
                 {
                     foreach (var lot in activeSummary)
@@ -712,14 +712,13 @@ public partial class ProductionPage : Page
 
                     if (dialog.SelectedItemIds.Count > 0)
                     {
-                        (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{AgingConstants.AGING_LOTS_ACTIVE}/discard-items", new
+                        (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_DISCARD_ITEMS, new
                         {
                             AgingLotId = lotId,
                             ItemIds = dialog.SelectedItemIds,
                             Reason = dialog.Reason
                         });
                     }
-
                     else
                     {
                         (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{AgingConstants.AGING_LOTS_ACTIVE}/discard", new

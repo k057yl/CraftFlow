@@ -9,11 +9,19 @@ public class SalesOrderConfiguration : IEntityTypeConfiguration<SalesOrder>
 {
     public void Configure(EntityTypeBuilder<SalesOrder> builder)
     {
-        builder.ToTable(DbTables.SALES_ORDERS);
+        builder.ToTable(DbTables.SALES_ORDERS, DbSchemas.SALES);
+
         builder.HasKey(o => o.Id);
-        builder.Property(o => o.TotalAmount).HasPrecision(18, 2);
+
+        builder.Property(o => o.TotalAmount).HasPrecision(18, 4);
         builder.Property(o => o.Status).HasConversion<int>();
-        builder.HasMany(o => o.Items).WithOne().HasForeignKey(i => i.SalesOrderId).OnDelete(DeleteBehavior.Cascade);
-        builder.HasQueryFilter(o => o.TenantId == EF.Property<Guid>(o, "TenantId"));
+
+        builder.HasMany(o => o.Items)
+            .WithOne()
+            .HasForeignKey(i => i.SalesOrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasIndex(o => o.CustomerId).HasDatabaseName(DbIndexes.Sales.IX_SALES_ORDERS_CUSTOMER);
+        builder.HasIndex(o => o.Status).HasDatabaseName(DbIndexes.Sales.IX_SALES_ORDERS_STATUS);
     }
 }

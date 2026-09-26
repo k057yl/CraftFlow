@@ -1,32 +1,38 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Common.Persistence;
+using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Identity.RegisterOrganization;
 
-public sealed class RegisterOrganizationCommandValidator : AbstractValidator<RegisterOrganizationCommand>
+public class RegisterOrganizationValidator : AbstractValidator<RegisterOrganizationCommand>
 {
-    public RegisterOrganizationCommandValidator()
+    public RegisterOrganizationValidator(AppDbContext dbContext)
     {
         RuleFor(x => x.CompanyName)
             .NotEmpty()
-            .WithErrorCode(ErrorCodes.General.VALUE_REQUIRED)
             .MaximumLength(200);
 
         RuleFor(x => x.OwnerFullName)
             .NotEmpty()
-            .WithErrorCode(ErrorCodes.General.VALUE_REQUIRED)
-            .MaximumLength(150);
+            .MaximumLength(200);
 
         RuleFor(x => x.OwnerEmail)
             .NotEmpty()
-            .WithErrorCode(ErrorCodes.General.VALUE_REQUIRED)
             .EmailAddress()
-            .WithErrorCode(ErrorCodes.Auth.INVALID_CREDENTIALS);
+            .MustAsync(async (email, ct) =>
+            {
+                var normalizedEmail = email.Trim().ToLowerInvariant();
+                var exists = await dbContext.Users
+                    .IgnoreQueryFilters()
+                    .AnyAsync(u => u.Email == normalizedEmail, ct);
+
+                return !exists;
+            })
+            .WithErrorCode(ErrorCodes.Auth.USER_ALREADY_EXISTS);
 
         RuleFor(x => x.OwnerPassword)
             .NotEmpty()
-            .WithErrorCode(ErrorCodes.General.VALUE_REQUIRED)
-            .MinimumLength(6)
-            .WithErrorCode(ErrorCodes.Auth.INVALID_CREDENTIALS);
+            .MinimumLength(6);
     }
 }

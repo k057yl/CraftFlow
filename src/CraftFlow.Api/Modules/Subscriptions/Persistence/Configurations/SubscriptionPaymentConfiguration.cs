@@ -9,7 +9,7 @@ public class SubscriptionPaymentConfiguration : IEntityTypeConfiguration<Subscri
 {
     public void Configure(EntityTypeBuilder<SubscriptionPayment> builder)
     {
-        builder.ToTable(DbTables.SUBSCRIPTION_PAYMENTS);
+        builder.ToTable(DbTables.SUBSCRIPTION_PAYMENTS, DbSchemas.SAAS);
 
         builder.HasKey(p => p.Id);
 

@@ -8,7 +8,8 @@ public class RawMaterialConfiguration : IEntityTypeConfiguration<RawMaterial>
 {
     public void Configure(EntityTypeBuilder<RawMaterial> builder)
     {
-        builder.ToTable(DbTables.RAW_MATERIALS);
+        builder.ToTable(DbTables.RAW_MATERIALS, DbSchemas.CATALOG);
+
         builder.HasKey(r => r.Id);
     }
 }

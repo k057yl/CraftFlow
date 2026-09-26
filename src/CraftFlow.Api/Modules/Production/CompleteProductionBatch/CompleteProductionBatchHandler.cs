@@ -1,7 +1,6 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Production.Events;
-using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -22,12 +21,7 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
     public async Task<Result<Guid>> Handle(CompleteProductionBatchCommand request, CancellationToken cancellationToken)
     {
         var batch = await _dbContext.ProductionBatches
-            .FirstOrDefaultAsync(b => b.Id == request.BatchId, cancellationToken);
-
-        if (batch == null)
-        {
-            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Production.BATCH_NOT_FOUND));
-        }
+            .FirstAsync(b => b.Id == request.BatchId, cancellationToken);
 
         if (!string.IsNullOrWhiteSpace(request.BatchNumber))
         {
@@ -36,21 +30,8 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
 
         int unitsCount = request.UnitsCount > 0 ? request.UnitsCount : 1;
 
-        if (request.RequiresAging)
+        if (request.RequiresAging && request.AgingChamberId.HasValue)
         {
-            if (!request.AgingChamberId.HasValue)
-            {
-                return Result.Failure<Guid>(Error.Validation(ErrorCodes.General.VALUE_REQUIRED));
-            }
-
-            var chamberExists = await _dbContext.Set<AgingChamber>()
-                .AnyAsync(c => c.Id == request.AgingChamberId.Value, cancellationToken);
-
-            if (!chamberExists)
-            {
-                return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Aging.CHAMBER_NOT_FOUND));
-            }
-
             batch.MarkReadyForAging(request.ActualOutputQuantity, unitsCount);
             batch.MarkAsTransferredToAging();
 
@@ -77,13 +58,7 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
         }
 
         await _publisher.Publish(
-            new ProductionBatchCompletedEvent(
-                batch.Id,
-                batch.RecipeId,
-                batch.WarehouseId,
-                batch.ActualOutputQuantity,
-                unitsCount
-            ),
+            new ProductionBatchCompletedEvent(batch.Id, batch.RecipeId, batch.WarehouseId, batch.ActualOutputQuantity, unitsCount),
             cancellationToken
         );
 

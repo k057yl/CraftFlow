@@ -30,4 +30,5 @@ public static class FormattingConstants
     public const string NOT_AVAILABLE = "N/A";
 
     public const string DEFAULT_WEIGHT_UNIT = "KG";
+    public const string CONST_DEFAULT_BATCH_NUMBER = "Б/Н";
 }

@@ -1,11 +1,13 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Common.Persistence;
+using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Inventory.CreateStorageLocation;
 
-public class CreateStorageLocationCommandValidator : AbstractValidator<CreateStorageLocationCommand>
+public class CreateStorageLocationValidator : AbstractValidator<CreateStorageLocationCommand>
 {
-    public CreateStorageLocationCommandValidator()
+    public CreateStorageLocationValidator(AppDbContext dbContext)
     {
         RuleFor(x => x.Name)
             .NotEmpty()
@@ -22,6 +24,16 @@ public class CreateStorageLocationCommandValidator : AbstractValidator<CreateSto
         RuleFor(x => x)
             .Must(x => x.WarehouseId.HasValue || x.ChamberId.HasValue)
             .WithErrorCode(ErrorCodes.Inventory.PARENT_CONTAINER_REQUIRED);
+
+        RuleFor(x => x.WarehouseId)
+            .MustAsync(async (warehouseId, ct) =>
+                !warehouseId.HasValue || await dbContext.Warehouses.AnyAsync(w => w.Id == warehouseId.Value, ct))
+            .WithErrorCode(ErrorCodes.Inventory.WAREHOUSE_NOT_FOUND);
+
+        RuleFor(x => x.ChamberId)
+            .MustAsync(async (chamberId, ct) =>
+                !chamberId.HasValue || await dbContext.AgingChambers.AnyAsync(c => c.Id == chamberId.Value, ct))
+            .WithErrorCode(ErrorCodes.Aging.CHAMBER_NOT_FOUND);
 
         RuleFor(x => x.Capacity)
             .GreaterThan(0)

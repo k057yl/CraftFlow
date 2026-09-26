@@ -1,27 +1,34 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Common.Persistence;
+using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Identity.CreateTenantUser;
 
-public sealed class CreateTenantUserCommandValidator : AbstractValidator<CreateTenantUserCommand>
+public class CreateTenantUserValidator : AbstractValidator<CreateTenantUserCommand>
 {
-    public CreateTenantUserCommandValidator()
+    public CreateTenantUserValidator(AppDbContext dbContext)
     {
-        RuleFor(x => x.FullName)
-            .NotEmpty()
-            .WithErrorCode(ErrorCodes.General.VALUE_REQUIRED)
-            .MaximumLength(150);
-
         RuleFor(x => x.Email)
             .NotEmpty()
-            .WithErrorCode(ErrorCodes.General.VALUE_REQUIRED)
             .EmailAddress()
-            .WithErrorCode(ErrorCodes.Auth.INVALID_CREDENTIALS);
+            .MustAsync(async (email, ct) =>
+            {
+                var normalizedEmail = email.Trim().ToLowerInvariant();
+                var exists = await dbContext.Users
+                    .IgnoreQueryFilters()
+                    .AnyAsync(u => u.Email == normalizedEmail, ct);
+
+                return !exists;
+            })
+            .WithErrorCode(ErrorCodes.Auth.USER_ALREADY_EXISTS);
+
+        RuleFor(x => x.FullName)
+            .NotEmpty()
+            .MaximumLength(200);
 
         RuleFor(x => x.Password)
             .NotEmpty()
-            .WithErrorCode(ErrorCodes.General.VALUE_REQUIRED)
-            .MinimumLength(6)
-            .WithErrorCode(ErrorCodes.Auth.INVALID_CREDENTIALS);
+            .MinimumLength(6);
     }
 }

@@ -32,14 +32,12 @@ public static class AgingEndpoints
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
 
-        // Списание всей массы / усушка
         group.MapPost($"{AgingConstants.AGING_LOTS_ACTIVE}/discard", async (DiscardAgingLotCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
 
-        // ТОЧЕЧНОЕ Списание штук
         group.MapPost(AgingConstants.AGING_LOTS_DISCARD_ITEMS, async (DiscardSpecificAgingItemsCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
@@ -72,19 +70,12 @@ public static class AgingEndpoints
             return Results.Ok(result);
         });
 
-        group.MapGet(AgingConstants.AGING_LOTS_ACTIVE_SUMMARY, async (GetActiveAgingLotsQueryHandler handler) =>
-        {
-            var result = await handler.HandleAsync();
-            return Results.Ok(result);
-        });
-
         group.MapGet($"{AgingConstants.AGING_LOTS_ACTIVE}/{{id:guid}}", async (Guid id, GetAgingLotDetailsQueryHandler handler) =>
         {
             var result = await handler.HandleAsync(id);
             return result is not null ? Results.Ok(result) : Results.NotFound();
         });
 
-        // СПИСОК ГОЛОВОК ДЛЯ ДИАЛОГА (Fix 404)
         group.MapGet($"{AgingConstants.AGING_LOTS_ACTIVE}/{{id:guid}}/items", async (Guid id, ISender sender) =>
         {
             var result = await sender.Send(new GetAgingLotItemsQuery(id));

@@ -21,14 +21,15 @@ public sealed class SalesOrder : AggregateRoot, ITenantEntity
 
     private SalesOrder() { }
 
-    public static SalesOrder Create(Guid customerId, Guid warehouseId)
+    public static SalesOrder Create(Guid tenantId, Guid customerId, Guid warehouseId)
     {
-        if (customerId == Guid.Empty || warehouseId == Guid.Empty)
+        if (tenantId == Guid.Empty || customerId == Guid.Empty || warehouseId == Guid.Empty)
             throw new ArgumentException(ErrorCodes.General.VALUE_REQUIRED);
 
         var order = new SalesOrder
         {
             Id = Guid.NewGuid(),
+            TenantId = tenantId,
             CustomerId = customerId,
             WarehouseId = warehouseId,
             Status = OrderState.Draft,

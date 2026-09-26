@@ -1,8 +1,9 @@
-﻿namespace CraftFlow.Api.Modules.Subscriptions.Domain;
+﻿using CraftFlow.SharedKernel.Domain;
 
-public class SubscriptionPayment
+namespace CraftFlow.Api.Modules.Subscriptions.Domain;
+
+public class SubscriptionPayment : Entity, ITenantEntity
 {
-    public Guid Id { get; private set; }
     public Guid TenantId { get; private set; }
     public decimal Amount { get; private set; }
     public string PlanCode { get; private set; } = null!;

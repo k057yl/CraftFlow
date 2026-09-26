@@ -16,6 +16,9 @@ public class GenerateAccessKeyHandler : IRequestHandler<GenerateAccessKeyCommand
     private readonly ITenantContext _tenantContext;
     private readonly IKeyHasher _keyHasher;
 
+    private const string FREE_PLAN_CODE = "FREE";
+    private const string KEY_PREFIX_FORMAT = "cf_live_{0}";
+
     public GenerateAccessKeyHandler(AppDbContext dbContext, ITenantContext tenantContext, IKeyHasher keyHasher)
     {
         _dbContext = dbContext;
@@ -38,14 +41,13 @@ public class GenerateAccessKeyHandler : IRequestHandler<GenerateAccessKeyCommand
         if (subscription == null)
         {
             var plan = await _dbContext.Set<SubscriptionPlan>()
-                .FirstOrDefaultAsync(p => p.Code == "FREE", ct)
+                .FirstOrDefaultAsync(p => p.Code == FREE_PLAN_CODE, ct)
                 ?? await _dbContext.Set<SubscriptionPlan>().FirstOrDefaultAsync(ct);
 
             if (plan != null)
             {
                 subscription = TenantSubscription.CreateFree(tenantId, plan.Id);
                 _dbContext.Set<TenantSubscription>().Add(subscription);
-
                 await _dbContext.SaveChangesAsync(ct);
             }
         }
@@ -57,7 +59,7 @@ public class GenerateAccessKeyHandler : IRequestHandler<GenerateAccessKeyCommand
 
         var randomBytes = RandomNumberGenerator.GetBytes(16);
         var randomHex = Convert.ToHexString(randomBytes).ToLowerInvariant();
-        var rawKey = $"cf_live_{randomHex}";
+        var rawKey = string.Format(KEY_PREFIX_FORMAT, randomHex);
 
         var prefix = rawKey[..11];
         var suffix = rawKey[^4..];

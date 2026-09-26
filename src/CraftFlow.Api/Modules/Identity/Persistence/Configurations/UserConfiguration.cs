@@ -10,7 +10,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.ToTable(DbTables.USERS);
+        builder.ToTable(DbTables.USERS, DbSchemas.IDENTITY);
 
         builder.HasKey(u => u.Id);
 
@@ -25,13 +25,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.HasIndex(u => u.Email)
-            .IsUnique()
-            .HasDatabaseName(DbIndexes.Identity.IX_USERS_EMAIL);
-
-        builder.HasIndex(u => new { u.TenantId, u.Role, u.IsActive })
-            .HasDatabaseName(DbIndexes.Identity.IX_USERS_TENANT_ROLE_ACTIVE);
-
         builder.Property(u => u.Role)
             .IsRequired()
             .HasConversion<int>()
@@ -45,5 +38,15 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(100);
 
         builder.Property(u => u.OtpExpiresAtUtc);
+
+        builder.HasIndex(u => u.Email)
+            .IsUnique()
+            .HasDatabaseName(DbIndexes.Identity.IX_USERS_EMAIL);
+
+        builder.HasIndex(u => new { u.TenantId, u.Role, u.IsActive })
+            .HasDatabaseName(DbIndexes.Identity.IX_USERS_TENANT_ROLE_ACTIVE);
+
+        builder.HasIndex(u => u.OtpExpiresAtUtc)
+            .HasDatabaseName(DbIndexes.Identity.IX_USERS_OTP_EXPIRATION);
     }
 }

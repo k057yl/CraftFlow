@@ -9,7 +9,8 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
     {
-        builder.ToTable(DbTables.PRODUCTS);
+        builder.ToTable(DbTables.PRODUCTS, DbSchemas.CATALOG);
+
         builder.HasKey(p => p.Id);
 
         builder.HasIndex(p => new { p.TenantId, p.Id }).IsUnique();

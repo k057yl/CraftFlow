@@ -1,4 +1,4 @@
-﻿using CraftFlow.Api.Modules.Traceability.Contracts;
+﻿using CraftFlow.SharedKernel.Dtos.Traceability;
 using CraftFlow.SharedKernel.Constants;
 using Dapper;
 using System.Data;

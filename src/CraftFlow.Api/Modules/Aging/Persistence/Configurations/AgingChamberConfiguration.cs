@@ -16,6 +16,8 @@ public sealed class AgingChamberConfiguration : IEntityTypeConfiguration<AgingCh
         builder.Property(c => c.TargetTemperature).HasPrecision(5, 2);
         builder.Property(c => c.TargetHumidity).HasPrecision(5, 2);
 
-        builder.HasQueryFilter(c => c.TenantId != Guid.Empty);
+        builder.HasIndex(c => new { c.TenantId, c.Name })
+            .IsUnique()
+            .HasDatabaseName(DbIndexes.Aging.IX_AGING_CHAMBERS_TENANT_NAME);
     }
 }

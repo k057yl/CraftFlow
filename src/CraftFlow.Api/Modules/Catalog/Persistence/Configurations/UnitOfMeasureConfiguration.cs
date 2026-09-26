@@ -8,7 +8,8 @@ public class UnitOfMeasureConfiguration : IEntityTypeConfiguration<UnitOfMeasure
 {
     public void Configure(EntityTypeBuilder<UnitOfMeasure> builder)
     {
-        builder.ToTable(DbTables.UNITS_OF_MEASURE);
+        builder.ToTable(DbTables.UNITS_OF_MEASURE, DbSchemas.CATALOG);
+
         builder.HasKey(u => u.Id);
     }
 }

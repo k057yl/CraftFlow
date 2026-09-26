@@ -17,16 +17,14 @@ public class DeleteStorageLocationHandler : IRequestHandler<DeleteStorageLocatio
 
     public async Task<Result<bool>> Handle(DeleteStorageLocationCommand request, CancellationToken cancellationToken)
     {
-        var location = await _dbContext.StorageLocations
-            .FirstOrDefaultAsync(l => l.Id == request.Id, cancellationToken);
+        var rowsAffected = await _dbContext.StorageLocations
+            .Where(l => l.Id == request.Id)
+            .ExecuteDeleteAsync(cancellationToken);
 
-        if (location == null)
+        if (rowsAffected == 0)
         {
             return Result.Failure<bool>(Error.NotFound(ErrorCodes.Inventory.LOCATION_NOT_FOUND));
         }
-
-        _dbContext.StorageLocations.Remove(location);
-        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success(true);
     }

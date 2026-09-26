@@ -35,5 +35,7 @@ public sealed class AgingLotItemConfiguration : IEntityTypeConfiguration<AgingLo
         builder.Property(i => i.DiscardReason)
             .HasMaxLength(500)
             .IsRequired(false);
+
+        builder.HasIndex(i => i.AgingLotId).HasDatabaseName(DbIndexes.Aging.IX_AGING_LOT_ITEMS_LOT);
     }
 }

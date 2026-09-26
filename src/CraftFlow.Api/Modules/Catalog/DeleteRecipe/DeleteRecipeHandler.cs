@@ -17,16 +17,14 @@ public class DeleteRecipeHandler : IRequestHandler<DeleteRecipeCommand, Result>
 
     public async Task<Result> Handle(DeleteRecipeCommand request, CancellationToken cancellationToken)
     {
-        var recipe = await _dbContext.Recipes
-            .FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
+        var rowsAffected = await _dbContext.Recipes
+            .Where(r => r.Id == request.Id)
+            .ExecuteUpdateAsync(s => s.SetProperty(r => r.IsActive, false), cancellationToken);
 
-        if (recipe is null)
+        if (rowsAffected == 0)
         {
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
         }
-
-        recipe.Archive();
-        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }

@@ -9,7 +9,7 @@ public class WarehouseConfiguration : IEntityTypeConfiguration<Warehouse>
 {
     public void Configure(EntityTypeBuilder<Warehouse> builder)
     {
-        builder.ToTable(DbTables.WAREHOUSES);
+        builder.ToTable(DbTables.WAREHOUSES, DbSchemas.INVENTORY);
 
         builder.HasKey(w => w.Id);
 

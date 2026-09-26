@@ -8,7 +8,8 @@ public class RecipeIngredientConfiguration : IEntityTypeConfiguration<RecipeIngr
 {
     public void Configure(EntityTypeBuilder<RecipeIngredient> builder)
     {
-        builder.ToTable(DbTables.RECIPE_INGREDIENTS);
+        builder.ToTable(DbTables.RECIPE_INGREDIENTS, DbSchemas.CATALOG);
+
         builder.HasKey(ri => ri.Id);
     }
 }

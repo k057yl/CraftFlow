@@ -1,6 +1,4 @@
 ﻿using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Modules.Catalog.Domain;
-using CraftFlow.Api.Modules.Inventory.Domain;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
@@ -22,42 +20,71 @@ public class StartProductionBatchHandler : IRequestHandler<StartProductionBatchC
     {
         var recipe = await _dbContext.Recipes
             .Include(r => r.Ingredients)
-            .FirstOrDefaultAsync(r => r.Id == request.RecipeId, cancellationToken);
-
-        if (recipe == null)
-        {
-            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
-        }
+            .FirstAsync(r => r.Id == request.RecipeId, cancellationToken);
 
         var multiplier = request.PlannedOutputQuantity / recipe.TargetOutputQuantity;
+        var rawMaterialIds = recipe.Ingredients.Select(i => i.RawMaterialId).ToList();
+        var allStockLots = await _dbContext.StockLots
+            .Include(s => s.StorageLocations)
+            .Where(s => s.WarehouseId == request.WarehouseId && rawMaterialIds.Contains(s.ItemId) && s.Quantity > 0)
+            .OrderBy(s => s.CreatedDate)
+            .ToListAsync(cancellationToken);
 
-        var batchRequirements = new List<(RecipeIngredient Ingredient, decimal RequiredQuantity, List<StockLot> Lots)>();
+        var allLocationIds = allStockLots.SelectMany(sl => sl.StorageLocations.Select(l => l.StorageLocationId)).Distinct().ToList();
+        var allLocations = await _dbContext.StorageLocations
+            .Where(sl => allLocationIds.Contains(sl.Id))
+            .ToListAsync(cancellationToken);
+
+        var consumedIngredientsToSave = new List<ConsumedIngredient>();
 
         foreach (var recipeIngredient in recipe.Ingredients)
         {
             var requiredQuantity = recipeIngredient.Quantity * multiplier;
-
-            var stockLots = await _dbContext.StockLots
-                .Include(s => s.StorageLocations)
-                .Where(s => s.WarehouseId == request.WarehouseId && s.ItemId == recipeIngredient.RawMaterialId && s.Quantity > 0)
-                .OrderBy(s => s.CreatedDate)
-                .ToListAsync(cancellationToken);
-
-            var totalAvailable = stockLots.Sum(s => s.Quantity);
+            var availableLots = allStockLots.Where(s => s.ItemId == recipeIngredient.RawMaterialId).ToList();
+            var totalAvailable = availableLots.Sum(s => s.Quantity);
 
             if (totalAvailable < requiredQuantity)
             {
                 return Result.Failure<Guid>(Error.Validation(ErrorCodes.Production.INSUFFICIENT_RAW_MATERIAL));
             }
 
-            batchRequirements.Add((recipeIngredient, requiredQuantity, stockLots));
+            var remainingToDeduct = requiredQuantity;
+
+            foreach (var lot in availableLots)
+            {
+                if (remainingToDeduct <= 0) break;
+
+                var deduct = Math.Min(lot.Quantity, remainingToDeduct);
+                lot.AdjustQuantity(-deduct);
+                remainingToDeduct -= deduct;
+
+                decimal remainingToFree = deduct;
+                foreach (var stockLoc in lot.StorageLocations)
+                {
+                    if (remainingToFree <= 0) break;
+
+                    var loc = allLocations.FirstOrDefault(l => l.Id == stockLoc.StorageLocationId);
+                    if (loc != null)
+                    {
+                        decimal amountToFree = Math.Min(stockLoc.AllocatedQuantity, remainingToFree);
+                        loc.AddVolume(-amountToFree);
+                        remainingToFree -= amountToFree;
+                    }
+                }
+
+                consumedIngredientsToSave.Add(ConsumedIngredient.Create(
+                    Guid.Empty,
+                    lot.Id,
+                    recipeIngredient.RawMaterialId,
+                    deduct,
+                    Guid.Empty
+                ));
+            }
         }
 
         var destinationWarehouse = request.DestinationWarehouseId != Guid.Empty
             ? request.DestinationWarehouseId
             : request.WarehouseId;
-
-        int targetDuration = recipe.TargetDurationMinutes > 0 ? recipe.TargetDurationMinutes : 180;
 
         var batch = ProductionBatch.Create(
             request.RecipeId,
@@ -65,57 +92,17 @@ public class StartProductionBatchHandler : IRequestHandler<StartProductionBatchC
             request.WarehouseId,
             destinationWarehouse,
             request.PlannedOutputQuantity,
-            targetDuration,
+            recipe.TargetDurationMinutes,
             request.Name
         );
 
         batch.Start();
         _dbContext.ProductionBatches.Add(batch);
 
-        foreach (var requirement in batchRequirements)
+        foreach (var consumed in consumedIngredientsToSave)
         {
-            var remainingToDeduct = requirement.RequiredQuantity;
-
-            foreach (var lot in requirement.Lots)
-            {
-                if (remainingToDeduct <= 0) break;
-
-                var deduct = Math.Min(lot.Quantity, remainingToDeduct);
-
-                lot.AdjustQuantity(-deduct);
-                remainingToDeduct -= deduct;
-
-                if (lot.StorageLocations.Count > 0)
-                {
-                    var locationIds = lot.StorageLocations.Select(sl => sl.StorageLocationId).ToList();
-                    var locations = await _dbContext.StorageLocations
-                        .Where(sl => locationIds.Contains(sl.Id))
-                        .ToListAsync(cancellationToken);
-
-                    decimal remainingToFree = deduct;
-                    foreach (var stockLoc in lot.StorageLocations)
-                    {
-                        if (remainingToFree <= 0) break;
-                        var loc = locations.FirstOrDefault(l => l.Id == stockLoc.StorageLocationId);
-                        if (loc != null)
-                        {
-                            decimal amountToFree = Math.Min(stockLoc.AllocatedQuantity, remainingToFree);
-                            loc.AddVolume(-amountToFree);
-                            remainingToFree -= amountToFree;
-                        }
-                    }
-                }
-
-                var consumed = ConsumedIngredient.Create(
-                    batch.Id,
-                    lot.Id,
-                    requirement.Ingredient.RawMaterialId,
-                    deduct,
-                    batch.TenantId
-                );
-
-                await _dbContext.Set<ConsumedIngredient>().AddAsync(consumed, cancellationToken);
-            }
+            var finalConsumed = ConsumedIngredient.Create(batch.Id, consumed.StockLotId, consumed.RawMaterialId, consumed.Quantity, batch.TenantId);
+            _dbContext.Set<ConsumedIngredient>().Add(finalConsumed);
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);

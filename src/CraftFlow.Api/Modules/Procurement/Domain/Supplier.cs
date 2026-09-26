@@ -12,14 +12,18 @@ public sealed class Supplier : AggregateRoot, ITenantEntity
 
     private Supplier() { }
 
-    public static Supplier Create(string name, string? phone = null, string? email = null)
+    public static Supplier Create(Guid tenantId, string name, string? phone = null, string? email = null)
     {
+        if (tenantId == Guid.Empty)
+            throw new ArgumentException(ErrorCodes.General.VALUE_REQUIRED);
+
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException(ErrorCodes.Procurement.SUPPLIER_NAME_REQUIRED);
 
         return new Supplier
         {
             Id = Guid.NewGuid(),
+            TenantId = tenantId,
             Name = name,
             Phone = phone,
             Email = email

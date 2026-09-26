@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Procurement.PurchaseOrders;
 
-public sealed class ReceiveGoodsCommandHandler : IRequestHandler<ReceiveGoodsCommand, Result>
+public sealed class ReceiveGoodsHandler : IRequestHandler<ReceiveGoodsCommand, Result>
 {
     private readonly AppDbContext _dbContext;
 
-    public ReceiveGoodsCommandHandler(AppDbContext dbContext)
+    public ReceiveGoodsHandler(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }

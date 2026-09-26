@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Common.Persistence;
+﻿using CraftFlow.Api.Common.MultiTenancy;
+using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Sales.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
@@ -10,10 +11,12 @@ namespace CraftFlow.Api.Modules.Sales.CreateAndShipSalesOrder;
 public class CreateAndShipSalesOrderHandler : IRequestHandler<CreateAndShipSalesOrderCommand, Result<Guid>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly ITenantContext _tenantContext;
 
-    public CreateAndShipSalesOrderHandler(AppDbContext dbContext)
+    public CreateAndShipSalesOrderHandler(AppDbContext dbContext, ITenantContext tenantContext)
     {
         _dbContext = dbContext;
+        _tenantContext = tenantContext;
     }
 
     public async Task<Result<Guid>> Handle(CreateAndShipSalesOrderCommand request, CancellationToken cancellationToken)
@@ -29,9 +32,10 @@ public class CreateAndShipSalesOrderHandler : IRequestHandler<CreateAndShipSales
         if (!customerExists)
             return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Sales.CUSTOMER_NAME_REQUIRED));
 
-        var order = SalesOrder.Create(request.CustomerId, request.WarehouseId);
+        var order = SalesOrder.Create(_tenantContext.TenantId, request.CustomerId, request.WarehouseId);
 
         var lotIds = request.Items.Select(i => i.StockLotId).ToList();
+
         var stockLots = await _dbContext.StockLots
             .Where(s => lotIds.Contains(s.Id) && s.IsActive)
             .ToDictionaryAsync(s => s.Id, cancellationToken);

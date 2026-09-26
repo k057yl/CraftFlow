@@ -17,14 +17,14 @@ public class DeleteRawMaterialHandler : IRequestHandler<DeleteRawMaterialCommand
 
     public async Task<Result> Handle(DeleteRawMaterialCommand request, CancellationToken cancellationToken)
     {
-        var rawMaterial = await _dbContext.RawMaterials
-            .FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
+        var rowsAffected = await _dbContext.RawMaterials
+            .Where(r => r.Id == request.Id)
+            .ExecuteUpdateAsync(s => s.SetProperty(r => r.IsActive, false), cancellationToken);
 
-        if (rawMaterial is null)
+        if (rowsAffected == 0)
+        {
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
-
-        rawMaterial.Archive();
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        }
 
         return Result.Success();
     }

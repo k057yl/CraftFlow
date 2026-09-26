@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Traceability.Contracts;
+﻿namespace CraftFlow.SharedKernel.Dtos.Traceability;
 
 public sealed record TraceabilityProductionBatchDto(
     Guid ProductionBatchId,

@@ -31,4 +31,9 @@ public static class CoreConstants
         public const string API_BASE_URL = "https://localhost:7203/";
         public const string BEARER_SCHEME = "Bearer";
     }
+
+    public static class Billing
+    {
+        public const string PLAN_FREE_CODE = "FREE";
+    }
 }

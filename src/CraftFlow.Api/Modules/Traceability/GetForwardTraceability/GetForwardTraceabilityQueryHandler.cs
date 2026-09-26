@@ -1,5 +1,5 @@
 ﻿using CraftFlow.Api.Common.MultiTenancy;
-using CraftFlow.Api.Modules.Traceability.Contracts;
+using CraftFlow.SharedKernel.Dtos.Traceability;
 using CraftFlow.Api.Modules.Traceability.TraceabilityRead;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;

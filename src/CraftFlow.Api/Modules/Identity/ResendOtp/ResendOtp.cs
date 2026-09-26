@@ -3,4 +3,4 @@ using MediatR;
 
 namespace CraftFlow.Api.Modules.Identity.ResendOtp;
 
-public record ResendOtpCommand(string Email) : IRequest<Result<bool>>;
+public record ResendOtp(string Email) : IRequest<Result<bool>>;

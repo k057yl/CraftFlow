@@ -9,7 +9,7 @@ public class SubscriptionPlanConfiguration : IEntityTypeConfiguration<Subscripti
 {
     public void Configure(EntityTypeBuilder<SubscriptionPlan> builder)
     {
-        builder.ToTable(DbTables.SUBSCRIPTION_PLANS);
+        builder.ToTable(DbTables.SUBSCRIPTION_PLANS, DbSchemas.SAAS);
 
         builder.HasKey(p => p.Id);
 
@@ -18,7 +18,8 @@ public class SubscriptionPlanConfiguration : IEntityTypeConfiguration<Subscripti
             .HasMaxLength(50);
 
         builder.HasIndex(p => p.Code)
-            .IsUnique();
+            .IsUnique()
+            .HasDatabaseName(DbIndexes.Subscriptions.IX_SUBSCRIPTION_PLANS_CODE);
 
         builder.Property(p => p.Name)
             .IsRequired()

@@ -1,14 +1,19 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Common.Persistence;
+using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Inventory.AddStockLot;
 
 public class AddStockLotValidator : AbstractValidator<AddStockLotCommand>
 {
-    public AddStockLotValidator()
+    public AddStockLotValidator(AppDbContext dbContext)
     {
         RuleFor(x => x.WarehouseId)
-            .NotEmpty();
+            .NotEmpty()
+            .MustAsync(async (warehouseId, ct) =>
+                await dbContext.Warehouses.AnyAsync(w => w.Id == warehouseId, ct))
+            .WithErrorCode(ErrorCodes.Inventory.WAREHOUSE_NOT_FOUND);
 
         RuleFor(x => x.ItemId)
             .NotEmpty();
@@ -25,6 +30,6 @@ public class AddStockLotValidator : AbstractValidator<AddStockLotCommand>
 
         RuleFor(x => x.ExpirationDate)
             .Must(date => date == null || date.Value > DateTime.UtcNow)
-            .WithMessage(ErrorCodes.Production.EXPIRATION_DATE_MUST_BE_IN_FUTURE);
+            .WithErrorCode(ErrorCodes.Production.EXPIRATION_DATE_MUST_BE_IN_FUTURE);
     }
 }

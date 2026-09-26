@@ -13,19 +13,15 @@ public sealed class PurchaseOrderConfiguration : IEntityTypeConfiguration<Purcha
 
         builder.HasKey(po => po.Id);
 
-        builder.Property(po => po.Status)
-            .HasConversion<int>()
-            .IsRequired();
-
-        builder.Property(po => po.TotalAmount)
-            .HasPrecision(18, 4)
-            .IsRequired();
+        builder.Property(po => po.Status).HasConversion<int>().IsRequired();
+        builder.Property(po => po.TotalAmount).HasPrecision(18, 4).IsRequired();
 
         builder.HasMany(po => po.Items)
             .WithOne()
             .HasForeignKey(poi => poi.PurchaseOrderId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasQueryFilter(po => po.TenantId != Guid.Empty);
+        builder.HasIndex(po => po.SupplierId).HasDatabaseName(DbIndexes.Procurement.IX_PURCHASE_ORDERS_SUPPLIER);
+        builder.HasIndex(po => po.Status).HasDatabaseName(DbIndexes.Procurement.IX_PURCHASE_ORDERS_STATUS);
     }
 }

@@ -17,14 +17,14 @@ public class DeleteUnitOfMeasureHandler : IRequestHandler<DeleteUnitOfMeasureCom
 
     public async Task<Result> Handle(DeleteUnitOfMeasureCommand request, CancellationToken cancellationToken)
     {
-        var unit = await _dbContext.UnitsOfMeasure
-            .FirstOrDefaultAsync(u => u.Id == request.Id, cancellationToken);
+        var rowsAffected = await _dbContext.UnitsOfMeasure
+            .Where(u => u.Id == request.Id)
+            .ExecuteUpdateAsync(s => s.SetProperty(u => u.IsActive, false), cancellationToken);
 
-        if (unit is null)
+        if (rowsAffected == 0)
+        {
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
-
-        unit.Archive();
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        }
 
         return Result.Success();
     }

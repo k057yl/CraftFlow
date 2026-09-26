@@ -1,8 +1,9 @@
-﻿namespace CraftFlow.Api.Modules.Subscriptions.Domain;
+﻿using CraftFlow.SharedKernel.Domain;
 
-public class TenantAccessKey
+namespace CraftFlow.Api.Modules.Subscriptions.Domain;
+
+public class TenantAccessKey : Entity, ITenantEntity
 {
-    public Guid Id { get; private set; }
     public Guid TenantId { get; private set; }
     public Guid SubscriptionId { get; private set; }
 

@@ -9,7 +9,7 @@ public class ProductionBatchConfiguration : IEntityTypeConfiguration<ProductionB
 {
     public void Configure(EntityTypeBuilder<ProductionBatch> builder)
     {
-        builder.ToTable(DbTables.PRODUCTION_BATCHES);
+        builder.ToTable(DbTables.PRODUCTION_BATCHES, DbSchemas.PRODUCTION);
 
         builder.HasKey(p => p.Id);
 

@@ -9,7 +9,7 @@ public class StorageLocationConfiguration : IEntityTypeConfiguration<StorageLoca
 {
     public void Configure(EntityTypeBuilder<StorageLocation> builder)
     {
-        builder.ToTable(DbTables.STORAGE_LOCATIONS);
+        builder.ToTable(DbTables.STORAGE_LOCATIONS, DbSchemas.INVENTORY);
 
         builder.HasKey(sl => sl.Id);
 

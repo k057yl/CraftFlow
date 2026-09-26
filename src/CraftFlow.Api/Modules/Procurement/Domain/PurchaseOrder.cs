@@ -18,11 +18,15 @@ public sealed class PurchaseOrder : AggregateRoot, ITenantEntity
 
     private PurchaseOrder() { }
 
-    public static PurchaseOrder Create(Guid supplierId, Guid warehouseId)
+    public static PurchaseOrder Create(Guid tenantId, Guid supplierId, Guid warehouseId)
     {
+        if (tenantId == Guid.Empty)
+            throw new ArgumentException(ErrorCodes.General.VALUE_REQUIRED);
+
         return new PurchaseOrder
         {
             Id = Guid.NewGuid(),
+            TenantId = tenantId,
             SupplierId = supplierId,
             WarehouseId = warehouseId,
             Status = PurchaseOrderStatus.Draft,

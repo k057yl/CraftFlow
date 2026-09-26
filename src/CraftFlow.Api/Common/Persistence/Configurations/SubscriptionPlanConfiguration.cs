@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Modules.Subscriptions.Domain;
+﻿using CraftFlow.Api.Common.Constants;
+using CraftFlow.Api.Modules.Subscriptions.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,7 +9,7 @@ public class SubscriptionPlanConfiguration : IEntityTypeConfiguration<Subscripti
 {
     public void Configure(EntityTypeBuilder<SubscriptionPlan> builder)
     {
-        builder.ToTable("subscription_plans");
+        builder.ToTable(DbTables.SUBSCRIPTION_PLANS, DbSchemas.SAAS);
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Code).HasMaxLength(32).IsRequired();

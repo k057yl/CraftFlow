@@ -109,7 +109,7 @@
                         </GroupBox>
 
                         <!-- ТЕКУЩИЕ ВАРКИ В РАБОТЕ -->
-                        <GroupBox Header="Текущие варки в процессе" Margin="0,0,0,12" Padding="8">
+                        <GroupBox Header="{loc:Loc Key=GROUP_ACTIVE_BATCHES}" Margin="0,0,0,12" Padding="8">
                             <DataGrid x:Name="ActiveBatchesDataGrid" 
                                       AutoGenerateColumns="False" 
                                       IsReadOnly="True" 
@@ -121,11 +121,11 @@
                                       SelectionMode="Single"
                                       SelectionChanged="ActiveBatchesDataGrid_SelectionChanged">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Партия" Binding="{Binding BatchName}" Width="1.5*"/>
-                                    <DataGridTextColumn Header="Рецептура" Binding="{Binding RecipeName}" Width="2*"/>
-                                    <DataGridTextColumn Header="План (кг/л)" Binding="{Binding PlannedOutputQuantity, StringFormat={}{0:F2}}" Width="1*"/>
-                                    <DataGridTextColumn Header="Старт" Binding="{Binding StartedAt, StringFormat={}{0:HH:mm}}" Width="0.8*"/>
-                                    <DataGridTemplateColumn Header="В работе" Width="1.2*">
+                                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_BATCH_NAME}" Binding="{Binding BatchName}" Width="1.5*"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_RECIPE}" Binding="{Binding RecipeName}" Width="2*"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_PLANNED_QTY}" Binding="{Binding PlannedOutputQuantity, StringFormat={}{0:F2}}" Width="1*"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_STARTED_AT}" Binding="{Binding StartedAt, StringFormat={}{0:HH:mm}}" Width="0.8*"/>
+                                    <DataGridTemplateColumn Header="{loc:Loc Key=COLUMN_ELAPSED}" Width="1.2*">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <TextBlock Text="{Binding FormattedElapsed}" 
@@ -146,7 +146,7 @@
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
-                                    <DataGridTextColumn Header="План (мин)" Binding="{Binding TargetDurationMinutes}" Width="0.8*"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_TARGET_DURATION}" Binding="{Binding TargetDurationMinutes}" Width="0.8*"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
@@ -163,7 +163,7 @@
                                     <TextBlock Text="{loc:Loc Key=LABEL_ACTIVE_BATCH}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
                                     <ComboBox x:Name="ActiveBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,8" Padding="5,4" SelectionChanged="ActiveBatchComboBox_SelectionChanged"/>
 
-                                    <TextBlock Text="Наименование готовой партии:" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <TextBlock Text="{loc:Loc Key=LABEL_COMPLETE_BATCH_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
                                     <TextBox x:Name="CompleteBatchNameTextBox" Margin="0,0,0,8" Padding="5,4"/>
 
                                     <Grid Margin="0,0,0,8">
@@ -173,7 +173,7 @@
                                         </Grid.ColumnDefinitions>
 
                                         <StackPanel Grid.Column="0" Margin="0,0,5,0">
-                                            <TextBlock Text="Фактический вес (кг/л):" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                            <TextBlock Text="{loc:Loc Key=LABEL_ACTUAL_OUTPUT}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
                                             <TextBox x:Name="ActualOutputQuantityTextBox" Padding="5,4" TextChanged="CostInputs_Changed"/>
                                         </StackPanel>
 
@@ -189,7 +189,7 @@
                                             <ColumnDefinition Width="80"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <CheckBox x:Name="UseOverheadCheckBox" Grid.Column="0" Content="Накладные расходы" VerticalAlignment="Center" Margin="0,0,8,0" Click="CostInputs_Changed"/>
+                                        <CheckBox x:Name="UseOverheadCheckBox" Grid.Column="0" Content="{loc:Loc Key=CHECKBOX_OVERHEAD}" VerticalAlignment="Center" Margin="0,0,8,0" Click="CostInputs_Changed"/>
                                         <TextBox x:Name="OverheadPercentageTextBox" Grid.Column="1" Text="15" Padding="5,4" IsEnabled="{Binding IsChecked, ElementName=UseOverheadCheckBox}" TextChanged="CostInputs_Changed"/>
                                         <TextBlock Grid.Column="2" Text="%" VerticalAlignment="Center" Margin="5,0,0,0" Foreground="#475569" FontWeight="Bold"/>
                                     </Grid>
@@ -206,29 +206,29 @@
                                 </StackPanel>
                             </GroupBox>
 
-                            <GroupBox Grid.Column="1" Header="Расчет себестоимости партии" Padding="12" Background="#F8FAFC">
+                            <GroupBox Grid.Column="1" Header="{loc:Loc Key=GROUP_BATCH_COSTING}" Padding="12" Background="#F8FAFC">
                                 <StackPanel VerticalAlignment="Center">
                                     <Grid Margin="0,0,0,6">
-                                        <TextBlock Text="Затраты на сырье:" Foreground="#475569" FontSize="11"/>
+                                        <TextBlock Text="{loc:Loc Key=LABEL_RAW_COST}" Foreground="#475569" FontSize="11"/>
                                         <TextBlock x:Name="RawMaterialCostTextBlock" Text="$0.00" HorizontalAlignment="Right" FontWeight="SemiBold"/>
                                     </Grid>
 
                                     <Grid Margin="0,0,0,6">
-                                        <TextBlock Text="Накладные расходы:" Foreground="#475569" FontSize="11"/>
+                                        <TextBlock Text="{loc:Loc Key=LABEL_OVERHEAD_COST}" Foreground="#475569" FontSize="11"/>
                                         <TextBlock x:Name="OverheadCostTextBlock" Text="+$0.00 (0%)" HorizontalAlignment="Right" Foreground="#D97706" FontWeight="SemiBold"/>
                                     </Grid>
 
                                     <Separator Margin="0,4,0,8" Background="#CBD5E1"/>
 
                                     <Grid Margin="0,0,0,8">
-                                        <TextBlock Text="Итого стоимость партии:" Foreground="#1E293B" FontWeight="Bold" FontSize="12"/>
+                                        <TextBlock Text="{loc:Loc Key=LABEL_TOTAL_COST}" Foreground="#1E293B" FontWeight="Bold" FontSize="12"/>
                                         <TextBlock x:Name="TotalBatchCostTextBlock" Text="$0.00" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#059669" FontSize="14"/>
                                     </Grid>
 
                                     <Border Background="#E0F2FE" Padding="8" CornerRadius="4" Margin="0,4,0,0">
                                         <StackPanel>
-                                            <TextBlock Text="Себестоимость за 1 кг/л:" Foreground="#0369A1" FontSize="10" FontWeight="Bold"/>
-                                            <TextBlock x:Name="UnitCostTextBlock" Text="$0.00 / кг" FontSize="18" FontWeight="Bold" Foreground="#0284C7" Margin="0,2,0,0"/>
+                                            <TextBlock Text="{loc:Loc Key=LABEL_UNIT_COST}" Foreground="#0369A1" FontSize="10" FontWeight="Bold"/>
+                                            <TextBlock x:Name="UnitCostTextBlock" Text="$0.00" FontSize="18" FontWeight="Bold" Foreground="#0284C7" Margin="0,2,0,0"/>
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
@@ -296,7 +296,7 @@
                         </GroupBox>
 
                         <!-- ТАБЛИЦА: ТЕКУЩИЕ ПАРТИИ В КАМЕРАХ СОЗРЕВАНИЯ -->
-                        <GroupBox Header="Текущие партии в камерах созревания" Margin="0,0,0,12" Padding="8">
+                        <GroupBox Header="{loc:Loc Key=GROUP_ACTIVE_AGING_LOTS}" Margin="0,0,0,12" Padding="8">
                             <DataGrid x:Name="AgingLotsDataGrid" 
                                       AutoGenerateColumns="False" 
                                       IsReadOnly="True" 
@@ -308,13 +308,13 @@
                                       SelectionMode="Single"
                                       SelectionChanged="AgingLotsDataGrid_SelectionChanged">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Лот / Партия" Binding="{Binding BatchNumber}" Width="2*"/>
-                                    <DataGridTextColumn Header="Камера" Binding="{Binding ChamberName}" Width="*"/>
-                                    <DataGridTextColumn Header="Текущий остаток (кг)" Binding="{Binding InitialQuantity, StringFormat={}{0:N2}}" Width="1.2*"/>
-                                    <DataGridTextColumn Header="Головок (шт)" Binding="{Binding UnitsCount}" Width="0.8*"/>
-                                    <DataGridTextColumn Header="Дней в камере" Binding="{Binding DaysInChamber}" Width="*"/>
-                                    <DataGridTextColumn Header="План (дней)" Binding="{Binding TargetDays}" Width="*"/>
-                                    <DataGridCheckBoxColumn Header="Готов" Binding="{Binding IsReadyForRelease}" Width="Auto"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_LOT_BATCH}" Binding="{Binding BatchNumber}" Width="2*"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_CHAMBER}" Binding="{Binding ChamberName}" Width="*"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_CURRENT_STOCK}" Binding="{Binding InitialQuantity, StringFormat={}{0:N2}}" Width="1.2*"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_UNITS_COUNT}" Binding="{Binding UnitsCount}" Width="0.8*"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_DAYS_IN_CHAMBER}" Binding="{Binding DaysInChamber}" Width="*"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_TARGET_DAYS}" Binding="{Binding TargetDays}" Width="*"/>
+                                    <DataGridCheckBoxColumn Header="{loc:Loc Key=COLUMN_IS_READY}" Binding="{Binding IsReadyForRelease}" Width="Auto"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>
@@ -340,15 +340,15 @@
                                 </Grid>
 
                                 <StackPanel Margin="0,0,0,10">
-                                    <TextBlock Text="Стеллажи / ячейки приемного склада:" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
+                                    <TextBlock Text="{loc:Loc Key=LABEL_TARGET_LOCATIONS}" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
                                     <ListBox x:Name="TargetStorageLocationsListBox" Height="80" Background="#F8FAFC" SelectionMode="Multiple">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" Margin="2">
                                                     <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="0,0,8,0"/>
-                                                    <TextBlock Text="[Свободно: " Foreground="#64748B"/>
+                                                    <TextBlock Text="{loc:Loc Key=LABEL_FREE_CAPACITY_PREFIX}" Foreground="#64748B"/>
                                                     <TextBlock Text="{Binding FreeCapacityDisplay}" Foreground="#16A34A" FontWeight="Bold"/>
-                                                    <TextBlock Text=" л/кг]" Foreground="#64748B"/>
+                                                    <TextBlock Text="{loc:Loc Key=LABEL_FREE_CAPACITY_SUFFIX}" Foreground="#64748B"/>
                                                 </StackPanel>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -357,7 +357,7 @@
 
                                 <Grid Margin="0,0,0,8">
                                     <StackPanel>
-                                        <TextBlock Text="Наименование лота готовой продукции:" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBlock Text="{loc:Loc Key=LABEL_RELEASE_LOT_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
                                         <TextBox x:Name="ReleaseLotNameTextBox" Padding="5,4"/>
                                     </StackPanel>
                                 </Grid>
@@ -381,12 +381,12 @@
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="2" Margin="5,0,5,0" VerticalAlignment="Center">
-                                        <TextBlock x:Name="CalculatedCostLabelTextBlock" Text="Себестоимость (за 1 кг):" FontSize="11" Foreground="Gray"/>
+                                        <TextBlock x:Name="CalculatedCostLabelTextBlock" Text="{loc:Loc Key=LABEL_UNIT_COST_KG}" FontSize="11" Foreground="Gray"/>
                                         <TextBlock x:Name="CalculatedUnitCostTextBlock" Text="$ 0.00" FontSize="16" FontWeight="Bold" Foreground="Green" Margin="0,2,0,0"/>
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="3" Margin="5,0,0,0">
-                                        <TextBlock x:Name="UnitPriceLabelTextBlock" Text="Отпускная цена (за 1 кг):" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                        <TextBlock x:Name="UnitPriceLabelTextBlock" Text="{loc:Loc Key=LABEL_SELLING_PRICE_KG}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
                                         <TextBox x:Name="UnitPriceTextBox" Padding="5,4"/>
                                     </StackPanel>
                                 </Grid>
@@ -405,14 +405,14 @@
             </TabItem>
 
             <!-- Вкладка 3: Брак варки и Акт списания -->
-            <TabItem Header="Забраковка и Акт списания">
+            <TabItem Header="{loc:Loc Key=TAB_DISCARD_ACTS}">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <GroupBox Grid.Row="0" Header="Забраковка активной варки (в котле)" Padding="10" Margin="0,0,0,15">
+                    <GroupBox Grid.Row="0" Header="{loc:Loc Key=GROUP_DISCARD_IN_KETTLE}" Padding="10" Margin="0,0,0,15">
                         <StackPanel>
                             <Grid Margin="0,0,0,8">
                                 <Grid.ColumnDefinitions>
@@ -421,17 +421,17 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" Margin="0,0,10,0">
-                                    <TextBlock Text="Выберите варку в процессе:" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <TextBlock Text="{loc:Loc Key=LABEL_SELECT_ACTIVE_BATCH}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
                                     <ComboBox x:Name="DiscardBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1">
-                                    <TextBlock Text="Причина забраковки:" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                    <TextBox x:Name="DiscardReasonTextBox" Text="Закисание партии при формовании" Padding="5,4"/>
+                                    <TextBlock Text="{loc:Loc Key=LABEL_DISCARD_REASON}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                                    <TextBox x:Name="DiscardReasonTextBox" Padding="5,4"/>
                                 </StackPanel>
                             </Grid>
 
-                            <Button Content="🗑️ Списать варку в брак" 
+                            <Button Content="{loc:Loc Key=BTN_DISCARD_BATCH_SUBMIT}" 
                                     Click="DiscardBatch_Click" 
                                     Height="32" 
                                     HorizontalAlignment="Left"
@@ -443,22 +443,22 @@
                     </GroupBox>
 
                     <!-- ТАБЛИЦА ЛОТОВ ДЛЯ БРАКОВКИ С ШТУКАМИ -->
-                    <GroupBox Grid.Row="1" Header="Забраковка лотов из камер созревания (плесень, порча, брак флипа)" Padding="10">
+                    <GroupBox Grid.Row="1" Header="{loc:Loc Key=GROUP_DISCARD_AGING_LOTS}" Padding="10">
                         <DataGrid x:Name="DiscardAgingLotsDataGrid" 
                                   AutoGenerateColumns="False" 
                                   IsReadOnly="True" 
                                   GridLinesVisibility="Horizontal" 
                                   HeadersVisibility="Column">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Лот / Партия" Binding="{Binding BatchNumber}" Width="2*"/>
-                                <DataGridTextColumn Header="Камера" Binding="{Binding ChamberName}" Width="*"/>
-                                <DataGridTextColumn Header="Текущий остаток (кг)" Binding="{Binding InitialQuantity, StringFormat={}{0:N2}}" Width="1.2*"/>
-                                <DataGridTextColumn Header="Головок (шт)" Binding="{Binding UnitsCount}" Width="0.8*"/>
-                                <DataGridTextColumn Header="Дней на выдержке" Binding="{Binding DaysInChamber}" Width="*"/>
-                                <DataGridTemplateColumn Header="Действие" Width="130">
+                                <DataGridTextColumn Header="{loc:Loc Key=COLUMN_LOT_BATCH}" Binding="{Binding BatchNumber}" Width="2*"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=COLUMN_CHAMBER}" Binding="{Binding ChamberName}" Width="*"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=COLUMN_CURRENT_STOCK}" Binding="{Binding InitialQuantity, StringFormat={}{0:N2}}" Width="1.2*"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=COLUMN_UNITS_COUNT}" Binding="{Binding UnitsCount}" Width="0.8*"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=COLUMN_DAYS_IN_AGING}" Binding="{Binding DaysInChamber}" Width="*"/>
+                                <DataGridTemplateColumn Header="{loc:Loc Key=COLUMN_ACTION}" Width="130">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Button Content="🗑️ В брак" 
+                                            <Button Content="{loc:Loc Key=BTN_DISCARD_ROW}" 
                                                     Click="DiscardAgingLotRow_Click" 
                                                     Tag="{Binding LotId}" 
                                                     Background="#FEE2E2" 

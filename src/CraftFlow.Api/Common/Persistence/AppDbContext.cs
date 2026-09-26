@@ -67,6 +67,11 @@ public class AppDbContext : DbContext
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
+            if (entityType.IsOwned())
+            {
+                continue;
+            }
+
             var clrType = entityType.ClrType;
 
             if (clrType == typeof(User))

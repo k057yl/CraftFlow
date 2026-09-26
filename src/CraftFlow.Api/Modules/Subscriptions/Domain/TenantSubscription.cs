@@ -1,11 +1,11 @@
 ﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Domain;
 using Stateless;
 
 namespace CraftFlow.Api.Modules.Subscriptions.Domain;
 
-public class TenantSubscription
+public class TenantSubscription : Entity, ITenantEntity
 {
-    public Guid Id { get; private set; }
     public Guid TenantId { get; private set; }
     public Guid PlanId { get; private set; }
     public SubscriptionState State { get; private set; }

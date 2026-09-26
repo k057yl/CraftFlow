@@ -52,7 +52,7 @@ public static class IdentityEndpoints
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost(IdentityConstants.RESEND_OTP, async (ResendOtpCommand command, ISender sender) =>
+        group.MapPost(IdentityConstants.RESEND_OTP, async (ResendOtp.ResendOtp command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);

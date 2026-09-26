@@ -9,7 +9,8 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
 {
     public void Configure(EntityTypeBuilder<Recipe> builder)
     {
-        builder.ToTable(DbTables.RECIPES);
+        builder.ToTable(DbTables.RECIPES, DbSchemas.CATALOG);
+
         builder.HasKey(r => r.Id);
         builder.Property(r => r.Name).HasMaxLength(200).IsRequired();
         builder.Property(r => r.TargetOutputQuantity).HasPrecision(18, 4);

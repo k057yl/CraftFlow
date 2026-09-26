@@ -9,7 +9,7 @@ public class TenantAccessKeyConfiguration : IEntityTypeConfiguration<TenantAcces
 {
     public void Configure(EntityTypeBuilder<TenantAccessKey> builder)
     {
-        builder.ToTable(DbTables.TENANT_ACCESS_KEYS);
+        builder.ToTable(DbTables.TENANT_ACCESS_KEYS, DbSchemas.SAAS);
 
         builder.HasKey(k => k.Id);
 
@@ -19,7 +19,7 @@ public class TenantAccessKeyConfiguration : IEntityTypeConfiguration<TenantAcces
 
         builder.Property(k => k.KeyPrefix)
             .IsRequired()
-            .HasMaxLength(10);
+            .HasMaxLength(15);
 
         builder.Property(k => k.KeySuffix)
             .IsRequired()
@@ -30,7 +30,8 @@ public class TenantAccessKeyConfiguration : IEntityTypeConfiguration<TenantAcces
             .HasMaxLength(128);
 
         builder.HasIndex(k => k.KeyHash)
-            .IsUnique();
+            .IsUnique()
+            .HasDatabaseName(DbIndexes.Subscriptions.IX_ACCESS_KEYS_HASH);
 
         builder.Property(k => k.Status)
             .IsRequired()
@@ -44,6 +45,7 @@ public class TenantAccessKeyConfiguration : IEntityTypeConfiguration<TenantAcces
             .HasForeignKey(k => k.SubscriptionId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(k => k.TenantId);
+        builder.HasIndex(k => k.TenantId)
+            .HasDatabaseName(DbIndexes.Subscriptions.IX_ACCESS_KEYS_TENANT);
     }
 }

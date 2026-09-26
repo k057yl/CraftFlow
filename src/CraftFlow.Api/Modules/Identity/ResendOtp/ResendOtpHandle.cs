@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Identity.ResendOtp;
 
-public class ResendOtpHandler : IRequestHandler<ResendOtpCommand, Result<bool>>
+public class ResendOtpHandler : IRequestHandler<ResendOtp, Result<bool>>
 {
     private readonly AppDbContext _dbContext;
     private readonly IEmailService _emailService;
@@ -18,18 +18,13 @@ public class ResendOtpHandler : IRequestHandler<ResendOtpCommand, Result<bool>>
         _emailService = emailService;
     }
 
-    public async Task<Result<bool>> Handle(ResendOtpCommand request, CancellationToken cancellationToken)
+    public async Task<Result<bool>> Handle(ResendOtp request, CancellationToken cancellationToken)
     {
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
 
         var user = await _dbContext.Users
             .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(u => u.Email == normalizedEmail, cancellationToken);
-
-        if (user == null)
-        {
-            return Result.Failure<bool>(Error.NotFound(ErrorCodes.Auth.USER_NOT_FOUND));
-        }
+            .FirstAsync(u => u.Email == normalizedEmail, cancellationToken);
 
         if (user.IsActive)
         {

@@ -8,11 +8,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Aging.TransferToAging;
 
-public sealed class TransferToAgingCommandHandler : IRequestHandler<TransferToAgingCommand, Result<Guid>>
+public sealed class TransferToAgingHandler : IRequestHandler<TransferToAgingCommand, Result<Guid>>
 {
     private readonly AppDbContext _dbContext;
 
-    public TransferToAgingCommandHandler(AppDbContext dbContext)
+    public TransferToAgingHandler(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
@@ -20,20 +20,7 @@ public sealed class TransferToAgingCommandHandler : IRequestHandler<TransferToAg
     public async Task<Result<Guid>> Handle(TransferToAgingCommand request, CancellationToken cancellationToken)
     {
         var batch = await _dbContext.Set<ProductionBatch>()
-            .FirstOrDefaultAsync(b => b.Id == request.ProductionBatchId, cancellationToken);
-
-        if (batch is null)
-        {
-            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Production.BATCH_NOT_FOUND));
-        }
-
-        var chamberExists = await _dbContext.Set<AgingChamber>()
-            .AnyAsync(c => c.Id == request.AgingChamberId, cancellationToken);
-
-        if (!chamberExists)
-        {
-            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Aging.CHAMBER_NOT_FOUND));
-        }
+            .FirstAsync(b => b.Id == request.ProductionBatchId, cancellationToken);
 
         var finalLotNumber = !string.IsNullOrWhiteSpace(request.CustomBatchNumber)
             ? request.CustomBatchNumber.Trim()

@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Common.Persistence;
+﻿using CraftFlow.Api.Common.Constants;
+using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.Api.Modules.Subscriptions.Domain;
@@ -24,15 +25,6 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
     {
         var normalizedEmail = request.OwnerEmail.Trim().ToLowerInvariant();
 
-        var existingUser = await _dbContext.Users
-            .IgnoreQueryFilters()
-            .FirstOrDefaultAsync(u => u.Email == normalizedEmail, cancellationToken);
-
-        if (existingUser != null)
-        {
-            return Result.Failure<Guid>(Error.Conflict(ErrorCodes.Auth.USER_ALREADY_EXISTS));
-        }
-
         var organization = Organization.Create(request.CompanyName);
         _dbContext.Organizations.Add(organization);
 
@@ -52,7 +44,7 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
         _dbContext.Users.Add(ownerUser);
 
         var freePlan = await _dbContext.SubscriptionPlans
-            .FirstOrDefaultAsync(p => p.Code == "FREE", cancellationToken)
+            .FirstOrDefaultAsync(p => p.Code == CoreConstants.Billing.PLAN_FREE_CODE, cancellationToken)
             ?? await _dbContext.SubscriptionPlans.FirstOrDefaultAsync(cancellationToken);
 
         if (freePlan != null)

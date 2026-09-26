@@ -57,7 +57,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("audit_logs", "public");
+                    b.ToTable("audit_logs", "identity");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Aging.Domain.AgingChamber", b =>
@@ -86,6 +86,10 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_AGING_CHAMBERS_TENANT_NAME");
 
                     b.ToTable("aging_chambers", "aging");
                 });
@@ -137,6 +141,12 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AgingChamberId")
+                        .HasDatabaseName("IX_AGING_LOTS_CHAMBER");
+
+                    b.HasIndex("ProductionBatchId")
+                        .HasDatabaseName("IX_AGING_LOTS_BATCH");
+
                     b.ToTable("aging_lots", "aging");
                 });
 
@@ -174,7 +184,8 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AgingLotId");
+                    b.HasIndex("AgingLotId")
+                        .HasDatabaseName("IX_AGING_LOT_ITEMS_LOT");
 
                     b.ToTable("aging_lot_items", "aging");
                 });
@@ -204,7 +215,7 @@ namespace CraftFlow.Api.Migrations
                     b.HasIndex("TenantId", "Id")
                         .IsUnique();
 
-                    b.ToTable("products", "public");
+                    b.ToTable("products", "catalog");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.RawMaterial", b =>
@@ -228,7 +239,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("raw_materials", "public");
+                    b.ToTable("raw_materials", "catalog");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.Recipe", b =>
@@ -268,7 +279,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasIndex("TenantId", "ProductId");
 
-                    b.ToTable("recipes", "public");
+                    b.ToTable("recipes", "catalog");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.RecipeIngredient", b =>
@@ -293,7 +304,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasIndex("RecipeId");
 
-                    b.ToTable("recipe_ingredients", "public");
+                    b.ToTable("recipe_ingredients", "catalog");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.UnitOfMeasure", b =>
@@ -318,7 +329,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("units_of_measure", "public");
+                    b.ToTable("units_of_measure", "catalog");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Identity.Domain.Organization", b =>
@@ -351,7 +362,10 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("organizations", "public");
+                    b.HasIndex("IsActive", "IsSelfDeactivated", "DeactivatedAtUtc")
+                        .HasDatabaseName("IX_ORGANIZATIONS_RETENTION_CHECK");
+
+                    b.ToTable("organizations", "identity");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Identity.Domain.User", b =>
@@ -400,10 +414,13 @@ namespace CraftFlow.Api.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_USERS_EMAIL");
 
+                    b.HasIndex("OtpExpiresAtUtc")
+                        .HasDatabaseName("IX_USERS_OTP_EXPIRATION");
+
                     b.HasIndex("TenantId", "Role", "IsActive")
                         .HasDatabaseName("IX_USERS_TENANT_ROLE_ACTIVE");
 
-                    b.ToTable("users", "public");
+                    b.ToTable("users", "identity");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Inventory.Domain.StockLot", b =>
@@ -452,7 +469,10 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("stock_lots", "public");
+                    b.HasIndex("TenantId", "WarehouseId", "ItemId")
+                        .HasDatabaseName("IX_STOCK_LOTS_LOOKUP");
+
+                    b.ToTable("stock_lots", "inventory");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Inventory.Domain.StorageLocation", b =>
@@ -506,7 +526,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasIndex("WarehouseId");
 
-                    b.ToTable("storage_locations", "public");
+                    b.ToTable("storage_locations", "inventory");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Inventory.Domain.Warehouse", b =>
@@ -532,7 +552,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("warehouses", "public");
+                    b.ToTable("warehouses", "inventory");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Procurement.Domain.PurchaseOrder", b =>
@@ -565,6 +585,12 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_PURCHASE_ORDERS_STATUS");
+
+                    b.HasIndex("SupplierId")
+                        .HasDatabaseName("IX_PURCHASE_ORDERS_SUPPLIER");
+
                     b.ToTable("purchase_orders", "procurement");
                 });
 
@@ -593,7 +619,8 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PurchaseOrderId");
+                    b.HasIndex("PurchaseOrderId")
+                        .HasDatabaseName("IX_PURCHASE_ORDER_ITEMS_ORDER");
 
                     b.ToTable("purchase_order_items", "procurement");
                 });
@@ -625,6 +652,10 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TenantId", "Name")
+                        .IsUnique()
+                        .HasDatabaseName("IX_SUPPLIERS_TENANT_NAME");
+
                     b.ToTable("suppliers", "procurement");
                 });
 
@@ -654,7 +685,10 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("consumed_ingredients", "public");
+                    b.HasIndex("ProductionBatchId")
+                        .HasDatabaseName("IX_CONSUMED_INGREDIENTS_BATCH");
+
+                    b.ToTable("consumed_ingredients", "production");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Production.Domain.ProductionBatch", b =>
@@ -729,7 +763,7 @@ namespace CraftFlow.Api.Migrations
                     b.HasIndex("State", "IsTelegramNotified", "StartedAt")
                         .HasDatabaseName("IX_PRODUCTION_BATCHES_TIMER_MONITORING");
 
-                    b.ToTable("production_batches", "public");
+                    b.ToTable("production_batches", "production");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Sales.Domain.Customer", b =>
@@ -747,14 +781,18 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("character varying(200)");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("customers", "public");
+                    b.HasIndex("TenantId", "Name")
+                        .HasDatabaseName("IX_CUSTOMERS_TENANT_NAME");
+
+                    b.ToTable("customers", "sales");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Sales.Domain.SalesOrder", b =>
@@ -782,15 +820,21 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("TotalAmount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<Guid>("WarehouseId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.ToTable("sales_orders", "public");
+                    b.HasIndex("CustomerId")
+                        .HasDatabaseName("IX_SALES_ORDERS_CUSTOMER");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("IX_SALES_ORDERS_STATUS");
+
+                    b.ToTable("sales_orders", "sales");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Sales.Domain.SalesOrderItem", b =>
@@ -803,7 +847,8 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<Guid>("SalesOrderId")
                         .HasColumnType("uuid");
@@ -812,13 +857,15 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<decimal>("UnitPrice")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SalesOrderId");
+                    b.HasIndex("SalesOrderId")
+                        .HasDatabaseName("IX_SALES_ORDER_ITEMS_ORDER");
 
-                    b.ToTable("sales_order_items", "public");
+                    b.ToTable("sales_order_items", "sales");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Subscriptions.Domain.SubscriptionPayment", b =>
@@ -842,6 +889,9 @@ namespace CraftFlow.Api.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("PlanCode")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -854,7 +904,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("subscription_payments", "public");
+                    b.ToTable("subscription_payments", "saas");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Subscriptions.Domain.SubscriptionPlan", b =>
@@ -888,9 +938,10 @@ namespace CraftFlow.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Code")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("IX_SUBSCRIPTION_PLANS_CODE");
 
-                    b.ToTable("subscription_plans", "public");
+                    b.ToTable("subscription_plans", "saas");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Subscriptions.Domain.TenantAccessKey", b =>
@@ -902,6 +953,9 @@ namespace CraftFlow.Api.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("KeyHash")
                         .IsRequired()
                         .HasMaxLength(128)
@@ -909,8 +963,8 @@ namespace CraftFlow.Api.Migrations
 
                     b.Property<string>("KeyPrefix")
                         .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
+                        .HasMaxLength(15)
+                        .HasColumnType("character varying(15)");
 
                     b.Property<string>("KeySuffix")
                         .IsRequired()
@@ -942,13 +996,15 @@ namespace CraftFlow.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("KeyHash")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("IX_ACCESS_KEYS_HASH");
 
                     b.HasIndex("SubscriptionId");
 
-                    b.HasIndex("TenantId");
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_ACCESS_KEYS_TENANT");
 
-                    b.ToTable("tenant_access_keys", "public");
+                    b.ToTable("tenant_access_keys", "saas");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Subscriptions.Domain.TenantSubscription", b =>
@@ -959,6 +1015,9 @@ namespace CraftFlow.Api.Migrations
 
                     b.Property<DateTime?>("ExpiresAtUtc")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
 
                     b.Property<Guid>("PlanId")
                         .HasColumnType("uuid");
@@ -983,7 +1042,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasIndex("TenantId", "ExpiresAtUtc");
 
-                    b.ToTable("tenant_subscriptions", "public");
+                    b.ToTable("tenant_subscriptions", "saas");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Aging.Domain.AgingLotItem", b =>
@@ -1031,7 +1090,7 @@ namespace CraftFlow.Api.Migrations
 
                             b1.HasKey("StockLotId", "StorageLocationId");
 
-                            b1.ToTable("stock_lot_storage_locations", "public");
+                            b1.ToTable("stock_lot_storage_locations", "inventory");
 
                             b1.WithOwner()
                                 .HasForeignKey("StockLotId");
