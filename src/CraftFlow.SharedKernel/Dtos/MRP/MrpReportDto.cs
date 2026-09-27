@@ -1,4 +1,5 @@
-﻿namespace CraftFlow.Api.Modules.MRP.Contracts;
+﻿namespace CraftFlow.SharedKernel.Dtos.MRP;
+
 public sealed record MrpReportDto(
     DateTime GeneratedAt,
     List<MaterialRequirementDto> Requirements

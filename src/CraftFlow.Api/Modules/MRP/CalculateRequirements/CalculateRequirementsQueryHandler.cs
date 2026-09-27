@@ -1,7 +1,7 @@
-﻿using CraftFlow.Api.Common.MultiTenancy;
+﻿using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Modules.MRP.Contracts;
 using CraftFlow.Api.Modules.Production.Domain;
+using CraftFlow.SharedKernel.Dtos.MRP;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -67,7 +67,7 @@ public sealed class CalculateRequirementsQueryHandler : IRequestHandler<Calculat
 
         var stockBalances = await _dbContext.StockLots
             .AsNoTracking()
-            .Where(sl => rawMaterialIds.Contains(sl.ItemId) && sl.IsActive && sl.Quantity > 0)
+            .Where(sl => rawMaterialIds.Contains(sl.ItemId) && sl.Quantity > 0)
             .GroupBy(sl => sl.ItemId)
             .Select(g => new { RawMaterialId = g.Key, TotalQuantity = g.Sum(x => x.Quantity) })
             .ToDictionaryAsync(x => x.RawMaterialId, x => x.TotalQuantity, cancellationToken);
@@ -87,7 +87,7 @@ public sealed class CalculateRequirementsQueryHandler : IRequestHandler<Calculat
 
             requirements.Add(new MaterialRequirementDto(
                 rawMaterialId,
-                rawMaterials.GetValueOrDefault(rawMaterialId, "UNKNOWN_MATERIAL"),
+                rawMaterials.GetValueOrDefault(rawMaterialId, CoreConstants.Catalog.UNKNOWN_MATERIAL_NAME),
                 totalRequired,
                 currentStock,
                 shortage,

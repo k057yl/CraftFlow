@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Aging.GetActiveAgingLots;
+﻿namespace CraftFlow.SharedKernel.Dtos.Aging;
 
 public class AgingLotSummaryDto
 {

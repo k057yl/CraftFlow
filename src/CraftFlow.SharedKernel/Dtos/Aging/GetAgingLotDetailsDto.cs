@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
+﻿namespace CraftFlow.SharedKernel.Dtos.Aging;
 
 public record GetAgingLotDetailsDto(
     Guid LotId,

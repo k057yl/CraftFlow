@@ -1,4 +1,4 @@
-﻿using CraftFlow.Api.Modules.Identity.LoginUser;
+﻿using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.SharedKernel.Result;
 using CraftFlow.SharedKernel.Security;
 using MediatR;

@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Production.CalculateRequirements;
+﻿namespace CraftFlow.SharedKernel.Dtos.Production;
 
 public record RequirementItemDto(
     string MaterialName,

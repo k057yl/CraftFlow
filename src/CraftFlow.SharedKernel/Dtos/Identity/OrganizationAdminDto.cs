@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Identity.GetOrganizations;
+﻿namespace CraftFlow.SharedKernel.Dtos.Identity;
 
 public record OrganizationAdminDto(
     Guid Id,
@@ -7,4 +7,7 @@ public record OrganizationAdminDto(
     DateTime CreatedAtUtc,
     string SubscriptionStatus,
     DateTime? SubscriptionExpiresAtUtc
-);
+)
+{
+    public string AccessText => IsActive ? "Разрешен" : "Заблокирован";
+}

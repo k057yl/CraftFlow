@@ -29,8 +29,9 @@ public class CreateProcurementFromMrpHandler : IRequestHandler<CreateProcurement
 
         foreach (var item in request.Items.Where(i => i.Quantity > 0))
         {
-            decimal estimatedPrice = 100.00m;
-            purchaseOrder.AddItem(item.RawMaterialId, item.Quantity, estimatedPrice);
+            const decimal defaultUnitPrice = 0m;
+
+            purchaseOrder.AddItem(item.RawMaterialId, item.Quantity, defaultUnitPrice);
         }
 
         _dbContext.PurchaseOrders.Add(purchaseOrder);

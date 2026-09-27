@@ -1,6 +1,4 @@
-﻿using CraftFlow.SharedKernel.Dtos.Sale;
-
-namespace CraftFlow.Api.Modules.Sales.GetStockLotDetails;
+﻿namespace CraftFlow.SharedKernel.Dtos.Sale;
 
 public sealed record StockLotDetailsDto(
     Guid StockLotId,

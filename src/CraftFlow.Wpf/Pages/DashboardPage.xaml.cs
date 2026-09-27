@@ -1,6 +1,5 @@
 ﻿using CraftFlow.Api.Modules.Analytics;
-using CraftFlow.SharedKernel.Constants;
-using CraftFlow.Wpf.Models;
+using CraftFlow.SharedKernel.Dtos.Dashboard;
 using CraftFlow.Wpf.Services;
 using System.Windows.Controls;
 

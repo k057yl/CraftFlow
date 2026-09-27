@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using CraftFlow.Api.Modules.Traceability;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
 

@@ -1,6 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Identity;
 using CraftFlow.SharedKernel.Constants;
-using CraftFlow.Wpf.Models;
+using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.Wpf.Services;
 using System.Net.Http.Json;
 using System.Windows;

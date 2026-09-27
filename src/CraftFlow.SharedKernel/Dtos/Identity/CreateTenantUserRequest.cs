@@ -1,6 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Identity.Domain;
 
-namespace CraftFlow.SharedKernel.Dtos.Auth;
+namespace CraftFlow.SharedKernel.Dtos.Identity;
 
 public record CreateTenantUserRequest(
     string Email,

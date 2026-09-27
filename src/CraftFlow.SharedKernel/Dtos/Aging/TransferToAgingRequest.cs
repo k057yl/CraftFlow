@@ -1,8 +1,9 @@
-﻿namespace CraftFlow.Wpf.Models;
+﻿namespace CraftFlow.SharedKernel.Dtos.Aging;
 
 public record TransferToAgingRequest(
     Guid ProductionBatchId,
     Guid AgingChamberId,
     int MinAgingDays,
-    string? CustomBatchNumber = null
+    int UnitsCount,
+    string? CustomBatchNumber
 );

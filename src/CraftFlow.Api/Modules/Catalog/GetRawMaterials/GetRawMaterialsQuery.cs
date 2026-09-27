@@ -1,4 +1,5 @@
-﻿using CraftFlow.SharedKernel.Result;
+﻿using CraftFlow.SharedKernel.Dtos.Catalog;
+using CraftFlow.SharedKernel.Result;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Catalog.GetRawMaterials

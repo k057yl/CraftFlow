@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Aging;
 using CraftFlow.Api.Modules.Inventory;
+using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;

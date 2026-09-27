@@ -1,4 +1,5 @@
-﻿using CraftFlow.SharedKernel.Result;
+﻿using CraftFlow.SharedKernel.Dtos.Aging;
+using CraftFlow.SharedKernel.Result;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Aging.GetAgingChambers;

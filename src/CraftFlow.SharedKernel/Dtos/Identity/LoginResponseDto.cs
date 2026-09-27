@@ -1,6 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Identity.Domain;
 
-namespace CraftFlow.Api.Modules.Identity.LoginUser;
+namespace CraftFlow.SharedKernel.Dtos.Identity;
 
 public record LoginResponseDto(
     string Token,

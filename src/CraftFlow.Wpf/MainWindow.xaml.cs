@@ -1,6 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.SharedKernel.Constants;
-using CraftFlow.Wpf.Models;
+using CraftFlow.SharedKernel.Dtos.Dashboard;
 using CraftFlow.Wpf.Pages;
 using CraftFlow.Wpf.Services;
 using System.Windows;

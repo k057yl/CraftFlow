@@ -1,3 +1,3 @@
-﻿namespace CraftFlow.Api.Modules.Inventory.GetRawStockLots;
+﻿namespace CraftFlow.SharedKernel.Dtos.Inventory;
 
 public record RawStockLotLookupDto(Guid Id, string Name);

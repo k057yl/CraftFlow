@@ -1,4 +1,4 @@
-﻿using CraftFlow.Api.Modules.MRP.Contracts;
+﻿using CraftFlow.SharedKernel.Dtos.MRP;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 

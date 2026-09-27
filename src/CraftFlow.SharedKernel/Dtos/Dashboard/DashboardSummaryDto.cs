@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Wpf.Models;
+﻿namespace CraftFlow.SharedKernel.Dtos.Dashboard;
 public record DashboardSummaryDto(
     int TotalProducts,
     int TotalRecipes,

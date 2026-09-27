@@ -1,3 +1,3 @@
-﻿namespace CraftFlow.Api.Modules.Aging.GetAgingChambers;
+﻿namespace CraftFlow.SharedKernel.Dtos.Aging;
 
 public record AgingChamberDto(Guid Id, string Name);

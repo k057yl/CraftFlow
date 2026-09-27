@@ -1,4 +1,4 @@
-﻿using CraftFlow.Wpf.Models.Auth;
+﻿using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
 using System.Windows;

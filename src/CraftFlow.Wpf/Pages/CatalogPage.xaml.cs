@@ -1,4 +1,5 @@
 ﻿using CraftFlow.Api.Modules.Catalog;
+using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
 using System.Collections.ObjectModel;
@@ -6,7 +7,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using static CraftFlow.Wpf.Models.Catalogs.CatalogDtos;
+using static CraftFlow.SharedKernel.Dtos.Catalog.CatalogDtos;
 
 namespace CraftFlow.Wpf.Pages;
 

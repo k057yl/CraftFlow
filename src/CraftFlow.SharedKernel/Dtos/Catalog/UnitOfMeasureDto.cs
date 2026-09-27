@@ -1,4 +1,3 @@
-﻿namespace CraftFlow.Api.Modules.Catalog.GetUnitsOfMeasure
-{
-    public record UnitOfMeasureDto(Guid Id, string Name, string Code);
-}
+﻿namespace CraftFlow.SharedKernel.Dtos.Catalog;
+
+public record UnitOfMeasureDto(Guid Id, string Name, string Code);

@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Identity.GetSubscriptionPayments;
+﻿namespace CraftFlow.SharedKernel.Dtos.Identity;
 
 public record PaymentDto(
     Guid Id,

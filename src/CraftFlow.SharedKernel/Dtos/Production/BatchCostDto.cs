@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Production.GetBatchCost;
+﻿namespace CraftFlow.SharedKernel.Dtos.Production;
 
 public record BatchCostDto(
     Guid BatchId,

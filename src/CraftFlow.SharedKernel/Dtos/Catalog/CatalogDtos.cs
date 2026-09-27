@@ -1,6 +1,6 @@
-﻿namespace CraftFlow.Wpf.Models.Catalogs;
+﻿namespace CraftFlow.SharedKernel.Dtos.Catalog;
 
-class CatalogDtos
+public class CatalogDtos
 {
     public record RawMaterialDto(Guid Id, string Name, Guid UnitOfMeasureId, string UnitOfMeasureCode);
     public record ProductDto(Guid Id, string Name, Guid UnitOfMeasureId, string UnitOfMeasureCode);

@@ -1,4 +1,4 @@
-﻿using CraftFlow.SharedKernel.Dtos.Auth;
+﻿using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 

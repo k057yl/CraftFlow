@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Production.GetActiveBatchesSummary;
+﻿namespace CraftFlow.SharedKernel.Dtos.Production;
 
 public sealed record ActiveBatchSummaryDto(
     Guid Id,

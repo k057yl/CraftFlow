@@ -1,6 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Subscriptions.Domain;
 
-namespace CraftFlow.Api.Modules.Subscriptions.GetAccessKeys;
+namespace CraftFlow.SharedKernel.Dtos.Subscription;
 
 public record AccessKeyDto(
     Guid Id,

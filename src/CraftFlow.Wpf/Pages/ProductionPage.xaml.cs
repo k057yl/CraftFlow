@@ -4,9 +4,10 @@ using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.Api.Modules.Production;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Aging;
+using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
+using CraftFlow.SharedKernel.Dtos.Production;
 using CraftFlow.Wpf.Models;
-using CraftFlow.Wpf.Models.Productions;
 using CraftFlow.Wpf.Services;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -23,7 +24,7 @@ public partial class ProductionPage : Page
     public ObservableCollection<LookupItem> Warehouses { get; } = [];
     public ObservableCollection<LookupItem> Recipes { get; } = [];
     public ObservableCollection<LookupItem> ActiveBatches { get; } = [];
-    public ObservableCollection<ActiveBatchSummaryDto> ActiveBatchesSummary { get; } = [];
+    public ObservableCollection<ActiveBatchWpfModel> ActiveBatchesSummary { get; } = [];
     public ObservableCollection<BatchReadyForAgingDto> CompletedBatches { get; } = [];
     public ObservableCollection<LookupItem> AgingChambers { get; } = [];
     public ObservableCollection<LookupItem> ActiveAgingLots { get; } = [];
@@ -120,8 +121,21 @@ public partial class ProductionPage : Page
                     var now = DateTime.UtcNow;
                     foreach (var b in summaryList)
                     {
-                        b.CurrentElapsed = now - b.StartedAt;
-                        ActiveBatchesSummary.Add(b);
+                        var model = new ActiveBatchWpfModel
+                        {
+                            Id = b.Id,
+                            BatchName = b.BatchName,
+                            RecipeName = b.RecipeName,
+                            StartedAt = b.StartedAt,
+                            TargetDurationMinutes = b.TargetDurationMinutes,
+                            ElapsedMinutes = b.ElapsedMinutes,
+                            IsOverdue = b.IsOverdue,
+                            Status = b.State,
+                            PlannedOutputQuantity = b.PlannedOutputQuantity,
+                            CurrentElapsed = now - b.StartedAt
+                        };
+
+                        ActiveBatchesSummary.Add(model);
                         ActiveBatches.Add(new LookupItem(b.Id, b.BatchName));
                     }
                 }
@@ -193,7 +207,7 @@ public partial class ProductionPage : Page
 
     private void ActiveBatchesDataGrid_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (ActiveBatchesDataGrid.SelectedItem is ActiveBatchSummaryDto selectedBatch)
+        if (ActiveBatchesDataGrid.SelectedItem is ActiveBatchWpfModel selectedBatch)
         {
             ActiveBatchComboBox.SelectedValue = selectedBatch.Id;
         }
@@ -489,14 +503,13 @@ public partial class ProductionPage : Page
 
         var customLotName = AgingLotNameTextBox.Text?.Trim();
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_TRANSFER, new
-        {
-            ProductionBatchId = selectedBatch.Id,
-            AgingChamberId = chamberId,
-            MinAgingDays = minDays,
-            UnitsCount = selectedBatch.UnitsCount,
-            CustomBatchNumber = string.IsNullOrWhiteSpace(customLotName) ? null : customLotName
-        });
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_TRANSFER, new TransferToAgingRequest(
+            selectedBatch.Id,
+            chamberId,
+            minDays,
+            selectedBatch.UnitsCount,
+            string.IsNullOrWhiteSpace(customLotName) ? null : customLotName
+        ));
 
         if (isSuccess)
         {
@@ -547,16 +560,15 @@ public partial class ProductionPage : Page
             .Select(l => l.Id)
             .ToList();
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_RELEASE, new
-        {
-            AgingLotId = lotId,
-            TargetWarehouseId = warehouseId,
-            ActualFinalQuantity = actualQty,
-            UnitsCount = unitsCount,
-            UnitPrice = unitPrice,
-            CustomBatchNumber = string.IsNullOrWhiteSpace(customLotName) ? null : customLotName,
-            StorageLocationIds = selectedStorageLocationIds.Count > 0 ? selectedStorageLocationIds : null
-        });
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_RELEASE, new ReleaseFromAgingRequest(
+            lotId,
+            warehouseId,
+            actualQty,
+            unitsCount,
+            unitPrice,
+            string.IsNullOrWhiteSpace(customLotName) ? null : customLotName,
+            selectedStorageLocationIds.Count > 0 ? selectedStorageLocationIds : null
+        ));
 
         if (isSuccess)
         {

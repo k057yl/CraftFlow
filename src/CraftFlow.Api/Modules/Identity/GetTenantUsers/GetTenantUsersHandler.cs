@@ -2,7 +2,7 @@
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.SharedKernel.Constants;
-using CraftFlow.SharedKernel.Dtos.Auth;
+using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

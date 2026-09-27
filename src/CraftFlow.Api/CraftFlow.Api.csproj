@@ -24,11 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\CraftFlow.SharedKernel\CraftFlow.SharedKernel.csproj" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
+    <ProjectReference Include="..\CraftFlow.SharedKernel\CraftFlow.SharedKernel.csproj" />
   </ItemGroup>
 
 </Project>

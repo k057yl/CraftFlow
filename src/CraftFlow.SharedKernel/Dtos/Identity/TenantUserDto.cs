@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Modules.Identity.Domain;
 
-namespace CraftFlow.SharedKernel.Dtos.Auth;
+namespace CraftFlow.SharedKernel.Dtos.Identity;
+
 public sealed record TenantUserDto(
     Guid Id,
     string FullName,

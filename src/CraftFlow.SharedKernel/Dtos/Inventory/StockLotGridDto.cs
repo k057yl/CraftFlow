@@ -1,4 +1,5 @@
-﻿namespace CraftFlow.Wpf.Models;
+﻿namespace CraftFlow.SharedKernel.Dtos.Inventory;
+
 public record StockLotGridDto(
     Guid Id,
     string ItemName,

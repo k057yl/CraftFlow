@@ -1,6 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Identity.Domain;
 
-namespace CraftFlow.Wpf.Models.Auth;
+namespace CraftFlow.SharedKernel.Dtos.Identity;
 
 public class UserProfileDto
 {

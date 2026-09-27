@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Sales.GetSalesStockInfo;
+﻿namespace CraftFlow.SharedKernel.Dtos.Sale;
 
 public record SalesStockInfoDto(
     decimal Quantity,

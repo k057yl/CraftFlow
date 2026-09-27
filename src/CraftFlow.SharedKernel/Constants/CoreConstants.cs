@@ -36,4 +36,8 @@ public static class CoreConstants
     {
         public const string PLAN_FREE_CODE = "FREE";
     }
+    public static class Catalog
+    {
+        public const string UNKNOWN_MATERIAL_NAME = "UNKNOWN_MATERIAL_NAME";
+    }
 }

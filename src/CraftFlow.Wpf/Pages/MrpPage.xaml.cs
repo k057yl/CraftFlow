@@ -5,6 +5,8 @@ using System.Windows.Media;
 using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.Api.Modules.Procurement;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Dtos.Common;
+using CraftFlow.SharedKernel.Dtos.MRP;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
 

@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.MRP.Contracts;
+﻿namespace CraftFlow.SharedKernel.Dtos.MRP;
 
 public sealed record MaterialRequirementDto(
     Guid RawMaterialId,

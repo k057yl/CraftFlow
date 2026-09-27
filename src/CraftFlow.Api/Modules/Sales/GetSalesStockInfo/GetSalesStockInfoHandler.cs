@@ -1,4 +1,5 @@
 ﻿using CraftFlow.Api.Common.Persistence;
+using CraftFlow.SharedKernel.Dtos.Sale;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

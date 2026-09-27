@@ -1,7 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Identity;
 using CraftFlow.Api.Modules.Identity.Domain;
-using CraftFlow.SharedKernel.Dtos.Auth;
-using CraftFlow.Wpf.Models.Auth;
+using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
 using System.Windows;

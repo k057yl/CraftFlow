@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Inventory.GetStockLots;
+﻿namespace CraftFlow.SharedKernel.Dtos.Inventory;
 
 public record StockLotDto(
     Guid Id,

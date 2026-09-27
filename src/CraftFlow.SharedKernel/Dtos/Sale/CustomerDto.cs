@@ -1,4 +1,3 @@
-﻿namespace CraftFlow.Api.Modules.Sales.GetCustomers
-{
-    public record CustomerDto(Guid Id, string Name);
-}
+﻿namespace CraftFlow.SharedKernel.Dtos.Sale;
+
+public record CustomerDto(Guid Id, string Name);
