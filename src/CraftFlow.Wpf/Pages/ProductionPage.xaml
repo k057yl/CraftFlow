@@ -99,16 +99,26 @@
                                     </StackPanel>
                                 </GroupBox>
 
-                                <Button Content="{loc:Loc Key=BTN_START_BATCH}" 
-                                        Click="StartBatch_Click" 
-                                        Height="32" 
-                                        Width="180" 
-                                        HorizontalAlignment="Left" 
-                                        FontWeight="Bold"/>
+                                <StackPanel Orientation="Horizontal">
+                                    <Button Content="{loc:Loc Key=BTN_START_BATCH}" 
+                                            Click="StartBatch_Click" 
+                                            Height="32" 
+                                            Width="160" 
+                                            Margin="0,0,10,0" 
+                                            FontWeight="Bold"/>
+
+                                    <Button Content="Запланировать (в Черновик)" 
+                                            Click="PlanBatch_Click" 
+                                            Height="32" 
+                                            Padding="12,0" 
+                                            Background="#16A34A" 
+                                            Foreground="White" 
+                                            FontWeight="Bold"/>
+                                </StackPanel>
                             </StackPanel>
                         </GroupBox>
 
-                        <!-- ТЕКУЩИЕ ВАРКИ В РАБОТЕ -->
+                        <!-- ТЕКУЩИЕ ВАРКИ В РАБОТЕ И ЧЕРНОВИКИ -->
                         <GroupBox Header="{loc:Loc Key=GROUP_ACTIVE_BATCHES}" Margin="0,0,0,12" Padding="8">
                             <DataGrid x:Name="ActiveBatchesDataGrid" 
                                       AutoGenerateColumns="False" 
@@ -147,6 +157,32 @@
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
                                     <DataGridTextColumn Header="{loc:Loc Key=COLUMN_TARGET_DURATION}" Binding="{Binding TargetDurationMinutes}" Width="0.8*"/>
+
+                                    <DataGridTemplateColumn Header="Действия" Width="80">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Button Content="▶" 
+                                                            Click="StartDraftBatch_Click" 
+                                                            Tag="{Binding Id}" 
+                                                            ToolTip="Запустить черновик" 
+                                                            Margin="0,0,4,0" 
+                                                            Padding="5,1" 
+                                                            Background="#16A34A" 
+                                                            Foreground="White" 
+                                                            FontWeight="Bold"/>
+                                                    <Button Content="✕" 
+                                                            Click="DeleteDraftBatch_Click" 
+                                                            Tag="{Binding Id}" 
+                                                            ToolTip="Удалить черновик" 
+                                                            Padding="5,1" 
+                                                            Background="#DC2626" 
+                                                            Foreground="White" 
+                                                            FontWeight="Bold"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </GroupBox>

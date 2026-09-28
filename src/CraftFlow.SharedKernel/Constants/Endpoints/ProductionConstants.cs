@@ -1,7 +1,11 @@
 ﻿namespace CraftFlow.Api.Modules.Production;
+
 public class ProductionConstants
 {
     public const string BATCHES_START = "api/production/batches/start";
+    public const string BATCHES_PLAN = "api/production/batches/plan";
+    public const string BATCHES_DELETE_DRAFT = "api/production/batches";
+    public const string BATCHES_START_DRAFT = "api/production/batches";
     public const string BATCHES_ACTIVE_SUMMARY = "api/production/batches/active-summary";
     public const string BATCHES_COMPLETE = "api/production/batches/complete";
     public const string BATCHES_CONSUME = "api/production/batches/consume-ingredient";

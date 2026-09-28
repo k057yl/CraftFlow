@@ -3,11 +3,14 @@ using CraftFlow.Api.Modules.Production.CalculateMaxOutput;
 using CraftFlow.Api.Modules.Production.CalculateRequirements;
 using CraftFlow.Api.Modules.Production.CompleteProductionBatch;
 using CraftFlow.Api.Modules.Production.ConsumeIngredient;
+using CraftFlow.Api.Modules.Production.DeleteDraftBatch;
 using CraftFlow.Api.Modules.Production.DiscardBatch;
 using CraftFlow.Api.Modules.Production.EstimateCost;
 using CraftFlow.Api.Modules.Production.GetActiveBatchesSummary;
 using CraftFlow.Api.Modules.Production.GetBatchCost;
 using CraftFlow.Api.Modules.Production.GetBatchesReadyForAging;
+using CraftFlow.Api.Modules.Production.PlanProductionBatch;
+using CraftFlow.Api.Modules.Production.StartDraftBatch;
 using CraftFlow.Api.Modules.Production.StartProductionBatch;
 using MediatR;
 
@@ -79,6 +82,24 @@ public static class ProductionEndpoints
         {
             var result = await sender.Send(new CalculateMaxOutputQuery(recipeId, warehouseId));
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapPost(ProductionConstants.BATCHES_PLAN, async (PlanProductionBatchCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapDelete($"{ProductionConstants.BATCHES_DELETE_DRAFT}/{{id:guid}}", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new DeleteDraftBatchCommand(id));
+            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
+        });
+
+        group.MapPost($"{ProductionConstants.BATCHES_START_DRAFT}/{{id:guid}}/start", async (Guid id, ISender sender) =>
+        {
+            var result = await sender.Send(new StartDraftBatchCommand(id));
+            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
     }
 }

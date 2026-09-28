@@ -24,6 +24,7 @@ public static class ErrorCodes
         public const string CONSUMED_INGREDIENT_NEGATIVE_QUANTITY = "PRODUCTION.CONSUMED_INGREDIENT_NEGATIVE_QUANTITY";
         public const string ONLY_COMPLETED_BATCHES_CAN_BE_TRANSFERRED_TO_AGING = "PRODUCTION.ONLY_COMPLETED_BATCHES_CAN_BE_TRANSFERRED_TO_AGING";
         public const string EXPIRATION_DATE_MUST_BE_IN_FUTURE = "PRODUCTION.EXPIRATION_DATE_MUST_BE_IN_FUTURE";
+        public const string BATCH_CANNOT_BE_DELETED = "PRODUCTION_BATCH_CANNOT_BE_DELETED";
     }
 
     public static class Inventory
@@ -48,6 +49,7 @@ public static class ErrorCodes
         public const string UNIT_OF_MEASURE_NOT_FOUND = "CATALOG.UNIT_OF_MEASURE_NOT_FOUND";
         public const string RECIPE_INVALID_AGING_DAYS = "CATALOG.RECIPE_INVALID_AGING_DAYS";
         public const string PRODUCT_NOT_FOUND = "CATALOG.PRODUCT_NOT_FOUND";
+        public const string RECIPE_NOT_FOUND = "CATALOG.RECIPE_NOT_FOUND";
     }
 
     public static class Sales

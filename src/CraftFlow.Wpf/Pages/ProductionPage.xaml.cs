@@ -259,6 +259,42 @@ public partial class ProductionPage : Page
         catch { }
     }
 
+    private async void StartDraftBatch_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is Guid batchId)
+        {
+            var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"api/production/batches/{batchId}/start", new { });
+
+            if (isSuccess)
+            {
+                SetStatus("UI_BATCH_STARTED_SUCCESS", Brushes.Green);
+                await LoadDataAsync();
+            }
+            else
+            {
+                SetStatusRaw(contentOrError, Brushes.Red);
+            }
+        }
+    }
+
+    private async void DeleteDraftBatch_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is Guid batchId)
+        {
+            var (isSuccess, contentOrError) = await ApiService.Instance.DeleteAndReadAsync($"api/production/batches/{batchId}");
+
+            if (isSuccess)
+            {
+                SetStatus("Черновик удален!", Brushes.OrangeRed);
+                await LoadDataAsync();
+            }
+            else
+            {
+                SetStatusRaw(contentOrError, Brushes.Red);
+            }
+        }
+    }
+
     private void CostInputs_Changed(object sender, RoutedEventArgs e)
     {
         RecalculateBatchCostUI();
@@ -484,6 +520,41 @@ public partial class ProductionPage : Page
                 ProductionTabControl.SelectedIndex = 1;
                 CompletedBatchesComboBox.SelectedValue = batchId;
             }
+        }
+        else
+        {
+            SetStatusRaw(contentOrError, Brushes.Red);
+        }
+    }
+
+    private async void PlanBatch_Click(object sender, RoutedEventArgs e)
+    {
+        if (BatchRecipeComboBox.SelectedValue is not Guid recipeId ||
+            BatchWarehouseComboBox.SelectedValue is not Guid rawWarehouseId ||
+            DestinationWarehouseComboBox.SelectedValue is not Guid destWarehouseId ||
+            !TryParseDecimal(BatchQuantityTextBox.Text, out var plannedQuantity))
+        {
+            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
+            return;
+        }
+
+        var customName = BatchNameTextBox.Text?.Trim();
+
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync("api/production/batches/plan", new
+        {
+            RecipeId = recipeId,
+            WarehouseId = rawWarehouseId,
+            DestinationWarehouseId = destWarehouseId,
+            PlannedOutputQuantity = plannedQuantity,
+            Name = string.IsNullOrWhiteSpace(customName) ? null : customName
+        });
+
+        if (isSuccess)
+        {
+            SetStatus("Партия успешно запланирована!", Brushes.Green);
+            BatchNameTextBox.Clear();
+            GenerateDefaultBatchName();
+            await LoadDataAsync();
         }
         else
         {
