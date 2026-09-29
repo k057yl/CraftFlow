@@ -148,7 +148,6 @@ public partial class MainWindow : Window
     }
 
     private void NavDirectory_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new CatalogPage());
-    private void NavInventory_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new InventoryPage());
     private void NavProcurement_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProcurementPage());
     private void NavProduction_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
     private void NavSales_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new SalesPage());

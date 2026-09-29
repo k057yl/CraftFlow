@@ -5,7 +5,9 @@ public record StorageLocationDto(
     string Name,
     string LocationType,
     Guid? WarehouseId,
+    string? WarehouseName,
     Guid? ChamberId,
+    string? ChamberName,
     decimal? Capacity,
     decimal CurrentVolume,
     bool IsOccupied,
@@ -26,4 +28,8 @@ public record StorageLocationDto(
     public string VolumeInfo => Capacity.HasValue && Capacity.Value > 0
         ? $"{CurrentVolume:N0} / {Capacity.Value:N0} л (Свободно: {FreeCapacity:N0} л)"
         : $"{CurrentVolume:N0} л (Без лимита)";
+
+    public string ParentName => !string.IsNullOrWhiteSpace(WarehouseName)
+        ? $"🏠 {WarehouseName}"
+        : (!string.IsNullOrWhiteSpace(ChamberName) ? $"❄ {ChamberName}" : "—");
 }

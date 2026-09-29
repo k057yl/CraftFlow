@@ -27,7 +27,6 @@
                         <!-- ОСНОВНОЕ МЕНЮ (Скрыто для неавторизованных) -->
                         <StackPanel x:Name="MainMenuPanel" Visibility="Collapsed">
                             <Button Content="{loc:Loc Key=NAV_DIRECTORY}" Click="NavDirectory_Click" Style="{StaticResource NavButtonStyle}"/>
-                            <Button Content="{loc:Loc Key=NAV_INVENTORY}" Click="NavInventory_Click" Style="{StaticResource NavButtonStyle}"/>
                             <Button Content="{loc:Loc Key=NAV_PROCUREMENT}" Click="NavProcurement_Click" Style="{StaticResource NavButtonStyle}"/>
                             <Button Content="{loc:Loc Key=NAV_PRODUCTION}" Click="NavProduction_Click" Style="{StaticResource NavButtonStyle}"/>
                             <Button Content="{loc:Loc Key=NAV_SALES}" Click="NavSales_Click" Style="{StaticResource NavButtonStyle}"/>

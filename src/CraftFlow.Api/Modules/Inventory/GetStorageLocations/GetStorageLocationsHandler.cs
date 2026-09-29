@@ -29,22 +29,27 @@ public class GetStorageLocationsHandler : IRequestHandler<GetStorageLocationsQue
             query = query.Where(l => l.ChamberId == request.ChamberId.Value);
         }
 
-        var locations = await query.ToListAsync(cancellationToken);
-
-        var result = locations.Select(l => new StorageLocationDto(
-            l.Id,
-            l.Name,
-            l.LocationType,
-            l.WarehouseId,
-            l.ChamberId,
-            l.Capacity,
-            l.CurrentVolume,
-            l.IsOccupied,
-            l.BatchesProcessedCount,
-            l.WashCycleBatchInterval,
-            l.LastWashedAt,
-            l.BatchesProcessedCount >= l.WashCycleBatchInterval ? "WASH_REQUIRED" : "OK"
-        )).ToList();
+        var result = await (from l in query
+                            join w in _dbContext.Warehouses.AsNoTracking() on l.WarehouseId equals w.Id into warehouses
+                            from w in warehouses.DefaultIfEmpty()
+                            join c in _dbContext.AgingChambers.AsNoTracking() on l.ChamberId equals c.Id into chambers
+                            from c in chambers.DefaultIfEmpty()
+                            select new StorageLocationDto(
+                                l.Id,
+                                l.Name,
+                                l.LocationType,
+                                l.WarehouseId,
+                                w != null ? w.Name : null,
+                                l.ChamberId,
+                                c != null ? c.Name : null,
+                                l.Capacity,
+                                l.CurrentVolume,
+                                l.IsOccupied,
+                                l.BatchesProcessedCount,
+                                l.WashCycleBatchInterval,
+                                l.LastWashedAt,
+                                l.BatchesProcessedCount >= l.WashCycleBatchInterval ? "WASH_REQUIRED" : "OK"
+                            )).ToListAsync(cancellationToken);
 
         return Result.Success(result);
     }
