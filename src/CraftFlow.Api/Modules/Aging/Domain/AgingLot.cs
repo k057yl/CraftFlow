@@ -1,5 +1,6 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
+using CraftFlow.SharedKernel.Enums;
 using Stateless;
 
 namespace CraftFlow.Api.Modules.Aging.Domain;

@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Aging.Domain;
+﻿namespace CraftFlow.SharedKernel.Enums;
 
 public enum AgingState
 {

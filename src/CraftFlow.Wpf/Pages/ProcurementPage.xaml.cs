@@ -2,6 +2,7 @@
 using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.Api.Modules.Procurement;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Dtos.Aging;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.SharedKernel.Dtos.Supplier;
@@ -208,8 +209,16 @@ public partial class ProcurementPage : Page
 
             string queryUrl = $"{InventoryConstants.STOCK_LOTS}?{string.Join("&", queryParams)}";
             var lots = await ApiService.Instance.GetAsync<List<StockLotGridDto>>(queryUrl);
+
             StockLots.Clear();
-            lots?.ForEach(l => StockLots.Add(l));
+
+            if (lots != null)
+            {
+                foreach (var lot in lots.Where(l => l.Quantity > 0m))
+                {
+                    StockLots.Add(lot);
+                }
+            }
         }
         catch { }
     }
@@ -315,25 +324,35 @@ public partial class ProcurementPage : Page
             var lot = StockLots.FirstOrDefault(l => l.Id == lotId);
             if (lot != null)
             {
-                var dialog = new WriteOffDialog(lot.ItemName, lot.BatchNumber, lot.Quantity, items: null)
+                if (lot.Quantity <= 0m)
+                {
+                    SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+                    return;
+                }
+
+                List<GetAgingLotItemDto>? agingItems = await ApiService.Instance.GetAsync<List<GetAgingLotItemDto>>($"{InventoryConstants.STOCK_LOTS}/{lot.Id}/items");
+
+                var dialog = new WriteOffDialog(lot.ItemName, lot.BatchNumber, lot.Quantity, items: agingItems)
                 {
                     Owner = Window.GetWindow(this)
                 };
 
                 if (dialog.ShowDialog() == true)
                 {
-                    await ExecuteWriteOffAsync(lot.Id, dialog.QuantityToWriteOff);
+                    await ExecuteWriteOffAsync(lot.Id, dialog.QuantityToWriteOff, dialog.SelectedItemIds, dialog.Reason);
                 }
             }
         }
     }
 
-    private async Task ExecuteWriteOffAsync(Guid stockLotId, decimal quantity)
+    private async Task ExecuteWriteOffAsync(Guid stockLotId, decimal quantity, List<Guid>? itemIds = null, string? reason = null)
     {
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{InventoryConstants.STOCK_LOTS}/write-off", new
         {
             StockLotId = stockLotId,
-            QuantityToWriteOff = quantity
+            QuantityToWriteOff = quantity,
+            SelectedItemIds = itemIds,
+            Reason = reason
         });
 
         if (isSuccess)

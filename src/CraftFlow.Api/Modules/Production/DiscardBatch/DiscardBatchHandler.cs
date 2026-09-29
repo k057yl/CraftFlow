@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +25,11 @@ public class DiscardBatchHandler : IRequestHandler<DiscardBatchCommand, Result>
         if (batch is null)
         {
             return Result.Failure(Error.NotFound(ErrorCodes.Production.BATCH_NOT_FOUND));
+        }
+
+        if (batch.State == BatchState.InAging)
+        {
+            return Result.Failure(Error.Validation(ErrorCodes.General.VALIDATION_ERROR));
         }
 
         batch.Discard(request.Reason);

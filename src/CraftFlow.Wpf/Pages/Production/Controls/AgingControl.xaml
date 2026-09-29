@@ -1,0 +1,167 @@
+﻿<UserControl x:Class="CraftFlow.Wpf.Pages.Production.Controls.AgingControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
+        <StackPanel MaxWidth="920" HorizontalAlignment="Left" Width="920">
+
+            <GroupBox Header="{loc:Loc Key=GROUP_TRANSFER_AGING}" Margin="0,0,0,12" Padding="10">
+                <StackPanel>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <TextBlock Text="{loc:Loc Key=LABEL_COMPLETED_BATCH}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                            <ComboBox x:Name="CompletedBatchesComboBox" 
+                                      DisplayMemberPath="Name" 
+                                      SelectedValuePath="Id" 
+                                      Height="28"
+                                      Padding="5,4" 
+                                      SelectionChanged="CompletedBatchesComboBox_SelectionChanged"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{loc:Loc Key=LABEL_AGING_LOT_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                            <TextBox x:Name="AgingLotNameTextBox" Padding="5,4"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="1*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <TextBlock Text="{loc:Loc Key=LABEL_AGING_CHAMBER}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                            <ComboBox x:Name="AgingChambersComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Padding="5,4"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{loc:Loc Key=LABEL_MIN_AGING_DAYS}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                            <TextBox x:Name="MinAgingDaysTextBox" Text="30" Padding="5,4"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Button Content="{loc:Loc Key=BTN_TRANSFER_AGING}" 
+                            Click="TransferToAging_Click" 
+                            Height="32" 
+                            HorizontalAlignment="Left"
+                            Padding="15,0"
+                            Background="#059669" 
+                            Foreground="White" 
+                            FontWeight="Bold"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- ТАБЛИЦА: ТЕКУЩИЕ ПАРТИИ В КАМЕРАХ СОЗРЕВАНИЯ -->
+            <GroupBox Header="{loc:Loc Key=GROUP_ACTIVE_AGING_LOTS}" Margin="0,0,0,12" Padding="8">
+                <DataGrid x:Name="AgingLotsDataGrid" 
+                          AutoGenerateColumns="False" 
+                          IsReadOnly="True" 
+                          GridLinesVisibility="Horizontal"
+                          HeadersVisibility="Column"
+                          Background="Transparent"
+                          RowHeaderWidth="0"
+                          MaxHeight="180"
+                          SelectionMode="Single"
+                          SelectionChanged="AgingLotsDataGrid_SelectionChanged">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="{loc:Loc Key=COLUMN_LOT_BATCH}" Binding="{Binding BatchNumber}" Width="2*"/>
+                        <DataGridTextColumn Header="{loc:Loc Key=COLUMN_CHAMBER}" Binding="{Binding ChamberName}" Width="*"/>
+                        <DataGridTextColumn Header="{loc:Loc Key=COLUMN_CURRENT_STOCK}" Binding="{Binding InitialQuantity, StringFormat={}{0:N2}}" Width="1.2*"/>
+                        <DataGridTextColumn Header="{loc:Loc Key=COLUMN_UNITS_COUNT}" Binding="{Binding UnitsCount}" Width="0.8*"/>
+                        <DataGridTextColumn Header="{loc:Loc Key=COLUMN_DAYS_IN_CHAMBER}" Binding="{Binding DaysInChamber}" Width="*"/>
+                        <DataGridTextColumn Header="{loc:Loc Key=COLUMN_TARGET_DAYS}" Binding="{Binding TargetDays}" Width="*"/>
+                        <DataGridCheckBoxColumn Header="{loc:Loc Key=COLUMN_IS_READY}" Binding="{Binding IsReadyForRelease}" Width="Auto"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </GroupBox>
+
+            <!-- Извлечение из камеры созревания -->
+            <GroupBox Header="{loc:Loc Key=GROUP_RELEASE_AGING}" Padding="10">
+                <StackPanel>
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                            <TextBlock Text="{loc:Loc Key=LABEL_ACTIVE_AGING_LOT}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                            <ComboBox x:Name="ActiveAgingLotsComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Padding="5,4" SelectionChanged="ActiveAgingLotsComboBox_SelectionChanged"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="{loc:Loc Key=LABEL_TARGET_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                            <ComboBox x:Name="TargetWarehousesComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Padding="5,4" SelectionChanged="TargetWarehousesComboBox_SelectionChanged"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <StackPanel Margin="0,0,0,10">
+                        <TextBlock Text="{loc:Loc Key=LABEL_TARGET_LOCATIONS}" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
+                        <ListBox x:Name="TargetStorageLocationsListBox" Height="80" Background="#F8FAFC" SelectionMode="Multiple">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="2">
+                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="0,0,8,0"/>
+                                        <TextBlock Text="{loc:Loc Key=LABEL_FREE_CAPACITY_PREFIX}" Foreground="#64748B"/>
+                                        <TextBlock Text="{Binding FreeCapacityDisplay}" Foreground="#16A34A" FontWeight="Bold"/>
+                                        <TextBlock Text="{loc:Loc Key=LABEL_FREE_CAPACITY_SUFFIX}" Foreground="#64748B"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                    </StackPanel>
+
+                    <Grid Margin="0,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Loc Key=LABEL_RELEASE_LOT_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                            <TextBox x:Name="ReleaseLotNameTextBox" Padding="5,4"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid Margin="0,0,0,12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1.2*"/>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="1.5*"/>
+                            <ColumnDefinition Width="1.5*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                            <TextBlock Text="{loc:Loc Key=LABEL_FINAL_WEIGHT}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                            <TextBox x:Name="ActualFinalQuantityTextBox" TextChanged="ActualFinalQuantityTextBox_TextChanged" Padding="5,4"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="1" Margin="5,0,5,0">
+                            <TextBlock Text="{loc:Loc Key=LABEL_UNITS_COUNT}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                            <TextBox x:Name="ReleaseUnitsCountTextBox" Text="1" Padding="5,4"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="2" Margin="5,0,5,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="CalculatedCostLabelTextBlock" Text="{loc:Loc Key=LABEL_UNIT_COST_KG}" FontSize="11" Foreground="Gray"/>
+                            <TextBlock x:Name="CalculatedUnitCostTextBlock" Text="$ 0.00" FontSize="16" FontWeight="Bold" Foreground="Green" Margin="0,2,0,0"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Column="3" Margin="5,0,0,0">
+                            <TextBlock x:Name="UnitPriceLabelTextBlock" Text="{loc:Loc Key=LABEL_SELLING_PRICE_KG}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                            <TextBox x:Name="UnitPriceTextBox" Padding="5,4"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Button Content="{loc:Loc Key=BTN_RELEASE_AGING}" 
+                            Click="ReleaseFromAging_Click" 
+                            Height="32" 
+                            HorizontalAlignment="Left"
+                            Padding="15,0"
+                            FontWeight="Bold"/>
+                </StackPanel>
+            </GroupBox>
+
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -123,18 +123,15 @@ public partial class WriteOffDialog : Window
 
     private void Confirm_Click(object sender, RoutedEventArgs e)
     {
-        if (!TryParseDecimal(QuantityTextBox.Text, out var qty) || qty < 0)
-        {
-            MessageBox.Show("Введите корректный вес для списания!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
         var selected = LotItems.Where(i => i.IsSelected).ToList();
         SelectedItemIds = selected.Select(i => i.Id).ToList();
 
-        if (qty <= 0 && SelectedItemIds.Count == 0)
+        bool hasValidQty = TryParseDecimal(QuantityTextBox.Text, out var qty) && qty > 0m;
+        bool hasSelectedItems = SelectedItemIds.Count > 0;
+
+        if (!hasValidQty && !hasSelectedItems)
         {
-            MessageBox.Show("Укажите списываемый вес (усушку) или выберите конкретные головки!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show("Укажите списываемый вес или выберите конкретные головки!", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 

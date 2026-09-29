@@ -1,5 +1,6 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
+using CraftFlow.SharedKernel.Enums;
 using Stateless;
 
 namespace CraftFlow.Api.Modules.Production.Domain;
@@ -39,7 +40,8 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         Guid destinationWarehouseId,
         decimal plannedOutputQuantity,
         int targetDurationMinutes,
-        string? customName = null)
+        string? customName = null,
+        DateTime? scheduledAt = null)
     {
         if (plannedOutputQuantity <= 0)
             throw new ArgumentException(ErrorCodes.Catalog.RECIPE_INVALID_TARGET_OUTPUT);
@@ -59,7 +61,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
             TargetDurationMinutes = targetDurationMinutes > 0 ? targetDurationMinutes : 180,
             ActualOutputQuantity = 0,
             State = BatchState.Draft,
-            StartedAt = DateTime.UtcNow,
+            StartedAt = scheduledAt ?? DateTime.UtcNow,
             IsTelegramNotified = false
         };
 

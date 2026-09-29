@@ -1,4 +1,4 @@
-﻿using CraftFlow.SharedKernel.Dtos.Catalog;
+﻿using CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 

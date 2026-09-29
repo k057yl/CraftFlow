@@ -1,0 +1,72 @@
+﻿<UserControl x:Class="CraftFlow.Wpf.Pages.Production.Controls.DiscardActsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <GroupBox Grid.Row="0" Header="{loc:Loc Key=GROUP_DISCARD_IN_KETTLE}" Padding="10" Margin="0,0,0,15">
+            <StackPanel>
+                <Grid Margin="0,0,0,8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                        <TextBlock Text="{loc:Loc Key=LABEL_SELECT_ACTIVE_BATCH}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                        <ComboBox x:Name="DiscardBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Padding="5,4"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="{loc:Loc Key=LABEL_DISCARD_REASON}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
+                        <TextBox x:Name="DiscardReasonTextBox" Padding="5,4"/>
+                    </StackPanel>
+                </Grid>
+
+                <Button Content="{loc:Loc Key=BTN_DISCARD_BATCH_SUBMIT}" 
+                        Click="DiscardBatch_Click" 
+                        Height="32" 
+                        HorizontalAlignment="Left"
+                        Padding="15,0"
+                        Background="#DC2626" 
+                        Foreground="White" 
+                        FontWeight="Bold"/>
+            </StackPanel>
+        </GroupBox>
+
+        <!-- ТАБЛИЦА ЛОТОВ ДЛЯ БРАКОВКИ С ШТУКАМИ -->
+        <GroupBox Grid.Row="1" Header="{loc:Loc Key=GROUP_DISCARD_AGING_LOTS}" Padding="10">
+            <DataGrid x:Name="DiscardAgingLotsDataGrid" 
+                      AutoGenerateColumns="False" 
+                      IsReadOnly="True" 
+                      GridLinesVisibility="Horizontal" 
+                      HeadersVisibility="Column">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_LOT_BATCH}" Binding="{Binding BatchNumber}" Width="2*"/>
+                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_CHAMBER}" Binding="{Binding ChamberName}" Width="*"/>
+                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_CURRENT_STOCK}" Binding="{Binding InitialQuantity, StringFormat={}{0:N2}}" Width="1.2*"/>
+                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_UNITS_COUNT}" Binding="{Binding UnitsCount}" Width="0.8*"/>
+                    <DataGridTextColumn Header="{loc:Loc Key=COLUMN_DAYS_IN_AGING}" Binding="{Binding DaysInChamber}" Width="*"/>
+                    <DataGridTemplateColumn Header="{loc:Loc Key=COLUMN_ACTION}" Width="130">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button Content="{loc:Loc Key=BTN_DISCARD_ROW}" 
+                                        Click="DiscardAgingLotRow_Click" 
+                                        Tag="{Binding LotId}" 
+                                        Background="#FEE2E2" 
+                                        Foreground="#991B1B" 
+                                        BorderBrush="#FCA5A5" 
+                                        FontWeight="Bold" 
+                                        Padding="6,2"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+    </Grid>
+</UserControl>

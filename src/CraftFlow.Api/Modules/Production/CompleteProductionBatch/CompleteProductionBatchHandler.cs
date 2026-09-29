@@ -1,6 +1,9 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging.Domain;
+using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.Api.Modules.Production.Events;
+using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +24,17 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
     public async Task<Result<Guid>> Handle(CompleteProductionBatchCommand request, CancellationToken cancellationToken)
     {
         var batch = await _dbContext.ProductionBatches
-            .FirstAsync(b => b.Id == request.BatchId, cancellationToken);
+            .FirstOrDefaultAsync(b => b.Id == request.BatchId, cancellationToken);
+
+        if (batch is null)
+        {
+            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Production.BATCH_NOT_FOUND));
+        }
+
+        if (batch.State == BatchState.Draft)
+        {
+            return Result.Failure<Guid>(Error.Validation(ErrorCodes.Production.BATCH_CANNOT_BE_DELETED));
+        }
 
         if (!string.IsNullOrWhiteSpace(request.BatchNumber))
         {

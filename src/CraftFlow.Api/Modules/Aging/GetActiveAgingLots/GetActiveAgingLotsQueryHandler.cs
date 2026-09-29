@@ -26,15 +26,15 @@ public class GetActiveAgingLotsQueryHandler
                 al."BatchNumber" AS "BatchNumber",
                 al."BatchNumber" AS "Name",
                 ach."Name" AS "ChamberName",
-                COALESCE(SUM(CASE WHEN ali."State" = 1 THEN 1 ELSE 0 END), 0)::integer AS "UnitsCount",
-                COALESCE(SUM(CASE WHEN ali."State" = 1 THEN ali."CurrentWeight" ELSE 0 END), 0) AS "InitialQuantity",
+                COALESCE(SUM(CASE WHEN ali."State"::text IN ('1', 'InChamber') THEN 1 ELSE 0 END), 0)::integer AS "UnitsCount",
+                COALESCE(SUM(CASE WHEN ali."State"::text IN ('1', 'InChamber') THEN ali."CurrentWeight" ELSE 0 END), al."InitialQuantity") AS "InitialQuantity",
                 EXTRACT(DAY FROM (NOW() - al."PlacedAt"))::integer AS "DaysInChamber",
                 EXTRACT(DAY FROM (al."TargetReleaseDate" - al."PlacedAt"))::integer AS "TargetDays",
                 (NOW() >= al."TargetReleaseDate") AS "IsReadyForRelease"
             FROM {DbSchemas.AGING}.{DbTables.AGING_LOTS} al
             JOIN {DbSchemas.AGING}.{DbTables.AGING_CHAMBERS} ach ON ach."Id" = al."AgingChamberId"
             LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_LOT_ITEMS} ali ON ali."AgingLotId" = al."Id"
-            WHERE al."TenantId" = @TenantId AND (al."State" = 1 OR al."State" = 2)
+            WHERE al."TenantId" = @TenantId AND al."State"::text IN ('1', '2', 'InChamber', 'ReadyForRelease')
             GROUP BY al."Id", ach."Name"
             ORDER BY al."PlacedAt" ASC;
             """;

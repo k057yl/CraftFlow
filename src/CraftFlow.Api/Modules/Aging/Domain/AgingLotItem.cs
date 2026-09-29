@@ -1,14 +1,8 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
+using CraftFlow.SharedKernel.Enums;
 
 namespace CraftFlow.Api.Modules.Aging.Domain;
-
-public enum AgingItemState
-{
-    InChamber = 1,
-    Released = 2,
-    Discarded = 3
-}
 
 public class AgingLotItem : Entity
 {

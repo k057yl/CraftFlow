@@ -10,7 +10,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using static CraftFlow.SharedKernel.Dtos.Catalog.CatalogDtos;
+using static CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature.CatalogDtos;
 
 namespace CraftFlow.Wpf.Pages;
 

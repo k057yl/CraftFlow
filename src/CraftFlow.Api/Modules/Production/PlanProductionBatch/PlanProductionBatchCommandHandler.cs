@@ -42,7 +42,8 @@ public sealed class PlanProductionBatchCommandHandler : IRequestHandler<PlanProd
             request.DestinationWarehouseId,
             request.PlannedOutputQuantity,
             recipe.TargetDurationMinutes,
-            request.Name
+            request.Name,
+            request.ScheduledAt
         );
 
         _dbContext.ProductionBatches.Add(batch);

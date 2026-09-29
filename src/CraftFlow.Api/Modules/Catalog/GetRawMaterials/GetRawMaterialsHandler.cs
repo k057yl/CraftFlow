@@ -1,5 +1,5 @@
 ﻿using CraftFlow.Api.Common.Persistence;
-using CraftFlow.SharedKernel.Dtos.Catalog;
+using CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

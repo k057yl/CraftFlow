@@ -8,5 +8,6 @@ public sealed record PlanProductionBatchCommand(
     Guid WarehouseId,
     Guid DestinationWarehouseId,
     decimal PlannedOutputQuantity,
-    string? Name = null
+    string? Name = null,
+    DateTime? ScheduledAt = null
 ) : IRequest<Result<Guid>>;

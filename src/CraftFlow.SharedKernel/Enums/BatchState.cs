@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Production.Domain;
+﻿namespace CraftFlow.SharedKernel.Enums;
 
 public enum BatchState
 {

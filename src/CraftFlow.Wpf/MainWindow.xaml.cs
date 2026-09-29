@@ -2,6 +2,7 @@
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Dashboard;
 using CraftFlow.Wpf.Pages;
+using CraftFlow.Wpf.Pages.Production;
 using CraftFlow.Wpf.Services;
 using System.Windows;
 using System.Windows.Controls;
