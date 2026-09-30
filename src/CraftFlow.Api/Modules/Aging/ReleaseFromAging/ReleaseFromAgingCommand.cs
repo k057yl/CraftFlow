@@ -9,5 +9,6 @@ public sealed record ReleaseFromAgingCommand(
     decimal ActualFinalQuantity,
     int UnitsCount,
     decimal UnitPrice,
-    List<Guid>? StorageLocationIds = null
+    List<Guid>? StorageLocationIds = null,
+    List<decimal>? HeadWeights = null
 ) : IRequest<Result>;

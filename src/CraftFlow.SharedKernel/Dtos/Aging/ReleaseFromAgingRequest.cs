@@ -7,5 +7,6 @@ public record ReleaseFromAgingRequest(
     int UnitsCount,
     decimal UnitPrice,
     string? CustomBatchNumber,
-    List<Guid>? StorageLocationIds
+    List<Guid>? StorageLocationIds,
+    List<decimal>? HeadWeights
 );

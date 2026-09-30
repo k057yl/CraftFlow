@@ -22,7 +22,7 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
 
     public async Task<Result> Handle(ReleaseFromAgingCommand request, CancellationToken cancellationToken)
     {
-        if (request.ActualFinalQuantity <= 0 || request.UnitsCount <= 0)
+        if (request.UnitsCount <= 0)
         {
             return Result.Failure(Error.Validation(ErrorCodes.General.VALUE_REQUIRED));
         }
@@ -34,6 +34,20 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
         if (lot is null)
         {
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
+        }
+
+        if (request.HeadWeights != null && request.HeadWeights.Count > 0)
+        {
+            lot.UpdateHeadWeights(request.HeadWeights);
+        }
+
+        decimal calculatedTotalWeight = lot.CurrentQuantity > 0
+            ? lot.CurrentQuantity
+            : request.ActualFinalQuantity;
+
+        if (calculatedTotalWeight <= 0)
+        {
+            return Result.Failure(Error.Validation(ErrorCodes.General.VALUE_REQUIRED));
         }
 
         if (lot.StorageLocationId.HasValue)
@@ -54,19 +68,18 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
 
         if (batch != null)
         {
-            batch.ReleaseFromAging(request.ActualFinalQuantity);
+            batch.ReleaseFromAging(calculatedTotalWeight);
         }
 
         var cleanBatchName = lot.BatchNumber.Contains("(Выход:")
             ? lot.BatchNumber.Substring(0, lot.BatchNumber.IndexOf("(Выход:")).Trim()
             : lot.BatchNumber;
 
-        var finalBatchNumber = $"{cleanBatchName} (Выход: {request.ActualFinalQuantity:N2} кг)";
-
+        var finalBatchNumber = $"{cleanBatchName} (Выход: {calculatedTotalWeight:N2} кг)";
         var stockLot = StockLot.Create(
             warehouseId: request.TargetWarehouseId,
             itemId: lot.ProductId,
-            initialQuantity: request.ActualFinalQuantity,
+            initialQuantity: calculatedTotalWeight,
             unitsCount: request.UnitsCount,
             unitPrice: request.UnitPrice,
             batchNumber: finalBatchNumber,
@@ -80,7 +93,7 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
                 .Where(s => request.StorageLocationIds.Contains(s.Id))
                 .ToListAsync(cancellationToken);
 
-            decimal qtyPerLocation = request.ActualFinalQuantity / targetLocations.Count;
+            decimal qtyPerLocation = calculatedTotalWeight / targetLocations.Count;
 
             foreach (var loc in targetLocations)
             {

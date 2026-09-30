@@ -6,6 +6,7 @@ using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.SharedKernel.Dtos.Production;
 using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Pages.Production.Windows;
 using CraftFlow.Wpf.Services;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -261,53 +262,55 @@ public partial class AgingControl : UserControl
             return;
         }
 
-        if (!TryParseDecimal(ActualFinalQuantityTextBox.Text, out var actualQty) || actualQty <= 0)
+        var details = await ApiService.Instance.GetAsync<GetAgingLotDetailsDto>($"{AgingConstants.AGING_LOTS_ACTIVE}/{lotId}");
+        if (details == null) return;
+
+        var selectedLotName = (ActiveAgingLotsComboBox.SelectedItem as LookupItem)?.Name ?? string.Empty;
+        var selectedChamberName = AgingLotsSummary.FirstOrDefault(l => l.LotId == lotId)?.ChamberName ?? string.Empty;
+        var weighWindow = new LotReleaseWeighingWindow(
+            selectedLotName,
+            selectedChamberName,
+            details.TotalBatchCost,
+            details.UnitsCount
+        )
         {
-            SetStatus(OLD_SCHULL_KEYS.ERR_INVALID_INPUT, Brushes.Red);
-            return;
-        }
+            Owner = Window.GetWindow(this)
+        };
 
-        if (!int.TryParse(ReleaseUnitsCountTextBox.Text.Trim(), out var unitsCount) || unitsCount <= 0)
+        if (weighWindow.ShowDialog() == true)
         {
-            SetStatus(OLD_SCHULL_KEYS.ERR_INVALID_INPUT, Brushes.Red);
-            return;
-        }
+            var selectedStorageLocationIds = TargetStorageLocationsListBox.SelectedItems
+                .OfType<StorageLocationDto>()
+                .Select(l => l.Id)
+                .ToList();
 
-        TryParseDecimal(UnitPriceTextBox.Text, out var unitPrice);
-        var customLotName = ReleaseLotNameTextBox.Text?.Trim();
+            var customLotName = ReleaseLotNameTextBox.Text?.Trim();
+            var response = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_RELEASE, new ReleaseFromAgingRequest(
+                lotId,
+                warehouseId,
+                weighWindow.TotalWeight,
+                weighWindow.ValidUnitsCount,
+                weighWindow.UnitPrice,
+                string.IsNullOrWhiteSpace(customLotName) ? null : customLotName,
+                selectedStorageLocationIds.Count > 0 ? selectedStorageLocationIds : null,
+                weighWindow.ValidHeadWeights
+            ));
 
-        var selectedStorageLocationIds = TargetStorageLocationsListBox.SelectedItems
-            .OfType<StorageLocationDto>()
-            .Select(l => l.Id)
-            .ToList();
-
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_RELEASE, new ReleaseFromAgingRequest(
-            lotId,
-            warehouseId,
-            actualQty,
-            unitsCount,
-            unitPrice,
-            string.IsNullOrWhiteSpace(customLotName) ? null : customLotName,
-            selectedStorageLocationIds.Count > 0 ? selectedStorageLocationIds : null
-        ));
-
-        if (isSuccess)
-        {
-            SetStatus(OLD_SCHULL_KEYS.SUCCESS_SHIPPED, Brushes.Green);
-            ActualFinalQuantityTextBox.Clear();
-            ReleaseUnitsCountTextBox.Clear();
-            UnitPriceTextBox.Clear();
-            ReleaseLotNameTextBox.Clear();
-            TargetStorageLocations.Clear();
-
-            if (ParentPage != null)
+            if (response.IsSuccess)
             {
-                await ParentPage.LoadDataExternalAsync();
+                SetStatus(OLD_SCHULL_KEYS.SUCCESS_SHIPPED, Brushes.Green);
+                ReleaseLotNameTextBox.Clear();
+                TargetStorageLocations.Clear();
+
+                if (ParentPage != null)
+                {
+                    await ParentPage.LoadDataExternalAsync();
+                }
             }
-        }
-        else
-        {
-            SetStatusFormatted(OLD_SCHULL_KEYS.ERR_API_PREFIX, Brushes.Red, contentOrError);
+            else
+            {
+                SetStatusFormatted(OLD_SCHULL_KEYS.ERR_API_PREFIX, Brushes.Red, response.ContentOrError);
+            }
         }
     }
 

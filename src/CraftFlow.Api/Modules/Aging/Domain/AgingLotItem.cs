@@ -59,4 +59,15 @@ public class AgingLotItem : Entity
         DiscardReason = reason;
         CurrentWeight = 0;
     }
+
+    public void SetFinalWeight(decimal weight)
+    {
+        if (State != AgingItemState.InChamber)
+            throw new InvalidOperationException(ErrorCodes.Aging.INVALID_LOT_STATE);
+
+        if (weight <= 0)
+            throw new ArgumentException(ErrorCodes.General.VALUE_REQUIRED);
+
+        CurrentWeight = weight;
+    }
 }

@@ -182,6 +182,22 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
         _stateMachine!.Fire(AgingTrigger.Discard);
     }
 
+    public void UpdateHeadWeights(IReadOnlyList<decimal> newWeights)
+    {
+        EnsureMachine();
+
+        var activeItems = _items.Where(i => i.State == AgingItemState.InChamber).ToList();
+        int count = Math.Min(activeItems.Count, newWeights.Count);
+
+        for (int i = 0; i < count; i++)
+        {
+            if (newWeights[i] > 0)
+            {
+                activeItems[i].SetFinalWeight(newWeights[i]);
+            }
+        }
+    }
+
     private void EnsureMachine()
     {
         if (_stateMachine is null)
