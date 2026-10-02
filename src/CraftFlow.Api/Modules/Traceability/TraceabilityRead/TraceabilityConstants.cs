@@ -40,7 +40,6 @@ public static class TraceabilityConstants
             COALESCE(sl."BatchNumber", pb."Name") AS product_batch_number,
             p."Name" AS product_name,
             sl."Quantity" AS actual_quantity,
-            sl."UnitPrice" AS unit_price,
             COALESCE(sl."ProductionBatchId", al."ProductionBatchId", pb."Id") AS production_batch_id,
             pb."State" AS batch_status_int,
             pb."StartedAt" AS started_at,
@@ -51,6 +50,7 @@ public static class TraceabilityConstants
             ach."Name" AS chamber_name,
             sloc."Name" AS location_name,
             so."Id" AS sales_order_id,
+            c."Id" AS customer_id,
             c."Name" AS customer_name
         FROM {DbSchemas.INVENTORY}.{DbTables.STOCK_LOTS} sl
         INNER JOIN {DbSchemas.CATALOG}.{DbTables.PRODUCTS} p ON p."Id" = sl."ItemId"
@@ -73,14 +73,13 @@ public static class TraceabilityConstants
             COALESCE(rm_sl."BatchNumber", '{FormattingConstants.CONST_DEFAULT_BATCH_NUMBER}') AS batch_number,
             ci."Quantity" AS quantity_used,
             COALESCE(uom."Code", '') AS unit_of_measure,
+            sup."Id" AS supplier_id,
             COALESCE(sup."Name", '{FormattingConstants.NOT_AVAILABLE}') AS supplier_name
         FROM {DbSchemas.PRODUCTION}.{DbTables.CONSUMED_INGREDIENTS} ci
         LEFT JOIN {DbSchemas.INVENTORY}.{DbTables.STOCK_LOTS} rm_sl ON rm_sl."Id" = ci."StockLotId"
         LEFT JOIN {DbSchemas.CATALOG}.{DbTables.RAW_MATERIALS} rm ON rm."Id" = ci."RawMaterialId"
         LEFT JOIN {DbSchemas.CATALOG}.{DbTables.UNITS_OF_MEASURE} uom ON uom."Id" = rm."UnitOfMeasureId"
-        LEFT JOIN {DbSchemas.PROCUREMENT}.{DbTables.PURCHASE_ORDER_ITEMS} poi ON poi."RawMaterialId" = rm."Id"
-        LEFT JOIN {DbSchemas.PROCUREMENT}.{DbTables.PURCHASE_ORDERS} po ON po."Id" = poi."PurchaseOrderId"
-        LEFT JOIN {DbSchemas.PROCUREMENT}.{DbTables.SUPPLIERS} sup ON sup."Id" = po."SupplierId"
+        LEFT JOIN {DbSchemas.PROCUREMENT}.{DbTables.SUPPLIERS} sup ON sup."Id" = rm_sl."SupplierId"
         WHERE ci."ProductionBatchId" = @BatchId;
         """;
 }

@@ -5,65 +5,32 @@ using System.Windows.Media;
 using CraftFlow.Api.Modules.Traceability;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Common;
+using CraftFlow.SharedKernel.Dtos.Traceability;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
 
 namespace CraftFlow.Wpf.Pages;
 
-public record ForwardTraceabilityDto(
-    Guid RawMaterialStockLotId,
-    string RawMaterialBatchNumber,
-    string RawMaterialName,
-    List<TraceabilityProductionBatchDto> Batches
-);
-
-public record BackwardTraceabilityDto(
-    Guid? SalesOrderId,
-    string CustomerName,
-    Guid ProductStockLotId,
-    string ProductBatchNumber,
-    string ProductName,
-    decimal CurrentStockQuantity,
-    decimal UnitPrice,
-    int AgingDaysTotal,
-    decimal AgingLossPercentage,
-    string StorageChamberName,
-    TraceabilityProductionBatchDto OriginBatch
-);
-
-public record TraceabilityProductionBatchDto(
-    Guid ProductionBatchId,
-    string BatchStatus,
-    DateTime StartedAt,
-    DateTime? CompletedAt,
-    decimal PlannedQuantity,
-    decimal ActualOutputQuantity,
-    decimal OutputYieldPercentage,
-    List<TraceabilityAgingLotDto> AgingLots,
-    List<TraceabilityIngredientDto> ConsumedIngredients
-);
-
-public record TraceabilityAgingLotDto(
-    Guid AgingLotId,
-    string AgingBatchNumber,
-    string ChamberName,
-    string AgingStatus
-);
-
-public record TraceabilityIngredientDto(
-    Guid RawMaterialStockLotId,
-    string RawMaterialName,
-    string BatchNumber,
-    decimal QuantityUsed,
-    string UnitOfMeasure,
-    string SupplierName
-);
+public enum TraceLinkType
+{
+    None,
+    Customer,
+    Supplier
+}
 
 public sealed class TraceTreeNode
 {
     public string Icon { get; set; } = string.Empty;
     public string Title { get; set; } = string.Empty;
-    public string Details { get; set; } = string.Empty;
+    public string PrefixDetails { get; set; } = string.Empty;
+    public string LinkText { get; set; } = string.Empty;
+    public string SuffixDetails { get; set; } = string.Empty;
+
+    public TraceLinkType LinkType { get; set; } = TraceLinkType.None;
+    public Guid TargetId { get; set; }
+
+    public bool HasLink => LinkType != TraceLinkType.None && !string.IsNullOrEmpty(LinkText);
+
     public ObservableCollection<TraceTreeNode> Children { get; } = [];
 }
 
@@ -146,7 +113,7 @@ public partial class TraceabilityPage : Page
                 {
                     Icon = "📦",
                     Title = traceData.RawMaterialName,
-                    Details = $"Партия сырья: {traceData.RawMaterialBatchNumber}"
+                    PrefixDetails = $"Партия сырья: {traceData.RawMaterialBatchNumber}"
                 };
 
                 foreach (var batch in traceData.Batches ?? [])
@@ -158,18 +125,8 @@ public partial class TraceabilityPage : Page
                     {
                         Icon = "🧀",
                         Title = $"Варка #{shortBatchId}",
-                        Details = $"Статус: {batch.BatchStatus} | Запуск: {batch.StartedAt:dd.MM.yyyy HH:mm}"
+                        PrefixDetails = $"Запуск: {batch.StartedAt:dd.MM.yyyy HH:mm}"
                     };
-
-                    foreach (var aging in batch.AgingLots ?? [])
-                    {
-                        batchNode.Children.Add(new TraceTreeNode
-                        {
-                            Icon = "⏳",
-                            Title = $"Камера: {aging.ChamberName}",
-                            Details = $"Лот: {aging.AgingBatchNumber} ({aging.AgingStatus})"
-                        });
-                    }
 
                     rootNode.Children.Add(batchNode);
                 }
@@ -197,18 +154,17 @@ public partial class TraceabilityPage : Page
 
             if (traceData != null)
             {
-                var customerInfo = string.IsNullOrEmpty(traceData.CustomerName) || traceData.CustomerName == FormattingConstants.CONST_DEFAULT_CUSTOMER_NAME
-                    ? "На складе"
-                    : traceData.CustomerName;
-
-                var priceInfo = traceData.UnitPrice > 0 ? $" | Себестоимость: ${traceData.UnitPrice:N2}" : string.Empty;
-                var agingLossInfo = traceData.AgingLossPercentage > 0 ? $" | Усушка: {traceData.AgingLossPercentage:N2}%" : string.Empty;
+                bool hasCustomer = !string.IsNullOrEmpty(traceData.CustomerName) &&
+                                  traceData.CustomerName != FormattingConstants.CONST_DEFAULT_CUSTOMER_NAME;
 
                 var rootNode = new TraceTreeNode
                 {
                     Icon = FormattingConstants.ICON_FINISHED_PRODUCT,
                     Title = traceData.ProductName,
-                    Details = $"Партия: {traceData.ProductBatchNumber} | Остаток: {traceData.CurrentStockQuantity:N2} кг | Покупатель: {customerInfo}{priceInfo}"
+                    PrefixDetails = $"Партия: {traceData.ProductBatchNumber} | Остаток: {traceData.CurrentStockQuantity:N2} кг | Покупатель: ",
+                    LinkText = hasCustomer ? traceData.CustomerName : "На складе",
+                    LinkType = hasCustomer && traceData.CustomerId.HasValue ? TraceLinkType.Customer : TraceLinkType.None,
+                    TargetId = traceData.CustomerId ?? Guid.Empty
                 };
 
                 TraceTreeNode parentForBatch = rootNode;
@@ -220,11 +176,12 @@ public partial class TraceabilityPage : Page
 
                 if (hasRealAging)
                 {
+                    var agingLossInfo = traceData.AgingLossPercentage > 0 ? $" | Усушка: {traceData.AgingLossPercentage:N2}%" : string.Empty;
                     var agingNode = new TraceTreeNode
                     {
                         Icon = "⏳",
                         Title = $"Выдержка: {traceData.StorageChamberName}",
-                        Details = $"Дней в камере: {traceData.AgingDaysTotal}{agingLossInfo}"
+                        PrefixDetails = $"Дней в камере: {traceData.AgingDaysTotal}{agingLossInfo}"
                     };
 
                     rootNode.Children.Add(agingNode);
@@ -244,22 +201,22 @@ public partial class TraceabilityPage : Page
                     {
                         Icon = FormattingConstants.ICON_PRODUCTION_BATCH,
                         Title = $"Варка #{shortBatchId}",
-                        Details = $"Статус: {traceData.OriginBatch.BatchStatus} | Запуск: {traceData.OriginBatch.StartedAt:dd.MM.yyyy HH:mm}{yieldInfo}"
+                        PrefixDetails = $"Запуск: {traceData.OriginBatch.StartedAt:dd.MM.yyyy HH:mm}{yieldInfo}"
                     };
 
                     foreach (var ing in traceData.OriginBatch.ConsumedIngredients ?? [])
                     {
-                        var supplier = !string.IsNullOrEmpty(ing.SupplierName) && ing.SupplierName != "—"
-                            ? $" | Поставщик: {ing.SupplierName}"
-                            : string.Empty;
-
+                        bool hasSupplier = !string.IsNullOrEmpty(ing.SupplierName) && ing.SupplierName != "—" && ing.SupplierName != FormattingConstants.NOT_AVAILABLE;
                         var uom = !string.IsNullOrEmpty(ing.UnitOfMeasure) ? $" {ing.UnitOfMeasure}" : string.Empty;
 
                         batchNode.Children.Add(new TraceTreeNode
                         {
                             Icon = FormattingConstants.ICON_RAW_MATERIAL,
                             Title = ing.RawMaterialName,
-                            Details = $"Партия: {ing.BatchNumber} | Расход: {ing.QuantityUsed:N2}{uom}{supplier}"
+                            PrefixDetails = $"Партия: {ing.BatchNumber} | Расход: {ing.QuantityUsed:N2}{uom}" + (hasSupplier ? " | Поставщик: " : string.Empty),
+                            LinkText = hasSupplier ? ing.SupplierName : string.Empty,
+                            LinkType = hasSupplier && ing.SupplierId.HasValue ? TraceLinkType.Supplier : TraceLinkType.None,
+                            TargetId = ing.SupplierId ?? Guid.Empty
                         });
                     }
 
@@ -277,6 +234,15 @@ public partial class TraceabilityPage : Page
         catch (Exception ex)
         {
             SetStatus($"{UiConstants.Messages.DATA_LOAD_ERROR}: {ex.Message}", Brushes.Red);
+        }
+    }
+
+    private void EntityLink_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is System.Windows.Documents.Hyperlink link && link.DataContext is TraceTreeNode node)
+        {
+            string entityType = node.LinkType == TraceLinkType.Customer ? "покупателя" : "поставщика";
+            MessageBox.Show($"Карточка {entityType} '{node.LinkText}' (ID: {node.TargetId}) находится в разработке.", "Навигация", MessageBoxButton.OK, MessageBoxImage.Information);
         }
     }
 

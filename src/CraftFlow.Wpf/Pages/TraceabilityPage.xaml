@@ -4,6 +4,10 @@
       xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
       Title="{loc:Loc Key=TITLE_TRACEABILITY}">
 
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+    </Page.Resources>
+
     <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -54,9 +58,36 @@
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate ItemsSource="{Binding Children}">
                             <StackPanel Orientation="Horizontal" Margin="2,4">
+                                <!-- Иконка и Заголовок узла -->
                                 <TextBlock Text="{Binding Icon}" Margin="0,0,8,0" FontSize="16"/>
                                 <TextBlock Text="{Binding Title}" FontWeight="Bold" Margin="0,0,8,0" Foreground="#0F172A"/>
-                                <TextBlock Text="{Binding Details}" Foreground="#475569"/>
+
+                                <!-- Текст до ссылки (Префикс) -->
+                                <TextBlock Text="{Binding PrefixDetails}" Foreground="#475569"/>
+
+                                <!-- Кликабельная ссылка (если есть HasLink) -->
+                                <TextBlock Visibility="{Binding HasLink, Converter={StaticResource BoolToVisConverter}}" Margin="0,0,4,0">
+                                    <Hyperlink Click="EntityLink_Click" Foreground="#0284C7">
+                                        <Run Text="{Binding LinkText}" FontWeight="SemiBold"/>
+                                    </Hyperlink>
+                                </TextBlock>
+
+                                <!-- Обычный текст, если ссылки нет -->
+                                <TextBlock Text="{Binding LinkText}" Foreground="#475569">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasLink}" Value="False">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <!-- Текст после ссылки (Суффикс) -->
+                                <TextBlock Text="{Binding SuffixDetails}" Foreground="#475569"/>
                             </StackPanel>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>

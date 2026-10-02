@@ -6,5 +6,6 @@ public sealed record TraceabilityIngredientDto(
     string BatchNumber,
     decimal QuantityUsed,
     string UnitOfMeasure,
+    Guid? SupplierId,
     string SupplierName
 );

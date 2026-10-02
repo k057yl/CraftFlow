@@ -80,6 +80,7 @@ public sealed class TraceabilityReadService
                     (string)(i.batch_number ?? string.Empty),
                     Convert.ToDecimal(i.quantity_used ?? 0m),
                     (string)(i.unit_of_measure ?? string.Empty),
+                    (Guid?)i.supplier_id,
                     (string)(i.supplier_name ?? string.Empty)
                 )).ToList() ?? [];
 
@@ -126,15 +127,16 @@ public sealed class TraceabilityReadService
         }
 
         Guid? salesOrderId = (Guid?)header.sales_order_id;
+        Guid? customerId = (Guid?)header.customer_id;
 
         return new BackwardTraceabilityDto(
             salesOrderId,
+            customerId,
             (string)(header.customer_name ?? FormattingConstants.CONST_DEFAULT_CUSTOMER_NAME),
             (Guid)header.product_stock_lot_id,
             (string)(header.product_batch_number ?? string.Empty),
             (string)(header.product_name ?? string.Empty),
             currentStockQty,
-            Convert.ToDecimal(header.unit_price ?? 0m),
             agingDays,
             agingLossPercentage,
             displayLocation,
