@@ -1,6 +1,5 @@
 ﻿using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Modules.Identity.Domain;
-using CraftFlow.SharedKernel.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -25,12 +24,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.Property(u => u.Role)
-            .IsRequired()
-            .HasConversion<int>()
-            .HasDefaultValue(TenantRole.Owner);
-
         builder.Property(u => u.IsActive)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        builder.Property(u => u.IsSuperAdmin)
             .IsRequired()
             .HasDefaultValue(false);
 
@@ -42,9 +40,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.HasIndex(u => u.Email)
             .IsUnique()
             .HasDatabaseName(DbIndexes.Identity.IX_USERS_EMAIL);
-
-        builder.HasIndex(u => new { u.TenantId, u.Role, u.IsActive })
-            .HasDatabaseName(DbIndexes.Identity.IX_USERS_TENANT_ROLE_ACTIVE);
 
         builder.HasIndex(u => u.OtpExpiresAtUtc)
             .HasDatabaseName(DbIndexes.Identity.IX_USERS_OTP_EXPIRATION);

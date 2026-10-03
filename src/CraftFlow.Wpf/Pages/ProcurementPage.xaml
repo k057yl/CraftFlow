@@ -83,6 +83,11 @@
                                 </StackPanel>
                             </Grid>
 
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="Доступные ёмкости на складе:" FontSize="11" Foreground="#475569" VerticalAlignment="Center"/>
+                                <Button Content="➕ Новая ёмкость" Click="QuickCreateLocation_Click" Margin="10,0,0,0" Padding="6,1" FontSize="10" Background="#0284C7" Foreground="White"/>
+                            </StackPanel>
+
                             <!-- Емкости хранилища -->
                             <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>

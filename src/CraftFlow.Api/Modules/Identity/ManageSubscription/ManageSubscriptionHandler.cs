@@ -87,7 +87,7 @@ public class ManageSubscriptionHandler : IRequestHandler<ManageSubscriptionComma
                 description: actionText
             );
 
-            _dbContext.Set<SubscriptionPayment>().Add(paymentRecord);
+            _dbContext.SubscriptionPayments.Add(paymentRecord);
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);

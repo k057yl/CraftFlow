@@ -15,6 +15,8 @@ public static class DbIndexes
         public const string IX_USERS_EMAIL = "IX_USERS_EMAIL";
         public const string IX_ORGANIZATIONS_RETENTION_CHECK = "IX_ORGANIZATIONS_RETENTION_CHECK";
         public const string IX_USERS_OTP_EXPIRATION = "IX_USERS_OTP_EXPIRATION";
+        public const string IX_MEMBERS_TENANT_USER = "IX_organization_members_tenant_user";
+        public const string IX_MEMBERS_TENANT_ROLE_ACTIVE = "IX_organization_members_tenant_role_active";
     }
 
     public static class Inventory

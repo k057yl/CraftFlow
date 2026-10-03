@@ -1,0 +1,52 @@
+﻿<Window x:Class="CraftFlow.Wpf.Windows.CreateStorageLocationWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Создание ёмкости / стеллажа" 
+        Height="360" Width="420" 
+        WindowStartupLocation="CenterOwner" 
+        ResizeMode="NoResize"
+        Background="{DynamicResource CardBackgroundBrush}">
+    <Border Padding="20">
+        <StackPanel>
+            <TextBlock Text="Новая ёмкость / место хранения" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
+
+            <TextBlock Text="Название / Номер:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+            <TextBox x:Name="NameTextBox" Height="28" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Тип емкости:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+            <ComboBox x:Name="LocationTypeComboBox" Height="28" SelectedIndex="0" Margin="0,0,0,10">
+                <ComboBoxItem Content="Ванна / Танк" Tag="VAT_TANK"/>
+                <ComboBoxItem Content="Стеллаж / Полка" Tag="RACK_SHELF"/>
+                <ComboBoxItem Content="Бочка" Tag="BARREL"/>
+                <ComboBoxItem Content="Контейнер" Tag="CONTAINER"/>
+            </ComboBox>
+
+            <Grid Margin="0,0,0,10">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Margin="0,0,5,0">
+                    <TextBlock Text="Привязка к Складу:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                    <ComboBox x:Name="WarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" SelectionChanged="Warehouse_SelectionChanged"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="5,0,0,0">
+                    <TextBlock Text="Или к Камере:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                    <ComboBox x:Name="ChamberComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" SelectionChanged="Chamber_SelectionChanged"/>
+                </StackPanel>
+            </Grid>
+
+            <TextBlock Text="Вместимость (л / кг):" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+            <TextBox x:Name="CapacityTextBox" Height="28" Text="500" Margin="0,0,0,20"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button Content="Отмена" Click="Cancel_Click" Height="32" Margin="0,0,5,0" Style="{StaticResource DangerButtonStyle}"/>
+                <Button Content="Сохранить" Click="Save_Click" Height="32" Margin="5,0,0,0" Style="{StaticResource PrimaryButtonStyle}"/>
+            </Grid>
+        </StackPanel>
+    </Border>
+</Window>

@@ -49,7 +49,7 @@ public partial class AuthPage : Page
     {
         await ExecuteWithLockAsync(async () =>
         {
-            (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync(IdentityConstants.REGISTER, new
+            var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(IdentityConstants.REGISTER, new
             {
                 CompanyName = RegisterCompanyNameTextBox.Text,
                 OwnerEmail = RegisterEmailTextBox.Text,
@@ -104,7 +104,7 @@ public partial class AuthPage : Page
     {
         await ExecuteWithLockAsync(async () =>
         {
-            (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync(IdentityConstants.RESEND_OTP, new
+            var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(IdentityConstants.RESEND_OTP, new
             {
                 Email = OtpEmailTextBox.Text
             });
@@ -135,11 +135,7 @@ public partial class AuthPage : Page
 
     private void ProcessSuccessfulAuth(LoginResponseDto result, bool rememberMe)
     {
-        if (result.TenantId != Guid.Empty)
-        {
-            ApiService.Instance.SetTenantHeader(result.TenantId);
-        }
-
+        ApiService.Instance.SetTenantHeader(result.TenantId);
         ApiService.Instance.SetAuthToken(result.Token, rememberMe);
 
         NavigationService?.Navigate(new DashboardPage());

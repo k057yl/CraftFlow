@@ -15,240 +15,199 @@
 
         <TabControl Grid.Row="1">
 
-            <!-- ================= 1. НОМЕНКЛАТУРА И РЕЦЕПТЫ ================= -->
+            <!-- ================= 1. НОМЕНКЛАТУРА И РЕЦЕПТЫ (СЕТКА 2x2) ================= -->
             <TabItem Header="Номенклатура и Рецепты">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
-                    <StackPanel Margin="0,0,10,0">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
 
-                        <!-- 1.1 Единицы измерения -->
-                        <GroupBox Header="{loc:Loc Key=HEADER_UOM}" Margin="0,0,0,15" Padding="10">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="160"/>
-                                </Grid.RowDefinitions>
+                    <!-- [1] Единицы измерения -->
+                    <GroupBox Grid.Row="0" Grid.Column="0" Header="{loc:Loc Key=HEADER_UOM}" Margin="0,0,5,5" Padding="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <WrapPanel Grid.Row="0" Margin="0,0,0,8">
+                                <TextBox x:Name="UomNameTextBox" Width="120" Margin="0,0,5,5" ToolTip="Название"/>
+                                <TextBox x:Name="UomCodeTextBox" Width="60" Margin="0,0,5,5" ToolTip="Код"/>
+                                <Button Content="{loc:Loc Key=CREATE_UOM}" Click="CreateUom_Click" Style="{StaticResource PrimaryButtonStyle}" Height="26" Padding="8,0" Margin="0,0,5,5"/>
+                                <Button Content="⚡ Presets ▾" Click="SeedUomPreset_Click" Background="#0EA5E9" Foreground="White" FontWeight="SemiBold" Height="26" Padding="8,0" Margin="0,0,0,5">
+                                    <Button.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="🇪🇺 Metric (kg, g, l, ml, pcs)" Click="SeedMetric_Click"/>
+                                            <MenuItem Header="🇺🇸 Imperial (lb, oz, gal, fl oz, pcs)" Click="SeedImperial_Click"/>
+                                            <Separator/>
+                                            <MenuItem Header="🌐 Full Set" Click="SeedFull_Click"/>
+                                        </ContextMenu>
+                                    </Button.ContextMenu>
+                                </Button>
+                            </WrapPanel>
+                            <DataGrid Grid.Row="1" x:Name="UomDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="{loc:Loc Key=UOM_NAME}" Binding="{Binding Name}" Width="*"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=UOM_CODE}" Binding="{Binding Code}" Width="80"/>
+                                    <DataGridTemplateColumn Width="40">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="❌" Click="DeleteUom_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </GroupBox>
 
-                                <WrapPanel VerticalAlignment="Center" Margin="0,0,0,10">
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="{loc:Loc Key=UOM_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <TextBox x:Name="UomNameTextBox" Width="160"/>
-                                    </StackPanel>
+                    <!-- [2] Сырье и ингредиенты -->
+                    <GroupBox Grid.Row="0" Grid.Column="1" Header="{loc:Loc Key=HEADER_RAW_MATERIALS}" Margin="5,0,0,5" Padding="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <WrapPanel Grid.Row="0" Margin="0,0,0,8">
+                                <TextBox x:Name="RawMaterialNameTextBox" Width="140" Margin="0,0,5,5"/>
+                                <ComboBox x:Name="RawUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="100" Margin="0,0,5,5"/>
+                                <Button Content="Добавить" Click="CreateRawMaterial_Click" Style="{StaticResource PrimaryButtonStyle}" Height="26" Padding="10,0" Margin="0,0,0,5"/>
+                            </WrapPanel>
+                            <DataGrid Grid.Row="1" x:Name="RawMaterialsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="{loc:Loc Key=RAW_MATERIAL_NAME}" Binding="{Binding Name}" Width="*"/>
+                                    <DataGridTemplateColumn Width="40">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="❌" Click="DeleteRawMaterial_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </GroupBox>
 
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="{loc:Loc Key=UOM_CODE}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <TextBox x:Name="UomCodeTextBox" Width="80"/>
-                                    </StackPanel>
+                    <!-- [3] Готовая продукция -->
+                    <GroupBox Grid.Row="1" Grid.Column="0" Header="{loc:Loc Key=HEADER_PRODUCTS}" Margin="0,5,5,0" Padding="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <WrapPanel Grid.Row="0" Margin="0,0,0,8">
+                                <TextBox x:Name="ProductNameTextBox" Width="140" Margin="0,0,5,5"/>
+                                <ComboBox x:Name="ProductUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="100" Margin="0,0,5,5"/>
+                                <Button Content="Создать" Click="CreateProduct_Click" Style="{StaticResource PrimaryButtonStyle}" Height="26" Padding="10,0" Margin="0,0,0,5"/>
+                            </WrapPanel>
+                            <DataGrid Grid.Row="1" x:Name="ProductsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="{loc:Loc Key=PRODUCT_NAME}" Binding="{Binding Name}" Width="*"/>
+                                    <DataGridTemplateColumn Width="40">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="❌" Click="DeleteProduct_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </GroupBox>
 
-                                    <Button Content="{loc:Loc Key=CREATE_UOM}" Click="CreateUom_Click" Style="{StaticResource PrimaryButtonStyle}" Width="120" Height="28" Margin="0,0,10,5"/>
+                    <!-- [4] Технологические рецептуры -->
+                    <GroupBox Grid.Row="1" Grid.Column="1" Header="{loc:Loc Key=HEADER_RECIPES}" Margin="5,5,0,0" Padding="8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="220"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
 
-                                    <Button Content="⚡ Auto-Seed Presets ▾" Click="SeedUomPreset_Click" Background="#0EA5E9" Foreground="White" FontWeight="SemiBold" Height="28" Padding="10,0" Margin="0,0,0,5">
-                                        <Button.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="🇪🇺 Metric (kg, g, l, ml, pcs)" Click="SeedMetric_Click"/>
-                                                <MenuItem Header="🇺🇸 Imperial (lb, oz, gal, fl oz, pcs)" Click="SeedImperial_Click"/>
-                                                <Separator/>
-                                                <MenuItem Header="🌐 Full Set (Metric + Imperial)" Click="SeedFull_Click"/>
-                                            </ContextMenu>
-                                        </Button.ContextMenu>
-                                    </Button>
-                                </WrapPanel>
+                            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="0" Margin="0,0,8,0">
+                                <StackPanel>
+                                    <TextBlock Text="Рецепт:" FontSize="10"/>
+                                    <TextBox x:Name="RecipeNameTextBox" Height="24" Margin="0,0,0,4"/>
 
-                                <DataGrid Grid.Row="1" x:Name="UomDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="{loc:Loc Key=UOM_NAME}" Binding="{Binding Name}" Width="*"/>
-                                        <DataGridTextColumn Header="{loc:Loc Key=UOM_CODE}" Binding="{Binding Code}" Width="120"/>
-                                        <DataGridTemplateColumn Width="60">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Button Content="❌" Click="DeleteUom_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" HorizontalAlignment="Center"/>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-                        </GroupBox>
+                                    <TextBlock Text="Продукт:" FontSize="10"/>
+                                    <ComboBox x:Name="RecipeProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="24" Margin="0,0,0,4"/>
 
-                        <!-- 1.2 Сырье и ингредиенты -->
-                        <GroupBox Header="{loc:Loc Key=HEADER_RAW_MATERIALS}" Margin="0,0,0,15" Padding="10">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="180"/>
-                                </Grid.RowDefinitions>
+                                    <TextBlock Text="Выход (кг/л):" FontSize="10"/>
+                                    <TextBox x:Name="RecipeOutputQuantityTextBox" Text="1" Height="24" Margin="0,0,0,4"/>
 
-                                <WrapPanel VerticalAlignment="Center" Margin="0,0,0,10">
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="{loc:Loc Key=RAW_MATERIAL_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <TextBox x:Name="RawMaterialNameTextBox" Width="220"/>
-                                    </StackPanel>
+                                    <CheckBox x:Name="IsAgingRequiredCheckBox" Content="Созревание (дни):" FontSize="10" Margin="0,2,0,2"/>
+                                    <TextBox x:Name="DefaultMinAgingDaysTextBox" Text="30" Height="24" Margin="0,0,0,6"/>
 
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="{loc:Loc Key=SELECT_UOM}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <ComboBox x:Name="RawUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="140"/>
-                                    </StackPanel>
-
-                                    <Button Content="{loc:Loc Key=CREATE_RAW_MATERIAL}" Click="CreateRawMaterial_Click" Style="{StaticResource PrimaryButtonStyle}" Width="140" Height="28" Margin="0,0,0,5"/>
-                                </WrapPanel>
-
-                                <DataGrid Grid.Row="1" x:Name="RawMaterialsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="{loc:Loc Key=RAW_MATERIAL_NAME}" Binding="{Binding Name}" Width="*"/>
-                                        <DataGridTemplateColumn Width="60">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Button Content="❌" Click="DeleteRawMaterial_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" HorizontalAlignment="Center"/>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-                        </GroupBox>
-
-                        <!-- 1.3 Готовая продукция -->
-                        <GroupBox Header="{loc:Loc Key=HEADER_PRODUCTS}" Margin="0,0,0,15" Padding="10">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="180"/>
-                                </Grid.RowDefinitions>
-
-                                <WrapPanel VerticalAlignment="Center" Margin="0,0,0,10">
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="{loc:Loc Key=PRODUCT_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <TextBox x:Name="ProductNameTextBox" Width="220"/>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="{loc:Loc Key=SELECT_UOM}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <ComboBox x:Name="ProductUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="140"/>
-                                    </StackPanel>
-
-                                    <Button Content="{loc:Loc Key=CREATE_PRODUCT}" Click="CreateProduct_Click" Style="{StaticResource PrimaryButtonStyle}" Width="140" Height="28" Margin="0,0,0,5"/>
-                                </WrapPanel>
-
-                                <DataGrid Grid.Row="1" x:Name="ProductsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="{loc:Loc Key=PRODUCT_NAME}" Binding="{Binding Name}" Width="*"/>
-                                        <DataGridTemplateColumn Width="60">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Button Content="❌" Click="DeleteProduct_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" HorizontalAlignment="Center"/>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-                        </GroupBox>
-
-                        <!-- 1.4 Технологические рецептуры -->
-                        <GroupBox Header="{loc:Loc Key=HEADER_RECIPES}" Margin="0,0,0,15" Padding="10">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="420"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel Grid.Column="0" Margin="0,0,15,0">
-                                    <TextBlock Text="{loc:Loc Key=RECIPE_NAME}" FontSize="11" Margin="0,0,0,2"/>
-                                    <TextBox x:Name="RecipeNameTextBox" Margin="0,0,0,8"/>
-
-                                    <TextBlock Text="{loc:Loc Key=SELECT_PRODUCT}" FontSize="11" Margin="0,0,0,2"/>
-                                    <ComboBox x:Name="RecipeProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,8"/>
-
-                                    <TextBlock Text="{loc:Loc Key=TARGET_OUTPUT_QUANTITY}" FontSize="11" Margin="0,0,0,2"/>
-                                    <TextBox x:Name="RecipeOutputQuantityTextBox" Text="1" Margin="0,0,0,10"/>
-
-                                    <Grid Margin="0,0,0,10">
+                                    <TextBlock Text="Состав:" FontSize="10" FontWeight="Bold"/>
+                                    <Grid Margin="0,0,0,4">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="40"/>
+                                            <ColumnDefinition Width="24"/>
                                         </Grid.ColumnDefinitions>
-
-                                        <CheckBox x:Name="IsAgingRequiredCheckBox" Content="{loc:Loc Key=IS_AGING_REQUIRED}" VerticalAlignment="Center" Grid.Column="0"/>
-
-                                        <StackPanel Orientation="Horizontal" Grid.Column="1">
-                                            <TextBlock Text="{loc:Loc Key=DEFAULT_MIN_AGING_DAYS}" VerticalAlignment="Center" Margin="0,0,5,0" FontSize="11"/>
-                                            <TextBox x:Name="DefaultMinAgingDaysTextBox" Text="30" Width="50"/>
-                                        </StackPanel>
+                                        <ComboBox Grid.Column="0" x:Name="RecipeRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="24" Margin="0,0,2,0"/>
+                                        <TextBox Grid.Column="1" x:Name="RecipeIngredientQuantityTextBox" Text="1" Height="24" Margin="0,0,2,0"/>
+                                        <Button Grid.Column="2" Content="+" Click="AddIngredient_Click" Style="{StaticResource PrimaryButtonStyle}" Height="24"/>
                                     </Grid>
+                                    <ListBox x:Name="AddedIngredientsListBox" Height="60" DisplayMemberPath="DisplayInfo" Margin="0,0,0,6"/>
 
-                                    <GroupBox Header="{loc:Loc Key=INGREDIENT_SECTION}" Margin="0,5,0,12" Padding="8">
-                                        <StackPanel>
-                                            <Grid Margin="0,0,0,8">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="80"/>
-                                                    <ColumnDefinition Width="Auto"/>
-                                                </Grid.ColumnDefinitions>
-
-                                                <ComboBox Grid.Column="0" x:Name="RecipeRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,6,0"/>
-                                                <TextBox Grid.Column="1" x:Name="RecipeIngredientQuantityTextBox" Text="1" Margin="0,0,6,0"/>
-                                                <Button Grid.Column="2" Content="+" Click="AddIngredient_Click" Style="{StaticResource PrimaryButtonStyle}" Width="28" Height="26"/>
-                                            </Grid>
-
-                                            <ListBox x:Name="AddedIngredientsListBox" Height="100" DisplayMemberPath="DisplayInfo" Background="Transparent"/>
-                                        </StackPanel>
-                                    </GroupBox>
-
-                                    <Button Content="{loc:Loc Key=CREATE_RECIPE}" Click="CreateRecipe_Click" Style="{StaticResource PrimaryButtonStyle}" Height="32"/>
+                                    <Button Content="Сохранить рецепт" Click="CreateRecipe_Click" Style="{StaticResource PrimaryButtonStyle}" Height="26"/>
                                 </StackPanel>
+                            </ScrollViewer>
 
-                                <DataGrid Grid.Column="1" x:Name="RecipesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" MinHeight="250">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="{loc:Loc Key=RECIPE_NAME}" Binding="{Binding Name}" Width="*"/>
-                                        <DataGridTemplateColumn Width="80">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Button Content="❌" Click="DeleteRecipe_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" HorizontalAlignment="Center"/>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-                        </GroupBox>
-
-                    </StackPanel>
-                </ScrollViewer>
+                            <DataGrid Grid.Column="1" x:Name="RecipesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Рецепт" Binding="{Binding Name}" Width="*"/>
+                                    <DataGridTemplateColumn Width="40">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="❌" Click="DeleteRecipe_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
             </TabItem>
 
             <!-- ================= 2. ИНФРАСТРУКТУРА И СКЛАДЫ ================= -->
             <TabItem Header="Инфраструктура и Склады">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
-                    <StackPanel Margin="0,0,10,0">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="180"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                        <!-- 2.1 Склады -->
-                        <GroupBox Header="{loc:Loc Key=WAREHOUSES_HEADER}" Margin="0,0,0,15" Padding="10">
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Склады -->
+                        <GroupBox Grid.Column="0" Header="{loc:Loc Key=WAREHOUSES_HEADER}" Margin="0,0,5,0" Padding="8">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="180"/>
+                                    <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-
-                                <WrapPanel VerticalAlignment="Center" Margin="0,0,0,10">
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="{loc:Loc Key=WAREHOUSE_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <TextBox x:Name="WarehouseNameTextBox" Width="180" Padding="5,3"/>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="{loc:Loc Key=WAREHOUSE_ADDRESS}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <TextBox x:Name="WarehouseAddressTextBox" Width="220" Padding="5,3"/>
-                                    </StackPanel>
-
-                                    <Button Content="{loc:Loc Key=CREATE_WAREHOUSE}" Click="CreateWarehouse_Click" Style="{StaticResource PrimaryButtonStyle}" Width="140" Height="28" Margin="0,0,0,5"/>
+                                <WrapPanel Grid.Row="0" Margin="0,0,0,6">
+                                    <TextBox x:Name="WarehouseNameTextBox" Width="120" Margin="0,0,5,0" ToolTip="Название"/>
+                                    <TextBox x:Name="WarehouseAddressTextBox" Width="120" Margin="0,0,5,0" ToolTip="Адрес"/>
+                                    <Button Content="+" Click="CreateWarehouse_Click" Style="{StaticResource PrimaryButtonStyle}" Width="30" Height="24"/>
                                 </WrapPanel>
-
                                 <DataGrid Grid.Row="1" x:Name="WarehousesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding Name}" Width="*"/>
-                                        <DataGridTemplateColumn Width="60">
+                                        <DataGridTextColumn Header="Склад" Binding="{Binding Name}" Width="*"/>
+                                        <DataGridTemplateColumn Width="40">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Button Content="❌" Click="DeleteWarehouse_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" HorizontalAlignment="Center"/>
+                                                    <Button Content="❌" Click="DeleteWarehouse_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
@@ -257,40 +216,26 @@
                             </Grid>
                         </GroupBox>
 
-                        <!-- 2.2 Камеры Созревания -->
-                        <GroupBox Header="{loc:Loc Key=HEADER_AGING_CHAMBERS}" Margin="0,0,0,15" Padding="10">
+                        <!-- Камеры Созревания -->
+                        <GroupBox Grid.Column="1" Header="{loc:Loc Key=HEADER_AGING_CHAMBERS}" Margin="5,0,0,0" Padding="8">
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="180"/>
+                                    <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
-
-                                <WrapPanel VerticalAlignment="Center" Margin="0,0,0,10">
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="{loc:Loc Key=AGING_CHAMBER_NAME}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <TextBox x:Name="ChamberNameTextBox" Width="160" Padding="5,3"/>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="{loc:Loc Key=TARGET_TEMPERATURE}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <TextBox x:Name="ChamberTempTextBox" Width="60" Padding="5,3" Text="12.0"/>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="{loc:Loc Key=TARGET_HUMIDITY}" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <TextBox x:Name="ChamberHumidityTextBox" Width="60" Padding="5,3" Text="85.0"/>
-                                    </StackPanel>
-
-                                    <Button Content="{loc:Loc Key=CREATE_AGING_CHAMBER}" Click="CreateChamber_Click" Style="{StaticResource PrimaryButtonStyle}" Width="160" Height="28" Margin="0,0,0,5"/>
+                                <WrapPanel Grid.Row="0" Margin="0,0,0,6">
+                                    <TextBox x:Name="ChamberNameTextBox" Width="110" Margin="0,0,5,0" ToolTip="Название"/>
+                                    <TextBox x:Name="ChamberTempTextBox" Width="45" Text="12.0" Margin="0,0,5,0" ToolTip="Температура °C"/>
+                                    <TextBox x:Name="ChamberHumidityTextBox" Width="45" Text="85.0" Margin="0,0,5,0" ToolTip="Влажность %"/>
+                                    <Button Content="+" Click="CreateChamber_Click" Style="{StaticResource PrimaryButtonStyle}" Width="30" Height="24"/>
                                 </WrapPanel>
-
                                 <DataGrid Grid.Row="1" x:Name="ChambersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                                     <DataGrid.Columns>
-                                        <DataGridTextColumn Header="{loc:Loc Key=AGING_CHAMBER_NAME}" Binding="{Binding Name}" Width="*"/>
-                                        <DataGridTemplateColumn Width="60">
+                                        <DataGridTextColumn Header="Камера" Binding="{Binding Name}" Width="*"/>
+                                        <DataGridTemplateColumn Width="40">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Button Content="❌" Click="DeleteChamber_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" HorizontalAlignment="Center"/>
+                                                    <Button Content="❌" Click="DeleteChamber_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
@@ -298,69 +243,38 @@
                                 </DataGrid>
                             </Grid>
                         </GroupBox>
+                    </Grid>
 
-                        <!-- 2.3 Ёмкости / Стеллажи -->
-                        <GroupBox Header="Ёмкости / Стеллажи" Margin="0,0,0,15" Padding="10">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="220"/>
-                                </Grid.RowDefinitions>
+                    <!-- Ёмкости / Стеллажи -->
+                    <GroupBox Grid.Row="1" Header="Ёмкости / Стеллажи" Padding="10">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
 
-                                <WrapPanel VerticalAlignment="Center" Margin="0,0,0,10">
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="Название:" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <TextBox x:Name="LocationNameTextBox" Width="140" Padding="5,3"/>
-                                    </StackPanel>
+                            <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                                <Button Content="➕ Создать ёмкость / танк" Click="OpenCreateStorageLocationModal_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Padding="12,0" HorizontalAlignment="Left"/>
+                            </DockPanel>
 
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="Тип:" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <ComboBox x:Name="LocationTypeComboBox" Width="130" SelectedIndex="0" Padding="5,3">
-                                            <ComboBoxItem Content="Ванна / Танк" Tag="VAT_TANK"/>
-                                            <ComboBoxItem Content="Стеллаж / Полка" Tag="RACK_SHELF"/>
-                                            <ComboBoxItem Content="Бочка" Tag="BARREL"/>
-                                            <ComboBoxItem Content="Контейнер" Tag="CONTAINER"/>
-                                        </ComboBox>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="Склад:" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <ComboBox x:Name="LocationWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="130" Padding="5,3"/>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="или Камера:" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <ComboBox x:Name="LocationChamberComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="130" Padding="5,3"/>
-                                    </StackPanel>
-
-                                    <StackPanel Orientation="Horizontal" Margin="0,0,15,5">
-                                        <TextBlock Text="Вместимость (л/кг):" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="11"/>
-                                        <TextBox x:Name="LocationCapacityTextBox" Width="70" Padding="5,3"/>
-                                    </StackPanel>
-
-                                    <Button Content="Создать" Click="CreateStorageLocation_Click" Style="{StaticResource PrimaryButtonStyle}" Width="100" Height="28" Margin="0,0,0,5"/>
-                                </WrapPanel>
-
-                                <DataGrid Grid.Row="1" x:Name="StorageLocationsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="160"/>
-                                        <DataGridTextColumn Header="Тип" Binding="{Binding LocationType}" Width="110"/>
-                                        <DataGridTextColumn Header="Склад / Камера" Binding="{Binding ParentName}" Width="180"/>
-                                        <DataGridTextColumn Header="Загрузка / Объём" Binding="{Binding VolumeInfo}" Width="*"/>
-                                        <DataGridTemplateColumn Width="60">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Button Content="❌" Click="DeleteStorageLocation_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" HorizontalAlignment="Center"/>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </Grid>
-                        </GroupBox>
-
-                    </StackPanel>
-                </ScrollViewer>
+                            <DataGrid Grid.Row="1" x:Name="StorageLocationsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="160"/>
+                                    <DataGridTextColumn Header="Тип" Binding="{Binding LocationType}" Width="120"/>
+                                    <DataGridTextColumn Header="Склад / Камера" Binding="{Binding ParentName}" Width="180"/>
+                                    <DataGridTextColumn Header="Загрузка / Объём" Binding="{Binding VolumeInfo}" Width="*"/>
+                                    <DataGridTemplateColumn Width="50">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button Content="❌" Click="DeleteStorageLocation_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
+                    </GroupBox>
+                </Grid>
             </TabItem>
 
         </TabControl>

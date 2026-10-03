@@ -8,6 +8,7 @@ using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.SharedKernel.Dtos.Supplier;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
+using CraftFlow.Wpf.Windows;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
@@ -342,6 +343,21 @@ public partial class ProcurementPage : Page
                     await ExecuteWriteOffAsync(lot.Id, dialog.QuantityToWriteOff, dialog.SelectedItemIds, dialog.Reason);
                 }
             }
+        }
+    }
+
+    private async void QuickCreateLocation_Click(object sender, RoutedEventArgs e)
+    {
+        Guid? currentWarehouseId = StockWarehouseComboBox.SelectedValue as Guid?;
+
+        var dialog = new CreateStorageLocationWindow(currentWarehouseId)
+        {
+            Owner = Window.GetWindow(this)
+        };
+
+        if (dialog.ShowDialog() == true && currentWarehouseId.HasValue && currentWarehouseId != Guid.Empty)
+        {
+            await LoadLocationsForWarehouseAsync(currentWarehouseId.Value);
         }
     }
 

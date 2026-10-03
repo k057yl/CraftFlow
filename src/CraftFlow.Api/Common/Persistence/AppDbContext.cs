@@ -32,6 +32,7 @@ public class AppDbContext : DbContext
     }
 
     public DbSet<Organization> Organizations => Set<Organization>();
+    public DbSet<OrganizationMember> OrganizationMembers => Set<OrganizationMember>();
     public DbSet<UnitOfMeasure> UnitsOfMeasure => Set<UnitOfMeasure>();
     public DbSet<RawMaterial> RawMaterials => Set<RawMaterial>();
     public DbSet<Product> Products => Set<Product>();
@@ -73,12 +74,6 @@ public class AppDbContext : DbContext
             }
 
             var clrType = entityType.ClrType;
-
-            if (clrType == typeof(User))
-            {
-                SetUserFilter(modelBuilder);
-                continue;
-            }
 
             var isTenant = typeof(ITenantEntity).IsAssignableFrom(clrType);
             var isEntity = typeof(Entity).IsAssignableFrom(clrType);
@@ -145,12 +140,6 @@ public class AppDbContext : DbContext
         }
 
         return base.SaveChangesAsync(cancellationToken);
-    }
-
-    private void SetUserFilter(ModelBuilder modelBuilder)
-    {
-        modelBuilder.Entity<User>().HasQueryFilter(u =>
-            (_tenantContext.IsSuperAdmin || (u.TenantId == _tenantContext.TenantId && u.Role != TenantRole.SuperAdmin)));
     }
 
     private void SetTenantAndActiveFilter<TEntity>(ModelBuilder modelBuilder)

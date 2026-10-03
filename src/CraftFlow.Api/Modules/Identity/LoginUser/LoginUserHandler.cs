@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.Infrastructure.Identity;
 using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.SharedKernel.Result;
@@ -42,14 +43,32 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginRe
             return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
         }
 
-        var tokenString = _tokenService.GenerateJwtToken(user);
+        OrganizationMember? activeMember = null;
+
+        if (!user.IsSuperAdmin)
+        {
+            activeMember = await _dbContext.OrganizationMembers
+                .IgnoreQueryFilters()
+                .Include(m => m.Organization)
+                .FirstOrDefaultAsync(m => m.UserId == user.Id && m.IsActive && m.Organization.IsActive, cancellationToken);
+
+            if (activeMember == null)
+            {
+                return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.ACCOUNT_NOT_ACTIVATED));
+            }
+        }
+
+        var tokenString = _tokenService.GenerateJwtToken(user, activeMember);
+
+        var tenantId = activeMember?.TenantId ?? Guid.Empty;
+        var role = user.IsSuperAdmin ? TenantRole.SuperAdmin : (activeMember?.Role ?? TenantRole.None);
 
         return Result.Success(new LoginResponseDto(
             tokenString,
-            user.TenantId,
+            tenantId,
             user.FullName,
             user.Email,
-            user.Role
+            role
         ));
     }
 }

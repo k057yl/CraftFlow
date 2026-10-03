@@ -25,6 +25,7 @@ public static class DbTables
     public const string SALES_ORDER_ITEMS = "sales_order_items";
     public const string UNITS_OF_MEASURE = "units_of_measure";
     public const string ORGANIZATIONS = "organizations";
+    public const string TABLE_ORGANIZATION_MEMBERS = "organization_members";
     public const string SUBSCRIPTION_PAYMENTS = "subscription_payments";
     public const string SUBSCRIPTION_PLANS = "subscription_plans";
     public const string TENANT_ACCESS_KEYS = "tenant_access_keys";

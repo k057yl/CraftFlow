@@ -218,7 +218,7 @@ public class ApiService
                 user.FullName = nameProp.GetString() ?? string.Empty;
             }
 
-            if (root.TryGetProperty(CoreConstants.MultiTenancy.CLAIM_TENANT_ID, out var tenantProp) &&
+            if (root.TryGetProperty(AuthConstants.Claims.TENANT_ID, out var tenantProp) &&
                 Guid.TryParse(tenantProp.GetString(), out var tenantId))
             {
                 CurrentTenantId = tenantId;

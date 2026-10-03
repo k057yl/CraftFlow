@@ -69,7 +69,7 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
             QuotaType.MonthlyBatches => await CheckMonthlyBatchesQuotaAsync(tenantId, plan.MaxMonthlyBatches, cancellationToken),
             QuotaType.WarehousesCount => await CheckCountQuotaAsync<Warehouse>(tenantId, plan.MaxWarehouses, cancellationToken),
             QuotaType.ChamberCount => await CheckCountQuotaAsync<AgingChamber>(tenantId, plan.MaxChambers, cancellationToken),
-            QuotaType.UsersCount => await CheckCountQuotaAsync<User>(tenantId, plan.MaxUsers, cancellationToken),
+            QuotaType.UsersCount => await CheckCountQuotaAsync<OrganizationMember>(tenantId, plan.MaxUsers, cancellationToken),
             _ => false
         };
 

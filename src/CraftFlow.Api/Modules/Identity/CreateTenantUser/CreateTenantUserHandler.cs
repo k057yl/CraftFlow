@@ -4,6 +4,7 @@ using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Identity.CreateTenantUser;
 
@@ -25,15 +26,32 @@ public class CreateTenantUserHandler : IRequestHandler<CreateTenantUserCommand, 
             return Result.Failure<Guid>(Error.Validation(ErrorCodes.Auth.ACCESS_DENIED));
         }
 
+        var tenantId = _tenantContext.TenantId;
         var normalizedEmail = request.Email.Trim().ToLowerInvariant();
-        var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+        var user = await _dbContext.Users
+            .FirstOrDefaultAsync(u => u.Email == normalizedEmail, cancellationToken);
 
-        var user = User.Create(_tenantContext.TenantId, normalizedEmail, passwordHash, request.FullName, request.Role);
-        user.Activate();
+        if (user == null)
+        {
+            var passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            user = User.Create(normalizedEmail, passwordHash, request.FullName);
+            user.Activate();
+            _dbContext.Users.Add(user);
+        }
 
-        _dbContext.Users.Add(user);
+        var organization = await _dbContext.Organizations
+            .Include(o => o.Members)
+            .FirstOrDefaultAsync(o => o.Id == tenantId, cancellationToken);
+
+        if (organization == null)
+        {
+            return Result.Failure<Guid>(Error.NotFound("ORGANIZATION_NOT_FOUND"));
+        }
+
+        var member = organization.AddMember(user.Id, request.Role);
+
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(user.Id);
+        return Result.Success(member.Id);
     }
 }

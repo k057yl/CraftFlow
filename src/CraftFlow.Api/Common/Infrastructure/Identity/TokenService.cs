@@ -17,19 +17,25 @@ public class TokenService : ITokenService
         _config = config;
     }
 
-    public string GenerateJwtToken(User user)
+    public string GenerateJwtToken(User user, OrganizationMember? member = null)
     {
         var adminEmail = Environment.GetEnvironmentVariable(AuthConstants.ADMIN_CONFIG_KEYS.ADMIN_EMAIL_KEY);
-        var isSystemAdmin = user.Role == TenantRole.SuperAdmin || (!string.IsNullOrEmpty(adminEmail) &&
+        var isSystemAdmin = user.IsSuperAdmin || (!string.IsNullOrEmpty(adminEmail) &&
                       user.Email.Equals(adminEmail.Trim().ToLowerInvariant(), StringComparison.OrdinalIgnoreCase));
 
-        var effectiveRole = isSystemAdmin ? TenantRole.SuperAdmin : user.Role;
+        var effectiveRole = isSystemAdmin
+            ? TenantRole.SuperAdmin
+            : (member?.Role ?? TenantRole.None);
+
+        var tenantId = isSystemAdmin
+            ? Guid.Empty
+            : (member?.TenantId ?? Guid.Empty);
 
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email),
-            new(AuthConstants.Claims.TENANT_ID, user.TenantId.ToString()),
+            new(AuthConstants.Claims.TENANT_ID, tenantId.ToString()),
             new(AuthConstants.Claims.FULL_NAME, user.FullName),
             new(ClaimTypes.Role, effectiveRole.ToString()),
             new("role_id", ((int)effectiveRole).ToString()),

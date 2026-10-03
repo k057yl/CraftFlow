@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.Infrastructure.Identity;
 using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.SharedKernel.Result;
@@ -45,19 +46,24 @@ public class VerifyOtpHandler : IRequestHandler<VerifyOtpCommand, Result<LoginRe
 
         user.Activate();
 
-        if (user.TenantId != Guid.Empty)
-        {
-            var organization = await _dbContext.Organizations
-                .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(o => o.Id == user.TenantId, cancellationToken);
+        var member = await _dbContext.OrganizationMembers
+            .IgnoreQueryFilters()
+            .Include(m => m.Organization)
+            .FirstOrDefaultAsync(m => m.UserId == user.Id, cancellationToken);
 
-            organization?.Activate();
+        if (member != null && member.Organization != null)
+        {
+            member.Organization.Activate();
+            member.Activate();
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var tokenString = _tokenService.GenerateJwtToken(user);
+        var tokenString = _tokenService.GenerateJwtToken(user, member);
 
-        return Result.Success(new LoginResponseDto(tokenString, user.TenantId, user.FullName, user.Email, user.Role));
+        var tenantId = member?.TenantId ?? Guid.Empty;
+        var role = user.IsSuperAdmin ? TenantRole.SuperAdmin : (member?.Role ?? TenantRole.None);
+
+        return Result.Success(new LoginResponseDto(tokenString, tenantId, user.FullName, user.Email, role));
     }
 }

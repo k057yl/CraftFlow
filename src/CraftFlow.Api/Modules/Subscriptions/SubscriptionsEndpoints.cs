@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Modules.Subscriptions.GenerateAccessKey;
+﻿using CraftFlow.Api.Modules.Subscriptions.ConfirmPayment;
+using CraftFlow.Api.Modules.Subscriptions.GenerateAccessKey;
 using CraftFlow.Api.Modules.Subscriptions.GetAccessKeys;
 using CraftFlow.Api.Modules.Subscriptions.RevokeAccessKey;
 using MediatR;
@@ -38,6 +39,13 @@ public static class SubscriptionsEndpoints
         {
             var result = await sender.Send(new GetAccessKeysQuery());
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        //Tests Payment
+        group.MapPost("api/subscriptions/confirm", async (ConfirmSubscriptionPaymentCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
     }
 }

@@ -1,6 +1,5 @@
 ﻿using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Modules.Identity.Domain;
-using CraftFlow.SharedKernel.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -24,6 +23,22 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
 
         builder.Property(o => o.CreatedAtUtc)
             .IsRequired();
+
+        builder.Property(o => o.IsSelfDeactivated)
+            .IsRequired()
+            .HasDefaultValue(false);
+
+        builder.Property(o => o.DeactivatedAtUtc);
+
+        builder.Property(o => o.LastRetentionNoticeSentAtUtc);
+
+        builder.Navigation(o => o.Members)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.HasMany(o => o.Members)
+            .WithOne(m => m.Organization)
+            .HasForeignKey(m => m.TenantId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.HasIndex(o => new { o.IsActive, o.IsSelfDeactivated, o.DeactivatedAtUtc })
             .HasDatabaseName(DbIndexes.Identity.IX_ORGANIZATIONS_RETENTION_CHECK);

@@ -26,30 +26,30 @@ public class ToggleUserStatusHandler : IRequestHandler<ToggleUserStatusCommand, 
             return Result.Failure<bool>(Error.Validation(ErrorCodes.Auth.ACCESS_DENIED));
         }
 
-        var user = await _dbContext.Users
-            .FirstOrDefaultAsync(u => u.Id == request.UserId && u.TenantId == _tenantContext.TenantId, cancellationToken);
+        var member = await _dbContext.OrganizationMembers
+            .FirstOrDefaultAsync(m => m.UserId == request.UserId && m.TenantId == _tenantContext.TenantId, cancellationToken);
 
-        if (user == null)
+        if (member == null)
         {
             return Result.Failure<bool>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
         }
 
-        if (user.Id == _tenantContext.UserId || user.Role == TenantRole.SuperAdmin)
+        if (member.UserId == _tenantContext.UserId || member.Role == TenantRole.SuperAdmin)
         {
             return Result.Failure<bool>(Error.Validation(ErrorCodes.Auth.ACCESS_DENIED));
         }
 
-        if (user.IsActive)
+        if (member.IsActive)
         {
-            user.Deactivate();
+            member.Deactivate();
         }
         else
         {
-            user.Activate();
+            member.Activate();
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result.Success(user.IsActive);
+        return Result.Success(member.IsActive);
     }
 }

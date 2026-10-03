@@ -97,6 +97,47 @@
                     </StackPanel>
                 </Border>
 
+                <!-- Управление подпиской и API ключами -->
+                <Border x:Name="SubscriptionManagementBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
+                    <StackPanel>
+                        <TextBlock Text="Управление подпиской и API ключами" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
+
+                        <!-- Тестовая смена подписки -->
+                        <TextBlock Text="Выбор тарифного плана (Тестовый режим):" FontSize="12" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,5"/>
+                        <WrapPanel Margin="0,0,0,15" VerticalAlignment="Center">
+                            <ComboBox x:Name="PlanComboBox" Width="200" Height="28" Margin="0,0,10,5"/>
+                            <Button Content="Активировать план" Click="ActivateSelectedPlan_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Padding="12,0" Margin="0,0,10,5"/>
+                        </WrapPanel>
+
+                        <!-- API ключи -->
+                        <TextBlock Text="API ключи доступа:" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,10,0,10"/>
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
+                            <TextBox x:Name="NewAccessKeyNameTextBox" Width="200" Height="28" Margin="0,0,10,0" ToolTip="Название ключа"/>
+                            <Button Content="Создать ключ" Click="GenerateAccessKey_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Padding="12,0"/>
+                        </StackPanel>
+
+                        <DataGrid x:Name="AccessKeysDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Height="180">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="140"/>
+                                <DataGridTextColumn Header="Ключ" Binding="{Binding KeyPreview}" Width="220"/>
+                                <DataGridTextColumn Header="Статус" Binding="{Binding StatusDisplay}" Width="100"/>
+
+                                <DataGridTemplateColumn Header="Действия" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="Отозвать" 
+                                                    Click="RevokeAccessKey_Click" 
+                                                    Tag="{Binding Id}"
+                                                    IsEnabled="{Binding CanRevoke}"
+                                                    Height="24" Padding="8,0" FontSize="11" Background="#DC2626" Foreground="White" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+
                 <!-- Danger Zone -->
                 <Border x:Name="DangerZoneBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="#DC2626" BorderThickness="1" CornerRadius="8" Padding="20">
                     <StackPanel>

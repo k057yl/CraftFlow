@@ -2,9 +2,8 @@
 
 namespace CraftFlow.Api.Modules.Identity.Domain;
 
-public sealed class User : AggregateRoot, ITenantEntity
+public sealed class User : AggregateRoot
 {
-    public Guid TenantId { get; private set; }
     public string Email { get; private set; } = null!;
     public string PasswordHash { get; private set; } = null!;
     public string FullName { get; private set; } = null!;
@@ -13,50 +12,26 @@ public sealed class User : AggregateRoot, ITenantEntity
     public DateTime? OtpExpiresAtUtc { get; private set; }
 
     public bool IsActive { get; private set; }
-    public TenantRole Role { get; private set; }
+    public bool IsSuperAdmin { get; private set; }
 
     private User() { }
 
     public static User Create(
-        Guid tenantId,
         string email,
         string passwordHash,
         string fullName,
-        TenantRole role = TenantRole.Owner)
+        bool isSuperAdmin = false)
     {
-        var actualRole = (role == TenantRole.SuperAdmin && tenantId != Guid.Empty)
-            ? TenantRole.Owner
-            : role;
-
         return new User
         {
             Id = Guid.NewGuid(),
-            TenantId = tenantId,
             Email = email.Trim().ToLowerInvariant(),
             PasswordHash = passwordHash,
             FullName = fullName.Trim(),
-            IsActive = false,
-            Role = actualRole
+            IsActive = true,
+            IsSuperAdmin = isSuperAdmin
         };
     }
-
-    public void ChangeRole(TenantRole newRole)
-    {
-        if (newRole == TenantRole.SuperAdmin && TenantId != Guid.Empty)
-        {
-            return;
-        }
-
-        Role = newRole;
-    }
-
-    public void Activate()
-    {
-        IsActive = true;
-        ClearOtpCode();
-    }
-
-    public void Deactivate() => IsActive = false;
 
     public void SetOtpCode(string codeHash, DateTime expiresAtUtc)
     {
@@ -69,4 +44,7 @@ public sealed class User : AggregateRoot, ITenantEntity
         OtpCodeHash = null;
         OtpExpiresAtUtc = null;
     }
+
+    public void Deactivate() => IsActive = false;
+    public void Activate() => IsActive = true;
 }

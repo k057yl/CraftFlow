@@ -70,7 +70,7 @@ public class DeleteAccountHandler : IRequestHandler<DeleteAccountCommand, Result
         await dbContext.Suppliers.IgnoreQueryFilters().Where(s => s.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
         await dbContext.Customers.IgnoreQueryFilters().Where(c => c.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
 
-        await dbContext.Users.IgnoreQueryFilters().Where(u => u.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
+        await dbContext.OrganizationMembers.IgnoreQueryFilters().Where(m => m.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
         await dbContext.Organizations.IgnoreQueryFilters().Where(o => o.Id == tenantId).ExecuteDeleteAsync(cancellationToken);
     }
 }

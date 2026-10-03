@@ -8,6 +8,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Identity.GetTenantUsers;
+
 public class GetTenantUsersHandler : IRequestHandler<GetTenantUsersQuery, Result<List<TenantUserDto>>>
 {
     private readonly AppDbContext _dbContext;
@@ -28,10 +29,11 @@ public class GetTenantUsersHandler : IRequestHandler<GetTenantUsersQuery, Result
 
         var currentTenantId = _tenantContext.TenantId;
 
-        var users = await _dbContext.Users
+        var users = await _dbContext.OrganizationMembers
             .AsNoTracking()
-            .Where(u => u.TenantId == currentTenantId && u.Role != TenantRole.SuperAdmin)
-            .Select(u => new TenantUserDto(u.Id, u.FullName, u.Email, u.Role, u.IsActive))
+            .Include(m => m.User)
+            .Where(m => m.TenantId == currentTenantId)
+            .Select(m => new TenantUserDto(m.UserId, m.User.FullName, m.User.Email, m.Role, m.IsActive))
             .ToListAsync(cancellationToken);
 
         return Result.Success(users);

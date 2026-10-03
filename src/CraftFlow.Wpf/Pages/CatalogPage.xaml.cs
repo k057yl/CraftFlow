@@ -5,6 +5,7 @@ using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
+using CraftFlow.Wpf.Windows;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
@@ -44,9 +45,6 @@ public partial class CatalogPage : Page
         WarehousesDataGrid.ItemsSource = Warehouses;
         ChambersDataGrid.ItemsSource = Chambers;
         StorageLocationsDataGrid.ItemsSource = StorageLocations;
-
-        LocationWarehouseComboBox.ItemsSource = Warehouses;
-        LocationChamberComboBox.ItemsSource = Chambers;
 
         Loaded += async (s, e) => await LoadDataAsync();
     }
@@ -327,46 +325,17 @@ public partial class CatalogPage : Page
         }
     }
 
-    private async void CreateStorageLocation_Click(object sender, RoutedEventArgs e)
+    private async void OpenCreateStorageLocationModal_Click(object sender, RoutedEventArgs e)
     {
-        var name = LocationNameTextBox.Text?.Trim();
-        var selectedTypeItem = LocationTypeComboBox.SelectedItem as ComboBoxItem;
-        var locationType = selectedTypeItem?.Tag?.ToString();
-
-        Guid? warehouseId = LocationWarehouseComboBox.SelectedValue as Guid?;
-        Guid? chamberId = LocationChamberComboBox.SelectedValue as Guid?;
-
-        if (string.IsNullOrWhiteSpace(name) ||
-            string.IsNullOrWhiteSpace(locationType) ||
-            (!warehouseId.HasValue && !chamberId.HasValue))
+        var dialog = new CreateStorageLocationWindow
         {
-            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
-            return;
-        }
+            Owner = Window.GetWindow(this)
+        };
 
-        decimal? capacity = TryParseDecimal(LocationCapacityTextBox.Text, out var cap) ? cap : null;
-
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{InventoryConstants.WAREHOUSES}/locations", new
+        if (dialog.ShowDialog() == true)
         {
-            Name = name,
-            LocationType = locationType,
-            WarehouseId = warehouseId,
-            ChamberId = chamberId,
-            Capacity = capacity
-        });
-
-        if (isSuccess)
-        {
-            SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);
-            LocationNameTextBox.Clear();
-            LocationCapacityTextBox.Clear();
-            LocationWarehouseComboBox.SelectedIndex = -1;
-            LocationChamberComboBox.SelectedIndex = -1;
             await LoadDataAsync();
-        }
-        else
-        {
-            SetStatusRaw(contentOrError, Brushes.Red);
+            SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);
         }
     }
 

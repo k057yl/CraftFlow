@@ -2,6 +2,7 @@
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.Api.Modules.Identity.DeleteAccount;
+using CraftFlow.Api.Modules.Identity.Domain;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Infrastructure.BackgroundServices.Cleanup;
@@ -88,9 +89,12 @@ public class IdentityCleanupWorker : BackgroundService
 
         foreach (var org in tenantsToNotify)
         {
-            var ownerUser = await dbContext.Users
+            var ownerMember = await dbContext.OrganizationMembers
                 .IgnoreQueryFilters()
-                .FirstOrDefaultAsync(u => u.TenantId == org.Id, cancellationToken);
+                .Include(m => m.User)
+                .FirstOrDefaultAsync(m => m.TenantId == org.Id && m.Role == TenantRole.Owner, cancellationToken);
+
+            var ownerUser = ownerMember?.User;
 
             if (ownerUser != null && !string.IsNullOrWhiteSpace(ownerUser.Email))
             {
