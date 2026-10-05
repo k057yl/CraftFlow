@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
+using CraftFlow.Api.Modules.Catalog.Domain;
 using CraftFlow.Api.Modules.Inventory.Domain;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.SharedKernel.Constants;
@@ -38,11 +39,12 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
 
         var product = await _dbContext.Products
             .AsNoTracking()
+            .Include(p => p.UnitOfMeasure)
             .FirstOrDefaultAsync(p => p.Id == lot.ProductId, cancellationToken);
 
-        if (product is null)
+        if (product is null || product.UnitOfMeasure is null)
         {
-            return Result.Failure(Error.NotFound("PRODUCT_NOT_FOUND"));
+            return Result.Failure(Error.NotFound("PRODUCT_OR_UOM_NOT_FOUND"));
         }
 
         if (request.HeadWeights != null && request.HeadWeights.Count > 0)
@@ -84,14 +86,18 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             ? lot.BatchNumber.Substring(0, lot.BatchNumber.IndexOf("(Выход:")).Trim()
             : lot.BatchNumber;
 
-        var finalBatchNumber = $"{cleanBatchName} (Выход: {calculatedTotalWeight:N2} кг)";
+        var finalBatchNumber = $"{cleanBatchName} (Выход: {calculatedTotalWeight:N2} {product.UnitOfMeasure.Code})";
+
+        int finalUnitsCount = product.UnitOfMeasure.Type == UnitType.Piece
+            ? (int)Math.Round(calculatedTotalWeight)
+            : request.UnitsCount;
 
         var stockLot = StockLot.Create(
             warehouseId: request.TargetWarehouseId,
             itemId: lot.ProductId,
             unitOfMeasureId: product.UnitOfMeasureId,
             initialQuantity: calculatedTotalWeight,
-            unitsCount: request.UnitsCount,
+            unitsCount: finalUnitsCount,
             unitPrice: request.UnitPrice,
             batchNumber: finalBatchNumber,
             tenantId: _tenantContext.TenantId,

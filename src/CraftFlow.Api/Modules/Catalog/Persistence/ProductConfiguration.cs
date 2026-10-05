@@ -17,5 +17,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(p => p.Name).HasMaxLength(200).IsRequired();
         builder.Property(p => p.TenantId).IsRequired();
+
+        builder.HasOne(p => p.UnitOfMeasure)
+               .WithMany()
+               .HasForeignKey(p => p.UnitOfMeasureId)
+               .OnDelete(DeleteBehavior.Restrict);
     }
 }

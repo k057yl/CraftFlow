@@ -68,6 +68,9 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
     public void PopulateItems(int unitsCount, decimal totalWeight)
     {
         _items.Clear();
+
+        if (unitsCount <= 0) return;
+
         decimal avgWeight = Math.Round(totalWeight / unitsCount, 3);
 
         for (int i = 1; i <= unitsCount; i++)

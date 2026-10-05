@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging.Domain;
+using CraftFlow.Api.Modules.Catalog.Domain;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
@@ -20,7 +21,22 @@ public sealed class TransferToAgingHandler : IRequestHandler<TransferToAgingComm
     public async Task<Result<Guid>> Handle(TransferToAgingCommand request, CancellationToken cancellationToken)
     {
         var batch = await _dbContext.Set<ProductionBatch>()
-            .FirstAsync(b => b.Id == request.ProductionBatchId, cancellationToken);
+            .FirstOrDefaultAsync(b => b.Id == request.ProductionBatchId, cancellationToken);
+
+        if (batch is null)
+        {
+            return Result.Failure<Guid>(Error.NotFound("BATCH_NOT_FOUND"));
+        }
+
+        var product = await _dbContext.Products
+            .AsNoTracking()
+            .Include(p => p.UnitOfMeasure)
+            .FirstOrDefaultAsync(p => p.Id == batch.TargetProductId, cancellationToken);
+
+        if (product is null || product.UnitOfMeasure is null)
+        {
+            return Result.Failure<Guid>(Error.NotFound("PRODUCT_OR_UOM_NOT_FOUND"));
+        }
 
         var finalLotNumber = !string.IsNullOrWhiteSpace(request.CustomBatchNumber)
             ? request.CustomBatchNumber.Trim()
@@ -34,6 +50,11 @@ public sealed class TransferToAgingHandler : IRequestHandler<TransferToAgingComm
 
         int unitsCount = request.UnitsCount > 0 ? request.UnitsCount : 1;
 
+        if (product.UnitOfMeasure.Type == UnitType.Piece)
+        {
+            unitsCount = (int)Math.Max(1, Math.Round(initialQuantity));
+        }
+
         var agingLot = AgingLot.Create(
             batch.Id,
             batch.TargetProductId,
@@ -41,7 +62,8 @@ public sealed class TransferToAgingHandler : IRequestHandler<TransferToAgingComm
             finalLotNumber,
             initialQuantity,
             unitsCount,
-            request.MinAgingDays
+            request.MinAgingDays,
+            request.StorageLocationId
         );
 
         batch.MarkAsTransferredToAging();

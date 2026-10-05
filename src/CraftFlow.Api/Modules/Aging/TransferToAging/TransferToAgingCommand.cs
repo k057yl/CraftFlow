@@ -8,7 +8,8 @@ public record TransferToAgingRequest(
     Guid AgingChamberId,
     int MinAgingDays,
     int UnitsCount = 1,
-    string? CustomBatchNumber = null
+    string? CustomBatchNumber = null,
+    Guid? StorageLocationId = null
 );
 
 public record TransferToAgingCommand(
@@ -16,5 +17,6 @@ public record TransferToAgingCommand(
     Guid AgingChamberId,
     int MinAgingDays,
     int UnitsCount = 1,
-    string? CustomBatchNumber = null
+    string? CustomBatchNumber = null,
+    Guid? StorageLocationId = null
 ) : IRequest<Result<Guid>>;
