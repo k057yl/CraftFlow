@@ -1,11 +1,9 @@
 ﻿using CraftFlow.Api.Modules.Catalog.CreateProduct;
 using CraftFlow.Api.Modules.Catalog.CreateRawMaterial;
 using CraftFlow.Api.Modules.Catalog.CreateRecipe;
-using CraftFlow.Api.Modules.Catalog.CreateUnitOfMeasure;
 using CraftFlow.Api.Modules.Catalog.DeleteProduct;
 using CraftFlow.Api.Modules.Catalog.DeleteRawMaterial;
 using CraftFlow.Api.Modules.Catalog.DeleteRecipe;
-using CraftFlow.Api.Modules.Catalog.DeleteUnitOfMeasure;
 using CraftFlow.Api.Modules.Catalog.GetProducts;
 using CraftFlow.Api.Modules.Catalog.GetRawMaterials;
 using CraftFlow.Api.Modules.Catalog.GetRecipes;
@@ -24,12 +22,6 @@ public static class CatalogEndpoints
             .RequireAuthorization();
 
         // Commands - Create
-        group.MapPost(CatalogConstants.UOM, async (CreateUnitOfMeasureCommand command, ISender sender) =>
-        {
-            var result = await sender.Send(command);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        });
-
         group.MapPost(CatalogConstants.RAW_MATERIALS, async (CreateRawMaterialCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
@@ -55,12 +47,6 @@ public static class CatalogEndpoints
         });
 
         // Commands - Delete
-        group.MapDelete($"{CatalogConstants.UOM}/{{id:guid}}", async (Guid id, ISender sender) =>
-        {
-            var result = await sender.Send(new DeleteUnitOfMeasureCommand(id));
-            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result.Error);
-        });
-
         group.MapDelete($"{CatalogConstants.RAW_MATERIALS}/{{id:guid}}", async (Guid id, ISender sender) =>
         {
             var result = await sender.Send(new DeleteRawMaterialCommand(id));

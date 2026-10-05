@@ -2,4 +2,5 @@
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Catalog.SeedUnitsOfMeasure;
-public record SeedUnitsOfMeasureCommand(UomPreset Preset) : IRequest<Result<int>>;
+
+public record SeedUnitsOfMeasureCommand : IRequest<Result<int>>;

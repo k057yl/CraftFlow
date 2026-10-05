@@ -36,6 +36,15 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
         }
 
+        var product = await _dbContext.Products
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == lot.ProductId, cancellationToken);
+
+        if (product is null)
+        {
+            return Result.Failure(Error.NotFound("PRODUCT_NOT_FOUND"));
+        }
+
         if (request.HeadWeights != null && request.HeadWeights.Count > 0)
         {
             lot.UpdateHeadWeights(request.HeadWeights);
@@ -76,9 +85,11 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             : lot.BatchNumber;
 
         var finalBatchNumber = $"{cleanBatchName} (Выход: {calculatedTotalWeight:N2} кг)";
+
         var stockLot = StockLot.Create(
             warehouseId: request.TargetWarehouseId,
             itemId: lot.ProductId,
+            unitOfMeasureId: product.UnitOfMeasureId,
             initialQuantity: calculatedTotalWeight,
             unitsCount: request.UnitsCount,
             unitPrice: request.UnitPrice,

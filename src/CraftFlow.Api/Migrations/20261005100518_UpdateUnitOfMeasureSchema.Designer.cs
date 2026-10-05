@@ -3,6 +3,7 @@ using System;
 using CraftFlow.Api.Common.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CraftFlow.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261005100518_UpdateUnitOfMeasureSchema")]
+    partial class UpdateUnitOfMeasureSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -229,8 +232,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
@@ -239,8 +241,6 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UnitOfMeasureId");
 
                     b.ToTable("raw_materials", "catalog");
                 });
@@ -321,20 +321,17 @@ namespace CraftFlow.Api.Migrations
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
+                        .HasColumnType("text");
 
                     b.Property<decimal>("ConversionFactor")
-                        .HasPrecision(18, 6)
-                        .HasColumnType("numeric(18,6)");
+                        .HasColumnType("numeric");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
@@ -343,8 +340,6 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BaseUnitId");
 
                     b.ToTable("units_of_measure", "catalog");
                 });
@@ -509,9 +504,6 @@ namespace CraftFlow.Api.Migrations
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("UnitOfMeasureId")
-                        .HasColumnType("uuid");
-
                     b.Property<decimal>("UnitPrice")
                         .HasPrecision(18, 4)
                         .HasColumnType("numeric(18,4)");
@@ -523,8 +515,6 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("UnitOfMeasureId");
 
                     b.HasIndex("TenantId", "WarehouseId", "ItemId")
                         .HasDatabaseName("IX_STOCK_LOTS_LOOKUP");
@@ -1111,17 +1101,6 @@ namespace CraftFlow.Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.RawMaterial", b =>
-                {
-                    b.HasOne("CraftFlow.Api.Modules.Catalog.Domain.UnitOfMeasure", "UnitOfMeasure")
-                        .WithMany()
-                        .HasForeignKey("UnitOfMeasureId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("UnitOfMeasure");
-                });
-
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.Recipe", b =>
                 {
                     b.HasOne("CraftFlow.Api.Modules.Catalog.Domain.Product", null)
@@ -1139,14 +1118,6 @@ namespace CraftFlow.Api.Migrations
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.UnitOfMeasure", b =>
-                {
-                    b.HasOne("CraftFlow.Api.Modules.Catalog.Domain.UnitOfMeasure", null)
-                        .WithMany()
-                        .HasForeignKey("BaseUnitId")
-                        .OnDelete(DeleteBehavior.Restrict);
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Identity.Domain.OrganizationMember", b =>
@@ -1170,12 +1141,6 @@ namespace CraftFlow.Api.Migrations
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Inventory.Domain.StockLot", b =>
                 {
-                    b.HasOne("CraftFlow.Api.Modules.Catalog.Domain.UnitOfMeasure", "UnitOfMeasure")
-                        .WithMany()
-                        .HasForeignKey("UnitOfMeasureId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.OwnsMany("CraftFlow.Api.Modules.Inventory.Domain.StockLotStorageLocation", "StorageLocations", b1 =>
                         {
                             b1.Property<Guid>("StockLotId")
@@ -1198,8 +1163,6 @@ namespace CraftFlow.Api.Migrations
                         });
 
                     b.Navigation("StorageLocations");
-
-                    b.Navigation("UnitOfMeasure");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Inventory.Domain.StorageLocation", b =>

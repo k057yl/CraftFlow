@@ -28,10 +28,21 @@ public sealed class ReceiveGoodsHandler : IRequestHandler<ReceiveGoodsCommand, R
             return Result.Failure(Error.NotFound(ErrorCodes.Procurement.PURCHASE_ORDER_NOT_FOUND));
         }
 
+        var rawMaterialIds = order.Items.Select(i => i.RawMaterialId).ToList();
+        var rawMaterials = await _dbContext.RawMaterials
+            .AsNoTracking()
+            .Where(rm => rawMaterialIds.Contains(rm.Id))
+            .ToDictionaryAsync(rm => rm.Id, cancellationToken);
+
         order.MarkAsReceived();
 
         foreach (var item in order.Items)
         {
+            if (!rawMaterials.TryGetValue(item.RawMaterialId, out var rawMaterial))
+            {
+                return Result.Failure(Error.NotFound("RAW_MATERIAL_NOT_FOUND"));
+            }
+
             var batchNumber = string.Format(
                 FormattingConstants.BATCH_NUMBER_FORMAT,
                 DateTime.UtcNow,
@@ -41,6 +52,7 @@ public sealed class ReceiveGoodsHandler : IRequestHandler<ReceiveGoodsCommand, R
             var stockLot = StockLot.Create(
                 warehouseId: order.WarehouseId,
                 itemId: item.RawMaterialId,
+                unitOfMeasureId: rawMaterial.UnitOfMeasureId,
                 initialQuantity: item.Quantity,
                 unitsCount: 1,
                 unitPrice: item.UnitPrice,

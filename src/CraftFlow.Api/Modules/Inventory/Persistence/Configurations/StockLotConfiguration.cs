@@ -16,6 +16,11 @@ public class StockLotConfiguration : IEntityTypeConfiguration<StockLot>
         builder.Property(sl => sl.Quantity).HasPrecision(18, 4);
         builder.Property(sl => sl.UnitPrice).HasPrecision(18, 4);
 
+        builder.HasOne(sl => sl.UnitOfMeasure)
+            .WithMany()
+            .HasForeignKey(sl => sl.UnitOfMeasureId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasIndex(sl => new { sl.TenantId, sl.WarehouseId, sl.ItemId })
             .HasDatabaseName(DbIndexes.Inventory.IX_STOCK_LOTS_LOOKUP);
 

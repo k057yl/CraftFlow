@@ -26,6 +26,7 @@ public class AddStockLotHandler : IRequestHandler<AddStockLotCommand, Result<Gui
         var stockLot = StockLot.Create(
             warehouseId: request.WarehouseId,
             itemId: request.ItemId,
+            unitOfMeasureId: request.UnitOfMeasureId,
             initialQuantity: request.Quantity,
             unitsCount: finalUnitsCount,
             unitPrice: request.UnitPrice,

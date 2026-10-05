@@ -11,5 +11,14 @@ public class RawMaterialConfiguration : IEntityTypeConfiguration<RawMaterial>
         builder.ToTable(DbTables.RAW_MATERIALS, DbSchemas.CATALOG);
 
         builder.HasKey(r => r.Id);
+
+        builder.Property(r => r.Name)
+            .IsRequired()
+            .HasMaxLength(200);
+
+        builder.HasOne(r => r.UnitOfMeasure)
+            .WithMany()
+            .HasForeignKey(r => r.UnitOfMeasureId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -7,6 +7,7 @@ namespace CraftFlow.Api.Modules.Catalog.Domain
         public Guid TenantId { get; private set; }
         public string Name { get; private set; } = null!;
         public Guid UnitOfMeasureId { get; private set; }
+        public UnitOfMeasure UnitOfMeasure { get; private set; } = null!;
 
         private RawMaterial() { }
 

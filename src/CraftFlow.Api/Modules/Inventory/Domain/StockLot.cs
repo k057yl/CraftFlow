@@ -1,4 +1,5 @@
-﻿using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.Api.Modules.Catalog.Domain;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
 
 namespace CraftFlow.Api.Modules.Inventory.Domain;
@@ -8,6 +9,7 @@ public sealed class StockLot : AggregateRoot, ITenantEntity
     public Guid TenantId { get; private set; }
     public Guid WarehouseId { get; private set; }
     public Guid ItemId { get; private set; }
+    public Guid UnitOfMeasureId { get; private set; }
     public Guid? SupplierId { get; private set; }
     public decimal Quantity { get; private set; }
     public int UnitsCount { get; private set; }
@@ -16,6 +18,7 @@ public sealed class StockLot : AggregateRoot, ITenantEntity
     public Guid? ProductionBatchId { get; private set; }
     public DateTime CreatedDate { get; private set; }
     public DateTime? ExpirationDate { get; private set; }
+    public UnitOfMeasure UnitOfMeasure { get; private set; } = null!;
 
     private readonly List<StockLotStorageLocation> _storageLocations = [];
     public IReadOnlyCollection<StockLotStorageLocation> StorageLocations => _storageLocations.AsReadOnly();
@@ -25,6 +28,7 @@ public sealed class StockLot : AggregateRoot, ITenantEntity
     public static StockLot Create(
         Guid warehouseId,
         Guid itemId,
+        Guid unitOfMeasureId,
         decimal initialQuantity,
         int unitsCount,
         decimal unitPrice,
@@ -45,6 +49,7 @@ public sealed class StockLot : AggregateRoot, ITenantEntity
             Id = Guid.NewGuid(),
             WarehouseId = warehouseId,
             ItemId = itemId,
+            UnitOfMeasureId = unitOfMeasureId,
             SupplierId = supplierId,
             Quantity = initialQuantity,
             UnitsCount = unitsCount,

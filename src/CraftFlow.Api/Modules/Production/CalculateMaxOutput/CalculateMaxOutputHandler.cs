@@ -27,12 +27,18 @@ public class CalculateMaxOutputHandler : IRequestHandler<CalculateMaxOutputQuery
         }
 
         var rawMaterialIds = recipe.Ingredients.Select(i => i.RawMaterialId).ToList();
-        var stockSummary = await _dbContext.StockLots
+
+        var rawMaterials = await _dbContext.RawMaterials
             .AsNoTracking()
+            .Include(rm => rm.UnitOfMeasure)
+            .Where(rm => rawMaterialIds.Contains(rm.Id))
+            .ToDictionaryAsync(rm => rm.Id, cancellationToken);
+
+        var stockLots = await _dbContext.StockLots
+            .AsNoTracking()
+            .Include(s => s.UnitOfMeasure)
             .Where(s => s.WarehouseId == request.WarehouseId && rawMaterialIds.Contains(s.ItemId) && s.Quantity > 0)
-            .GroupBy(s => s.ItemId)
-            .Select(g => new { ItemId = g.Key, TotalQuantity = g.Sum(s => s.Quantity) })
-            .ToDictionaryAsync(g => g.ItemId, g => g.TotalQuantity, cancellationToken);
+            .ToListAsync(cancellationToken);
 
         decimal maxPossibleMultiplier = decimal.MaxValue;
 
@@ -40,19 +46,33 @@ public class CalculateMaxOutputHandler : IRequestHandler<CalculateMaxOutputQuery
         {
             if (ingredient.Quantity <= 0) continue;
 
-            stockSummary.TryGetValue(ingredient.RawMaterialId, out var availableStock);
-
-            if (availableStock <= 0)
+            if (!rawMaterials.TryGetValue(ingredient.RawMaterialId, out var rawMaterial) || rawMaterial.UnitOfMeasure == null)
             {
                 return Result.Success(0m);
             }
 
-            var ingredientLimitMultiplier = availableStock / ingredient.Quantity;
+            var ingUom = rawMaterial.UnitOfMeasure;
+            var normalizedReqPerBatch = ingredient.Quantity * ingUom.ConversionFactor;
+            var totalAvailableNormalized = stockLots
+                .Where(s => s.ItemId == ingredient.RawMaterialId && s.UnitOfMeasure.Type == ingUom.Type)
+                .Sum(s => s.Quantity * s.UnitOfMeasure.ConversionFactor);
+
+            if (totalAvailableNormalized <= 0m || normalizedReqPerBatch <= 0m)
+            {
+                return Result.Success(0m);
+            }
+
+            var ingredientLimitMultiplier = totalAvailableNormalized / normalizedReqPerBatch;
 
             if (ingredientLimitMultiplier < maxPossibleMultiplier)
             {
                 maxPossibleMultiplier = ingredientLimitMultiplier;
             }
+        }
+
+        if (maxPossibleMultiplier == decimal.MaxValue)
+        {
+            return Result.Success(0m);
         }
 
         var maxPlannedOutput = Math.Floor(recipe.TargetOutputQuantity * maxPossibleMultiplier * 100m) / 100m;

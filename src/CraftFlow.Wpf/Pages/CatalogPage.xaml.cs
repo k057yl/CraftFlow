@@ -37,7 +37,6 @@ public partial class CatalogPage : Page
         RecipeRawMaterialComboBox.ItemsSource = RawMaterials;
         AddedIngredientsListBox.ItemsSource = _selectedIngredients;
 
-        UomDataGrid.ItemsSource = UnitsOfMeasure;
         RawMaterialsDataGrid.ItemsSource = RawMaterials;
         ProductsDataGrid.ItemsSource = Products;
         RecipesDataGrid.ItemsSource = Recipes;
@@ -69,6 +68,16 @@ public partial class CatalogPage : Page
         try
         {
             var uoms = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.UOM);
+
+            if (uoms == null || uoms.Count == 0)
+            {
+                var (isSuccess, _) = await ApiService.Instance.PostAndReadAsync($"{CatalogConstants.UOM}/seed", new { });
+                if (isSuccess)
+                {
+                    uoms = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.UOM);
+                }
+            }
+
             UnitsOfMeasure.Clear();
             uoms?.ForEach(u => UnitsOfMeasure.Add(new LookupItem(u.Id, u.Name, u.Code)));
 
@@ -142,35 +151,6 @@ public partial class CatalogPage : Page
     }
 
     // --- СОЗДАНИЕ ---
-
-    private async void CreateUom_Click(object sender, RoutedEventArgs e)
-    {
-        var name = UomNameTextBox.Text?.Trim();
-        var code = UomCodeTextBox.Text?.Trim();
-
-        if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(code))
-        {
-            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
-            return;
-        }
-
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(CatalogConstants.UOM, new
-        {
-            Name = name,
-            Code = code
-        });
-
-        if (isSuccess)
-        {
-            UomNameTextBox.Clear();
-            UomCodeTextBox.Clear();
-            await LoadDataAsync();
-        }
-        else
-        {
-            SetStatusRaw(contentOrError, Brushes.Red);
-        }
-    }
 
     private async void CreateRawMaterial_Click(object sender, RoutedEventArgs e)
     {
@@ -341,15 +321,6 @@ public partial class CatalogPage : Page
 
     // --- УДАЛЕНИЕ ---
 
-    private async void DeleteUom_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is Guid id)
-        {
-            await ApiService.Instance.DeleteAsync($"{CatalogConstants.UOM}/{id}");
-            await LoadDataAsync();
-        }
-    }
-
     private async void DeleteRawMaterial_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.Tag is Guid id)
@@ -427,38 +398,6 @@ public partial class CatalogPage : Page
             }
         }
     }
-
-    // --- АВТОСИДИНГ ---
-
-    private void SeedUomPreset_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.ContextMenu != null)
-        {
-            btn.ContextMenu.IsOpen = true;
-        }
-    }
-
-    private async Task ExecuteUomSeedAsync(int presetType)
-    {
-        var (isSuccess, response) = await ApiService.Instance.PostAndReadAsync($"{CatalogConstants.UOM}/seed", new
-        {
-            Preset = presetType
-        });
-
-        if (isSuccess)
-        {
-            await LoadDataAsync();
-            SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);
-        }
-        else
-        {
-            SetStatusRaw(response, Brushes.Red);
-        }
-    }
-
-    private async void SeedMetric_Click(object sender, RoutedEventArgs e) => await ExecuteUomSeedAsync(0);
-    private async void SeedImperial_Click(object sender, RoutedEventArgs e) => await ExecuteUomSeedAsync(1);
-    private async void SeedFull_Click(object sender, RoutedEventArgs e) => await ExecuteUomSeedAsync(2);
 
     private void SetStatus(string resourceKey, Brush color)
     {

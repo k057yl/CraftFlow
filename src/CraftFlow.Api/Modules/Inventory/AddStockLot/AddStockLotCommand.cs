@@ -6,6 +6,7 @@ namespace CraftFlow.Api.Modules.Inventory.AddStockLot;
 public record AddStockLotCommand(
     Guid WarehouseId,
     Guid ItemId,
+    Guid UnitOfMeasureId,
     decimal Quantity,
     decimal UnitPrice,
     string? BatchNumber,

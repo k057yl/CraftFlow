@@ -33,6 +33,12 @@ public class ProductionBatchCompletedEventHandler : INotificationHandler<Product
             return;
         }
 
+        var product = await _dbContext.Products
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == batch.TargetProductId, cancellationToken);
+
+        if (product == null) return;
+
         var consumedIngredients = await _dbContext.Set<ConsumedIngredient>()
             .Where(ci => ci.ProductionBatchId == batch.Id)
             .ToListAsync(cancellationToken);
@@ -66,6 +72,7 @@ public class ProductionBatchCompletedEventHandler : INotificationHandler<Product
         var finishedStockLot = StockLot.Create(
             warehouseId: destWarehouseId,
             itemId: batch.TargetProductId,
+            unitOfMeasureId: product.UnitOfMeasureId,
             initialQuantity: notification.ActualOutputQuantity,
             unitsCount: notification.UnitsCount,
             unitPrice: calculatedUnitCost,

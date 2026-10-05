@@ -27,15 +27,49 @@ public class SeedUnitsOfMeasureHandler : IRequestHandler<SeedUnitsOfMeasureComma
             .Select(u => u.Code.ToLower())
             .ToListAsync(cancellationToken);
 
-        var itemsToSeed = GetPresetItems(request.Preset)
-            .Where(item => !existingCodes.Contains(item.Code.ToLower()))
-            .Select(item => UnitOfMeasure.Create(item.Name, item.Code))
-            .ToList();
-
-        if (itemsToSeed.Count == 0)
+        if (existingCodes.Count > 0)
         {
             return Result.Success(0);
         }
+
+        var kg = UnitOfMeasure.Create(
+            NAME_KILOGRAM,
+            CODE_KG,
+            UnitType.Weight,
+            CONVERSION_FACTOR_BASE
+        );
+
+        var g = UnitOfMeasure.Create(
+            NAME_GRAM,
+            CODE_G,
+            UnitType.Weight,
+            CONVERSION_FACTOR_GRAM,
+            kg.Id
+        );
+
+        var l = UnitOfMeasure.Create(
+            NAME_LITER,
+            CODE_L,
+            UnitType.Volume,
+            CONVERSION_FACTOR_BASE
+        );
+
+        var ml = UnitOfMeasure.Create(
+            NAME_MILLILITER,
+            CODE_ML,
+            UnitType.Volume,
+            CONVERSION_FACTOR_MILLILITER,
+            l.Id
+        );
+
+        var pcs = UnitOfMeasure.Create(
+            NAME_PIECE,
+            CODE_PCS,
+            UnitType.Piece,
+            CONVERSION_FACTOR_BASE
+        );
+
+        var itemsToSeed = new List<UnitOfMeasure> { kg, g, l, ml, pcs };
 
         _dbContext.UnitsOfMeasure.AddRange(itemsToSeed);
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -43,35 +77,19 @@ public class SeedUnitsOfMeasureHandler : IRequestHandler<SeedUnitsOfMeasureComma
         return Result.Success(itemsToSeed.Count);
     }
 
-    private static List<(string Name, string Code)> GetPresetItems(UomPreset preset) => preset switch
-    {
-        UomPreset.Metric => new()
-        {
-            ("Kilogram", "kg"),
-            ("Gram", "g"),
-            ("Liter", "l"),
-            ("Milliliter", "ml"),
-            ("Piece", "pcs")
-        },
-        UomPreset.Imperial => new()
-        {
-            ("Pound", "lb"),
-            ("Ounce", "oz"),
-            ("Gallon", "gal"),
-            ("Fluid Ounce", "fl oz"),
-            ("Piece", "pcs")
-        },
-        UomPreset.Full => new()
-        {
-            ("Kilogram", "kg"),
-            ("Gram", "g"),
-            ("Liter", "l"),
-            ("Milliliter", "ml"),
-            ("Piece", "pcs"),
-            ("Pound", "lb"),
-            ("Ounce", "oz"),
-            ("Gallon", "gal")
-        },
-        _ => new()
-    };
+    private const string NAME_KILOGRAM = "Kilogram";
+    private const string NAME_GRAM = "Gram";
+    private const string NAME_LITER = "Liter";
+    private const string NAME_MILLILITER = "Milliliter";
+    private const string NAME_PIECE = "Piece";
+
+    private const string CODE_KG = "kg";
+    private const string CODE_G = "g";
+    private const string CODE_L = "l";
+    private const string CODE_ML = "ml";
+    private const string CODE_PCS = "pcs";
+
+    private const decimal CONVERSION_FACTOR_BASE = 1.0m;
+    private const decimal CONVERSION_FACTOR_GRAM = 0.001m;
+    private const decimal CONVERSION_FACTOR_MILLILITER = 0.001m;
 }

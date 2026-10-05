@@ -11,5 +11,26 @@ public class UnitOfMeasureConfiguration : IEntityTypeConfiguration<UnitOfMeasure
         builder.ToTable(DbTables.UNITS_OF_MEASURE, DbSchemas.CATALOG);
 
         builder.HasKey(u => u.Id);
+
+        builder.Property(u => u.Name)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(u => u.Code)
+            .IsRequired()
+            .HasMaxLength(20);
+
+        builder.Property(u => u.Type)
+            .HasConversion<int>()
+            .IsRequired();
+
+        builder.Property(u => u.ConversionFactor)
+            .HasPrecision(18, 6)
+            .IsRequired();
+
+        builder.HasOne<UnitOfMeasure>()
+            .WithMany()
+            .HasForeignKey(u => u.BaseUnitId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

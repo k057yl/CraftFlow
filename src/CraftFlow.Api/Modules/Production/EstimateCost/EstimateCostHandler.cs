@@ -26,31 +26,51 @@ public class EstimateCostHandler : IRequestHandler<EstimateCostQuery, Result<dec
             return Result.Success(0m);
         }
 
+        var rawMaterialIds = recipe.Ingredients.Select(i => i.RawMaterialId).ToList();
+        var rawMaterials = await _dbContext.RawMaterials
+            .AsNoTracking()
+            .Include(rm => rm.UnitOfMeasure)
+            .Where(rm => rawMaterialIds.Contains(rm.Id))
+            .ToDictionaryAsync(rm => rm.Id, cancellationToken);
+
         var multiplier = request.PlannedQty / recipe.TargetOutputQuantity;
         decimal totalEstimatedCost = 0m;
 
         foreach (var ingredient in recipe.Ingredients)
         {
+            var rawMaterial = rawMaterials.GetValueOrDefault(ingredient.RawMaterialId);
+            if (rawMaterial?.UnitOfMeasure == null) continue;
+
+            var ingUom = rawMaterial.UnitOfMeasure;
             var requiredQty = ingredient.Quantity * multiplier;
+            var normalizedRequiredQty = requiredQty * ingUom.ConversionFactor;
 
             var activeLots = await _dbContext.StockLots
                 .AsNoTracking()
+                .Include(s => s.UnitOfMeasure)
                 .Where(s => s.ItemId == ingredient.RawMaterialId && s.Quantity > 0)
-                .Select(s => new { s.Quantity, s.UnitPrice })
                 .ToListAsync(cancellationToken);
 
-            var totalQuantityOnStock = activeLots.Sum(l => l.Quantity);
-            decimal weightedAvgUnitPrice = 0m;
+            var validLots = activeLots.Where(l => l.UnitOfMeasure.Type == ingUom.Type).ToList();
 
-            if (totalQuantityOnStock > 0)
+            decimal totalStockCost = 0m;
+            decimal totalNormalizedStockQuantity = 0m;
+
+            foreach (var lot in validLots)
             {
-                var totalStockCost = activeLots.Sum(l => l.Quantity * l.UnitPrice);
-                weightedAvgUnitPrice = totalStockCost / totalQuantityOnStock;
+                var normalizedLotQty = lot.Quantity * lot.UnitOfMeasure.ConversionFactor;
+
+                totalStockCost += lot.Quantity * lot.UnitPrice;
+                totalNormalizedStockQuantity += normalizedLotQty;
             }
 
-            totalEstimatedCost += requiredQty * weightedAvgUnitPrice;
+            if (totalNormalizedStockQuantity > 0)
+            {
+                var costPerBaseUnit = totalStockCost / totalNormalizedStockQuantity;
+                totalEstimatedCost += normalizedRequiredQty * costPerBaseUnit;
+            }
         }
 
-        return Result.Success(totalEstimatedCost);
+        return Result.Success(Math.Round(totalEstimatedCost, 2));
     }
 }
