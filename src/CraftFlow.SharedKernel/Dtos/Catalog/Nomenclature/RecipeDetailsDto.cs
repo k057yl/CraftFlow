@@ -1,6 +1,5 @@
 ﻿namespace CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature;
-
-public record RecipeDto(
+public record RecipeDetailsDto(
     Guid Id,
     Guid ProductId,
     string ProductName,

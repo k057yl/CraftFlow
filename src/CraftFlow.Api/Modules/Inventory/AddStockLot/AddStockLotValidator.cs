@@ -31,5 +31,13 @@ public class AddStockLotValidator : AbstractValidator<AddStockLotCommand>
         RuleFor(x => x.ExpirationDate)
             .Must(date => date == null || date.Value > DateTime.UtcNow)
             .WithErrorCode(ErrorCodes.Production.EXPIRATION_DATE_MUST_BE_IN_FUTURE);
+
+        RuleFor(x => x.UnitOfMeasureId)
+            .MustAsync(async (uomId, ct) =>
+            {
+                if (uomId == Guid.Empty) return true;
+                return await dbContext.UnitsOfMeasure.AnyAsync(u => u.Id == uomId, ct);
+            })
+            .WithErrorCode(ErrorCodes.Catalog.UNIT_OF_MEASURE_NOT_FOUND);
     }
 }

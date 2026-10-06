@@ -1,0 +1,30 @@
+﻿<Window x:Class="CraftFlow.Wpf.Windows.RecipeDetailsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Состав рецепта" Height="380" Width="420"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+            <TextBlock x:Name="RecipeNameTextBlock" FontSize="18" FontWeight="Bold" Margin="0,0,0,5"/>
+            <TextBlock x:Name="RecipeInfoTextBlock" FontSize="12" Foreground="Gray"/>
+        </StackPanel>
+
+        <GroupBox Grid.Row="1" Header="Ингредиенты" Padding="5">
+            <DataGrid x:Name="IngredientsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Сырьё" Binding="{Binding RawMaterialName}" Width="*"/>
+                    <DataGridTextColumn Header="Количество" Binding="{Binding Quantity}" Width="100"/>
+                    <DataGridTextColumn Header="Ед. изм." Binding="{Binding UnitOfMeasureCode}" Width="80"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </GroupBox>
+
+        <Button Grid.Row="2" Content="Закрыть" Click="Close_Click" Style="{StaticResource PrimaryButtonStyle}" Height="30" Margin="0,10,0,0" HorizontalAlignment="Right" Width="100"/>
+    </Grid>
+</Window>

@@ -18,34 +18,40 @@
             <!-- ================= 1. НОМЕНКЛАТУРА И РЕЦЕПТЫ ================= -->
             <TabItem Header="Номенклатура и Рецепты">
                 <Grid Margin="10">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
+                        <!-- 1. Сырье -->
+                        <ColumnDefinition Width="260"/>
+                        <!-- 2 & 2.1 Новая рецептура -->
+                        <ColumnDefinition Width="300"/>
+                        <!-- 2.2 Список рецептов -->
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- [1] Сырье и ингредиенты (Теперь занимает левый верхний угол вместо ЕИ) -->
-                    <GroupBox Grid.Row="0" Grid.Column="0" Header="{loc:Loc Key=HEADER_RAW_MATERIALS}" Margin="0,0,5,5" Padding="8">
+                    <!-- ================= [1] СЫРЬЕ И ИНГРЕДИЕНТЫ ================= -->
+                    <GroupBox Grid.Column="0" Header="{loc:Loc Key=HEADER_RAW_MATERIALS}" Margin="0,0,10,0" Padding="8">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <WrapPanel Grid.Row="0" Margin="0,0,0,8">
-                                <TextBox x:Name="RawMaterialNameTextBox" Width="140" Margin="0,0,5,5"/>
-                                <ComboBox x:Name="RawUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="100" Margin="0,0,5,5"/>
-                                <Button Content="Добавить" Click="CreateRawMaterial_Click" Style="{StaticResource PrimaryButtonStyle}" Height="26" Padding="10,0" Margin="0,0,0,5"/>
-                            </WrapPanel>
-                            <DataGrid Grid.Row="1" x:Name="RawMaterialsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+
+                            <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                                <TextBlock Text="Название сырья:" FontSize="10" Margin="0,0,0,2"/>
+                                <TextBox x:Name="RawMaterialNameTextBox" Height="24" Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Единица измерения:" FontSize="10" Margin="0,0,0,2"/>
+                                <ComboBox x:Name="RawUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="24" Margin="0,0,0,8"/>
+
+                                <Button Content="Добавить сырьё" Click="CreateRawMaterial_Click" Style="{StaticResource PrimaryButtonStyle}" Height="26" Margin="0,0,0,4"/>
+                            </StackPanel>
+
+                            <DataGrid Grid.Row="1" x:Name="RawMaterialsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" VerticalScrollBarVisibility="Auto">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="{loc:Loc Key=RAW_MATERIAL_NAME}" Binding="{Binding Name}" Width="*"/>
-                                    <DataGridTemplateColumn Width="40">
+                                    <DataGridTemplateColumn Width="45">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Button Content="❌" Click="DeleteRawMaterial_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
+                                                <Button Content="✕" Click="DeleteRawMaterial_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>
@@ -54,85 +60,70 @@
                         </Grid>
                     </GroupBox>
 
-                    <!-- [2] Готовая продукция -->
-                    <GroupBox Grid.Row="0" Grid.Column="1" Header="{loc:Loc Key=HEADER_PRODUCTS}" Margin="5,0,0,5" Padding="8">
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                            </Grid.RowDefinitions>
-                            <WrapPanel Grid.Row="0" Margin="0,0,0,8">
-                                <TextBox x:Name="ProductNameTextBox" Width="140" Margin="0,0,5,5"/>
-                                <ComboBox x:Name="ProductUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="100" Margin="0,0,5,5"/>
-                                <Button Content="Создать" Click="CreateProduct_Click" Style="{StaticResource PrimaryButtonStyle}" Height="26" Padding="10,0" Margin="0,0,0,5"/>
-                            </WrapPanel>
-                            <DataGrid Grid.Row="1" x:Name="ProductsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="{loc:Loc Key=PRODUCT_NAME}" Binding="{Binding Name}" Width="*"/>
-                                    <DataGridTemplateColumn Width="40">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Button Content="❌" Click="DeleteProduct_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </Grid>
+                    <!-- ================= [2 & 2.1] СОЗДАНИЕ РЕЦЕПТУРЫ ================= -->
+                    <GroupBox Grid.Column="1" Header="Новая рецептура" Margin="0,0,10,0" Padding="8">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <!-- [Блок 2] Основная информация -->
+                                <TextBlock Text="Название продукта / рецепта:" FontSize="10" Margin="0,0,0,2"/>
+                                <TextBox x:Name="ProductNameTextBox" Height="24" Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Единица измерения выхода:" FontSize="10" Margin="0,0,0,2"/>
+                                <ComboBox x:Name="ProductUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="24" Margin="0,0,0,6"/>
+
+                                <TextBlock Text="Выход (кг/л):" FontSize="10" Margin="0,0,0,2"/>
+                                <TextBox x:Name="RecipeOutputQuantityTextBox" Text="1" Height="24" Margin="0,0,0,6"/>
+
+                                <CheckBox x:Name="IsAgingRequiredCheckBox" Content="Созревание (дни):" FontSize="10" Margin="0,2,0,2"/>
+                                <TextBox x:Name="DefaultMinAgingDaysTextBox" Text="30" Height="24" Margin="0,0,0,12"/>
+
+                                <Separator Margin="0,0,0,10"/>
+
+                                <!-- [Блок 2.1] Состав сырья и кнопки -->
+                                <TextBlock Text="Состав сырья:" FontSize="11" FontWeight="Bold" Margin="0,0,0,4"/>
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="26"/>
+                                    </Grid.ColumnDefinitions>
+                                    <ComboBox Grid.Column="0" x:Name="RecipeRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="24" Margin="0,0,4,0"/>
+                                    <TextBox Grid.Column="1" x:Name="RecipeIngredientQuantityTextBox" Text="1" Height="24" Margin="0,0,4,0"/>
+                                    <Button Grid.Column="2" Content="+" Click="AddIngredient_Click" Style="{StaticResource PrimaryButtonStyle}" Height="24"/>
+                                </Grid>
+
+                                <ListBox x:Name="AddedIngredientsListBox" Height="90" DisplayMemberPath="DisplayInfo" Margin="0,0,0,12"/>
+
+                                <Button Content="Сохранить рецепт" Click="CreateRecipe_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28"/>
+                            </StackPanel>
+                        </ScrollViewer>
                     </GroupBox>
 
-                    <!-- [3] Технологические рецептуры (Растянуто на всю нижнюю часть) -->
-                    <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Header="{loc:Loc Key=HEADER_RECIPES}" Margin="0,5,0,0" Padding="8">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="280"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
+                    <!-- ================= [2.2] СПИСОК РЕЦЕПТУР ================= -->
+                    <GroupBox Grid.Column="2" Header="{loc:Loc Key=HEADER_RECIPES}" Padding="8">
+                        <DataGrid x:Name="RecipesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" VerticalScrollBarVisibility="Auto">
+                            <DataGrid.Columns>
+                                <DataGridTemplateColumn Header="Рецепт" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock VerticalAlignment="Center" Margin="5,0">
+                                                <Hyperlink Click="OpenRecipeDetails_Click">
+                                                    <Run Text="{Binding Name}"/>
+                                                </Hyperlink>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
 
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" Grid.Column="0" Margin="0,0,8,0">
-                                <StackPanel>
-                                    <TextBlock Text="Рецепт:" FontSize="10"/>
-                                    <TextBox x:Name="RecipeNameTextBox" Height="24" Margin="0,0,0,4"/>
-
-                                    <TextBlock Text="Продукт:" FontSize="10"/>
-                                    <ComboBox x:Name="RecipeProductComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="24" Margin="0,0,0,4"/>
-
-                                    <TextBlock Text="Выход (кг/л):" FontSize="10"/>
-                                    <TextBox x:Name="RecipeOutputQuantityTextBox" Text="1" Height="24" Margin="0,0,0,4"/>
-
-                                    <CheckBox x:Name="IsAgingRequiredCheckBox" Content="Созревание (дни):" FontSize="10" Margin="0,2,0,2"/>
-                                    <TextBox x:Name="DefaultMinAgingDaysTextBox" Text="30" Height="24" Margin="0,0,0,6"/>
-
-                                    <TextBlock Text="Состав:" FontSize="10" FontWeight="Bold"/>
-                                    <Grid Margin="0,0,0,4">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="40"/>
-                                            <ColumnDefinition Width="24"/>
-                                        </Grid.ColumnDefinitions>
-                                        <ComboBox Grid.Column="0" x:Name="RecipeRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="24" Margin="0,0,2,0"/>
-                                        <TextBox Grid.Column="1" x:Name="RecipeIngredientQuantityTextBox" Text="1" Height="24" Margin="0,0,2,0"/>
-                                        <Button Grid.Column="2" Content="+" Click="AddIngredient_Click" Style="{StaticResource PrimaryButtonStyle}" Height="24"/>
-                                    </Grid>
-                                    <ListBox x:Name="AddedIngredientsListBox" Height="60" DisplayMemberPath="DisplayInfo" Margin="0,0,0,6"/>
-
-                                    <Button Content="Сохранить рецепт" Click="CreateRecipe_Click" Style="{StaticResource PrimaryButtonStyle}" Height="26"/>
-                                </StackPanel>
-                            </ScrollViewer>
-
-                            <DataGrid Grid.Column="1" x:Name="RecipesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Рецепт" Binding="{Binding Name}" Width="*"/>
-                                    <DataGridTemplateColumn Width="40">
-                                        <DataGridTemplateColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <Button Content="❌" Click="DeleteRecipe_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
-                                            </DataTemplate>
-                                        </DataGridTemplateColumn.CellTemplate>
-                                    </DataGridTemplateColumn>
-                                </DataGrid.Columns>
-                            </DataGrid>
-                        </Grid>
+                                <DataGridTemplateColumn Width="45">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="✕" Click="DeleteRecipe_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </GroupBox>
                 </Grid>
             </TabItem>
@@ -166,10 +157,10 @@
                                 <DataGrid Grid.Row="1" x:Name="WarehousesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Склад" Binding="{Binding Name}" Width="*"/>
-                                        <DataGridTemplateColumn Width="40">
+                                        <DataGridTemplateColumn Width="45">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Button Content="❌" Click="DeleteWarehouse_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
+                                                    <Button Content="✕" Click="DeleteWarehouse_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
@@ -194,10 +185,10 @@
                                 <DataGrid Grid.Row="1" x:Name="ChambersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                                     <DataGrid.Columns>
                                         <DataGridTextColumn Header="Камера" Binding="{Binding Name}" Width="*"/>
-                                        <DataGridTemplateColumn Width="40">
+                                        <DataGridTemplateColumn Width="45">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Button Content="❌" Click="DeleteChamber_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
+                                                    <Button Content="✕" Click="DeleteChamber_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
@@ -228,7 +219,7 @@
                                     <DataGridTemplateColumn Width="50">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
-                                                <Button Content="❌" Click="DeleteStorageLocation_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}"/>
+                                                <Button Content="✕" Click="DeleteStorageLocation_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
                                             </DataTemplate>
                                         </DataGridTemplateColumn.CellTemplate>
                                     </DataGridTemplateColumn>

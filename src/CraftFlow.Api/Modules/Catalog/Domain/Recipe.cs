@@ -9,6 +9,7 @@ public sealed class Recipe : AggregateRoot, ITenantEntity
 
     public Guid TenantId { get; private set; }
     public Guid ProductId { get; private set; }
+    public Product Product { get; private set; } = null!;
     public string Name { get; private set; } = null!;
     public decimal TargetOutputQuantity { get; private set; }
     public bool IsAgingRequired { get; private set; }

@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Modules.Aging;
 using CraftFlow.Api.Modules.Catalog;
 using CraftFlow.Api.Modules.Inventory;
+using CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.Wpf.Models;
@@ -10,8 +11,8 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Media;
-using static CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature.CatalogDtos;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -19,8 +20,7 @@ public partial class CatalogPage : Page
 {
     public ObservableCollection<LookupItem> UnitsOfMeasure { get; } = [];
     public ObservableCollection<LookupItem> RawMaterials { get; } = [];
-    public ObservableCollection<LookupItem> Products { get; } = [];
-    public ObservableCollection<LookupItem> Recipes { get; } = [];
+    public ObservableCollection<RecipeDto> Recipes { get; } = [];
     private readonly ObservableCollection<IngredientItemDto> _selectedIngredients = [];
 
     public ObservableCollection<LookupItem> Warehouses { get; } = [];
@@ -33,12 +33,10 @@ public partial class CatalogPage : Page
 
         RawUomComboBox.ItemsSource = UnitsOfMeasure;
         ProductUomComboBox.ItemsSource = UnitsOfMeasure;
-        RecipeProductComboBox.ItemsSource = Products;
         RecipeRawMaterialComboBox.ItemsSource = RawMaterials;
         AddedIngredientsListBox.ItemsSource = _selectedIngredients;
 
         RawMaterialsDataGrid.ItemsSource = RawMaterials;
-        ProductsDataGrid.ItemsSource = Products;
         RecipesDataGrid.ItemsSource = Recipes;
 
         WarehousesDataGrid.ItemsSource = Warehouses;
@@ -89,17 +87,9 @@ public partial class CatalogPage : Page
                 RawMaterials.Add(new LookupItem(r.Id, displayName, r.UnitOfMeasureCode));
             });
 
-            var prods = await ApiService.Instance.GetAsync<List<ProductDto>>(CatalogConstants.PRODUCTS);
-            Products.Clear();
-            prods?.ForEach(p =>
-            {
-                var displayName = !string.IsNullOrWhiteSpace(p.UnitOfMeasureCode) ? $"{p.Name} ({p.UnitOfMeasureCode})" : p.Name;
-                Products.Add(new LookupItem(p.Id, displayName, p.UnitOfMeasureCode));
-            });
-
-            var recs = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.RECIPES);
+            var recs = await ApiService.Instance.GetAsync<List<RecipeDto>>(CatalogConstants.RECIPES);
             Recipes.Clear();
-            recs?.ForEach(r => Recipes.Add(new LookupItem(r.Id, r.Name)));
+            recs?.ForEach(r => Recipes.Add(r));
 
             var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(InventoryConstants.WAREHOUSES);
             Warehouses.Clear();
@@ -150,6 +140,18 @@ public partial class CatalogPage : Page
         }
     }
 
+    private void OpenRecipeDetails_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Hyperlink link && link.DataContext is RecipeDto recipe)
+        {
+            var dialog = new RecipeDetailsWindow(recipe)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            dialog.ShowDialog();
+        }
+    }
+
     // --- СОЗДАНИЕ ---
 
     private async void CreateRawMaterial_Click(object sender, RoutedEventArgs e)
@@ -177,39 +179,34 @@ public partial class CatalogPage : Page
         }
     }
 
-    private async void CreateProduct_Click(object sender, RoutedEventArgs e)
+    private async void CreateRecipe_Click(object sender, RoutedEventArgs e)
     {
-        if (ProductUomComboBox.SelectedValue is not Guid uomId || string.IsNullOrWhiteSpace(ProductNameTextBox.Text))
+        var productName = ProductNameTextBox.Text?.Trim();
+        if (string.IsNullOrWhiteSpace(productName) ||
+            ProductUomComboBox.SelectedValue is not Guid productUomId ||
+            !TryParseDecimal(RecipeOutputQuantityTextBox.Text, out var targetOutput) ||
+            _selectedIngredients.Count == 0)
         {
             SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(CatalogConstants.PRODUCTS, new
+        var (isProdSuccess, prodContentOrError) = await ApiService.Instance.PostAndReadAsync(CatalogConstants.PRODUCTS, new
         {
-            Name = ProductNameTextBox.Text.Trim(),
-            UnitOfMeasureId = uomId
+            Name = productName,
+            UnitOfMeasureId = productUomId
         });
 
-        if (isSuccess)
+        if (!isProdSuccess)
         {
-            ProductNameTextBox.Clear();
-            await LoadDataAsync();
+            SetStatusRaw(prodContentOrError, Brushes.Red);
+            return;
         }
-        else
-        {
-            SetStatusRaw(contentOrError, Brushes.Red);
-        }
-    }
 
-    private async void CreateRecipe_Click(object sender, RoutedEventArgs e)
-    {
-        if (RecipeProductComboBox.SelectedValue is not Guid productId ||
-            !TryParseDecimal(RecipeOutputQuantityTextBox.Text, out var targetOutput) ||
-            _selectedIngredients.Count == 0 ||
-            string.IsNullOrWhiteSpace(RecipeNameTextBox.Text))
+        Guid productId;
+        if (!Guid.TryParse(prodContentOrError.Replace("\"", "").Trim(), out productId))
         {
-            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
+            await LoadDataAsync();
             return;
         }
 
@@ -220,25 +217,25 @@ public partial class CatalogPage : Page
             .Select(i => new { RawMaterialId = i.RawMaterialId, Quantity = i.Quantity })
             .ToArray();
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(CatalogConstants.RECIPES, new
+        var (isRecipeSuccess, recipeContentOrError) = await ApiService.Instance.PostAndReadAsync(CatalogConstants.RECIPES, new
         {
             ProductId = productId,
-            Name = RecipeNameTextBox.Text.Trim(),
+            Name = productName,
             TargetOutputQuantity = targetOutput,
             IsAgingRequired = isAgingRequired,
             DefaultMinAgingDays = defaultMinAgingDays,
             Ingredients = ingredientsPayload
         });
 
-        if (isSuccess)
+        if (isRecipeSuccess)
         {
-            RecipeNameTextBox.Clear();
+            ProductNameTextBox.Clear();
             _selectedIngredients.Clear();
             await LoadDataAsync();
         }
         else
         {
-            SetStatusRaw(contentOrError, Brushes.Red);
+            SetStatusRaw(recipeContentOrError, Brushes.Red);
         }
     }
 
@@ -326,15 +323,6 @@ public partial class CatalogPage : Page
         if (sender is Button btn && btn.Tag is Guid id)
         {
             await ApiService.Instance.DeleteAsync($"{CatalogConstants.RAW_MATERIALS}/{id}");
-            await LoadDataAsync();
-        }
-    }
-
-    private async void DeleteProduct_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is Guid id)
-        {
-            await ApiService.Instance.DeleteAsync($"{CatalogConstants.PRODUCTS}/{id}");
             await LoadDataAsync();
         }
     }

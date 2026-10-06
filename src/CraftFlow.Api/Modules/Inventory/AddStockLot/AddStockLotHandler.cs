@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Inventory.Domain;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +18,34 @@ public class AddStockLotHandler : IRequestHandler<AddStockLotCommand, Result<Gui
 
     public async Task<Result<Guid>> Handle(AddStockLotCommand request, CancellationToken cancellationToken)
     {
+        Guid finalUnitOfMeasureId = request.UnitOfMeasureId;
+
+        if (finalUnitOfMeasureId == Guid.Empty)
+        {
+            var rawMaterialUomId = await _dbContext.RawMaterials
+                .Where(r => r.Id == request.ItemId)
+                .Select(r => (Guid?)r.UnitOfMeasureId)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            var productUomId = rawMaterialUomId is null
+                ? await _dbContext.Products
+                    .Where(p => p.Id == request.ItemId)
+                    .Select(p => (Guid?)p.UnitOfMeasureId)
+                    .FirstOrDefaultAsync(cancellationToken)
+                : null;
+
+            var foundUomId = rawMaterialUomId ?? productUomId;
+
+            if (foundUomId is null || foundUomId == Guid.Empty)
+            {
+                return Result.Failure<Guid>(
+                    Error.NotFound(ErrorCodes.Catalog.UNIT_OF_MEASURE_NOT_FOUND)
+                );
+            }
+
+            finalUnitOfMeasureId = foundUomId.Value;
+        }
+
         DateTime? utcExpirationDate = request.ExpirationDate.HasValue
             ? DateTime.SpecifyKind(request.ExpirationDate.Value, DateTimeKind.Utc)
             : null;
@@ -26,7 +55,7 @@ public class AddStockLotHandler : IRequestHandler<AddStockLotCommand, Result<Gui
         var stockLot = StockLot.Create(
             warehouseId: request.WarehouseId,
             itemId: request.ItemId,
-            unitOfMeasureId: request.UnitOfMeasureId,
+            unitOfMeasureId: finalUnitOfMeasureId,
             initialQuantity: request.Quantity,
             unitsCount: finalUnitsCount,
             unitPrice: request.UnitPrice,

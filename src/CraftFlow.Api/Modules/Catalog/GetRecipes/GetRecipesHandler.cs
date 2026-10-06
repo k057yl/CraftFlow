@@ -21,9 +21,18 @@ public class GetRecipesHandler : IRequestHandler<GetRecipesQuery, Result<List<Re
             .AsNoTracking()
             .Select(r => new RecipeDto(
                 r.Id,
+                r.ProductId,
+                r.Product.Name,
                 r.Name,
+                r.TargetOutputQuantity,
                 r.IsAgingRequired,
-                r.DefaultMinAgingDays
+                r.DefaultMinAgingDays,
+                r.Ingredients.Select(i => new RecipeIngredientDetailDto(
+                    i.RawMaterialId,
+                    i.RawMaterial.Name,
+                    i.RawMaterial.UnitOfMeasure != null ? i.RawMaterial.UnitOfMeasure.Code : string.Empty,
+                    i.Quantity
+                )).ToList()
             ))
             .ToListAsync(cancellationToken);
 
