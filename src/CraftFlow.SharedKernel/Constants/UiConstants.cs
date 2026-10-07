@@ -2,6 +2,16 @@
 
 public static class UiConstants
 {
+    public static class Roles
+    {
+        public const string SUPER_ADMIN_DISPLAY = "SuperAdmin (SaaS)";
+        public const string OWNER_DISPLAY = "Владелец";
+        public const string TECHNOLOGIST_DISPLAY = "Технолог";
+        public const string STOREKEEPER_DISPLAY = "Кладовщик";
+        public const string SALES_MANAGER_DISPLAY = "Менеджер продаж";
+        public const string EMPLOYEE_DISPLAY = "Сотрудник";
+    }
+
     public static class Messages
     {
         public const string DATA_LOADED_SUCCESS = "UI.DATA_LOADED_SUCCESS";

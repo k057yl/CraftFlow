@@ -1,73 +1,51 @@
-﻿using CraftFlow.Api.Modules.Analytics;
-using CraftFlow.SharedKernel.Dtos.Dashboard;
-using CraftFlow.Wpf.Services;
+﻿using CraftFlow.SharedKernel.Dtos.Dashboard;
+using CraftFlow.Wpf.Services.Startup;
 using System.Windows;
 
 namespace CraftFlow.Wpf.Pages;
 
 public partial class SplashWindow : Window
 {
+    private readonly AppStartupService _startupService = new();
+
     public SplashWindow()
     {
         InitializeComponent();
-        Loaded += async (s, e) => await ExecuteRealStartupLoadingAsync();
+        Loaded += async (s, e) => await StartLoadingAsync();
     }
 
-    private async Task ExecuteRealStartupLoadingAsync()
+    private async Task StartLoadingAsync()
     {
-        try
+        var progress = new Progress<StartupProgress>(p =>
         {
-            UpdateProgress(20, "Проверка авторизации...");
-
-            bool hasSavedToken = ApiService.Instance.IsAuthenticated;
-            bool isValidSession = false;
-
-            if (hasSavedToken)
-            {
-                UpdateProgress(40, "Валидация сессии...");
-                isValidSession = await ApiService.Instance.ValidateAndRefreshCurrentUserAsync();
-            }
-
-            DashboardSummaryDto? initialSummary = null;
-
-            if (isValidSession)
-            {
-                UpdateProgress(70, "Загрузка данных дашборда...");
-                initialSummary = await ApiService.Instance.GetAsync<DashboardSummaryDto>(AnalyticConstants.DASHBOARD);
-            }
-
-            UpdateProgress(100, "Открытие системы...");
-
-            var mainWindow = new MainWindow(initialSummary);
-
-            if (!isValidSession)
-            {
-                mainWindow.NavigateToAuth();
-            }
-
-            mainWindow.Show();
-            Close();
-        }
-        catch (Exception ex)
-        {
-            StatusTextBlock.Text = $"Ошибка загрузки: {ex.Message}";
-            StatusTextBlock.Foreground = System.Windows.Media.Brushes.Red;
-
-            await Task.Delay(1500);
-
-            var mainWindow = new MainWindow(null);
-            mainWindow.NavigateToAuth();
-            mainWindow.Show();
-            Close();
-        }
-    }
-
-    private void UpdateProgress(int percent, string status)
-    {
-        Dispatcher.Invoke(() =>
-        {
-            LoadingProgressBar.Value = percent;
-            StatusTextBlock.Text = status;
+            LoadingProgressBar.Value = p.Percent;
+            StatusTextBlock.Text = p.Description;
         });
+
+        var result = await _startupService.RunAsync(progress);
+
+        if (result.ResultType == StartupResultType.CriticalError)
+        {
+            StatusTextBlock.Text = $"Ошибка загрузки: {result.ErrorMessage}";
+            StatusTextBlock.Foreground = System.Windows.Media.Brushes.Red;
+            await Task.Delay(1500);
+        }
+
+        OpenMainApp(result);
+    }
+
+    private void OpenMainApp(StartupResult result)
+    {
+        var summary = result.InitialData as DashboardSummaryDto;
+        var mainWindow = new MainWindow(summary);
+
+        if (result.ResultType != StartupResultType.Success)
+        {
+            mainWindow.NavigateToAuth();
+        }
+
+        mainWindow.Show();
+        Application.Current.MainWindow = mainWindow;
+        Close();
     }
 }

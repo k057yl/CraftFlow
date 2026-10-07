@@ -82,12 +82,12 @@ public partial class MainWindow : Window
         UserNameTextBlock.Text = currentUser?.FullName ?? string.Empty;
         UserRoleTextBlock.Text = currentUser?.Role switch
         {
-            TenantRole.SuperAdmin => "SuperAdmin (SaaS)",
-            TenantRole.Owner => "Владелец",
-            TenantRole.Technologist => "Технолог",
-            TenantRole.Storekeeper => "Кладовщик",
-            TenantRole.SalesManager => "Менеджер продаж",
-            _ => "Сотрудник"
+            TenantRole.SuperAdmin => UiConstants.Roles.SUPER_ADMIN_DISPLAY,
+            TenantRole.Owner => UiConstants.Roles.OWNER_DISPLAY,
+            TenantRole.Technologist => UiConstants.Roles.TECHNOLOGIST_DISPLAY,
+            TenantRole.Storekeeper => UiConstants.Roles.STOREKEEPER_DISPLAY,
+            TenantRole.SalesManager => UiConstants.Roles.SALES_MANAGER_DISPLAY,
+            _ => UiConstants.Roles.EMPLOYEE_DISPLAY
         };
 
         NavAuthButton.Visibility = Visibility.Collapsed;

@@ -17,12 +17,8 @@ public class TokenService : ITokenService
         _config = config;
     }
 
-    public string GenerateJwtToken(User user, OrganizationMember? member = null)
+    public string GenerateJwtToken(User user, OrganizationMember? member = null, bool isSystemAdmin = false)
     {
-        var adminEmail = Environment.GetEnvironmentVariable(AuthConstants.ADMIN_CONFIG_KEYS.ADMIN_EMAIL_KEY);
-        var isSystemAdmin = user.IsSuperAdmin || (!string.IsNullOrEmpty(adminEmail) &&
-                      user.Email.Equals(adminEmail.Trim().ToLowerInvariant(), StringComparison.OrdinalIgnoreCase));
-
         var effectiveRole = isSystemAdmin
             ? TenantRole.SuperAdmin
             : (member?.Role ?? TenantRole.None);
@@ -38,17 +34,17 @@ public class TokenService : ITokenService
             new(AuthConstants.Claims.TENANT_ID, tenantId.ToString()),
             new(AuthConstants.Claims.FULL_NAME, user.FullName),
             new(ClaimTypes.Role, effectiveRole.ToString()),
-            new("role_id", ((int)effectiveRole).ToString()),
+            new(AuthConstants.Claims.ROLE_ID, ((int)effectiveRole).ToString()),
             new(AuthConstants.Claims.ROLE_SHORT, effectiveRole.ToString()),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        var secretKey = _config["Jwt:SecretKey"]
-            ?? _config["JWT_SECRET_KEY"]
-            ?? throw new InvalidOperationException("JWT_SECRET_KEY_NOT_CONFIGURED");
+        var secretKey = _config[AuthConstants.ConfigurationKeys.JWT_SECRET_KEY_PATH]
+            ?? _config[AuthConstants.ConfigurationKeys.JWT_SECRET_KEY_ENV]
+            ?? throw new InvalidOperationException(AuthConstants.ErrorMessages.JWT_SECRET_KEY_NOT_CONFIGURED);
 
-        var issuer = _config["Jwt:Issuer"]?.Trim();
-        var audience = _config["Jwt:Audience"]?.Trim();
+        var issuer = _config[AuthConstants.ConfigurationKeys.JWT_ISSUER_PATH]?.Trim();
+        var audience = _config[AuthConstants.ConfigurationKeys.JWT_AUDIENCE_PATH]?.Trim();
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -57,7 +53,7 @@ public class TokenService : ITokenService
             issuer: issuer,
             audience: audience,
             claims: claims,
-            expires: DateTime.UtcNow.AddDays(7),
+            expires: DateTime.UtcNow.AddDays(AuthConstants.Token.DEFAULT_EXPIRATION_DAYS),
             signingCredentials: creds
         );
 
@@ -86,9 +82,9 @@ public class TokenService : ITokenService
 
     public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
     {
-        var secretKey = _config["Jwt:SecretKey"]
-            ?? _config["JWT_SECRET_KEY"]
-            ?? throw new InvalidOperationException("JWT_SECRET_KEY_NOT_CONFIGURED");
+        var secretKey = _config[AuthConstants.ConfigurationKeys.JWT_SECRET_KEY_PATH]
+            ?? _config[AuthConstants.ConfigurationKeys.JWT_SECRET_KEY_ENV]
+            ?? throw new InvalidOperationException(AuthConstants.ErrorMessages.JWT_SECRET_KEY_NOT_CONFIGURED);
 
         var tokenValidationParameters = new TokenValidationParameters
         {

@@ -5,7 +5,7 @@ namespace CraftFlow.Api.Common.Infrastructure.Identity;
 
 public interface ITokenService
 {
-    string GenerateJwtToken(User user, OrganizationMember? member = null);
+    string GenerateJwtToken(User user, OrganizationMember? member = null, bool isSystemAdmin = false);
     string GenerateRefreshToken();
     string HashRefreshToken(string refreshToken);
     ClaimsPrincipal GetPrincipalFromExpiredToken(string token);

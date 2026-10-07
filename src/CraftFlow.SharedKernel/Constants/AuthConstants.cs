@@ -3,8 +3,6 @@
 public static class AuthConstants
 {
     public const string DEFAULT_JWT_SECRET = "SUPER_SECRET_KEY_CRAFT_FLOW_2026_OLD_SCHULL_MUST_BE_LONG_ENOUGH";
-    public const string JWT_SECRET_CONFIG_PATH = "Jwt:SecretKey";
-    public const string JWT_SECRET_KEY_ENV = "JWT_SECRET_KEY";
     public const string DB_CONNECTION_STRING_PATH = "Database";
 
     public static class Headers
@@ -26,10 +24,26 @@ public static class AuthConstants
         public const string API_KEY_SECURITY_SECTION = "ApiKeySecurity";
     }
 
+    public static class ConfigurationKeys
+    {
+        public const string JWT_SECRET_KEY_PATH = "Jwt:SecretKey";
+        public const string JWT_SECRET_KEY_ENV = "JWT_SECRET_KEY";
+        public const string JWT_ISSUER_PATH = "Jwt:Issuer";
+        public const string JWT_AUDIENCE_PATH = "Jwt:Audience";
+    }
+
     public static class Roles
     {
         public const string ADMIN = "Admin";
         public const string USER = "User";
+    }
+
+    public static class AdminEnvironment
+    {
+        public const string ADMIN_EMAIL = "ADMIN_EMAIL";
+        public const string ADMIN_PASSWORD = "ADMIN_PASSWORD";
+        public const string ADMIN_NAME = "ADMIN_NAME";
+        public const string DEFAULT_ADMIN_NAME = "System Admin";
     }
 
     public static class Claims
@@ -37,21 +51,19 @@ public static class AuthConstants
         public const string EMAIL = "email";
         public const string ROLE_SHORT = "role";
         public const string ROLE_FULL = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";
+        public const string ROLE_ID = "role_id";
         public const string TENANT_ID = "tenant_id";
         public const string FULL_NAME = "full_name";
     }
 
-    public static class ADMIN_CONFIG_KEYS
+    public static class Token
     {
-        public const string ADMIN_EMAIL_KEY = "ADMIN_EMAIL";
-        public const string ADMIN_PASSWORD_KEY = "ADMIN_PASSWORD";
-        public const string ADMIN_NAME_KEY = "ADMIN_NAME";
+        public const int DEFAULT_EXPIRATION_DAYS = 7;
     }
 
-    public static class SYSTEM_SECURITY_CONSTANTS
+    public static class ErrorMessages
     {
-        public const string ADMIN_ROLE_CLAIM_KEY = "SYSTEM_ADMIN_ROLE";
-        public const string ADMIN_ROLE_VALUE = "BIG_BOSS";
+        public const string JWT_SECRET_KEY_NOT_CONFIGURED = "JWT_SECRET_KEY_NOT_CONFIGURED";
     }
 
     public static class OTP

@@ -59,10 +59,13 @@ public class VerifyOtpHandler : IRequestHandler<VerifyOtpCommand, Result<LoginRe
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var tokenString = _tokenService.GenerateJwtToken(user, member);
+        var isSystemAdmin = await _dbContext.SystemAdmins
+            .AnyAsync(sa => sa.UserId == user.Id, cancellationToken);
+
+        var tokenString = _tokenService.GenerateJwtToken(user, member, isSystemAdmin);
 
         var tenantId = member?.TenantId ?? Guid.Empty;
-        var role = user.IsSuperAdmin ? TenantRole.SuperAdmin : (member?.Role ?? TenantRole.None);
+        var role = isSystemAdmin ? TenantRole.SuperAdmin : (member?.Role ?? TenantRole.None);
 
         return Result.Success(new LoginResponseDto(tokenString, tenantId, user.FullName, user.Email, role));
     }

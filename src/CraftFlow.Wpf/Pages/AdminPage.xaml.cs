@@ -1,4 +1,6 @@
-﻿using CraftFlow.SharedKernel.Dtos.Identity;
+﻿using CraftFlow.Api.Modules.Identity;
+using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
 using System.Windows;
@@ -17,7 +19,7 @@ public partial class AdminPage : Page
 
     private async Task LoadOrganizationsAsync()
     {
-        var orgs = await ApiService.Instance.GetAsync<List<OrganizationAdminDto>>("/api/identity/organizations");
+        var orgs = await ApiService.Instance.GetAsync<List<OrganizationAdminDto>>(IdentityConstants.ORGANIZATIONS);
         if (orgs != null)
         {
             OrganizationsDataGrid.ItemsSource = orgs;

@@ -9,6 +9,7 @@ public static class DbTables
     public const string RECIPES = "recipes";
     public const string PRODUCTS = "products";
     public const string USERS = "users";
+    public const string SYSTEM_ADMINS = "system_admins";
     public const string STOCK_LOTS = "stock_lots";
     public const string STOCK_LOT_STORAGE_LOCATIONS = "stock_lot_storage_locations";
     public const string WAREHOUSES = "warehouses";

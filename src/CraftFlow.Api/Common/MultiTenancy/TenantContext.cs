@@ -45,9 +45,10 @@ public class TenantContext : ITenantContext
     private TenantRole FetchRole()
     {
         var httpContext = _httpContextAccessor.HttpContext;
+
         if (httpContext?.User is null || !httpContext.User.Identity?.IsAuthenticated == true)
         {
-            return TenantRole.Storekeeper;
+            return TenantRole.None;
         }
 
         if (httpContext.User.IsInRole(AuthConstants.Roles.ADMIN) ||
@@ -65,7 +66,7 @@ public class TenantContext : ITenantContext
             return parsedRole;
         }
 
-        return TenantRole.Owner;
+        return TenantRole.None;
     }
 
     private bool TryFetchTenantId(out Guid tenantId)

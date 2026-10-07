@@ -43,9 +43,12 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginRe
             return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.INVALID_CREDENTIALS));
         }
 
+        var isSystemAdmin = await _dbContext.SystemAdmins
+            .AnyAsync(sa => sa.UserId == user.Id, cancellationToken);
+
         OrganizationMember? activeMember = null;
 
-        if (!user.IsSuperAdmin)
+        if (!isSystemAdmin)
         {
             activeMember = await _dbContext.OrganizationMembers
                 .IgnoreQueryFilters()
@@ -58,10 +61,10 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginRe
             }
         }
 
-        var tokenString = _tokenService.GenerateJwtToken(user, activeMember);
+        var tokenString = _tokenService.GenerateJwtToken(user, activeMember, isSystemAdmin);
 
         var tenantId = activeMember?.TenantId ?? Guid.Empty;
-        var role = user.IsSuperAdmin ? TenantRole.SuperAdmin : (activeMember?.Role ?? TenantRole.None);
+        var role = isSystemAdmin ? TenantRole.SuperAdmin : (activeMember?.Role ?? TenantRole.None);
 
         return Result.Success(new LoginResponseDto(
             tokenString,

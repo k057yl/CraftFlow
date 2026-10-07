@@ -46,6 +46,7 @@ public class AppDbContext : DbContext
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
     public DbSet<User> Users => Set<User>();
+    public DbSet<SystemAdmin> SystemAdmins => Set<SystemAdmin>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<PurchaseOrder> PurchaseOrders => Set<PurchaseOrder>();
@@ -146,14 +147,14 @@ public class AppDbContext : DbContext
         where TEntity : Entity, ITenantEntity
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
-            (_tenantContext.IsSuperAdmin || e.TenantId == _tenantContext.TenantId) && e.IsActive);
+            (_tenantContext.Role == TenantRole.SuperAdmin || e.TenantId == _tenantContext.TenantId) && e.IsActive);
     }
 
     private void SetTenantFilter<TEntity>(ModelBuilder modelBuilder)
         where TEntity : class, ITenantEntity
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
-            _tenantContext.IsSuperAdmin || e.TenantId == _tenantContext.TenantId);
+            _tenantContext.Role == TenantRole.SuperAdmin || e.TenantId == _tenantContext.TenantId);
     }
 
     private void SetActiveFilter<TEntity>(ModelBuilder modelBuilder)
@@ -168,6 +169,5 @@ public class AppDbContext : DbContext
         public Guid UserId => Guid.Empty;
         public TenantRole Role => TenantRole.SuperAdmin;
         public bool IsResolved => true;
-        public bool IsSuperAdmin => true;
     }
 }

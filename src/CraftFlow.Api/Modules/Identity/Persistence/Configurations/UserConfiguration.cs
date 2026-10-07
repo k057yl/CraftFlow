@@ -28,10 +28,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasDefaultValue(true);
 
-        builder.Property(u => u.IsSuperAdmin)
-            .IsRequired()
-            .HasDefaultValue(false);
-
         builder.Property(u => u.OtpCodeHash)
             .HasMaxLength(100);
 

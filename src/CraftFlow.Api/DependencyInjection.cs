@@ -94,11 +94,12 @@ public static class DependencyInjection
         return services;
     }
 
-    private static IServiceCollection AddJwtAuthentication(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    private static IServiceCollection AddJwtAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        var secretKey = configuration[AuthConstants.JWT_SECRET_CONFIG_PATH] ?? AuthConstants.DEFAULT_JWT_SECRET;
+        var secretKey = configuration[AuthConstants.ConfigurationKeys.JWT_SECRET_KEY_PATH]
+                        ?? configuration[AuthConstants.ConfigurationKeys.JWT_SECRET_KEY_ENV]
+                        ?? AuthConstants.DEFAULT_JWT_SECRET;
+
         var keyBytes = Encoding.UTF8.GetBytes(secretKey);
 
         services.AddScoped<ITokenService, TokenService>();

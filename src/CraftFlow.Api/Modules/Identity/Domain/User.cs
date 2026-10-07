@@ -12,15 +12,10 @@ public sealed class User : AggregateRoot
     public DateTime? OtpExpiresAtUtc { get; private set; }
 
     public bool IsActive { get; private set; }
-    public bool IsSuperAdmin { get; private set; }
 
     private User() { }
 
-    public static User Create(
-        string email,
-        string passwordHash,
-        string fullName,
-        bool isSuperAdmin = false)
+    public static User Create(string email, string passwordHash, string fullName)
     {
         return new User
         {
@@ -28,8 +23,7 @@ public sealed class User : AggregateRoot
             Email = email.Trim().ToLowerInvariant(),
             PasswordHash = passwordHash,
             FullName = fullName.Trim(),
-            IsActive = true,
-            IsSuperAdmin = isSuperAdmin
+            IsActive = true
         };
     }
 
