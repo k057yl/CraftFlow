@@ -60,6 +60,19 @@
 	</resheader>
 
 	<!-- ========================================== -->
+	<!-- 0: Диалоги									-->
+	<!-- ========================================== -->
+	<data name="TITLE_ERROR" xml:space="preserve"><value>Ошибка</value></data>
+	<data name="TITLE_SUCCESS" xml:space="preserve"><value>Успешно</value></data>
+	<data name="TITLE_WARNING" xml:space="preserve"><value>Внимание</value></data>
+	<data name="TITLE_INFO" xml:space="preserve"><value>Информация</value></data>
+
+	<data name="GENERAL_INVALID_EMAIL_FORMAT" xml:space="preserve"><value>Некорректный формат Email адреса</value></data>
+	<data name="SUPPLIER_PHONE_NUMBER_INVALID_FORMAT" xml:space="preserve"><value>Некорректный формат номера телефона (требуется от 7 до 15 цифр)</value></data>
+	<data name="GENERAL_VALUE_REQUIRED" xml:space="preserve"><value>Обязательное поле не заполнено</value></data>
+	<data name="GENERAL_INVALID_TENANT" xml:space="preserve"><value>Недействительный идентификатор организации (Tenant)</value></data>
+
+	<!-- ========================================== -->
 	<!-- 1: Навигация Сайдбара                      -->
 	<!-- ========================================== -->
 	<data name="NAV_RECIPES" xml:space="preserve"><value>Сырьё и Рецепты</value></data>
@@ -105,39 +118,73 @@
 	<data name="BTN_ADD" xml:space="preserve"><value>Добавить</value></data>
 
 	<!-- ========================================== -->
-	<!-- 3. Section Headers & GroupBoxes            -->
+	<!-- 3: Склады и Оборудование                   -->
 	<!-- ========================================== -->
-	<data name="HEADER_UOM" xml:space="preserve"><value>1. ЕДИНИЦЫ ИЗМЕРЕНИЯ</value></data>
-	<data name="HEADER_RAW_MATERIALS" xml:space="preserve"><value>2. СЫРЬЁ И ИНГРЕДИЕНТЫ</value></data>
-	<data name="HEADER_PRODUCTS" xml:space="preserve"><value>3. ГОТОВАЯ ПРОДУКЦИЯ</value></data>
-	<data name="HEADER_RECIPES" xml:space="preserve"><value>4. ТЕХНОЛОГИЧЕСКИЕ РЕЦЕПТЫ</value></data>
-	<data name="HEADER_CUSTOMERS" xml:space="preserve"><value>1. КЛИЕНТЫ И ПОКУПАТЕЛИ</value></data>
-	<data name="HEADER_SHIP_ORDER" xml:space="preserve"><value>2. ОФОРМЛЕНИЕ И ОТГРУЗКА ЗАКАЗА</value></data>
-	<data name="HEADER_SUPPLIERS" xml:space="preserve"><value>1. ПОСТАВЩИКИ СЫРЬЯ</value></data>
-	<data name="HEADER_PURCHASE_ORDERS" xml:space="preserve"><value>2. ЗАКАЗЫ И ПРИЁМКА ПОСТАВОК</value></data>
-	<data name="HEADER_AGING_CHAMBERS" xml:space="preserve"><value>1. КАМЕРЫ СОЗРЕВАНИЯ</value></data>
-	<data name="HEADER_AGING_LOTS" xml:space="preserve"><value>2. ПАРТИИ НА ВЫДЕРЖКЕ</value></data>
-	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>1. СКЛАДЫ</value></data>
-	<data name="STOCK_LOTS_HEADER" xml:space="preserve"><value>2. ОПРИХОДОВАНИЕ СЫРЬЯ</value></data>
-	<data name="USER_AUTHENTICATION" xml:space="preserve"><value>АУТЕНТИФИКАЦИЯ ПОЛЬЗОВАТЕЛЯ</value></data>
-	<data name="SYSTEM_AUDIT_LOGS" xml:space="preserve"><value>Журнал аудита системы</value></data>
-	<data name="SYSTEM_DASHBOARD_OVERVIEW" xml:space="preserve"><value>ОБЗОР СИСТЕМЫ (ДАШБОРД)</value></data>
+	<data name="TITLE_STORAGE" xml:space="preserve"><value>Склады и Оборудование</value></data>
+	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>Склады</value></data>
+	<data name="HEADER_AGING_CHAMBERS" xml:space="preserve"><value>Камеры созревания</value></data>
+	<data name="HEADER_EQUIPMENT" xml:space="preserve"><value>Емкости, танки и стеллажи</value></data>
+	<data name="WAREHOUSE_NAME" xml:space="preserve"><value>Название склада</value></data>
+	<data name="AGING_CHAMBER_NAME" xml:space="preserve"><value>Название камеры</value></data>
+	<data name="BTN_CREATE_EQUIPMENT" xml:space="preserve"><value>Добавить оборудование</value></data>
+	<data name="LABEL_EQUIPMENT_NAME" xml:space="preserve"><value>Название</value></data>
+	<data name="LABEL_TYPE" xml:space="preserve"><value>Тип</value></data>
+	<data name="LABEL_PARENT_LOCATION" xml:space="preserve"><value>Локация</value></data>
+	<data name="LABEL_VOLUME" xml:space="preserve"><value>Объем / Вместимость</value></data>
+	<data name="LABEL_ADDRESS" xml:space="preserve"><value>Адрес:</value></data>
+	<data name="LABEL_TEMP_SHORT" xml:space="preserve"><value>Т, °C:</value></data>
+	<data name="LABEL_HUMIDITY_SHORT" xml:space="preserve"><value>Вл, %:</value></data>
 
 	<!-- ========================================== -->
-	<!-- 4. Production Page Structure               -->
+	<!-- 4: Закупки и Поставки                       -->
 	<!-- ========================================== -->
-	<data name="PRODUCTION_HEADER" xml:space="preserve"><value>Управление Производством и Выдержкой</value></data>
-	<data name="TAB_BREWHOUSE" xml:space="preserve"><value>1. Варочный цех</value></data>
-	<data name="TAB_AGING" xml:space="preserve"><value>2. Созревание и Аффинаж</value></data>
-	<data name="TAB_DISCARD" xml:space="preserve"><value>3. Брак и Списание</value></data>
-	
-	<data name="GROUP_START_BATCH" xml:space="preserve"><value>1. Запуск Варочного Процесса</value></data>
-	<data name="GROUP_COMPLETE_BATCH" xml:space="preserve"><value>2. Завершение Варочного Процесса</value></data>
-	<data name="GROUP_COST_ANALYSIS" xml:space="preserve"><value>Расчет себестоимости партии</value></data>
-	<data name="GROUP_RAW_REQUIREMENTS" xml:space="preserve"><value>Расчётная потребность и остатки сырья на складе</value></data>
-	<data name="GROUP_TRANSFER_AGING" xml:space="preserve"><value>Размещение партии в Климатической Камере</value></data>
-	<data name="GROUP_RELEASE_AGING" xml:space="preserve"><value>Снятие с выдержки (Фасовка / Склад ГП)</value></data>
-	<data name="GROUP_DISCARD" xml:space="preserve"><value>Регистрация брака и утилизация партии</value></data>
+	<data name="TITLE_PROCUREMENT" xml:space="preserve"><value>Закупки и Поставки</value></data>
+	<data name="TAB_STOCK_RECEIPT" xml:space="preserve"><value>Приход и Остатки сырья</value></data>
+	<data name="TAB_WRITE_OFF" xml:space="preserve"><value>Списание и Потери</value></data>
+	<data name="TAB_SUPPLIERS" xml:space="preserve"><value>Поставщики сырья</value></data>
+
+	<data name="GROUP_RECEIVE_STOCK_LOT" xml:space="preserve"><value>Принять партию сырья на склад</value></data>
+	<data name="LABEL_SELECT_SUPPLIER" xml:space="preserve"><value>Выбор Поставщика:</value></data>
+	<data name="SELECT_WAREHOUSE" xml:space="preserve"><value>Выберите склад:</value></data>
+	<data name="SELECT_RAW_MATERIAL" xml:space="preserve"><value>Выберите Сырьё:</value></data>
+	<data name="LOT_QUANTITY" xml:space="preserve"><value>Объём / Вес сырья (л/кг):</value></data>
+	<data name="LABEL_UNITS_COUNT" xml:space="preserve"><value>Кол-во тар / мест (опц.):</value></data>
+	<data name="UNIT_PRICE" xml:space="preserve"><value>Цена за Ед.:</value></data>
+	<data name="BATCH_NUMBER" xml:space="preserve"><value>Номер Партии:</value></data>
+	<data name="LABEL_EXPIRATION_DATE" xml:space="preserve"><value>Срок годности:</value></data>
+
+	<data name="LABEL_AVAILABLE_CONTAINERS" xml:space="preserve"><value>Доступные ёмкости на складе:</value></data>
+	<data name="BTN_QUICK_NEW_LOCATION" xml:space="preserve"><value>Новая ёмкость</value></data>
+	<data name="LABEL_AVAILABLE_CONTAINERS_HINT" xml:space="preserve"><value>Доступные ёмкости на складе (нажмите +, чтобы добавить):</value></data>
+	<data name="LABEL_SELECTED_CONTAINERS_HINT" xml:space="preserve"><value>Выбранные ёмкости под эту партию:</value></data>
+	<data name="ADD_STOCK_LOT" xml:space="preserve"><value>Принять Партию</value></data>
+
+	<data name="GROUP_CURRENT_STOCK" xml:space="preserve"><value>Текущие остатки сырья на складах</value></data>
+	<data name="LABEL_SUPPLIER_FILTER" xml:space="preserve"><value>Поставщик:</value></data>
+	<data name="LABEL_WAREHOUSE_FILTER" xml:space="preserve"><value>Склад:</value></data>
+	<data name="ALL_SUPPLIERS" xml:space="preserve"><value>— Все поставщики —</value></data>
+	<data name="ALL_WAREHOUSES" xml:space="preserve"><value>— Все склады —</value></data>
+	<data name="CHECK_EXPIRING_SOON" xml:space="preserve"><value>Только скоро просрочится</value></data>
+	<data name="BTN_REFRESH" xml:space="preserve"><value>Обновить</value></data>
+
+	<data name="LABEL_RAW_MATERIAL" xml:space="preserve"><value>Сырьё / Материал</value></data>
+	<data name="LABEL_STORAGE_CONTAINERS" xml:space="preserve"><value>Емкости хранения</value></data>
+	<data name="LABEL_REMAINING_STOCK" xml:space="preserve"><value>Остаток</value></data>
+
+	<data name="GROUP_WRITE_OFF_SELECTION" xml:space="preserve"><value>Выбор партии сырья для списания (промывка, увар, брак, пропажа)</value></data>
+	<data name="LABEL_ACTION" xml:space="preserve"><value>Действие</value></data>
+	<data name="BTN_WRITE_OFF" xml:space="preserve"><value>Списать</value></data>
+
+	<data name="HEADER_SUPPLIERS" xml:space="preserve"><value>Новый поставщик</value></data>
+	<data name="SUPPLIER_NAME" xml:space="preserve"><value>Название компании / ФИО:</value></data>
+	<data name="SUPPLIER_PHONE" xml:space="preserve"><value>Телефон:</value></data>
+	<data name="SUPPLIER_EMAIL" xml:space="preserve"><value>Email:</value></data>
+	<data name="CREATE_SUPPLIER" xml:space="preserve"><value>Добавить поставщика</value></data>
+
+	<data name="ALL_SUPPLIERS" xml:space="preserve"><value>— Все поставщики —</value></data>
+	<data name="ALL_WAREHOUSES" xml:space="preserve"><value>— Все склады —</value></data>
+	<data name="CAPACITY_WARNING_INSUFFICIENT" xml:space="preserve"><value>⚠️ Недостаточно места! Нужно: {0:N0} л/кг, доступно: {1:N0} л/кг</value></data>
+	<data name="CAPACITY_WARNING_SUFFICIENT" xml:space="preserve"><value>Вместимость подходит (выбрано на {0:N0} л/кг под партию в {1:N0} л/кг)</value></data>
 
 	<!-- ========================================== -->
 	<!-- 5. Input Labels & Display Fields           -->

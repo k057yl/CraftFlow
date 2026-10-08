@@ -13,9 +13,15 @@ public sealed class SupplierConfiguration : IEntityTypeConfiguration<Supplier>
 
         builder.HasKey(s => s.Id);
 
-        builder.Property(s => s.Name).HasMaxLength(200).IsRequired();
-        builder.Property(s => s.Phone).HasMaxLength(50);
-        builder.Property(s => s.Email).HasMaxLength(100);
+        builder.Property(s => s.Name)
+            .HasMaxLength(200)
+            .IsRequired();
+
+        builder.Property(s => s.Phone)
+            .HasMaxLength(50);
+
+        builder.Property(s => s.Email)
+            .HasMaxLength(100);
 
         builder.HasIndex(s => new { s.TenantId, s.Name })
             .IsUnique()

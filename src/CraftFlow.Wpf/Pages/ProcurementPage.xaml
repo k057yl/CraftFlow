@@ -11,11 +11,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="{loc:Loc Key=TITLE_PROCUREMENT}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10"/>
+        <TextBlock Text="{loc:Loc Key=TITLE_PROCUREMENT}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" Foreground="{DynamicResource AppForegroundBrush}"/>
 
         <TabControl Grid.Row="1">
             <!-- 1. Приход и Остатки Сырья -->
-            <TabItem Header="Приход и Остатки сырья">
+            <TabItem Header="{loc:Loc Key=TAB_STOCK_RECEIPT}">
                 <Grid Margin="10">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -33,18 +33,18 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" Margin="0,0,6,0">
-                                    <TextBlock Text="{loc:Loc Key=LABEL_SELECT_SUPPLIER}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                    <ComboBox x:Name="StockSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="4,3"/>
+                                    <TextBlock Text="{loc:Loc Key=LABEL_SELECT_SUPPLIER}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                    <ComboBox x:Name="StockSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1" Margin="3,0,3,0">
-                                    <TextBlock Text="{loc:Loc Key=SELECT_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                    <ComboBox x:Name="StockWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="4,3" SelectionChanged="StockWarehouseComboBox_SelectionChanged"/>
+                                    <TextBlock Text="{loc:Loc Key=SELECT_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                    <ComboBox x:Name="StockWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" SelectionChanged="StockWarehouseComboBox_SelectionChanged"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="2" Margin="6,0,0,0">
-                                    <TextBlock Text="{loc:Loc Key=SELECT_RAW_MATERIAL}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                    <ComboBox x:Name="StockRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="4,3"/>
+                                    <TextBlock Text="{loc:Loc Key=SELECT_RAW_MATERIAL}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                    <ComboBox x:Name="StockRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28"/>
                                 </StackPanel>
                             </Grid>
 
@@ -58,34 +58,34 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" Margin="0,0,4,0">
-                                    <TextBlock Text="{loc:Loc Key=LOT_QUANTITY}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                    <TextBox x:Name="StockQuantityTextBox" Text="500" Padding="4,3" TextChanged="StockQuantityTextBox_TextChanged"/>
+                                    <TextBlock Text="{loc:Loc Key=LOT_QUANTITY}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                    <TextBox x:Name="StockQuantityTextBox" Text="500" Height="28" TextChanged="StockQuantityTextBox_TextChanged"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1" Margin="4,0,4,0">
-                                    <TextBlock Text="Кол-во тар / мест (опц.)" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                    <TextBox x:Name="StockUnitsCountTextBox" Padding="4,3"/>
+                                    <TextBlock Text="{loc:Loc Key=LABEL_UNITS_COUNT}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                    <TextBox x:Name="StockUnitsCountTextBox" Height="28"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="2" Margin="4,0,4,0">
-                                    <TextBlock Text="{loc:Loc Key=UNIT_PRICE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                    <TextBox x:Name="StockUnitPriceTextBox" Text="25.00" Padding="4,3"/>
+                                    <TextBlock Text="{loc:Loc Key=UNIT_PRICE}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                    <TextBox x:Name="StockUnitPriceTextBox" Text="25.00" Height="28"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="3" Margin="4,0,4,0">
-                                    <TextBlock Text="{loc:Loc Key=BATCH_NUMBER}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                    <TextBox x:Name="StockBatchTextBox" Text="BATCH-2026-001" Padding="4,3"/>
+                                    <TextBlock Text="{loc:Loc Key=BATCH_NUMBER}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                    <TextBox x:Name="StockBatchTextBox" Text="BATCH-2026-001" Height="28"/>
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="4" Margin="4,0,0,0">
-                                    <TextBlock Text="Срок годности" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                    <DatePicker x:Name="ExpirationDatePicker" Padding="4,1"/>
+                                    <TextBlock Text="{loc:Loc Key=LABEL_EXPIRATION_DATE}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                    <DatePicker x:Name="ExpirationDatePicker" Height="28"/>
                                 </StackPanel>
                             </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                <TextBlock Text="Доступные ёмкости на складе:" FontSize="11" Foreground="#475569" VerticalAlignment="Center"/>
-                                <Button Content="➕ Новая ёмкость" Click="QuickCreateLocation_Click" Margin="10,0,0,0" Padding="6,1" FontSize="10" Background="#0284C7" Foreground="White"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                <TextBlock Text="{loc:Loc Key=LABEL_AVAILABLE_CONTAINERS}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" VerticalAlignment="Center"/>
+                                <Button Content="{loc:Loc Key=BTN_QUICK_NEW_LOCATION}" Click="QuickCreateLocation_Click" Margin="10,0,0,0" Style="{StaticResource PrimaryButtonStyle}" Height="24" Padding="8,0" FontSize="10"/>
                             </StackPanel>
 
                             <!-- Емкости хранилища -->
@@ -96,8 +96,8 @@
                                 </Grid.ColumnDefinitions>
 
                                 <StackPanel Grid.Column="0" Margin="0,0,6,0">
-                                    <TextBlock Text="Доступные ёмкости на складе (нажмите +, чтобы добавить):" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
-                                    <ListBox x:Name="AvailableLocationsListBox" Height="90" Background="#F8FAFC">
+                                    <TextBlock Text="{loc:Loc Key=LABEL_AVAILABLE_CONTAINERS_HINT}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
+                                    <ListBox x:Name="AvailableLocationsListBox" Height="90" Background="{DynamicResource AppBackgroundBrush}">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="2">
@@ -106,14 +106,14 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
-                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="0,0,6,0"/>
-                                                        <TextBlock Text="[Свободно: " Foreground="#64748B"/>
-                                                        <TextBlock Text="{Binding FreeCapacity, StringFormat={}{0:N0}}" Foreground="#0EA5E9" FontWeight="SemiBold"/>
-                                                        <TextBlock Text=" из " Foreground="#64748B"/>
-                                                        <TextBlock Text="{Binding Capacity, StringFormat={}{0:N0}}" Foreground="#64748B"/>
-                                                        <TextBlock Text=" л]" Foreground="#64748B"/>
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="0,0,6,0" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <TextBlock Text="[" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <TextBlock Text="{Binding FreeCapacity, StringFormat={}{0:N0}}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"/>
+                                                        <TextBlock Text=" / " Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <TextBlock Text="{Binding Capacity, StringFormat={}{0:N0}}" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <TextBlock Text="]" Foreground="{DynamicResource AppForegroundBrush}"/>
                                                     </StackPanel>
-                                                    <Button Grid.Column="1" Content="➕" Click="AddLocationToSelected_Click" Padding="4,1" Margin="6,0,0,0" Background="#0EA5E9" Foreground="White"/>
+                                                    <Button Grid.Column="1" Content="+" Click="AddLocationToSelected_Click" Style="{StaticResource PrimaryButtonStyle}" Height="20" Padding="6,0" Margin="6,0,0,0"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -121,8 +121,8 @@
                                 </StackPanel>
 
                                 <StackPanel Grid.Column="1" Margin="6,0,0,0">
-                                    <TextBlock Text="Выбранные ёмкости под эту партию:" FontSize="11" Foreground="#475569" Margin="0,0,0,4"/>
-                                    <ListBox x:Name="SelectedLocationsListBox" Height="90" Background="#F1F5F9">
+                                    <TextBlock Text="{loc:Loc Key=LABEL_SELECTED_CONTAINERS_HINT}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
+                                    <ListBox x:Name="SelectedLocationsListBox" Height="90" Background="{DynamicResource AppBackgroundBrush}">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="2">
@@ -131,14 +131,14 @@
                                                         <ColumnDefinition Width="Auto"/>
                                                     </Grid.ColumnDefinitions>
                                                     <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
-                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Foreground="#0F172A" Margin="0,0,6,0"/>
-                                                        <TextBlock Text="[Доступно под приход: " Foreground="#64748B"/>
-                                                        <TextBlock Text="{Binding FreeCapacity, StringFormat={}{0:N0}}" Foreground="#16A34A" FontWeight="Bold"/>
-                                                        <TextBlock Text=" из " Foreground="#64748B"/>
-                                                        <TextBlock Text="{Binding Capacity, StringFormat={}{0:N0}}" Foreground="#64748B"/>
-                                                        <TextBlock Text=" л]" Foreground="#64748B"/>
+                                                        <TextBlock Text="{Binding Name}" FontWeight="Bold" Margin="0,0,6,0" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <TextBlock Text="[" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <TextBlock Text="{Binding FreeCapacity, StringFormat={}{0:N0}}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
+                                                        <TextBlock Text=" / " Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <TextBlock Text="{Binding Capacity, StringFormat={}{0:N0}}" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <TextBlock Text="]" Foreground="{DynamicResource AppForegroundBrush}"/>
                                                     </StackPanel>
-                                                    <Button Grid.Column="1" Content="❌" Click="RemoveLocationFromSelected_Click" Padding="4,1" Margin="6,0,0,0" Background="Transparent" Foreground="#DC2626" BorderThickness="0" FontWeight="Bold"/>
+                                                    <Button Grid.Column="1" Content="✕" Click="RemoveLocationFromSelected_Click" Style="{StaticResource DangerButtonStyle}" Width="20" Height="20" Padding="0" Margin="6,0,0,0"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
@@ -150,11 +150,9 @@
                                 <Button x:Name="AddStockLotButton"
                                         Content="{loc:Loc Key=ADD_STOCK_LOT}" 
                                         Click="AddStockLot_Click" 
-                                        Height="28" 
-                                        Width="160" 
-                                        FontWeight="Bold" 
-                                        Background="#0284C7" 
-                                        Foreground="White"/>
+                                        Style="{StaticResource PrimaryButtonStyle}"
+                                        Height="30" 
+                                        Padding="14,0"/>
                                 <TextBlock x:Name="CapacityWarningTextBlock" 
                                            VerticalAlignment="Center" 
                                            Margin="15,0,0,0" 
@@ -165,7 +163,7 @@
                     </GroupBox>
 
                     <!-- Панель текущих остатков -->
-                    <GroupBox Grid.Row="1" Header="Текущие остатки сырья на складах" Padding="10">
+                    <GroupBox Grid.Row="1" Header="{loc:Loc Key=GROUP_CURRENT_STOCK}" Padding="10">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -173,15 +171,15 @@
                             </Grid.RowDefinitions>
 
                             <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                                <TextBlock Text="Поставщик:" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11"/>
-                                <ComboBox x:Name="FilterSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="160" SelectionChanged="FilterStockLots_Changed"/>
+                                <TextBlock Text="{loc:Loc Key=LABEL_SUPPLIER_FILTER}" VerticalAlignment="Center" Margin="0,0,4,0" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <ComboBox x:Name="FilterSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="160" Height="28" SelectionChanged="FilterStockLots_Changed"/>
 
-                                <TextBlock Text="Склад:" VerticalAlignment="Center" Margin="12,0,4,0" FontSize="11"/>
-                                <ComboBox x:Name="FilterWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="160" SelectionChanged="FilterStockLots_Changed"/>
+                                <TextBlock Text="{loc:Loc Key=LABEL_WAREHOUSE_FILTER}" VerticalAlignment="Center" Margin="12,0,4,0" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <ComboBox x:Name="FilterWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Width="160" Height="28" SelectionChanged="FilterStockLots_Changed"/>
 
-                                <CheckBox x:Name="FilterExpiringCheckBox" Content="Только скоро просрочится" VerticalAlignment="Center" Margin="12,0,0,0" Click="FilterStockLots_Changed"/>
+                                <CheckBox x:Name="FilterExpiringCheckBox" Content="{loc:Loc Key=CHECK_EXPIRING_SOON}" VerticalAlignment="Center" Margin="12,0,0,0" Foreground="{DynamicResource AppForegroundBrush}" Click="FilterStockLots_Changed"/>
 
-                                <Button Content="Обновить" Click="RefreshStockLots_Click" Margin="12,0,0,0" Padding="8,2"/>
+                                <Button Content="{loc:Loc Key=BTN_REFRESH}" Click="RefreshStockLots_Click" Style="{StaticResource PrimaryButtonStyle}" Margin="12,0,0,0" Height="28" Padding="12,0"/>
                             </StackPanel>
 
                             <DataGrid Grid.Row="1" 
@@ -191,14 +189,14 @@
                                       GridLinesVisibility="Horizontal" 
                                       HeadersVisibility="Column">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Сырьё / Материал" Binding="{Binding ItemName}" Width="150"/>
-                                    <DataGridTextColumn Header="Склад" Binding="{Binding WarehouseName}" Width="110"/>
-                                    <DataGridTextColumn Header="Емкости хранения" Binding="{Binding StorageLocationsInfo}" Width="*"/>
-                                    <DataGridTextColumn Header="Поставщик" Binding="{Binding SupplierName}" Width="120"/>
-                                    <DataGridTextColumn Header="Остаток" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="85"/>
-                                    <DataGridTextColumn Header="Цена за ед." Binding="{Binding UnitPrice, StringFormat={}{0:C2}}" Width="85"/>
-                                    <DataGridTextColumn Header="Партия" Binding="{Binding BatchNumber}" Width="110"/>
-                                    <DataGridTextColumn Header="Срок годности" Binding="{Binding ExpirationDate, StringFormat={}{0:dd.MM.yyyy}}" Width="100"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=LABEL_RAW_MATERIAL}" Binding="{Binding ItemName}" Width="150"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding WarehouseName}" Width="110"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=LABEL_STORAGE_CONTAINERS}" Binding="{Binding StorageLocationsInfo}" Width="*"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=LABEL_SELECT_SUPPLIER}" Binding="{Binding SupplierName}" Width="120"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=LABEL_REMAINING_STOCK}" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="85"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=UNIT_PRICE}" Binding="{Binding UnitPrice, StringFormat={}{0:C2}}" Width="85"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=BATCH_NUMBER}" Binding="{Binding BatchNumber}" Width="110"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=LABEL_EXPIRATION_DATE}" Binding="{Binding ExpirationDate, StringFormat={}{0:dd.MM.yyyy}}" Width="100"/>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Grid>
@@ -207,31 +205,28 @@
             </TabItem>
 
             <!-- 2. Списание / Акты Потерь -->
-            <TabItem Header="Списание и Потери">
+            <TabItem Header="{loc:Loc Key=TAB_WRITE_OFF}">
                 <Grid Margin="10">
-                    <GroupBox Header="Выбор партии сырья для списания (промывка, увар, брак, пропажа)" Padding="10">
+                    <GroupBox Header="{loc:Loc Key=GROUP_WRITE_OFF_SELECTION}" Padding="10">
                         <DataGrid x:Name="WriteOffDataGrid" 
-                      AutoGenerateColumns="False" 
-                      IsReadOnly="True" 
-                      GridLinesVisibility="Horizontal" 
-                      HeadersVisibility="Column">
+                                  AutoGenerateColumns="False" 
+                                  IsReadOnly="True" 
+                                  GridLinesVisibility="Horizontal" 
+                                  HeadersVisibility="Column">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Сырьё" Binding="{Binding ItemName}" Width="150"/>
-                                <DataGridTextColumn Header="Склад" Binding="{Binding WarehouseName}" Width="120"/>
-                                <DataGridTextColumn Header="Емкость" Binding="{Binding StorageLocationsInfo}" Width="*"/>
-                                <DataGridTextColumn Header="Текущий остаток" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="120"/>
-                                <DataGridTextColumn Header="Номер партии" Binding="{Binding BatchNumber}" Width="130"/>
-                                <DataGridTemplateColumn Header="Действие" Width="120">
+                                <DataGridTextColumn Header="{loc:Loc Key=LABEL_RAW_MATERIAL}" Binding="{Binding ItemName}" Width="150"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding WarehouseName}" Width="120"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=LABEL_STORAGE_CONTAINERS}" Binding="{Binding StorageLocationsInfo}" Width="*"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=LABEL_REMAINING_STOCK}" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="120"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=BATCH_NUMBER}" Binding="{Binding BatchNumber}" Width="130"/>
+                                <DataGridTemplateColumn Header="{loc:Loc Key=LABEL_ACTION}" Width="120">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Button Content="🗑️ Списать" 
-                                        Click="WriteOffRow_Click" 
-                                        Tag="{Binding Id}" 
-                                        Background="#FEE2E2" 
-                                        Foreground="#991B1B" 
-                                        BorderBrush="#FCA5A5" 
-                                        FontWeight="SemiBold" 
-                                        Padding="8,3"/>
+                                            <Button Content="{loc:Loc Key=BTN_WRITE_OFF}" 
+                                                    Click="WriteOffRow_Click" 
+                                                    Tag="{Binding Id}" 
+                                                    Style="{StaticResource DangerButtonStyle}" 
+                                                    Padding="8,3"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -254,26 +249,26 @@
                                     </Grid.ColumnDefinitions>
 
                                     <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                        <TextBlock Text="{loc:Loc Key=SUPPLIER_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <TextBox x:Name="NameTextBox" Padding="5,4"/>
+                                        <TextBlock Text="{loc:Loc Key=SUPPLIER_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                        <TextBox x:Name="NameTextBox" Height="28"/>
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="1" Margin="4,0,0,0">
-                                        <TextBlock Text="{loc:Loc Key=SUPPLIER_PHONE}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                        <TextBox x:Name="PhoneTextBox" Padding="5,4"/>
+                                        <TextBlock Text="{loc:Loc Key=SUPPLIER_PHONE}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                        <TextBox x:Name="PhoneTextBox" Height="28"/>
                                     </StackPanel>
                                 </Grid>
 
                                 <StackPanel Margin="0,0,0,15">
-                                    <TextBlock Text="{loc:Loc Key=SUPPLIER_EMAIL}" Margin="0,0,0,3" FontSize="11" Foreground="#475569"/>
-                                    <TextBox x:Name="EmailTextBox" Padding="5,4"/>
+                                    <TextBlock Text="{loc:Loc Key=SUPPLIER_EMAIL}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                    <TextBox x:Name="EmailTextBox" Height="28"/>
                                 </StackPanel>
 
                                 <Button Content="{loc:Loc Key=CREATE_SUPPLIER}" 
-                                        Width="180" 
+                                        Style="{StaticResource PrimaryButtonStyle}"
                                         Height="32"
+                                        Padding="14,0"
                                         HorizontalAlignment="Left" 
-                                        FontWeight="Bold"
                                         Click="CreateSupplier_Click"/>
                             </StackPanel>
                         </GroupBox>
@@ -282,6 +277,6 @@
             </TabItem>
         </TabControl>
 
-        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="0,10,0,0"/>
     </Grid>
 </Page>

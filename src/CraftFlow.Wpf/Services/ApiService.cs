@@ -168,6 +168,11 @@ public class ApiService
                         savedToken
                     );
                     CurrentUser = ParseUserFromJwt(savedToken);
+
+                    if (CurrentTenantId.HasValue && CurrentTenantId.Value != Guid.Empty)
+                    {
+                        SetTenantHeader(CurrentTenantId.Value);
+                    }
                 }
             }
         }

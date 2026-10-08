@@ -48,6 +48,8 @@ public static class UiConstants
         public const string INVALID_OTP_FORMAT = "UI.INVALID_OTP_FORMAT";
         public const string EMPTY_TOKEN_ERROR = "UI.EMPTY_TOKEN_ERROR";
         public const string OTP_RESENT_SUCCESS = "UI.OTP_RESENT_SUCCESS";
+        public const string INVALID_EMAIL_FORMAT = "INVALID_EMAIL_FORMAT";
+        public const string PHONE_NUMBER_INVALID_FORMAT = "PHONE_NUMBER_INVALID_FORMAT";
     }
 
     public static class Titles
@@ -77,5 +79,25 @@ public static class UiConstants
     {
         public const string LIGHT = "Light";
         public const string DARK = "Dark";
+    }
+
+    public static class Filters
+    {
+        public const string ALL_SUPPLIERS = "ALL_SUPPLIERS";
+        public const string ALL_WAREHOUSES = "ALL_WAREHOUSES";
+    }
+
+    public static class Capacity
+    {
+        public const string WARNING_INSUFFICIENT = "CAPACITY_WARNING_INSUFFICIENT";
+        public const string WARNING_SUFFICIENT = "CAPACITY_WARNING_SUFFICIENT";
+    }
+
+    public static class Dialogs
+    {
+        public const string TITLE_ERROR = "TITLE_ERROR";
+        public const string TITLE_SUCCESS = "TITLE_SUCCESS";
+        public const string TITLE_WARNING = "TITLE_WARNING";
+        public const string TITLE_INFO = "TITLE_INFO";
     }
 }

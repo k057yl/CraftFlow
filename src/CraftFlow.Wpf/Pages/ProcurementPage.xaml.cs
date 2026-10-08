@@ -62,7 +62,7 @@ public partial class ProcurementPage : Page
             var suppliers = await ApiService.Instance.GetAsync<List<LookupDto>>(ProcurementConstants.SUPPLIERS) ?? [];
             FormSuppliers.Clear();
             FilterSuppliers.Clear();
-            FilterSuppliers.Add(new LookupItem(Guid.Empty, "— Все поставщики —"));
+            FilterSuppliers.Add(new LookupItem(Guid.Empty, LocalizationService.Get(UiConstants.Filters.ALL_SUPPLIERS)));
             suppliers.ForEach(s =>
             {
                 var item = new LookupItem(s.Id, s.Name);
@@ -74,7 +74,7 @@ public partial class ProcurementPage : Page
             var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(InventoryConstants.WAREHOUSES) ?? [];
             FormWarehouses.Clear();
             FilterWarehouses.Clear();
-            FilterWarehouses.Add(new LookupItem(Guid.Empty, "— Все склады —"));
+            FilterWarehouses.Add(new LookupItem(Guid.Empty, LocalizationService.Get(UiConstants.Filters.ALL_WAREHOUSES)));
             warehouses.ForEach(w =>
             {
                 var item = new LookupItem(w.Id, w.Name);
@@ -94,7 +94,8 @@ public partial class ProcurementPage : Page
         }
         catch (Exception ex)
         {
-            SetStatus($"{UiConstants.Messages.DATA_LOAD_ERROR}: {ex.Message}", Brushes.Red);
+            SetStatusFormatted(UiConstants.Messages.DATA_LOAD_ERROR, Brushes.Red, ex.Message);
+            AlertWindow.ShowError(Window.GetWindow(this), ex.Message);
         }
     }
 
@@ -158,7 +159,7 @@ public partial class ProcurementPage : Page
         var rawQuantityText = StockQuantityTextBox.Text.Replace(',', '.');
         if (!decimal.TryParse(rawQuantityText, NumberStyles.Any, CultureInfo.InvariantCulture, out var requiredQuantity) || requiredQuantity <= 0)
         {
-            CapacityWarningTextBlock.Text = "Введите корректный объем партии";
+            CapacityWarningTextBlock.Text = LocalizationService.Get(UiConstants.Messages.INVALID_INPUT_FIELDS);
             CapacityWarningTextBlock.Foreground = Brushes.Red;
             AddStockLotButton.IsEnabled = false;
             return;
@@ -166,8 +167,7 @@ public partial class ProcurementPage : Page
 
         if (SelectedLocations.Count == 0)
         {
-            CapacityWarningTextBlock.Text = "Выберите хотя бы одну емкость для прихода";
-            CapacityWarningTextBlock.Foreground = Brushes.Gray;
+            CapacityWarningTextBlock.Text = string.Empty;
             AddStockLotButton.IsEnabled = true;
             return;
         }
@@ -182,13 +182,15 @@ public partial class ProcurementPage : Page
 
         if (totalCapacity < requiredQuantity)
         {
-            CapacityWarningTextBlock.Text = $"⚠️ Недостаточно места! Нужно: {requiredQuantity:N0} л/кг, в выбранных доступно: {totalCapacity:N0} л/кг";
+            var template = LocalizationService.Get(UiConstants.Capacity.WARNING_INSUFFICIENT);
+            CapacityWarningTextBlock.Text = string.Format(template, requiredQuantity, totalCapacity);
             CapacityWarningTextBlock.Foreground = Brushes.Red;
             AddStockLotButton.IsEnabled = false;
         }
         else
         {
-            CapacityWarningTextBlock.Text = $"Вместимость подходит (Выбрано тар на {totalCapacity:N0} л/кг под партию в {requiredQuantity:N0} л/кг)";
+            var template = LocalizationService.Get(UiConstants.Capacity.WARNING_SUFFICIENT);
+            CapacityWarningTextBlock.Text = string.Format(template, totalCapacity, requiredQuantity);
             CapacityWarningTextBlock.Foreground = Brushes.Green;
             AddStockLotButton.IsEnabled = true;
         }
@@ -230,12 +232,13 @@ public partial class ProcurementPage : Page
     private async void CreateSupplier_Click(object sender, RoutedEventArgs e)
     {
         var name = NameTextBox.Text.Trim();
-        var phone = PhoneTextBox.Text.Trim();
-        var email = EmailTextBox.Text.Trim();
+        var phone = string.IsNullOrWhiteSpace(PhoneTextBox.Text) ? null : PhoneTextBox.Text.Trim();
+        var email = string.IsNullOrWhiteSpace(EmailTextBox.Text) ? null : EmailTextBox.Text.Trim();
 
         if (string.IsNullOrWhiteSpace(name))
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            AlertWindow.ShowError(Window.GetWindow(this), UiConstants.Messages.INVALID_INPUT_FIELDS);
             return;
         }
 
@@ -245,6 +248,7 @@ public partial class ProcurementPage : Page
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.SUPPLIER_CREATED_SUCCESS, Brushes.Green);
+            AlertWindow.ShowSuccess(Window.GetWindow(this), UiConstants.Messages.SUPPLIER_CREATED_SUCCESS);
             NameTextBox.Clear();
             PhoneTextBox.Clear();
             EmailTextBox.Clear();
@@ -252,7 +256,8 @@ public partial class ProcurementPage : Page
         }
         else
         {
-            SetStatus(responseStr, Brushes.Red);
+            SetStatusRaw(responseStr, Brushes.Red);
+            AlertWindow.ShowError(Window.GetWindow(this), responseStr);
         }
     }
 
@@ -263,6 +268,7 @@ public partial class ProcurementPage : Page
             StockRawMaterialComboBox.SelectedItem is not LookupItem selectedRawMaterial)
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            AlertWindow.ShowError(Window.GetWindow(this), UiConstants.Messages.INVALID_INPUT_FIELDS);
             return;
         }
 
@@ -273,6 +279,7 @@ public partial class ProcurementPage : Page
             !decimal.TryParse(rawPriceText, NumberStyles.Any, CultureInfo.InvariantCulture, out var unitPrice))
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            AlertWindow.ShowError(Window.GetWindow(this), UiConstants.Messages.INVALID_INPUT_FIELDS);
             return;
         }
 
@@ -301,7 +308,8 @@ public partial class ProcurementPage : Page
 
         if (isSuccess)
         {
-            SetStatus($"{UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS} ID: {contentOrError}", Brushes.Green);
+            SetStatus(UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS, Brushes.Green);
+            AlertWindow.ShowSuccess(Window.GetWindow(this), UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS);
             StockUnitsCountTextBox.Clear();
             ExpirationDatePicker.SelectedDate = null;
             SelectedLocations.Clear();
@@ -313,11 +321,11 @@ public partial class ProcurementPage : Page
         }
         else
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatusRaw(contentOrError, Brushes.Red);
+            AlertWindow.ShowError(Window.GetWindow(this), contentOrError);
         }
     }
 
-    // --- ТОЧЕЧНОЕ Списание ИЗ ТАБЛИЦЫ ---
     private async void WriteOffRow_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.Tag is Guid lotId)
@@ -328,6 +336,7 @@ public partial class ProcurementPage : Page
                 if (lot.Quantity <= 0m)
                 {
                     SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+                    AlertWindow.ShowError(Window.GetWindow(this), UiConstants.Messages.INVALID_INPUT_FIELDS);
                     return;
                 }
 
@@ -374,17 +383,32 @@ public partial class ProcurementPage : Page
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            AlertWindow.ShowSuccess(Window.GetWindow(this), UiConstants.Messages.DATA_LOADED_SUCCESS);
             await LoadStockLotsAsync();
         }
         else
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatusRaw(contentOrError, Brushes.Red);
+            AlertWindow.ShowError(Window.GetWindow(this), contentOrError);
         }
     }
 
-    private void SetStatus(string msg, Brush color)
+    private void SetStatus(string resourceKey, Brush color)
     {
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = LocalizationService.Get(msg);
+        StatusTextBlock.Text = LocalizationService.Get(resourceKey);
+    }
+
+    private void SetStatusFormatted(string resourceKey, Brush color, params object[] args)
+    {
+        StatusTextBlock.Foreground = color;
+        var format = LocalizationService.Get(resourceKey);
+        StatusTextBlock.Text = string.Format(format, args);
+    }
+
+    private void SetStatusRaw(string rawText, Brush color)
+    {
+        StatusTextBlock.Foreground = color;
+        StatusTextBlock.Text = rawText;
     }
 }

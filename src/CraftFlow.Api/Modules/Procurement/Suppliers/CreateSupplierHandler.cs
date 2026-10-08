@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Procurement.Domain;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 
@@ -19,11 +20,16 @@ public sealed class CreateSupplierHandler : IRequestHandler<CreateSupplierComman
 
     public async Task<Result<Guid>> Handle(CreateSupplierCommand request, CancellationToken cancellationToken)
     {
+        if (_tenantContext.TenantId == Guid.Empty)
+        {
+            return Result.Failure<Guid>(ErrorCodes.General.INVALID_TENANT);
+        }
+
         var supplier = Supplier.Create(_tenantContext.TenantId, request.Name, request.Phone, request.Email);
 
         await _dbContext.Set<Supplier>().AddAsync(supplier, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result<Guid>.Success(supplier.Id);
+        return Result.Success(supplier.Id);
     }
 }

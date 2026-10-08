@@ -15,7 +15,7 @@
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="220"/>
+                <RowDefinition Height="230"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -33,11 +33,34 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-                            <TextBox x:Name="WarehouseNameTextBox" Width="140" Margin="0,0,6,0"/>
-                            <TextBox x:Name="WarehouseAddressTextBox" Width="140" Margin="0,0,6,0"/>
-                            <Button Content="+" Click="CreateWarehouse_Click" Style="{StaticResource PrimaryButtonStyle}" Width="32" Height="26"/>
-                        </StackPanel>
+
+                        <!-- Поля с подписями -->
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                <TextBlock Text="{loc:Loc Key=WAREHOUSE_NAME}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                <TextBox x:Name="WarehouseNameTextBox" Height="28"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="0,0,6,0">
+                                <TextBlock Text="{loc:Loc Key=LABEL_ADDRESS}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                <TextBox x:Name="WarehouseAddressTextBox" Height="28"/>
+                            </StackPanel>
+
+                            <Button Grid.Column="2" 
+                                    Content="{loc:Loc Key=BTN_ADD}" 
+                                    Click="CreateWarehouse_Click" 
+                                    Style="{StaticResource PrimaryButtonStyle}" 
+                                    Height="28" 
+                                    Padding="12,0" 
+                                    VerticalAlignment="Bottom"/>
+                        </Grid>
+
                         <DataGrid Grid.Row="1" x:Name="WarehousesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding Name}" Width="*"/>
@@ -60,12 +83,40 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-                            <TextBox x:Name="ChamberNameTextBox" Width="130" Margin="0,0,6,0"/>
-                            <TextBox x:Name="ChamberTempTextBox" Width="50" Text="12.0" Margin="0,0,6,0"/>
-                            <TextBox x:Name="ChamberHumidityTextBox" Width="50" Text="85.0" Margin="0,0,6,0"/>
-                            <Button Content="+" Click="CreateChamber_Click" Style="{StaticResource PrimaryButtonStyle}" Width="32" Height="26"/>
-                        </StackPanel>
+
+                        <!-- Поля с подписями -->
+                        <Grid Grid.Row="0" Margin="0,0,0,10">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                <TextBlock Text="{loc:Loc Key=AGING_CHAMBER_NAME}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                <TextBox x:Name="ChamberNameTextBox" Height="28"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="1" Margin="0,0,6,0">
+                                <TextBlock Text="{loc:Loc Key=LABEL_TEMP_SHORT}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                <TextBox x:Name="ChamberTempTextBox" Text="12.0" Height="28"/>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Margin="0,0,6,0">
+                                <TextBlock Text="{loc:Loc Key=LABEL_HUMIDITY_SHORT}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                <TextBox x:Name="ChamberHumidityTextBox" Text="85.0" Height="28"/>
+                            </StackPanel>
+
+                            <Button Grid.Column="3" 
+                                    Content="{loc:Loc Key=BTN_ADD}" 
+                                    Click="CreateChamber_Click" 
+                                    Style="{StaticResource PrimaryButtonStyle}" 
+                                    Height="28" 
+                                    Padding="12,0" 
+                                    VerticalAlignment="Bottom"/>
+                        </Grid>
+
                         <DataGrid Grid.Row="1" x:Name="ChambersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="{loc:Loc Key=AGING_CHAMBER_NAME}" Binding="{Binding Name}" Width="*"/>

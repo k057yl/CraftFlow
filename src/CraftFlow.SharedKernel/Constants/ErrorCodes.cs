@@ -13,6 +13,7 @@ public static class ErrorCodes
         public const string ALREADY_EXISTS = "GENERAL.ALREADY_EXISTS";
         public const string VALIDATION_ERROR = "GENERAL.VALIDATION_ERROR";
         public const string MAX_LENGTH_EXCEEDED = "GENERAL.MAX_LENGTH_EXCEEDED";
+        public const string INVALID_EMAIL_FORMAT = "GENERAL.INVALID_EMAIL_FORMAT";
     }
 
     public static class Production
