@@ -59,38 +59,50 @@
 		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 	</resheader>
 
-	<!-- Titles & Headers -->
-	<data name="TITLE_CATALOG" xml:space="preserve"><value>УПРАВЛІННЯ КАТАЛОГОМ</value></data>
-	<data name="TITLE_INVENTORY" xml:space="preserve"><value>УПРАВЛІННЯ СКЛАДОМ</value></data>
-	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>УПРАВЛІННЯ ВИРОБНИЦТВОМ</value></data>
-	<data name="TITLE_SALES" xml:space="preserve"><value>ПРОДАЖІ ТА ЗАМОВЛЕННЯ</value></data>
-	<data name="TITLE_AUTH" xml:space="preserve"><value>АУТЕНТИФІКАЦІЯ ТА JWT</value></data>
-	<data name="TITLE_DASHBOARD" xml:space="preserve"><value>ДАШБОРД СИСТЕМИ</value></data>
-	<data name="SYSTEM_AUDIT_LOGS" xml:space="preserve"><value>Журнал аудиту системи</value></data>
-	<data name="SYSTEM_DASHBOARD_OVERVIEW" xml:space="preserve"><value>ОГЛЯД СИСТЕМИ (ДАШБОРД)</value></data>
+	<!-- ========================================== -->
+	<!-- 1. Навігація Сайдбару                      -->
+	<!-- ========================================== -->
+	<data name="NAV_RECIPES" xml:space="preserve"><value>Сировина та Рецепти</value></data>
+	<data name="NAV_STORAGE" xml:space="preserve"><value>Склади та Обладнання</value></data>
+	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>Закупівлі та Поставки</value></data>
+	<data name="NAV_PRODUCTION" xml:space="preserve"><value>Варильний цех</value></data>
+	<data name="NAV_SALES" xml:space="preserve"><value>Продажі та Замовлення</value></data>
+	<data name="NAV_TRACEABILITY" xml:space="preserve"><value>Історія партій</value></data>
+	<data name="NAV_MRP" xml:space="preserve"><value>Розрахунок сировини</value></data>
+	<data name="NAV_AUDIT" xml:space="preserve"><value>Журнал подій</value></data>
+	<data name="NAV_ADMIN_KEYS" xml:space="preserve"><value>Ключі доступу (Адмін)</value></data>
+	<data name="NAV_AUTH" xml:space="preserve"><value>Вхід у систему</value></data>
+	<data name="NAV_PROFILE" xml:space="preserve"><value>Мій профіль</value></data>
 
-	<!-- Navigation -->
-	<data name="NAV_DASHBOARD" xml:space="preserve"><value>📊 ДАШБОРД</value></data>
-	<data name="NAV_CATALOG" xml:space="preserve"><value>📦 КАТАЛОГ</value></data>
-	<data name="NAV_INVENTORY" xml:space="preserve"><value>🏭 СКЛАД</value></data>
-	<data name="NAV_PRODUCTION" xml:space="preserve"><value>🧀 ВИРОБНИЦТВО</value></data>
-	<data name="NAV_SALES" xml:space="preserve"><value>💰 ПРОДАЖІ ТА ЗАМОВЛЕННЯ</value></data>
-	<data name="NAV_AUTH" xml:space="preserve"><value>🔐 АВТОРИЗАЦІЯ</value></data>
-	<data name="NAV_AUDIT" xml:space="preserve"><value>📜 ЖУРНАЛ АУДИТУ</value></data>
+	<!-- ========================================== -->
+	<!-- 1.1 Налаштування та Профіль                -->
+	<!-- ========================================== -->
+	<data name="LABEL_LANGUAGE" xml:space="preserve"><value>Мова</value></data>
+	<data name="LABEL_THEME" xml:space="preserve"><value>Тема оформлення</value></data>
+	<data name="GUEST_USER" xml:space="preserve"><value>Гість (не увійшов)</value></data>
+	<data name="BTN_LOGOUT" xml:space="preserve"><value>Вийти</value></data>
+	<data name="THEME_LIGHT_DISPLAY" xml:space="preserve"><value>☀️ Світла</value></data>
+	<data name="THEME_DARK_DISPLAY" xml:space="preserve"><value>🌙 Темна</value></data>
+	<data name="LANG_RU_DISPLAY" xml:space="preserve"><value>Русский</value></data>
+	<data name="LANG_UA_DISPLAY" xml:space="preserve"><value>Українська</value></data>
+	<data name="LANG_EN_DISPLAY" xml:space="preserve"><value>English</value></data>
 
-	<!-- GroupBox Headers -->
-	<data name="HEADER_UOM" xml:space="preserve"><value>1. ОДИНИЦІ ВИМІРУ</value></data>
-	<data name="HEADER_RAW_MATERIALS" xml:space="preserve"><value>2. СИРОВИНА ТА ІНГРЕДІЄНТИ</value></data>
-	<data name="HEADER_PRODUCTS" xml:space="preserve"><value>3. ГОТОВА ПРОДУКЦІЯ</value></data>
-	<data name="HEADER_RECIPES" xml:space="preserve"><value>4. ТЕХНОЛОГІЧНІ РЕЦЕПТИ</value></data>
-	<data name="HEADER_CUSTOMERS" xml:space="preserve"><value>1. КЛІЄНТИ ТА ПОКУПЦІ</value></data>
-	<data name="HEADER_SHIP_ORDER" xml:space="preserve"><value>2. ОФОРМЛЕННЯ ТА ВІДВАНТАЖЕННЯ</value></data>
-	<data name="PRODUCTION_BATCHES_START" xml:space="preserve"><value>1. ЗАПУСК ВАРКИ</value></data>
-	<data name="COMPLETE_PRODUCTION_BATCH_HEADER" xml:space="preserve"><value>2. ЗАВЕРШЕННЯ ВАРКИ</value></data>
-	<data name="BATCH_COST_ANALYSIS" xml:space="preserve"><value>3. АНАЛІЗ СОБІВАРТОСТІ</value></data>
-	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>1. СКЛАДИ</value></data>
-	<data name="STOCK_LOTS_HEADER" xml:space="preserve"><value>2. ПРИЙНЯТТЯ СИРОВИНИ</value></data>
-	<data name="USER_AUTHENTICATION" xml:space="preserve"><value>АУТЕНТИФІКАЦІЯ КОРИСТУВАЧА</value></data>
+	<!-- ========================================== -->
+	<!-- 2: Сировина та Рецепти                     -->
+	<!-- ========================================== -->
+	<data name="TITLE_RECIPES" xml:space="preserve"><value>Сировина та Технологічні Рецепти</value></data>
+	<data name="HEADER_RAW_MATERIALS" xml:space="preserve"><value>Сировина та Інгредієнти</value></data>
+	<data name="HEADER_NEW_RECIPE" xml:space="preserve"><value>Нова Рецептура</value></data>
+	<data name="HEADER_RECIPES" xml:space="preserve"><value>Технологічні Рецепти</value></data>
+	<data name="RAW_MATERIAL_NAME" xml:space="preserve"><value>Назва сировини:</value></data>
+	<data name="SELECT_UOM" xml:space="preserve"><value>Оберіть од. вим.:</value></data>
+	<data name="CREATE_RAW_MATERIAL" xml:space="preserve"><value>Додати сировину</value></data>
+	<data name="RECIPE_NAME" xml:space="preserve"><value>Назва рецепта:</value></data>
+	<data name="TARGET_OUTPUT_QUANTITY" xml:space="preserve"><value>Базовий вихід рецепта (кг/л):</value></data>
+	<data name="IS_AGING_REQUIRED" xml:space="preserve"><value>Потрібне дозрівання</value></data>
+	<data name="INGREDIENT_SECTION" xml:space="preserve"><value>СКЛАД РЕЦЕПТА</value></data>
+	<data name="CREATE_RECIPE" xml:space="preserve"><value>Зберегти рецепт</value></data>
+	<data name="BTN_ADD" xml:space="preserve"><value>Додати</value></data>
 
 	<!-- Buttons & Actions -->
 	<data name="REFRESH_LOGS" xml:space="preserve"><value>Оновити</value></data>

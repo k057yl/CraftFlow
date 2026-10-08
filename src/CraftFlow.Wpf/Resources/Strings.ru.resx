@@ -60,32 +60,49 @@
 	</resheader>
 
 	<!-- ========================================== -->
-	<!-- 1. Page Titles                             -->
+	<!-- 1: Навигация Сайдбара                      -->
 	<!-- ========================================== -->
-	<data name="TITLE_CATALOG" xml:space="preserve"><value>УПРАВЛЕНИЕ КАТАЛОГОМ</value></data>
-	<data name="TITLE_INVENTORY" xml:space="preserve"><value>УПРАВЛЕНИЕ СКЛАДОМ</value></data>
-	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>УПРАВЛЕНИЕ ПРОИЗВОДСТВОМ</value></data>
-	<data name="TITLE_SALES" xml:space="preserve"><value>ПРОДАЖИ И ЗАКАЗЫ</value></data>
-	<data name="TITLE_AUTH" xml:space="preserve"><value>АУТЕНТИФИКАЦИЯ И JWT</value></data>
-	<data name="TITLE_DASHBOARD" xml:space="preserve"><value>ДАШБОРД СИСТЕМЫ</value></data>
-	<data name="TITLE_PROCUREMENT" xml:space="preserve"><value>ЗАКУПКИ И ПОСТАВЩИКИ</value></data>
-	<data name="TITLE_AGING" xml:space="preserve"><value>КАМЕРЫ СОЗРЕВАНИЯ СЫРА</value></data>
-	<data name="TITLE_TRACEABILITY" xml:space="preserve"><value>СКВОЗНАЯ ТРАССИРОВКА ПАРТИЙ</value></data>
-	<data name="TITLE_MRP" xml:space="preserve"><value>ПЛАНИРОВАНИЕ ПОТРЕБНОСТЕЙ (MRP)</value></data>
+	<data name="NAV_RECIPES" xml:space="preserve"><value>Сырьё и Рецепты</value></data>
+	<data name="NAV_STORAGE" xml:space="preserve"><value>Склады и Оборудование</value></data>
+	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>Покупки и Поставки</value></data>
+	<data name="NAV_PRODUCTION" xml:space="preserve"><value>Варочный цех</value></data>
+	<data name="NAV_SALES" xml:space="preserve"><value>Продажи и Заказы</value></data>
+	<data name="NAV_TRACEABILITY" xml:space="preserve"><value>История партий</value></data>
+	<data name="NAV_MRP" xml:space="preserve"><value>Расчет сырья</value></data>
+	<data name="NAV_AUDIT" xml:space="preserve"><value>Журнал событий</value></data>
+	<data name="NAV_ADMIN_KEYS" xml:space="preserve"><value>Ключи доступа (Админ)</value></data>
+	<data name="NAV_AUTH" xml:space="preserve"><value>Вход в систему</value></data>
+	<data name="NAV_PROFILE" xml:space="preserve"><value>Мой профиль</value></data>
 
 	<!-- ========================================== -->
-	<!-- 2. Main Navigation                         -->
+	<!-- 1.1: Настройки и Профиль                    -->
 	<!-- ========================================== -->
-	<data name="NAV_DIRECTORY" xml:space="preserve"><value>Номенклатура и Рецепты</value></data>
-	<data name="NAV_INVENTORY" xml:space="preserve"><value>Склад и Камеры</value></data>
-	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>Закупки и Поставки</value></data>
-	<data name="NAV_PRODUCTION" xml:space="preserve"><value>Цех и Варочная</value></data>
-	<data name="NAV_SALES" xml:space="preserve"><value>Продажи и Заказы</value></data>
-	<data name="NAV_TRACEABILITY" xml:space="preserve"><value>История Партий (S2S)</value></data>
-	<data name="NAV_MRP" xml:space="preserve"><value>Расчет Потребностей</value></data>
-	<data name="NAV_AGING" xml:space="preserve"><value>Созревание и Аффинаж</value></data>
-	<data name="NAV_AUTH" xml:space="preserve"><value>Авторизация</value></data>
-	<data name="NAV_AUDIT" xml:space="preserve"><value>Журнал Действий</value></data>
+	<data name="LABEL_LANGUAGE" xml:space="preserve"><value>Язык</value></data>
+	<data name="LABEL_THEME" xml:space="preserve"><value>Тема оформления</value></data>
+	<data name="GUEST_USER" xml:space="preserve"><value>Гость (не вошел)</value></data>
+	<data name="BTN_LOGOUT" xml:space="preserve"><value>Выйти</value></data>
+	<data name="THEME_LIGHT_DISPLAY" xml:space="preserve"><value>☀️ Светлая</value></data>
+	<data name="THEME_DARK_DISPLAY" xml:space="preserve"><value>🌙 Тёмная</value></data>
+	<data name="LANG_RU_DISPLAY" xml:space="preserve"><value>Русский</value></data>
+	<data name="LANG_UA_DISPLAY" xml:space="preserve"><value>Українська</value></data>
+	<data name="LANG_EN_DISPLAY" xml:space="preserve"><value>English</value></data>
+
+	<!-- ========================================== -->
+	<!-- 2: Сырьё и Рецепты                         -->
+	<!-- ========================================== -->
+	<data name="TITLE_RECIPES" xml:space="preserve"><value>Сырьё и Технологические Рецепты</value></data>
+	<data name="HEADER_RAW_MATERIALS" xml:space="preserve"><value>Сырьё и Ингредиенты</value></data>
+	<data name="HEADER_NEW_RECIPE" xml:space="preserve"><value>Новая Рецептура</value></data>
+	<data name="HEADER_RECIPES" xml:space="preserve"><value>Технологические Рецепты</value></data>
+	<data name="RAW_MATERIAL_NAME" xml:space="preserve"><value>Название сырья:</value></data>
+	<data name="SELECT_UOM" xml:space="preserve"><value>Выберите ед. изм.:</value></data>
+	<data name="CREATE_RAW_MATERIAL" xml:space="preserve"><value>Добавить сырьё</value></data>
+	<data name="RECIPE_NAME" xml:space="preserve"><value>Название рецепта:</value></data>
+	<data name="TARGET_OUTPUT_QUANTITY" xml:space="preserve"><value>Базовый выход рецепта (кг/л):</value></data>
+	<data name="IS_AGING_REQUIRED" xml:space="preserve"><value>Требуется созревание</value></data>
+	<data name="INGREDIENT_SECTION" xml:space="preserve"><value>СОСТАВ РЕЦЕПТА</value></data>
+	<data name="CREATE_RECIPE" xml:space="preserve"><value>Сохранить рецепт</value></data>
+	<data name="BTN_ADD" xml:space="preserve"><value>Добавить</value></data>
 
 	<!-- ========================================== -->
 	<!-- 3. Section Headers & GroupBoxes            -->

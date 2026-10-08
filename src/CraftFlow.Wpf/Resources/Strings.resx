@@ -59,38 +59,50 @@
 		<value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
 	</resheader>
 
-	<!-- Titles & Headers -->
-	<data name="TITLE_CATALOG" xml:space="preserve"><value>CATALOG MANAGEMENT</value></data>
-	<data name="TITLE_INVENTORY" xml:space="preserve"><value>INVENTORY MANAGEMENT</value></data>
-	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>PRODUCTION MANAGEMENT</value></data>
-	<data name="TITLE_SALES" xml:space="preserve"><value>SALES &amp; ORDERS MANAGEMENT</value></data>
-	<data name="TITLE_AUTH" xml:space="preserve"><value>AUTHENTICATION &amp; JWT</value></data>
-	<data name="TITLE_DASHBOARD" xml:space="preserve"><value>SYSTEM DASHBOARD</value></data>
-	<data name="SYSTEM_AUDIT_LOGS" xml:space="preserve"><value>System Audit Logs</value></data>
-	<data name="SYSTEM_DASHBOARD_OVERVIEW" xml:space="preserve"><value>SYSTEM DASHBOARD OVERVIEW</value></data>
+	<!-- ========================================== -->
+	<!-- 1. Sidebar Navigation                      -->
+	<!-- ========================================== -->
+	<data name="NAV_RECIPES" xml:space="preserve"><value>Raw &amp; Recipes</value></data>
+	<data name="NAV_STORAGE" xml:space="preserve"><value>Stores &amp; Equipment</value></data>
+	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>Purchases &amp; Supplies</value></data>
+	<data name="NAV_PRODUCTION" xml:space="preserve"><value>Cheese House</value></data>
+	<data name="NAV_SALES" xml:space="preserve"><value>Sales &amp; Orders</value></data>
+	<data name="NAV_TRACEABILITY" xml:space="preserve"><value>Batch History</value></data>
+	<data name="NAV_MRP" xml:space="preserve"><value>Supply Planning</value></data>
+	<data name="NAV_AUDIT" xml:space="preserve"><value>Event Log</value></data>
+	<data name="NAV_ADMIN_KEYS" xml:space="preserve"><value>Access Keys (Admin)</value></data>
+	<data name="NAV_AUTH" xml:space="preserve"><value>Sign In</value></data>
+	<data name="NAV_PROFILE" xml:space="preserve"><value>My Profile</value></data>
 
-	<!-- Navigation -->
-	<data name="NAV_DASHBOARD" xml:space="preserve"><value>📊 DASHBOARD</value></data>
-	<data name="NAV_CATALOG" xml:space="preserve"><value>📦 CATALOG</value></data>
-	<data name="NAV_INVENTORY" xml:space="preserve"><value>🏭 INVENTORY</value></data>
-	<data name="NAV_PRODUCTION" xml:space="preserve"><value>🧀 PRODUCTION</value></data>
-	<data name="NAV_SALES" xml:space="preserve"><value>💰 SALES &amp; ORDERS</value></data>
-	<data name="NAV_AUTH" xml:space="preserve"><value>🔐 AUTH (JWT)</value></data>
-	<data name="NAV_AUDIT" xml:space="preserve"><value>📜 AUDIT LOGS</value></data>
+	<!-- ========================================== -->
+	<!-- 1.1 Settings & User Controls               -->
+	<!-- ========================================== -->
+	<data name="LABEL_LANGUAGE" xml:space="preserve"><value>Language</value></data>
+	<data name="LABEL_THEME" xml:space="preserve"><value>Theme</value></data>
+	<data name="GUEST_USER" xml:space="preserve"><value>Guest (not logged in)</value></data>
+	<data name="BTN_LOGOUT" xml:space="preserve"><value>Log Out</value></data>
+	<data name="THEME_LIGHT_DISPLAY" xml:space="preserve"><value>☀️ Light</value></data>
+	<data name="THEME_DARK_DISPLAY" xml:space="preserve"><value>🌙 Dark</value></data>
+	<data name="LANG_RU_DISPLAY" xml:space="preserve"><value>Русский</value></data>
+	<data name="LANG_UA_DISPLAY" xml:space="preserve"><value>Українська</value></data>
+	<data name="LANG_EN_DISPLAY" xml:space="preserve"><value>English</value></data>
 
-	<!-- GroupBox Headers -->
-	<data name="HEADER_UOM" xml:space="preserve"><value>1. UNITS OF MEASURE</value></data>
-	<data name="HEADER_RAW_MATERIALS" xml:space="preserve"><value>2. RAW MATERIALS</value></data>
-	<data name="HEADER_PRODUCTS" xml:space="preserve"><value>3. PRODUCTS</value></data>
-	<data name="HEADER_RECIPES" xml:space="preserve"><value>4. RECIPES</value></data>
-	<data name="HEADER_CUSTOMERS" xml:space="preserve"><value>1. CUSTOMERS</value></data>
-	<data name="HEADER_SHIP_ORDER" xml:space="preserve"><value>2. SHIP SALES ORDER</value></data>
-	<data name="PRODUCTION_BATCHES_START" xml:space="preserve"><value>1. PRODUCTION BATCHES (START)</value></data>
-	<data name="COMPLETE_PRODUCTION_BATCH_HEADER" xml:space="preserve"><value>2. COMPLETE PRODUCTION BATCH</value></data>
-	<data name="BATCH_COST_ANALYSIS" xml:space="preserve"><value>3. BATCH COST ANALYSIS</value></data>
-	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>1. WAREHOUSES</value></data>
-	<data name="STOCK_LOTS_HEADER" xml:space="preserve"><value>2. STOCK LOTS</value></data>
-	<data name="USER_AUTHENTICATION" xml:space="preserve"><value>USER AUTHENTICATION</value></data>
+	<!-- ========================================== -->
+	<!-- 2: Raw Materials & Recipes                 -->
+	<!-- ========================================== -->
+	<data name="TITLE_RECIPES" xml:space="preserve"><value>Raw Materials &amp; Tech Recipes</value></data>
+	<data name="HEADER_RAW_MATERIALS" xml:space="preserve"><value>Raw Materials &amp; Ingredients</value></data>
+	<data name="HEADER_NEW_RECIPE" xml:space="preserve"><value>New Recipe</value></data>
+	<data name="HEADER_RECIPES" xml:space="preserve"><value>Technology Recipes</value></data>
+	<data name="RAW_MATERIAL_NAME" xml:space="preserve"><value>Material Name:</value></data>
+	<data name="SELECT_UOM" xml:space="preserve"><value>Select Unit:</value></data>
+	<data name="CREATE_RAW_MATERIAL" xml:space="preserve"><value>Add Material</value></data>
+	<data name="RECIPE_NAME" xml:space="preserve"><value>Recipe Name:</value></data>
+	<data name="TARGET_OUTPUT_QUANTITY" xml:space="preserve"><value>Base Output Yield (kg/l):</value></data>
+	<data name="IS_AGING_REQUIRED" xml:space="preserve"><value>Requires Aging</value></data>
+	<data name="INGREDIENT_SECTION" xml:space="preserve"><value>RECIPE FORMULA</value></data>
+	<data name="CREATE_RECIPE" xml:space="preserve"><value>Save Recipe</value></data>
+	<data name="BTN_ADD" xml:space="preserve"><value>Add</value></data>
 
 	<!-- Buttons & Actions -->
 	<data name="REFRESH_LOGS" xml:space="preserve"><value>Refresh</value></data>

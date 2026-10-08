@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Aging;
 using CraftFlow.Api.Modules.Production;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Aging;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Production;
@@ -98,11 +99,11 @@ public partial class ProductionPage : Page
             }
             catch { }
 
-            SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);
+            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
         }
         catch (Exception ex)
         {
-            SetStatusFormatted("UI_DATA_LOAD_ERROR", Brushes.Red, ex.Message);
+            SetStatusFormatted(UiConstants.Messages.DATA_LOAD_ERROR, Brushes.Red, ex.Message);
         }
     }
 

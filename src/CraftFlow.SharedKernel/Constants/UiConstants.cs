@@ -65,4 +65,17 @@ public static class UiConstants
         public const string QUANTITY_DESC = "QUANTITY_DESC";
         public const string SUPPLIER = "SUPPLIER";
     }
+
+    public static class Cultures
+    {
+        public const string RU = "ru-RU";
+        public const string UA = "uk-UA";
+        public const string EN = "en-US";
+    }
+
+    public static class Themes
+    {
+        public const string LIGHT = "Light";
+        public const string DARK = "Dark";
+    }
 }

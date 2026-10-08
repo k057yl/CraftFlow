@@ -11,13 +11,6 @@ namespace CraftFlow.Wpf;
 
 public partial class MainWindow : Window
 {
-    private const string LANG_RU = "ru-RU";
-    private const string LANG_UA = "uk-UA";
-    private const string LANG_EN = "en-US";
-
-    private const string THEME_LIGHT = "Light";
-    private const string THEME_DARK = "Dark";
-
     private bool _isInitializing = true;
 
     public MainWindow() : this(null) { }
@@ -28,7 +21,8 @@ public partial class MainWindow : Window
         Title = UiConstants.Titles.APP_TITLE;
 
         InitSettingsControls();
-        LocalizationService.LanguageChanged += RefreshUiContent;
+
+        LocalizationService.LanguageChanged += OnLanguageChanged;
 
         ApiService.Instance.OnAuthStateChanged += () =>
         {
@@ -82,12 +76,12 @@ public partial class MainWindow : Window
         UserNameTextBlock.Text = currentUser?.FullName ?? string.Empty;
         UserRoleTextBlock.Text = currentUser?.Role switch
         {
-            TenantRole.SuperAdmin => UiConstants.Roles.SUPER_ADMIN_DISPLAY,
-            TenantRole.Owner => UiConstants.Roles.OWNER_DISPLAY,
-            TenantRole.Technologist => UiConstants.Roles.TECHNOLOGIST_DISPLAY,
-            TenantRole.Storekeeper => UiConstants.Roles.STOREKEEPER_DISPLAY,
-            TenantRole.SalesManager => UiConstants.Roles.SALES_MANAGER_DISPLAY,
-            _ => UiConstants.Roles.EMPLOYEE_DISPLAY
+            TenantRole.SuperAdmin => LocalizationService.Get(UiConstants.Roles.SUPER_ADMIN_DISPLAY),
+            TenantRole.Owner => LocalizationService.Get(UiConstants.Roles.OWNER_DISPLAY),
+            TenantRole.Technologist => LocalizationService.Get(UiConstants.Roles.TECHNOLOGIST_DISPLAY),
+            TenantRole.Storekeeper => LocalizationService.Get(UiConstants.Roles.STOREKEEPER_DISPLAY),
+            TenantRole.SalesManager => LocalizationService.Get(UiConstants.Roles.SALES_MANAGER_DISPLAY),
+            _ => LocalizationService.Get(UiConstants.Roles.EMPLOYEE_DISPLAY)
         };
 
         NavAuthButton.Visibility = Visibility.Collapsed;
@@ -106,9 +100,9 @@ public partial class MainWindow : Window
     {
         LanguageComboBox.ItemsSource = new[]
         {
-            new { Code = LANG_RU, Display = "RU" },
-            new { Code = LANG_UA, Display = "UA" },
-            new { Code = LANG_EN, Display = "EN" }
+            new { Code = UiConstants.Cultures.RU, Display = LocalizationService.Get("LANG_RU_DISPLAY") },
+            new { Code = UiConstants.Cultures.UA, Display = LocalizationService.Get("LANG_UA_DISPLAY") },
+            new { Code = UiConstants.Cultures.EN, Display = LocalizationService.Get("LANG_EN_DISPLAY") }
         };
         LanguageComboBox.DisplayMemberPath = "Display";
         LanguageComboBox.SelectedValuePath = "Code";
@@ -116,12 +110,12 @@ public partial class MainWindow : Window
 
         ThemeComboBox.ItemsSource = new[]
         {
-            new { Code = THEME_LIGHT, Display = "☀️ Light" },
-            new { Code = THEME_DARK, Display = "🌙 Dark" }
+            new { Code = UiConstants.Themes.LIGHT, Display = LocalizationService.Get("THEME_LIGHT_DISPLAY") },
+            new { Code = UiConstants.Themes.DARK, Display = LocalizationService.Get("THEME_DARK_DISPLAY") }
         };
         ThemeComboBox.DisplayMemberPath = "Display";
         ThemeComboBox.SelectedValuePath = "Code";
-        ThemeComboBox.SelectedValue = THEME_LIGHT;
+        ThemeComboBox.SelectedValue = UiConstants.Themes.LIGHT;
     }
 
     private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -139,6 +133,16 @@ public partial class MainWindow : Window
         RefreshUiContent();
     }
 
+    private void OnLanguageChanged()
+    {
+        _isInitializing = true;
+        InitSettingsControls();
+        UpdateNavigationPermissions();
+        _isInitializing = false;
+
+        RefreshUiContent();
+    }
+
     private void RefreshUiContent()
     {
         if (MainFrame.Content is object currentContent)
@@ -148,7 +152,8 @@ public partial class MainWindow : Window
         }
     }
 
-    private void NavDirectory_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new CatalogPage());
+    private void NavRecipes_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RecipesPage());
+    private void NavStorage_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new StoragePage());
     private void NavProcurement_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProcurementPage());
     private void NavProduction_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
     private void NavSales_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new SalesPage());

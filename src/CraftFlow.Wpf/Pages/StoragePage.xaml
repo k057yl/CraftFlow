@@ -1,0 +1,116 @@
+﻿<Page x:Class="CraftFlow.Wpf.Pages.StoragePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
+      Title="{loc:Loc Key=TITLE_STORAGE}">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="{loc:Loc Key=TITLE_STORAGE}" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,16"/>
+
+        <Grid Grid.Row="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="220"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Верхняя часть: Склады и Камеры -->
+            <Grid Grid.Row="0" Margin="0,0,0,12">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Склады -->
+                <GroupBox Grid.Column="0" Header="{loc:Loc Key=WAREHOUSES_HEADER}" Margin="0,0,6,0" Padding="10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBox x:Name="WarehouseNameTextBox" Width="140" Margin="0,0,6,0"/>
+                            <TextBox x:Name="WarehouseAddressTextBox" Width="140" Margin="0,0,6,0"/>
+                            <Button Content="+" Click="CreateWarehouse_Click" Style="{StaticResource PrimaryButtonStyle}" Width="32" Height="26"/>
+                        </StackPanel>
+                        <DataGrid Grid.Row="1" x:Name="WarehousesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding Name}" Width="*"/>
+                                <DataGridTemplateColumn Width="45">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="✕" Click="DeleteWarehouse_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </GroupBox>
+
+                <!-- Камеры выдержки -->
+                <GroupBox Grid.Column="1" Header="{loc:Loc Key=HEADER_AGING_CHAMBERS}" Margin="6,0,0,0" Padding="10">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBox x:Name="ChamberNameTextBox" Width="130" Margin="0,0,6,0"/>
+                            <TextBox x:Name="ChamberTempTextBox" Width="50" Text="12.0" Margin="0,0,6,0"/>
+                            <TextBox x:Name="ChamberHumidityTextBox" Width="50" Text="85.0" Margin="0,0,6,0"/>
+                            <Button Content="+" Click="CreateChamber_Click" Style="{StaticResource PrimaryButtonStyle}" Width="32" Height="26"/>
+                        </StackPanel>
+                        <DataGrid Grid.Row="1" x:Name="ChambersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="{loc:Loc Key=AGING_CHAMBER_NAME}" Binding="{Binding Name}" Width="*"/>
+                                <DataGridTemplateColumn Width="45">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="✕" Click="DeleteChamber_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+
+            <!-- Нижняя часть: Ёмкости, танки и стеллажи -->
+            <GroupBox Grid.Row="1" Header="{loc:Loc Key=HEADER_EQUIPMENT}" Padding="10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Button Grid.Row="0" Content="{loc:Loc Key=BTN_CREATE_EQUIPMENT}" Click="OpenCreateStorageLocationModal_Click" Style="{StaticResource PrimaryButtonStyle}" Height="30" Padding="14,0" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+
+                    <DataGrid Grid.Row="1" x:Name="StorageLocationsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_EQUIPMENT_NAME}" Binding="{Binding Name}" Width="180"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_TYPE}" Binding="{Binding LocationType}" Width="130"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_PARENT_LOCATION}" Binding="{Binding ParentName}" Width="200"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_VOLUME}" Binding="{Binding VolumeInfo}" Width="*"/>
+                            <DataGridTemplateColumn Width="50">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="✕" Click="DeleteStorageLocation_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </GroupBox>
+        </Grid>
+
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" Margin="0,12,0,0"/>
+    </Grid>
+</Page>

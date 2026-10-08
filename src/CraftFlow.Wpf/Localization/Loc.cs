@@ -1,48 +1,54 @@
 ﻿using System.ComponentModel;
-using System.Globalization;
-using System.Resources;
-using System.Windows;
-using System.Windows.Markup;
-using CraftFlow.Wpf.Resources;
+using System.Windows.Data;
+using CraftFlow.Wpf.Services;
 
 namespace CraftFlow.Wpf.Localization;
 
-[MarkupExtensionReturnType(typeof(string))]
-public class Loc : MarkupExtension
+public class Loc : Binding
 {
-    private const string EMPTY_KEY_RESULT = "";
-
-    [ConstructorArgument("key")]
-    public string Key { get; set; } = string.Empty;
-
     public Loc()
     {
+        Source = TranslationSource.Instance;
+        Path = new System.Windows.PropertyPath("Item[]");
+        Mode = BindingMode.OneWay;
     }
 
-    public Loc(string key)
+    public Loc(string key) : this()
     {
         Key = key;
     }
 
-    public override object ProvideValue(IServiceProvider serviceProvider)
+    public string Key
     {
-        if (string.IsNullOrEmpty(Key)) return EMPTY_KEY_RESULT;
+        get => Path.PathParameters.Count > 0 ? (string)Path.PathParameters[0] : string.Empty;
+        set => Path = new System.Windows.PropertyPath($"Item[{value}]");
+    }
+}
 
-        if (DesignerProperties.GetIsInDesignMode(new DependencyObject()))
-        {
-            return Key;
-        }
+public class TranslationSource : INotifyPropertyChanged
+{
+    public static TranslationSource Instance { get; } = new();
 
-        try
-        {
-            var resourceManager = new ResourceManager(typeof(Strings));
-            var localizedString = resourceManager.GetString(Key, CultureInfo.CurrentUICulture);
+    public event PropertyChangedEventHandler? PropertyChanged;
 
-            return localizedString ?? Key;
-        }
-        catch
+    private TranslationSource()
+    {
+        LocalizationService.LanguageChanged += () =>
         {
-            return Key;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(string.Empty));
+        };
+    }
+
+    public string this[string key]
+    {
+        get
+        {
+            if (DesignerProperties.GetIsInDesignMode(new System.Windows.DependencyObject()))
+            {
+                return key;
+            }
+
+            return LocalizationService.Get(key);
         }
     }
 }

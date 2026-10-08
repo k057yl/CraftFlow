@@ -13,7 +13,7 @@
                 <Setter Property="Foreground" Value="{DynamicResource AppForegroundBrush}"/>
             </Style>
 
-            <!-- 2. ТЕКСТБОКС (Убрали мини-скроллы внутри инпутов) -->
+            <!-- 2. ТЕКСТБОКС -->
             <Style TargetType="TextBox">
                 <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
                 <Setter Property="Foreground" Value="{DynamicResource AppForegroundBrush}"/>
@@ -83,7 +83,7 @@
                 </Setter>
             </Style>
 
-            <!-- 2.2 СТИЛЬ ДЛЯ COMBOBOX (Flat Modern) -->
+            <!-- 2.2 СТИЛЬ ДЛЯ COMBOBOX (ФИКС ФОНА И ЦВЕТА СТРЕЛКИ) -->
             <Style TargetType="ComboBox">
                 <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
                 <Setter Property="Foreground" Value="{DynamicResource AppForegroundBrush}"/>
@@ -96,13 +96,13 @@
                         <ControlTemplate TargetType="ComboBox">
                             <Grid x:Name="MainGrid">
                                 <ToggleButton x:Name="ToggleButton" 
-                                  Focusable="False" 
-                                  IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" 
-                                  ClickMode="Press">
+                                              Focusable="False" 
+                                              IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" 
+                                              ClickMode="Press">
                                     <ToggleButton.Template>
                                         <ControlTemplate TargetType="ToggleButton">
                                             <Border x:Name="Border" 
-                                                    Background="{TemplateBinding Background}" 
+                                                    Background="{DynamicResource CardBackgroundBrush}" 
                                                     BorderBrush="{DynamicResource BorderBrush}" 
                                                     BorderThickness="1" 
                                                     CornerRadius="6">
@@ -177,7 +177,7 @@
                 </Setter>
             </Style>
 
-            <!-- 3. КАРТОЧНЫЙ GROUPBOX (ФИКС: TextBlock.FontSize вместо FontSize) -->
+            <!-- 3. КАРТОЧНЫЙ GROUPBOX -->
             <Style TargetType="GroupBox">
                 <Setter Property="Foreground" Value="{DynamicResource AppForegroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
@@ -250,13 +250,23 @@
                 <Setter Property="Foreground" Value="White"/>
                 <Setter Property="FontWeight" Value="SemiBold"/>
                 <Setter Property="BorderThickness" Value="0"/>
-                <Setter Property="Padding" Value="12,6"/>
+                <Setter Property="Padding" Value="10,5"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="VerticalContentAlignment" Value="Center"/>
                 <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="TextOptions.TextFormattingMode" Value="Display"/>
+                <Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="Button">
-                            <Border x:Name="btnBorder" Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
-                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border x:Name="btnBorder" 
+                                    Background="{TemplateBinding Background}" 
+                                    CornerRadius="6" 
+                                    Padding="{TemplateBinding Padding}"
+                                    SnapsToDevicePixels="True">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                      VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      SnapsToDevicePixels="True"/>
                             </Border>
                             <ControlTemplate.Triggers>
                                 <Trigger Property="IsMouseOver" Value="True">
@@ -294,7 +304,7 @@
                 </Setter>
             </Style>
 
-            <!-- 7. НАВИГАЦИОННЫЕ КНОПКИ САЙДБАРА (СЛЕВА ИНДИКАТОР АКТИВНОСТИ) -->
+            <!-- 7. НАВИГАЦИОННЫЕ КНОПКИ САЙДБАРА -->
             <Style x:Key="NavButtonStyle" TargetType="Button">
                 <Setter Property="Height" Value="38"/>
                 <Setter Property="Margin" Value="0,0,0,4"/>
