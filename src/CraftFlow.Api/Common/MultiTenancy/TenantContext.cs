@@ -93,13 +93,16 @@ public class TenantContext : ITenantContext
             return false;
         }
 
-        if (httpContext.Items.TryGetValue(CoreConstants.MultiTenancy.TENANT_ID_ITEM_KEY, out var itemValue) && itemValue is Guid keyTenantId)
+        if (httpContext.Items.TryGetValue(CoreConstants.MultiTenancy.TENANT_ID_ITEM_KEY, out var itemValue) &&
+            itemValue is Guid keyTenantId && keyTenantId != Guid.Empty)
         {
             tenantId = keyTenantId;
             return true;
         }
 
-        var tenantClaim = httpContext.User.FindFirst(CoreConstants.MultiTenancy.CLAIM_TENANT_ID)?.Value;
+        var tenantClaim = httpContext.User.FindFirst(CoreConstants.MultiTenancy.CLAIM_TENANT_ID)?.Value
+                          ?? httpContext.User.FindFirst("tenant_id")?.Value;
+
         if (Guid.TryParse(tenantClaim, out tenantId) && tenantId != Guid.Empty)
         {
             return true;

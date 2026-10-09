@@ -296,7 +296,7 @@ public partial class BrewhouseControl : UserControl
 
         if (isSuccess)
         {
-            SetStatusRaw("Партия успешно запланирована!", Brushes.Green);
+            SetStatus("MSG_BATCH_PLANNED_SUCCESS", Brushes.Green);
             BatchNameTextBox.Clear();
             GenerateDefaultBatchName();
 
@@ -334,7 +334,7 @@ public partial class BrewhouseControl : UserControl
 
             if (isSuccess)
             {
-                SetStatusRaw("Черновик удален!", Brushes.OrangeRed);
+                SetStatus("MSG_DRAFT_DELETED_SUCCESS", Brushes.OrangeRed);
                 if (ParentPage != null) await ParentPage.LoadDataExternalAsync();
             }
             else

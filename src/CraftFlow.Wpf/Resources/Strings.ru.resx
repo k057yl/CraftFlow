@@ -187,38 +187,68 @@
 	<data name="CAPACITY_WARNING_SUFFICIENT" xml:space="preserve"><value>Вместимость подходит (выбрано на {0:N0} л/кг под партию в {1:N0} л/кг)</value></data>
 
 	<!-- ========================================== -->
-	<!-- 5. Input Labels & Display Fields           -->
+	<!-- 5: Варочный цех				            -->
 	<!-- ========================================== -->
-	<data name="UOM_NAME" xml:space="preserve"><value>Название Ед. Изм.:</value></data>
-	<data name="UOM_CODE" xml:space="preserve"><value>Код Ед. Изм.:</value></data>
-	<data name="RAW_MATERIAL_NAME" xml:space="preserve"><value>Название Сырья:</value></data>
-	<data name="PRODUCT_NAME" xml:space="preserve"><value>Название Продукта:</value></data>
-	<data name="RECIPE_NAME" xml:space="preserve"><value>Название Рецепта:</value></data>
-	<data name="SELECT_UOM" xml:space="preserve"><value>Выберите Ед. Изм.:</value></data>
-	<data name="SELECT_PRODUCT" xml:space="preserve"><value>Выберите Продукт:</value></data>
-	<data name="SELECT_RAW_MATERIAL" xml:space="preserve"><value>Выберите Сырьё:</value></data>
-	<data name="TARGET_OUTPUT_QUANTITY" xml:space="preserve"><value>Базовый выход рецепта (кг/л):</value></data>
-	<data name="INGREDIENT_SECTION" xml:space="preserve"><value>СОСТАВ РЕЦЕПТА</value></data>
-	<data name="INGREDIENT_QUANTITY" xml:space="preserve"><value>Количество Ингредиента:</value></data>
-	<data name="WAREHOUSE_NAME" xml:space="preserve"><value>Название Склада:</value></data>
-	<data name="WAREHOUSE_ADDRESS" xml:space="preserve"><value>Адрес Склада:</value></data>
-	<data name="BATCH_NUMBER" xml:space="preserve"><value>Номер Партии:</value></data>
-	<data name="CUSTOMER_NAME" xml:space="preserve"><value>Имя Клиента:</value></data>
-	<data name="CUSTOMER_PHONE" xml:space="preserve"><value>Телефон:</value></data>
-	<data name="SUPPLIER_NAME" xml:space="preserve"><value>Название Поставщика:</value></data>
-	<data name="SUPPLIER_PHONE" xml:space="preserve"><value>Телефон:</value></data>
-	<data name="SUPPLIER_EMAIL" xml:space="preserve"><value>Email:</value></data>
-	<data name="FULL_NAME" xml:space="preserve"><value>Полное Имя:</value></data>
-	<data name="EMAIL" xml:space="preserve"><value>Email:</value></data>
-	<data name="PASSWORD" xml:space="preserve"><value>Пароль:</value></data>
-	<data name="QUANTITY" xml:space="preserve"><value>Количество:</value></data>
-	<data name="UNIT_PRICE" xml:space="preserve"><value>Цена за Ед.:</value></data>
-	<data name="LOT_QUANTITY" xml:space="preserve"><value>Объём / Вес сырья (л/кг):</value></data>
-	<data name="IS_AGING_REQUIRED" xml:space="preserve"><value>Требуется созревание</value></data>
-	<data name="DEFAULT_MIN_AGING_DAYS" xml:space="preserve"><value>Дней выдержки:</value></data>
-	<data name="AGING_CHAMBER_NAME" xml:space="preserve"><value>Название камеры:</value></data>
-	<data name="TARGET_TEMPERATURE" xml:space="preserve"><value>Температура (°C):</value></data>
-	<data name="TARGET_HUMIDITY" xml:space="preserve"><value>Влажность (%):</value></data>
+	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>CRAFTFLOW — Производство</value></data>
+	<data name="PRODUCTION_HEADER" xml:space="preserve"><value>Производство и Варочный цех</value></data>
+
+	<!-- Вкладки -->
+	<data name="TAB_BREWHOUSE" xml:space="preserve"><value>Варочный цех</value></data>
+	<data name="TAB_AGING" xml:space="preserve"><value>Созревание и Аффинаж</value></data>
+	<data name="TAB_DISCARD_ACTS" xml:space="preserve"><value>Брак и Списания</value></data>
+
+	<!-- Группы (GroupBox) -->
+	<data name="GROUP_START_BATCH" xml:space="preserve"><value>Параметры запуска варки</value></data>
+	<data name="GROUP_RAW_REQUIREMENTS" xml:space="preserve"><value>Расчет потребности в сырье</value></data>
+	<data name="GROUP_PLANNED_BATCHES" xml:space="preserve"><value>Запланированные варки (Черновики)</value></data>
+	<data name="GROUP_ACTIVE_BATCHES" xml:space="preserve"><value>Варки в процессе</value></data>
+	<data name="GROUP_COMPLETE_BATCH" xml:space="preserve"><value>Завершение варки</value></data>
+	<data name="GROUP_BATCH_COSTING" xml:space="preserve"><value>Калькуляция себестоимости</value></data>
+
+	<!-- Лейблы полей -->
+	<data name="LABEL_BATCH_CODE" xml:space="preserve"><value>Код / Наименование партии:</value></data>
+	<data name="LABEL_SELECT_RECIPE" xml:space="preserve"><value>Выберите Рецептуру:</value></data>
+	<data name="LABEL_RAW_WAREHOUSE" xml:space="preserve"><value>Склад списания сырья:</value></data>
+	<data name="LABEL_DEST_WAREHOUSE" xml:space="preserve"><value>Склад зачисления продукции:</value></data>
+	<data name="LABEL_PLANNED_OUTPUT" xml:space="preserve"><value>Планируемый объём (кг/л):</value></data>
+	<data name="LABEL_SCHEDULED_DATE" xml:space="preserve"><value>Запланированная дата старта</value></data>
+	<data name="LABEL_SCHEDULED_TIME" xml:space="preserve"><value>Время (ЧЧ:ММ)</value></data>
+	<data name="LABEL_ESTIMATED_RAW_COST" xml:space="preserve"><value>Предварительная себестоимость сырья:</value></data>
+	<data name="LABEL_ACTIVE_BATCH" xml:space="preserve"><value>Выберите активную варку (В процессе):</value></data>
+	<data name="LABEL_COMPLETE_BATCH_NAME" xml:space="preserve"><value>Наименование готовой партии / Маркировка:</value></data>
+	<data name="LABEL_ACTUAL_OUTPUT" xml:space="preserve"><value>Фактический вес (кг/л):</value></data>
+	<data name="LABEL_UNITS_COUNT" xml:space="preserve"><value>Кол-во тар / мест (опц.):</value></data>
+	<data name="LABEL_RAW_COST" xml:space="preserve"><value>Себестоимость сырья:</value></data>
+	<data name="LABEL_OVERHEAD_COST" xml:space="preserve"><value>Накладные расходы:</value></data>
+	<data name="LABEL_TOTAL_COST" xml:space="preserve"><value>Итоговая себестоимость:</value></data>
+	<data name="LABEL_UNIT_COST" xml:space="preserve"><value>Себестоимость за 1 кг/л:</value></data>
+
+	<!-- Чекбоксы и Кнопки -->
+	<data name="CHECKBOX_OVERHEAD" xml:space="preserve"><value>Учесть накладные расходы</value></data>
+	<data name="BTN_CALC_MAX" xml:space="preserve"><value>Максимум по остаткам</value></data>
+	<data name="BTN_PRINT_CARD" xml:space="preserve"><value>Печать тех. карты</value></data>
+	<data name="BTN_START_BATCH" xml:space="preserve"><value>Запустить Варку</value></data>
+	<data name="BTN_PLAN_BATCH" xml:space="preserve"><value>Запланировать (в Черновик)</value></data>
+	<data name="BTN_COMPLETE_BATCH" xml:space="preserve"><value>Завершить Варку</value></data>
+
+	<!-- Колонки таблиц -->
+	<data name="COLUMN_BATCH_CODE" xml:space="preserve"><value>Код партии</value></data>
+	<data name="COLUMN_BATCH_NAME" xml:space="preserve"><value>Партия</value></data>
+	<data name="COLUMN_RECIPE" xml:space="preserve"><value>Рецептура</value></data>
+	<data name="COLUMN_VOLUME" xml:space="preserve"><value>Объём</value></data>
+	<data name="COLUMN_PLANNED_QTY" xml:space="preserve"><value>План (кг)</value></data>
+	<data name="COLUMN_SCHEDULED_AT" xml:space="preserve"><value>Запланировано на</value></data>
+	<data name="COLUMN_STARTED_AT" xml:space="preserve"><value>Старт</value></data>
+	<data name="COLUMN_COUNTDOWN" xml:space="preserve"><value>До старта</value></data>
+	<data name="COLUMN_ELAPSED" xml:space="preserve"><value>Прошло времени</value></data>
+	<data name="COLUMN_TARGET_DURATION" xml:space="preserve"><value>План (мин)</value></data>
+	<data name="COLUMN_ACTIONS" xml:space="preserve"><value>Действия</value></data>
+
+	<!-- Тултипы и Сообщения -->
+	<data name="TOOLTIP_START" xml:space="preserve"><value>Запустить варку</value></data>
+	<data name="TOOLTIP_DELETE" xml:space="preserve"><value>Удалить черновик</value></data>
+	<data name="MSG_BATCH_PLANNED_SUCCESS" xml:space="preserve"><value>Партия успешно запланирована!</value></data>
+	<data name="MSG_DRAFT_DELETED_SUCCESS" xml:space="preserve"><value>Черновик успешно удален!</value></data>
 
 	<!-- ========================================== -->
 	<!-- 6. Production Page & Costing Labels        -->

@@ -74,6 +74,7 @@ public static class ErrorCodes
         public const string OTP_EXPIRED = "AUTH.OTP_EXPIRED";
         public const string ALREADY_ACTIVATED = "AUTH.ALREADY_ACTIVATED";
         public const string ACCESS_DENIED = "AUTH.ACCESS_DENIED";
+        public const string UNAUTHORIZED = "AUTH.UNAUTHORIZED";
     }
 
     public static class Notifications
