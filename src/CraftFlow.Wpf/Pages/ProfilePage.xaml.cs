@@ -1,8 +1,8 @@
 ﻿using CraftFlow.Api.Modules.Identity;
-using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.Api.Modules.Subscriptions.Domain;
 using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.SharedKernel.Dtos.Subscription;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
 using System.Windows;

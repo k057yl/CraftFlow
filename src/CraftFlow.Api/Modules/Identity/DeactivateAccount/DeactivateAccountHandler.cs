@@ -5,6 +5,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Identity.DeactivateAccount;
+
 public class DeactivateAccountHandler : IRequestHandler<DeactivateAccountCommand, Result<bool>>
 {
     private readonly AppDbContext _dbContext;
@@ -32,11 +33,24 @@ public class DeactivateAccountHandler : IRequestHandler<DeactivateAccountCommand
 
         var org = await _dbContext.Organizations
             .IgnoreQueryFilters()
+            .Include(o => o.Members)
             .FirstOrDefaultAsync(o => o.Id == tenantId, cancellationToken);
 
         if (org != null)
         {
             org.DeactivateByOwner();
+
+            var memberUserIds = org.Members.Select(m => m.UserId).ToList();
+            var usersToDeactivate = await _dbContext.Users
+                .IgnoreQueryFilters()
+                .Where(u => memberUserIds.Contains(u.Id))
+                .ToListAsync(cancellationToken);
+
+            foreach (var u in usersToDeactivate)
+            {
+                u.Deactivate();
+            }
+
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 

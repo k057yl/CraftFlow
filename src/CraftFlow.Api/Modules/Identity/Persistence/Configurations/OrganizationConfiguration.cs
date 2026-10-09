@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Modules.Identity.Domain;
+using CraftFlow.SharedKernel.Enums.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -17,16 +18,13 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.Property(o => o.IsActive)
+        builder.Property(o => o.Status)
             .IsRequired()
-            .HasDefaultValue(true);
+            .HasConversion<int>()
+            .HasDefaultValue(OrganizationStatus.Active);
 
         builder.Property(o => o.CreatedAtUtc)
             .IsRequired();
-
-        builder.Property(o => o.IsSelfDeactivated)
-            .IsRequired()
-            .HasDefaultValue(false);
 
         builder.Property(o => o.DeactivatedAtUtc);
 
@@ -40,7 +38,7 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
             .HasForeignKey(m => m.TenantId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(o => new { o.IsActive, o.IsSelfDeactivated, o.DeactivatedAtUtc })
+        builder.HasIndex(o => new { o.Status, o.DeactivatedAtUtc })
             .HasDatabaseName(DbIndexes.Identity.IX_ORGANIZATIONS_RETENTION_CHECK);
     }
 }

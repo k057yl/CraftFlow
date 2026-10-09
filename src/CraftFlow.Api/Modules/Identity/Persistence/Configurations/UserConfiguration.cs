@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Modules.Identity.Domain;
+using CraftFlow.SharedKernel.Enums.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -24,9 +25,10 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.Property(u => u.IsActive)
+        builder.Property(u => u.Status)
             .IsRequired()
-            .HasDefaultValue(true);
+            .HasConversion<int>()
+            .HasDefaultValue(UserStatus.Active);
 
         builder.Property(u => u.OtpCodeHash)
             .HasMaxLength(100);

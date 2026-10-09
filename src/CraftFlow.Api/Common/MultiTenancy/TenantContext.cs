@@ -1,6 +1,6 @@
 ﻿using CraftFlow.Api.Common.Constants;
-using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Enums.Identity;
 using System.Security.Claims;
 
 namespace CraftFlow.Api.Common.MultiTenancy;
@@ -17,6 +17,7 @@ public class TenantContext : ITenantContext
 
     public Guid TenantId => FetchTenantId();
     public Guid UserId => FetchUserId();
+    public string? UserEmail => FetchUserEmail();
     public TenantRole Role => FetchRole();
     public bool IsResolved => TryFetchTenantId(out _);
 
@@ -40,6 +41,19 @@ public class TenantContext : ITenantContext
 
         var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return Guid.TryParse(userIdClaim, out var userId) ? userId : Guid.Empty;
+    }
+
+    private string? FetchUserEmail()
+    {
+        var httpContext = _httpContextAccessor.HttpContext;
+        if (httpContext?.User is null || !httpContext.User.Identity?.IsAuthenticated == true)
+        {
+            return null;
+        }
+
+        return httpContext.User.FindFirst(ClaimTypes.Email)?.Value
+            ?? httpContext.User.FindFirst("email")?.Value
+            ?? httpContext.User.FindFirst(ClaimTypes.Name)?.Value;
     }
 
     private TenantRole FetchRole()

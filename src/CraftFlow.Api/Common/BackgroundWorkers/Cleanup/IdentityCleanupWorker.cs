@@ -2,7 +2,7 @@
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.Api.Modules.Identity.DeleteAccount;
-using CraftFlow.Api.Modules.Identity.Domain;
+using CraftFlow.SharedKernel.Enums.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Infrastructure.BackgroundServices.Cleanup;
@@ -48,7 +48,7 @@ public class IdentityCleanupWorker : BackgroundService
 
         var deletedCount = await dbContext.Users
             .IgnoreQueryFilters()
-            .Where(u => u.OtpCodeHash != null && u.OtpExpiresAtUtc != null && u.OtpExpiresAtUtc < nowUtc)
+            .Where(u => u.Status == UserStatus.PendingActivation && u.OtpExpiresAtUtc != null && u.OtpExpiresAtUtc < nowUtc)
             .ExecuteDeleteAsync(cancellationToken);
 
         if (deletedCount > 0)
@@ -69,7 +69,7 @@ public class IdentityCleanupWorker : BackgroundService
 
         var expiredTenantIds = await dbContext.Organizations
             .IgnoreQueryFilters()
-            .Where(o => !o.IsActive && o.IsSelfDeactivated && o.DeactivatedAtUtc <= twoYearsAgo)
+            .Where(o => o.Status == OrganizationStatus.DeactivatedByOwner && o.DeactivatedAtUtc <= twoYearsAgo)
             .Select(o => o.Id)
             .ToListAsync(cancellationToken);
 
@@ -81,8 +81,7 @@ public class IdentityCleanupWorker : BackgroundService
 
         var tenantsToNotify = await dbContext.Organizations
             .IgnoreQueryFilters()
-            .Where(o => !o.IsActive
-                     && o.IsSelfDeactivated
+            .Where(o => o.Status == OrganizationStatus.DeactivatedByOwner
                      && o.DeactivatedAtUtc <= sixMonthsAgo
                      && (o.LastRetentionNoticeSentAtUtc == null || o.LastRetentionNoticeSentAtUtc <= sixMonthsAgo))
             .ToListAsync(cancellationToken);

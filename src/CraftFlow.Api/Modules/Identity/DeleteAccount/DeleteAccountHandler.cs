@@ -1,6 +1,6 @@
 ﻿using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Modules.Identity.Domain;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -44,6 +44,12 @@ public class DeleteAccountHandler : IRequestHandler<DeleteAccountCommand, Result
 
     public static async Task HardDeleteTenantDataAsync(Guid tenantId, AppDbContext dbContext, CancellationToken cancellationToken)
     {
+        var tenantUserIds = await dbContext.OrganizationMembers
+            .IgnoreQueryFilters()
+            .Where(m => m.TenantId == tenantId)
+            .Select(m => m.UserId)
+            .ToListAsync(cancellationToken);
+
         await dbContext.AuditLogs.IgnoreQueryFilters().Where(a => a.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
         await dbContext.SubscriptionPayments.IgnoreQueryFilters().Where(p => p.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
         await dbContext.TenantSubscriptions.IgnoreQueryFilters().Where(s => s.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
@@ -72,5 +78,22 @@ public class DeleteAccountHandler : IRequestHandler<DeleteAccountCommand, Result
 
         await dbContext.OrganizationMembers.IgnoreQueryFilters().Where(m => m.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
         await dbContext.Organizations.IgnoreQueryFilters().Where(o => o.Id == tenantId).ExecuteDeleteAsync(cancellationToken);
+
+        if (tenantUserIds.Count > 0)
+        {
+            var systemAdminUserIds = await dbContext.SystemAdmins
+                .Select(sa => sa.UserId)
+                .ToListAsync(cancellationToken);
+
+            var userIdsToDelete = tenantUserIds.Except(systemAdminUserIds).ToList();
+
+            if (userIdsToDelete.Count > 0)
+            {
+                await dbContext.Users
+                    .IgnoreQueryFilters()
+                    .Where(u => userIdsToDelete.Contains(u.Id))
+                    .ExecuteDeleteAsync(cancellationToken);
+            }
+        }
     }
 }

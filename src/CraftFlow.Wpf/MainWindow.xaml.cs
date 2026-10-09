@@ -1,6 +1,6 @@
-﻿using CraftFlow.Api.Modules.Identity.Domain;
-using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Dashboard;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Pages;
 using CraftFlow.Wpf.Pages.Production;
 using CraftFlow.Wpf.Services;
@@ -57,6 +57,7 @@ public partial class MainWindow : Window
             MainMenuPanel.Visibility = Visibility.Collapsed;
             NavAdminKeysButton.Visibility = Visibility.Collapsed;
             NavProfileButton.Visibility = Visibility.Collapsed;
+            if (NavAuditButton != null) NavAuditButton.Visibility = Visibility.Collapsed;
             NavAuthButton.Visibility = Visibility.Visible;
 
             UserProfilePanel.Visibility = Visibility.Collapsed;
@@ -87,6 +88,11 @@ public partial class MainWindow : Window
         NavAuthButton.Visibility = Visibility.Collapsed;
         NavAdminKeysButton.Visibility = isSuperAdmin ? Visibility.Visible : Visibility.Collapsed;
         NavProfileButton.Visibility = (isOwner || isSuperAdmin) ? Visibility.Visible : Visibility.Collapsed;
+
+        if (NavAuditButton != null)
+        {
+            NavAuditButton.Visibility = (isOwner || isSuperAdmin) ? Visibility.Visible : Visibility.Collapsed;
+        }
     }
 
     private void Logout_Click(object sender, RoutedEventArgs e)

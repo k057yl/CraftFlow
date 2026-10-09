@@ -3,31 +3,57 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
       Title="AuditPage">
-	<Grid Margin="20">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="Auto"/>
-			<RowDefinition Height="*"/>
-			<RowDefinition Height="Auto"/>
-		</Grid.RowDefinitions>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-		<TextBlock Grid.Row="0" Text="{loc:Loc SYSTEM_AUDIT_LOGS}" FontSize="20" FontWeight="Bold" Margin="0,0,0,15"/>
+        <TextBlock Grid.Row="0" Text="{loc:Loc SYSTEM_AUDIT_LOGS}" FontSize="22" FontWeight="Bold" Margin="0,0,0,15"/>
 
-		<StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
-			<Button Content="{loc:Loc REFRESH_LOGS}" Click="Refresh_Click" Height="28" Width="120" Margin="0,0,10,0"/>
-			<Button Content="{loc:Loc EXPORT_CSV}" Click="ExportCsv_Click" Height="28" Width="120"/>
-		</StackPanel>
+        <!-- Панель Фильтров -->
+        <Border Grid.Row="1" Background="#F4F5F7" CornerRadius="6" Padding="12" Margin="0,0,0,15">
+            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel Orientation="Vertical" Margin="0,0,10,5">
+                    <TextBlock Text="Поиск (Сотрудник / Детали):" FontSize="11" Foreground="#5E6C84" Margin="0,0,0,2"/>
+                    <TextBox x:Name="SearchTextBox" Width="180" Height="28" VerticalContentAlignment="Center"/>
+                </StackPanel>
 
-		<DataGrid Grid.Row="2" x:Name="AuditDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Background="White">
-			<DataGrid.Columns>
-				<DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="Auto"/>
-				<DataGridTextColumn Header="{loc:Loc COL_ENTITY_NAME}" Binding="{Binding EntityName}" Width="150"/>
-				<DataGridTextColumn Header="{loc:Loc COL_ACTION}" Binding="{Binding Action}" Width="100"/>
-				<DataGridTextColumn Header="{loc:Loc COL_DETAILS}" Binding="{Binding Details}" Width="*"/>
-				<DataGridTextColumn Header="{loc:Loc COL_CREATED_AT}" Binding="{Binding CreatedAtUtc, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}" Width="160"/>
-			</DataGrid.Columns>
-		</DataGrid>
+                <StackPanel Orientation="Vertical" Margin="0,0,10,5">
+                    <TextBlock Text="Действие:" FontSize="11" Foreground="#5E6C84" Margin="0,0,0,2"/>
+                    <ComboBox x:Name="ActionComboBox" Width="120" Height="28" VerticalContentAlignment="Center"/>
+                </StackPanel>
 
-		<TextBlock Grid.Row="3" x:Name="StatusTextBlock" Text="READY" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
-	</Grid>
+                <StackPanel Orientation="Vertical" Margin="0,0,10,5">
+                    <TextBlock Text="Дата С:" FontSize="11" Foreground="#5E6C84" Margin="0,0,0,2"/>
+                    <DatePicker x:Name="FromDatePicker" Width="130" Height="28"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Vertical" Margin="0,0,10,5">
+                    <TextBlock Text="Дата ПО:" FontSize="11" Foreground="#5E6C84" Margin="0,0,0,2"/>
+                    <DatePicker x:Name="ToDatePicker" Width="130" Height="28"/>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Margin="10,0,0,5">
+                    <Button Content="{loc:Loc REFRESH_LOGS}" Click="ApplyFilter_Click" Height="28" Width="100" Margin="0,0,8,0"/>
+                    <Button Content="Сбросить" Click="ResetFilter_Click" Height="28" Width="90" Margin="0,0,8,0"/>
+                    <Button Content="{loc:Loc EXPORT_CSV}" Click="ExportCsv_Click" Height="28" Width="100"/>
+                </StackPanel>
+            </WrapPanel>
+        </Border>
+
+        <!-- Таблица Логов -->
+        <DataGrid Grid.Row="2" x:Name="AuditDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Background="White" RowHeight="32">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Дата и время (UTC)" Binding="{Binding CreatedAtUtc, StringFormat=\{0:yyyy-MM-dd HH:mm:ss\}}" Width="160"/>
+                <DataGridTextColumn Header="Сотрудник" Binding="{Binding UserEmail}" Width="220"/>
+                <DataGridTextColumn Header="Действие" Binding="{Binding Action}" Width="120"/>
+                <DataGridTextColumn Header="Детали" Binding="{Binding Details}" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <TextBlock Grid.Row="3" x:Name="StatusTextBlock" Text="ГОТОВО" Foreground="#0052CC" FontWeight="Bold" Margin="0,10,0,0"/>
+    </Grid>
 </Page>

@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
+using System.Text.Json;
 using CraftFlow.Api.Common.Audit;
-using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Catalog.Domain;
@@ -11,6 +11,7 @@ using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.Api.Modules.Sales.Domain;
 using CraftFlow.Api.Modules.Subscriptions.Domain;
 using CraftFlow.SharedKernel.Domain;
+using CraftFlow.SharedKernel.Enums.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Common.Persistence;
@@ -67,9 +68,12 @@ public class AppDbContext : DbContext
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
+        modelBuilder.Entity<AuditLog>().HasQueryFilter(e =>
+            _tenantContext.Role == TenantRole.SuperAdmin || e.TenantId == _tenantContext.TenantId);
+
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
-            if (entityType.IsOwned())
+            if (entityType.IsOwned() || entityType.ClrType == typeof(AuditLog))
             {
                 continue;
             }
@@ -124,16 +128,57 @@ public class AppDbContext : DbContext
             }
         }
 
-        var auditEntries = ChangeTracker.Entries()
-            .Where(e => e.Entity is not AuditLog && (e.State == EntityState.Added || e.State == EntityState.Modified))
-            .Select(e => AuditLog.Create(
+        var auditEntries = new List<AuditLog>();
+        var entriesToAudit = ChangeTracker.Entries()
+            .Where(e => e.Entity is not AuditLog &&
+                       (e.State == EntityState.Added || e.State == EntityState.Modified || e.State == EntityState.Deleted))
+            .ToList();
+
+        foreach (var entry in entriesToAudit)
+        {
+            var entityName = entry.Entity.GetType().Name;
+            var action = entry.State.ToString();
+            var changes = new Dictionary<string, object?>();
+
+            if (entry.State == EntityState.Added)
+            {
+                foreach (var prop in entry.CurrentValues.Properties)
+                {
+                    changes[prop.Name] = entry.CurrentValues[prop];
+                }
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                foreach (var prop in entry.Properties.Where(p => p.IsModified))
+                {
+                    changes[prop.Metadata.Name] = new
+                    {
+                        Old = prop.OriginalValue,
+                        New = prop.CurrentValue
+                    };
+                }
+            }
+            else if (entry.State == EntityState.Deleted)
+            {
+                foreach (var prop in entry.OriginalValues.Properties)
+                {
+                    changes[prop.Name] = entry.OriginalValues[prop];
+                }
+            }
+
+            var changesJson = JsonSerializer.Serialize(changes);
+            var details = $"{action} {entityName}";
+
+            auditEntries.Add(AuditLog.Create(
                 _tenantContext.TenantId,
                 _tenantContext.UserId,
-                e.Entity.GetType().Name,
-                e.State.ToString(),
-                string.Format(CoreConstants.Audit.AUDIT_CHANGE_FORMAT, e.Entity.GetType().Name)
-            ))
-            .ToList();
+                _tenantContext.UserEmail ?? string.Empty,
+                entityName,
+                action,
+                details,
+                changesJson
+            ));
+        }
 
         if (auditEntries.Count > 0)
         {
@@ -147,7 +192,7 @@ public class AppDbContext : DbContext
         where TEntity : Entity, ITenantEntity
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
-            (_tenantContext.Role == TenantRole.SuperAdmin || e.TenantId == _tenantContext.TenantId) && e.IsActive);
+            (_tenantContext.Role == TenantRole.SuperAdmin || e.TenantId == _tenantContext.TenantId));
     }
 
     private void SetTenantFilter<TEntity>(ModelBuilder modelBuilder)
@@ -160,13 +205,13 @@ public class AppDbContext : DbContext
     private void SetActiveFilter<TEntity>(ModelBuilder modelBuilder)
         where TEntity : Entity
     {
-        modelBuilder.Entity<TEntity>().HasQueryFilter(e => e.IsActive);
     }
 
     private sealed class DesignTimeTenantContext : ITenantContext
     {
         public Guid TenantId => Guid.Empty;
         public Guid UserId => Guid.Empty;
+        public string? UserEmail => null;
         public TenantRole Role => TenantRole.SuperAdmin;
         public bool IsResolved => true;
     }

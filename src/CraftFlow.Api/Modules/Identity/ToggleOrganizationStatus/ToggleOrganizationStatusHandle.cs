@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +35,7 @@ public class ToggleOrganizationStatusHandler : IRequestHandler<ToggleOrganizatio
             return Result.Failure<bool>(Error.NotFound(ErrorCodes.Auth.USER_NOT_FOUND));
         }
 
-        if (organization.IsActive)
+        if (organization.Status == OrganizationStatus.Active)
         {
             organization.Deactivate();
         }

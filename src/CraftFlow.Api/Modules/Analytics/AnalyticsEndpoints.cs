@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Modules.Analytics.GetAuditLogs;
 using CraftFlow.Api.Modules.Analytics.GetDashboardSummary;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CraftFlow.Api.Modules.Analytics;
 
@@ -18,9 +19,9 @@ public static class AnalyticsEndpoints
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet(AnalyticConstants.AUDIT_LOGS, async (ISender sender) =>
+        group.MapGet(AnalyticConstants.AUDIT_LOGS, async ([AsParameters] GetAuditLogsQuery query, ISender sender) =>
         {
-            var result = await sender.Send(new GetAuditLogsQuery());
+            var result = await sender.Send(query);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
     }

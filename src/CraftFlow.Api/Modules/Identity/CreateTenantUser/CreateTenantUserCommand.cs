@@ -1,4 +1,4 @@
-﻿using CraftFlow.Api.Modules.Identity.Domain;
+﻿using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 

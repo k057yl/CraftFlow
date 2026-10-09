@@ -33,7 +33,7 @@
                             <Button Content="{loc:Loc Key=NAV_SALES}" Click="NavSales_Click" Style="{StaticResource NavButtonStyle}"/>
                             <Button Content="{loc:Loc Key=NAV_TRACEABILITY}" Click="NavTraceability_Click" Style="{StaticResource NavButtonStyle}"/>
                             <Button Content="{loc:Loc Key=NAV_MRP}" Click="NavMrp_Click" Style="{StaticResource NavButtonStyle}"/>
-                            <Button Content="{loc:Loc Key=NAV_AUDIT}" Click="NavAudit_Click" Style="{StaticResource NavButtonStyle}"/>
+                            <Button x:Name="NavAuditButton" Content="{loc:Loc Key=NAV_AUDIT}" Click="NavAudit_Click" Style="{StaticResource NavButtonStyle}"/>
                         </StackPanel>
 
                         <Button x:Name="NavAdminKeysButton" Content="{loc:Loc Key=NAV_ADMIN_KEYS}" Click="NavAdminKeys_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed" Margin="0,0,0,20"/>

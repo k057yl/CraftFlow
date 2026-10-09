@@ -1,4 +1,5 @@
 ﻿using CraftFlow.SharedKernel.Domain;
+using CraftFlow.SharedKernel.Enums.Identity;
 
 namespace CraftFlow.Api.Modules.Identity.Domain;
 
@@ -8,7 +9,7 @@ public sealed class OrganizationMember : Entity, ITenantEntity
     public Guid UserId { get; private set; }
 
     public TenantRole Role { get; private set; }
-    public bool IsActive { get; private set; }
+    public MemberStatus Status { get; private set; }
     public DateTime JoinedAtUtc { get; private set; }
 
     public User User { get; private set; } = null!;
@@ -20,20 +21,15 @@ public sealed class OrganizationMember : Entity, ITenantEntity
     {
         return new OrganizationMember
         {
-            Id = Guid.NewGuid(),
             TenantId = organizationId,
             UserId = userId,
             Role = role,
-            IsActive = true,
+            Status = MemberStatus.Active,
             JoinedAtUtc = DateTime.UtcNow
         };
     }
 
-    public void ChangeRole(TenantRole newRole)
-    {
-        Role = newRole;
-    }
-
-    public void Deactivate() => IsActive = false;
-    public void Activate() => IsActive = true;
+    public void ChangeRole(TenantRole newRole) => Role = newRole;
+    public void Deactivate() => Status = MemberStatus.Disabled;
+    public void Activate() => Status = MemberStatus.Active;
 }

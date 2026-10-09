@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Identity.Domain;
+﻿namespace CraftFlow.SharedKernel.Enums.Identity;
 
 public enum TenantRole
 {

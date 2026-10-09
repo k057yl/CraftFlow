@@ -1,7 +1,6 @@
 ﻿using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Modules.Aging;
 using CraftFlow.Api.Modules.Identity;
-using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.Api.Modules.MRP;
 using CraftFlow.Api.Modules.Procurement;
 using CraftFlow.SharedKernel.Constants;
@@ -10,6 +9,7 @@ using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.SharedKernel.Dtos.MRP;
 using CraftFlow.SharedKernel.Dtos.Supplier;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using System.IO;
 using System.Net.Http;

@@ -2,6 +2,7 @@
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Identity.Domain;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,7 @@ public class CreateTenantUserHandler : IRequestHandler<CreateTenantUserCommand, 
         }
 
         var organization = await _dbContext.Organizations
+            .IgnoreQueryFilters()
             .Include(o => o.Members)
             .FirstOrDefaultAsync(o => o.Id == tenantId, cancellationToken);
 

@@ -1,4 +1,5 @@
 ﻿using CraftFlow.SharedKernel.Domain;
+using CraftFlow.SharedKernel.Enums.Identity;
 
 namespace CraftFlow.Api.Modules.Identity.Domain;
 
@@ -7,9 +8,8 @@ public sealed class Organization : AggregateRoot
     private readonly List<OrganizationMember> _members = new();
 
     public string Name { get; private set; } = null!;
-    public bool IsActive { get; private set; }
+    public OrganizationStatus Status { get; private set; }
     public DateTime CreatedAtUtc { get; private set; }
-    public bool IsSelfDeactivated { get; private set; }
     public DateTime? DeactivatedAtUtc { get; private set; }
     public DateTime? LastRetentionNoticeSentAtUtc { get; private set; }
 
@@ -23,9 +23,8 @@ public sealed class Organization : AggregateRoot
         {
             Id = Guid.NewGuid(),
             Name = name.Trim(),
-            IsActive = true,
-            CreatedAtUtc = DateTime.UtcNow,
-            IsSelfDeactivated = false
+            Status = OrganizationStatus.Active,
+            CreatedAtUtc = DateTime.UtcNow
         };
     }
 
@@ -51,8 +50,7 @@ public sealed class Organization : AggregateRoot
 
     public void DeactivateByOwner()
     {
-        IsActive = false;
-        IsSelfDeactivated = true;
+        Status = OrganizationStatus.DeactivatedByOwner;
         DeactivatedAtUtc = DateTime.UtcNow;
 
         foreach (var member in _members)
@@ -63,15 +61,13 @@ public sealed class Organization : AggregateRoot
 
     public void Activate()
     {
-        IsActive = true;
-        IsSelfDeactivated = false;
+        Status = OrganizationStatus.Active;
         DeactivatedAtUtc = null;
         LastRetentionNoticeSentAtUtc = null;
     }
 
     public void Deactivate()
     {
-        IsActive = false;
-        IsSelfDeactivated = false;
+        Status = OrganizationStatus.Suspended;
     }
 }

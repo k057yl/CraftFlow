@@ -3,6 +3,7 @@ using System;
 using CraftFlow.Api.Common.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CraftFlow.Api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20261009084933_AddUserEmailAndChangesJsonToAuditLog")]
+    partial class AddUserEmailAndChangesJsonToAuditLog
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -377,7 +380,14 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<bool>("IsSelfDeactivated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(false);
 
                     b.Property<DateTime?>("LastRetentionNoticeSentAtUtc")
                         .HasColumnType("timestamp with time zone");
@@ -387,14 +397,9 @@ namespace CraftFlow.Api.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<int>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
-
                     b.HasKey("Id");
 
-                    b.HasIndex("Status", "DeactivatedAtUtc")
+                    b.HasIndex("IsActive", "IsSelfDeactivated", "DeactivatedAtUtc")
                         .HasDatabaseName("IX_ORGANIZATIONS_RETENTION_CHECK");
 
                     b.ToTable("organizations", "identity");
@@ -407,7 +412,9 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<DateTime>("JoinedAtUtc")
                         .HasColumnType("timestamp with time zone");
@@ -416,11 +423,6 @@ namespace CraftFlow.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
                         .HasDefaultValue(3);
-
-                    b.Property<int>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(0);
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
@@ -436,7 +438,7 @@ namespace CraftFlow.Api.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_MEMBERS_TENANT_USER");
 
-                    b.HasIndex("TenantId", "Role", "Status")
+                    b.HasIndex("TenantId", "Role", "IsActive")
                         .HasDatabaseName("IX_MEMBERS_TENANT_ROLE_ACTIVE");
 
                     b.ToTable("organization_members", "identity");
@@ -483,7 +485,9 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("character varying(200)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
 
                     b.Property<string>("OtpCodeHash")
                         .HasMaxLength(100)
@@ -495,11 +499,6 @@ namespace CraftFlow.Api.Migrations
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasDefaultValue(1);
 
                     b.HasKey("Id");
 

@@ -1,4 +1,5 @@
 ﻿using CraftFlow.SharedKernel.Domain;
+using CraftFlow.SharedKernel.Enums.Identity;
 
 namespace CraftFlow.Api.Modules.Identity.Domain;
 
@@ -11,11 +12,11 @@ public sealed class User : AggregateRoot
     public string? OtpCodeHash { get; private set; }
     public DateTime? OtpExpiresAtUtc { get; private set; }
 
-    public bool IsActive { get; private set; }
+    public UserStatus Status { get; private set; }
 
     private User() { }
 
-    public static User Create(string email, string passwordHash, string fullName)
+    public static User Create(string email, string passwordHash, string fullName, bool requireOtp = false)
     {
         return new User
         {
@@ -23,7 +24,7 @@ public sealed class User : AggregateRoot
             Email = email.Trim().ToLowerInvariant(),
             PasswordHash = passwordHash,
             FullName = fullName.Trim(),
-            IsActive = true
+            Status = requireOtp ? UserStatus.PendingActivation : UserStatus.Active
         };
     }
 
@@ -39,6 +40,7 @@ public sealed class User : AggregateRoot
         OtpExpiresAtUtc = null;
     }
 
-    public void Deactivate() => IsActive = false;
-    public void Activate() => IsActive = true;
+    public void Activate() => Status = UserStatus.Active;
+    public void Deactivate() => Status = UserStatus.Blocked;
+    public void Block() => Status = UserStatus.Blocked;
 }

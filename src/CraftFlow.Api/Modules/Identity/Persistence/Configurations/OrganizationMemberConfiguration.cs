@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Modules.Identity.Domain;
+using CraftFlow.SharedKernel.Enums.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -24,9 +25,10 @@ public class OrganizationMemberConfiguration : IEntityTypeConfiguration<Organiza
             .HasConversion<int>()
             .HasDefaultValue(TenantRole.Technologist);
 
-        builder.Property(m => m.IsActive)
+        builder.Property(m => m.Status)
             .IsRequired()
-            .HasDefaultValue(true);
+            .HasConversion<int>()
+            .HasDefaultValue(MemberStatus.Active);
 
         builder.Property(m => m.JoinedAtUtc)
             .IsRequired();
@@ -45,7 +47,7 @@ public class OrganizationMemberConfiguration : IEntityTypeConfiguration<Organiza
             .IsUnique()
             .HasDatabaseName(DbIndexes.Identity.IX_MEMBERS_TENANT_USER);
 
-        builder.HasIndex(m => new { m.TenantId, m.Role, m.IsActive })
+        builder.HasIndex(m => new { m.TenantId, m.Role, m.Status })
             .HasDatabaseName(DbIndexes.Identity.IX_MEMBERS_TENANT_ROLE_ACTIVE);
     }
 }
