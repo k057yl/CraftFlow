@@ -497,8 +497,13 @@ public partial class BrewhouseControl : UserControl
 
             if (maxQty > 0)
             {
-                BatchQuantityTextBox.Text = Math.Round(maxQty, 2).ToString("0.##");
-                SetStatusFormatted("LABEL_PLANNED_OUTPUT", Brushes.Green, Math.Round(maxQty, 2));
+                var roundedQty = Math.Round(maxQty, 2);
+
+                BatchQuantityTextBox.Text = roundedQty.ToString("0.##", CultureInfo.InvariantCulture);
+
+                BatchInputs_Changed(this, null!);
+
+                SetStatusFormatted("LABEL_PLANNED_OUTPUT", Brushes.Green, roundedQty);
             }
             else
             {
@@ -507,7 +512,7 @@ public partial class BrewhouseControl : UserControl
         }
         catch (Exception ex)
         {
-            SetStatusFormatted("UI_API_ERROR_PREFIX", Brushes.Red, ex.Message);
+            SetStatusRaw($"Ошибка расчета: {ex.Message}", Brushes.Red);
         }
     }
 

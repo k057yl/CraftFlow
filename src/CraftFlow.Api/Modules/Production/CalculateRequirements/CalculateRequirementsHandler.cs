@@ -36,7 +36,6 @@ public class CalculateRequirementsHandler : IRequestHandler<CalculateBatchRequir
 
         var stockLots = await _dbContext.StockLots
             .AsNoTracking()
-            .Include(s => s.UnitOfMeasure)
             .Where(s => s.WarehouseId == request.WarehouseId && rawMaterialIds.Contains(s.ItemId) && s.Quantity > 0)
             .ToListAsync(cancellationToken);
 
@@ -47,28 +46,13 @@ public class CalculateRequirementsHandler : IRequestHandler<CalculateBatchRequir
         {
             var rawMaterial = rawMaterials.GetValueOrDefault(ingredient.RawMaterialId);
             var matName = rawMaterial?.Name ?? "Raw materials";
-            var ingUom = rawMaterial?.UnitOfMeasure;
+            var requiredQty = Math.Round(ingredient.Quantity * multiplier, 3);
+            var totalAvailable = stockLots
+                .Where(s => s.ItemId == ingredient.RawMaterialId)
+                .Sum(s => s.Quantity);
 
-            var rawRequiredQty = ingredient.Quantity * multiplier;
-            var requiredQty = Math.Round(rawRequiredQty, 3);
-
-            if (ingUom == null)
-            {
-                items.Add(new RequirementItemDto(matName, requiredQty, 0m, false));
-                continue;
-            }
-
-            var normalizedRequired = rawRequiredQty * ingUom.ConversionFactor;
-            var totalAvailableNormalized = stockLots
-                .Where(s => s.ItemId == ingredient.RawMaterialId && s.UnitOfMeasure.Type == ingUom.Type)
-                .Sum(s => s.Quantity * s.UnitOfMeasure.ConversionFactor);
-
-            var availableInIngredientUom = ingUom.ConversionFactor > 0
-                ? totalAvailableNormalized / ingUom.ConversionFactor
-                : 0m;
-
-            var roundedAvailable = Math.Round(availableInIngredientUom, 3);
-            var isSufficient = (totalAvailableNormalized + 0.000001m) >= normalizedRequired;
+            var roundedAvailable = Math.Round(totalAvailable, 3);
+            var isSufficient = totalAvailable >= requiredQty;
 
             items.Add(new RequirementItemDto(matName, requiredQty, roundedAvailable, isSufficient));
         }

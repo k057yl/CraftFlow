@@ -4,6 +4,7 @@ using CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
+using CraftFlow.Wpf.Services.Converters;
 using CraftFlow.Wpf.Windows;
 using System.Collections.ObjectModel;
 using System.Globalization;
@@ -97,6 +98,10 @@ public partial class RecipesPage : Page
             var uomCode = rawItem.Code ?? string.Empty;
             _selectedIngredients.Add(new IngredientItemDto(rawItem.Id, rawItem.Name, uomCode, qty));
             RecipeIngredientQuantityTextBox.Text = "1";
+
+            // Пример применения форматирования напрямую в C# для уведомления
+            var formattedQty = UnitFormatter.Format(qty, uomCode);
+            SetStatusRaw($"Добавлено: {rawItem.Name} — {formattedQty}", Brushes.Green);
         }
         else
         {
