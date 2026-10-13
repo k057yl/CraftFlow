@@ -73,6 +73,15 @@
 	<data name="GENERAL_INVALID_TENANT" xml:space="preserve"><value>Недействительный идентификатор организации (Tenant)</value></data>
 
 	<!-- ========================================== -->
+	<!-- 0.1: Ед. Изм								-->
+	<!-- ========================================== -->
+	<data name="UOM_L" xml:space="preserve"><value>л</value></data>
+	<data name="UOM_ML" xml:space="preserve"><value>мл</value></data>
+	<data name="UOM_KG" xml:space="preserve"><value>кг</value></data>
+	<data name="UOM_G" xml:space="preserve"><value>г</value></data>
+	<data name="UOM_PCS" xml:space="preserve"><value>шт</value></data>
+
+	<!-- ========================================== -->
 	<!-- 1: Навигация Сайдбара                      -->
 	<!-- ========================================== -->
 	<data name="NAV_RECIPES" xml:space="preserve"><value>Сырьё и Рецепты</value></data>
@@ -191,12 +200,10 @@
 	<!-- ========================================== -->
 	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>CRAFTFLOW — Производство</value></data>
 	<data name="PRODUCTION_HEADER" xml:space="preserve"><value>Производство и Варочный цех</value></data>
-
 	<!-- Вкладки -->
 	<data name="TAB_BREWHOUSE" xml:space="preserve"><value>Варочный цех</value></data>
 	<data name="TAB_AGING" xml:space="preserve"><value>Созревание и Аффинаж</value></data>
 	<data name="TAB_DISCARD_ACTS" xml:space="preserve"><value>Брак и Списания</value></data>
-
 	<!-- Группы (GroupBox) -->
 	<data name="GROUP_START_BATCH" xml:space="preserve"><value>Параметры запуска варки</value></data>
 	<data name="GROUP_RAW_REQUIREMENTS" xml:space="preserve"><value>Расчет потребности в сырье</value></data>
@@ -204,7 +211,6 @@
 	<data name="GROUP_ACTIVE_BATCHES" xml:space="preserve"><value>Варки в процессе</value></data>
 	<data name="GROUP_COMPLETE_BATCH" xml:space="preserve"><value>Завершение варки</value></data>
 	<data name="GROUP_BATCH_COSTING" xml:space="preserve"><value>Калькуляция себестоимости</value></data>
-
 	<!-- Лейблы полей -->
 	<data name="LABEL_BATCH_CODE" xml:space="preserve"><value>Код / Наименование партии:</value></data>
 	<data name="LABEL_SELECT_RECIPE" xml:space="preserve"><value>Выберите Рецептуру:</value></data>
@@ -222,7 +228,6 @@
 	<data name="LABEL_OVERHEAD_COST" xml:space="preserve"><value>Накладные расходы:</value></data>
 	<data name="LABEL_TOTAL_COST" xml:space="preserve"><value>Итоговая себестоимость:</value></data>
 	<data name="LABEL_UNIT_COST" xml:space="preserve"><value>Себестоимость за 1 кг/л:</value></data>
-
 	<!-- Чекбоксы и Кнопки -->
 	<data name="CHECKBOX_OVERHEAD" xml:space="preserve"><value>Учесть накладные расходы</value></data>
 	<data name="BTN_CALC_MAX" xml:space="preserve"><value>Максимум по остаткам</value></data>
@@ -230,7 +235,6 @@
 	<data name="BTN_START_BATCH" xml:space="preserve"><value>Запустить Варку</value></data>
 	<data name="BTN_PLAN_BATCH" xml:space="preserve"><value>Запланировать (в Черновик)</value></data>
 	<data name="BTN_COMPLETE_BATCH" xml:space="preserve"><value>Завершить Варку</value></data>
-
 	<!-- Колонки таблиц -->
 	<data name="COLUMN_BATCH_CODE" xml:space="preserve"><value>Код партии</value></data>
 	<data name="COLUMN_BATCH_NAME" xml:space="preserve"><value>Партия</value></data>
@@ -243,12 +247,45 @@
 	<data name="COLUMN_ELAPSED" xml:space="preserve"><value>Прошло времени</value></data>
 	<data name="COLUMN_TARGET_DURATION" xml:space="preserve"><value>План (мин)</value></data>
 	<data name="COLUMN_ACTIONS" xml:space="preserve"><value>Действия</value></data>
-
 	<!-- Тултипы и Сообщения -->
 	<data name="TOOLTIP_START" xml:space="preserve"><value>Запустить варку</value></data>
 	<data name="TOOLTIP_DELETE" xml:space="preserve"><value>Удалить черновик</value></data>
 	<data name="MSG_BATCH_PLANNED_SUCCESS" xml:space="preserve"><value>Партия успешно запланирована!</value></data>
 	<data name="MSG_DRAFT_DELETED_SUCCESS" xml:space="preserve"><value>Черновик успешно удален!</value></data>
+
+	<!-- ========================================== -->
+	<!-- 5: Созревание и Аффинаж                    -->
+	<!-- ========================================== -->
+	<data name="GROUP_TRANSFER_AGING" xml:space="preserve"><value>Перемещение на созревание</value></data>
+	<data name="LABEL_COMPLETED_BATCH" xml:space="preserve"><value>Выбор завершённой варки:</value></data>
+	<data name="LABEL_AGING_CHAMBER" xml:space="preserve"><value>Выбор Климатической Камеры:</value></data>
+	<data name="LABEL_AGING_LOT_NAME" xml:space="preserve"><value>Маркировка лота на созревании:</value></data>
+	<data name="LABEL_MIN_AGING_DAYS" xml:space="preserve"><value>Срок выдержки (дней):</value></data>
+	<data name="BTN_TRANSFER_AGING" xml:space="preserve"><value>Разместить в Камеру</value></data>
+
+	<data name="GROUP_ACTIVE_AGING_LOTS" xml:space="preserve"><value>Текущие партии в камерах созревания</value></data>
+	<data name="COLUMN_LOT_BATCH" xml:space="preserve"><value>Партия / Лот</value></data>
+	<data name="COLUMN_CHAMBER" xml:space="preserve"><value>Камера</value></data>
+	<data name="COLUMN_CURRENT_STOCK" xml:space="preserve"><value>Масса (кг)</value></data>
+	<data name="COLUMN_UNITS_COUNT" xml:space="preserve"><value>Голов / Штук</value></data>
+	<data name="COLUMN_DAYS_IN_CHAMBER" xml:space="preserve"><value>Дней в камере</value></data>
+	<data name="COLUMN_TARGET_DAYS" xml:space="preserve"><value>План (дней)</value></data>
+	<data name="COLUMN_IS_READY" xml:space="preserve"><value>Готово</value></data>
+
+	<data name="GROUP_RELEASE_AGING" xml:space="preserve"><value>Извлечение из камеры созревания</value></data>
+	<data name="LABEL_ACTIVE_AGING_LOT" xml:space="preserve"><value>Выберите партию в камере:</value></data>
+	<data name="LABEL_TARGET_WAREHOUSE" xml:space="preserve"><value>Склад зачисления сыра:</value></data>
+	<data name="LABEL_TARGET_LOCATIONS" xml:space="preserve"><value>Ячейки хранения на складе:</value></data>
+	<data name="LABEL_RELEASE_LOT_NAME" xml:space="preserve"><value>Маркировка готовой партии / Лота:</value></data>
+	<data name="LABEL_FINAL_WEIGHT" xml:space="preserve"><value>Фактический вес после усушки (кг):</value></data>
+	<data name="LABEL_UNITS_COUNT" xml:space="preserve"><value>Кол-во тар / мест (шт.):</value></data>
+	<data name="LABEL_UNIT_COST_KG" xml:space="preserve"><value>Расчетная себестоимость за 1 кг:</value></data>
+	<data name="LABEL_SELLING_PRICE_KG" xml:space="preserve"><value>Цена продажи за 1 кг:</value></data>
+	<data name="BTN_RELEASE_AGING" xml:space="preserve"><value>Выпустить в Продажу</value></data>
+	<data name="LABEL_CALCULATED_UNIT_COST" xml:space="preserve"><value>Расчетная себестоимость за 1 {0}:</value></data>
+	<data name="LABEL_SELLING_PRICE_PER_UNIT" xml:space="preserve"><value>Цена продажи за 1 {0}:</value></data>
+	<data name="LABEL_ACTIVE_AGING_LOT" xml:space="preserve"><value>Выберите партию из камеры</value></data>
+	<data name="SELECT_WAREHOUSE" xml:space="preserve"><value>Выберите склад зачисления</value></data>
 
 	<!-- ========================================== -->
 	<!-- 6. Production Page & Costing Labels        -->

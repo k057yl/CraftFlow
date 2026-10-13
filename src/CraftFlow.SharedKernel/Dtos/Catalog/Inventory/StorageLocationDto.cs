@@ -14,7 +14,8 @@ public record StorageLocationDto(
     int BatchesProcessedCount,
     int WashCycleBatchInterval,
     DateTime? LastWashedAt,
-    string MaintenanceStatus
+    string MaintenanceStatus,
+    string? UnitOfMeasure = null
 )
 {
     public decimal FreeCapacity => Capacity.HasValue
@@ -25,9 +26,16 @@ public record StorageLocationDto(
         ? $"{FreeCapacity:N0}"
         : "∞";
 
-    public string VolumeInfo => Capacity.HasValue && Capacity.Value > 0
-        ? $"{CurrentVolume:N0} / {Capacity.Value:N0} л (Свободно: {FreeCapacity:N0} л)"
-        : $"{CurrentVolume:N0} л (Без лимита)";
+    public string VolumeInfo
+    {
+        get
+        {
+            var uom = !string.IsNullOrWhiteSpace(UnitOfMeasure) ? UnitOfMeasure : "л";
+            return Capacity.HasValue && Capacity.Value > 0
+                ? $"{CurrentVolume:N0} / {Capacity.Value:N0} {uom} (Свободно: {FreeCapacity:N0} {uom})"
+                : $"{CurrentVolume:N0} {uom} (Без лимита)";
+        }
+    }
 
     public string ParentName => !string.IsNullOrWhiteSpace(WarehouseName)
         ? $"🏠 {WarehouseName}"

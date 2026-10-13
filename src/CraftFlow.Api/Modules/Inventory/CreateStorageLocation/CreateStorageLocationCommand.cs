@@ -8,5 +8,6 @@ public record CreateStorageLocationCommand(
     string LocationType,
     Guid? WarehouseId = null,
     Guid? ChamberId = null,
-    decimal? Capacity = null
+    decimal? Capacity = null,
+    string? UnitOfMeasure = null
 ) : IRequest<Result<Guid>>;

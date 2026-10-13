@@ -1,8 +1,9 @@
 ﻿<Window x:Class="CraftFlow.Wpf.Windows.CreateStorageLocationWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
         Title="Создание ёмкости / стеллажа" 
-        Height="360" Width="420" 
+        Height="380" Width="420" 
         WindowStartupLocation="CenterOwner" 
         ResizeMode="NoResize"
         Background="{DynamicResource CardBackgroundBrush}">
@@ -36,8 +37,21 @@
                 </StackPanel>
             </Grid>
 
-            <TextBlock Text="Вместимость (л / кг):" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-            <TextBox x:Name="CapacityTextBox" Height="28" Text="500" Margin="0,0,0,20"/>
+            <TextBlock Text="Вместимость и Ед. изм.:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+            <Grid Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="90"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="CapacityTextBox" Height="28" Text="500"/>
+                <ComboBox x:Name="UnitOfMeasureComboBox" Grid.Column="1" Height="28" Margin="5,0,0,0" SelectedIndex="0">
+                    <ComboBoxItem Content="{loc:Loc Key=UOM_L}" Tag="l"/>
+                    <ComboBoxItem Content="{loc:Loc Key=UOM_ML}" Tag="ml"/>
+                    <ComboBoxItem Content="{loc:Loc Key=UOM_KG}" Tag="kg"/>
+                    <ComboBoxItem Content="{loc:Loc Key=UOM_G}" Tag="g"/>
+                    <ComboBoxItem Content="{loc:Loc Key=UOM_PCS}" Tag="pcs"/>
+                </ComboBox>
+            </Grid>
 
             <Grid>
                 <Grid.ColumnDefinitions>

@@ -611,6 +611,10 @@ namespace CraftFlow.Api.Migrations
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("UnitOfMeasure")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
                     b.Property<Guid?>("WarehouseId")
                         .HasColumnType("uuid");
 

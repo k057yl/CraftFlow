@@ -25,7 +25,8 @@ public class CreateStorageLocationHandler : IRequestHandler<CreateStorageLocatio
             request.LocationType,
             request.WarehouseId,
             request.ChamberId,
-            request.Capacity
+            request.Capacity,
+            request.UnitOfMeasure
         );
 
         _dbContext.StorageLocations.Add(storageLocation);

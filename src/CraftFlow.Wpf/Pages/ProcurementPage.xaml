@@ -25,79 +25,55 @@
                     <!-- Форма оприходования -->
                     <GroupBox Grid.Row="0" Header="{loc:Loc Key=GROUP_RECEIVE_STOCK_LOT}" Padding="10" Margin="0,0,0,15">
                         <StackPanel>
-                            <Grid Margin="0,0,0,8">
+                            <!-- 1. ВЕРХНИЙ БЛОК (ЛЕВАЯ И ПРАВАЯ КОЛОНКИ) -->
+                            <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="20"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
-                                <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                <!-- Левая колонка -->
+                                <StackPanel Grid.Column="0">
                                     <TextBlock Text="{loc:Loc Key=LABEL_SELECT_SUPPLIER}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    <ComboBox x:Name="StockSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28"/>
-                                </StackPanel>
+                                    <ComboBox x:Name="StockSupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Margin="0,0,0,8"/>
 
-                                <StackPanel Grid.Column="1" Margin="3,0,3,0">
                                     <TextBlock Text="{loc:Loc Key=SELECT_WAREHOUSE}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    <ComboBox x:Name="StockWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" SelectionChanged="StockWarehouseComboBox_SelectionChanged"/>
-                                </StackPanel>
+                                    <ComboBox x:Name="StockWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Margin="0,0,0,8" SelectionChanged="StockWarehouseComboBox_SelectionChanged"/>
 
-                                <StackPanel Grid.Column="2" Margin="6,0,0,0">
                                     <TextBlock Text="{loc:Loc Key=SELECT_RAW_MATERIAL}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    <ComboBox x:Name="StockRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28"/>
-                                </StackPanel>
-                            </Grid>
-
-                            <Grid Margin="0,0,0,8">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel Grid.Column="0" Margin="0,0,4,0">
-                                    <TextBlock Text="{loc:Loc Key=LOT_QUANTITY}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    <TextBox x:Name="StockQuantityTextBox" Text="500" Height="28" TextChanged="StockQuantityTextBox_TextChanged"/>
+                                    <ComboBox x:Name="StockRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" SelectionChanged="StockRawMaterialComboBox_SelectionChanged"/>
                                 </StackPanel>
 
-                                <StackPanel Grid.Column="1" Margin="4,0,4,0">
-                                    <TextBlock Text="{loc:Loc Key=LABEL_UNITS_COUNT}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    <TextBox x:Name="StockUnitsCountTextBox" Height="28"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="2" Margin="4,0,4,0">
-                                    <TextBlock Text="{loc:Loc Key=UNIT_PRICE}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    <TextBox x:Name="StockUnitPriceTextBox" Text="25.00" Height="28"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="3" Margin="4,0,4,0">
+                                <!-- Правая колонка -->
+                                <StackPanel Grid.Column="2">
                                     <TextBlock Text="{loc:Loc Key=BATCH_NUMBER}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    <TextBox x:Name="StockBatchTextBox" Text="BATCH-2026-001" Height="28"/>
-                                </StackPanel>
+                                    <TextBox x:Name="StockBatchTextBox" Text="BATCH-2026-001" Height="28" Margin="0,0,0,8"/>
 
-                                <StackPanel Grid.Column="4" Margin="4,0,0,0">
+                                    <TextBlock Text="{loc:Loc Key=UNIT_PRICE}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                    <TextBox x:Name="StockUnitPriceTextBox" Text="25.00" Height="28" Margin="0,0,0,8"/>
+
                                     <TextBlock Text="{loc:Loc Key=LABEL_EXPIRATION_DATE}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                     <DatePicker x:Name="ExpirationDatePicker" Height="28"/>
                                 </StackPanel>
                             </Grid>
 
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
-                                <TextBlock Text="{loc:Loc Key=LABEL_AVAILABLE_CONTAINERS}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" VerticalAlignment="Center"/>
-                                <Button Content="{loc:Loc Key=BTN_QUICK_NEW_LOCATION}" Click="QuickCreateLocation_Click" Margin="10,0,0,0" Style="{StaticResource PrimaryButtonStyle}" Height="24" Padding="8,0" FontSize="10"/>
+                            <!-- 2. КНОПКА СОЗДАНИЯ ЕМКОСТЕЙ -->
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                <Button Content="{loc:Loc Key=BTN_QUICK_NEW_LOCATION}" Click="QuickCreateLocation_Click" Style="{StaticResource PrimaryButtonStyle}" Height="26" Padding="12,0" FontSize="11"/>
                             </StackPanel>
 
-                            <!-- Емкости хранилища -->
-                            <Grid Margin="0,0,0,10">
+                            <!-- 3. ЦЕНТРАЛЬНЫЕ БЛОКИ (ЕМКОСТИ) -->
+                            <Grid Margin="0,0,0,12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
 
+                                <!-- Доступные емкости -->
                                 <StackPanel Grid.Column="0" Margin="0,0,6,0">
                                     <TextBlock Text="{loc:Loc Key=LABEL_AVAILABLE_CONTAINERS_HINT}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
-                                    <ListBox x:Name="AvailableLocationsListBox" Height="90" Background="{DynamicResource AppBackgroundBrush}">
+                                    <ListBox x:Name="AvailableLocationsListBox" Height="95" Background="{DynamicResource AppBackgroundBrush}">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="2">
@@ -111,6 +87,8 @@
                                                         <TextBlock Text="{Binding FreeCapacity, StringFormat={}{0:N0}}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"/>
                                                         <TextBlock Text=" / " Foreground="{DynamicResource AppForegroundBrush}"/>
                                                         <TextBlock Text="{Binding Capacity, StringFormat={}{0:N0}}" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <TextBlock Text=" " Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <TextBlock Text="{Binding UnitOfMeasure}" Foreground="{DynamicResource AppForegroundBrush}"/>
                                                         <TextBlock Text="]" Foreground="{DynamicResource AppForegroundBrush}"/>
                                                     </StackPanel>
                                                     <Button Grid.Column="1" Content="+" Click="AddLocationToSelected_Click" Style="{StaticResource PrimaryButtonStyle}" Height="20" Padding="6,0" Margin="6,0,0,0"/>
@@ -120,9 +98,10 @@
                                     </ListBox>
                                 </StackPanel>
 
+                                <!-- Выбранные емкости -->
                                 <StackPanel Grid.Column="1" Margin="6,0,0,0">
                                     <TextBlock Text="{loc:Loc Key=LABEL_SELECTED_CONTAINERS_HINT}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
-                                    <ListBox x:Name="SelectedLocationsListBox" Height="90" Background="{DynamicResource AppBackgroundBrush}">
+                                    <ListBox x:Name="SelectedLocationsListBox" Height="95" Background="{DynamicResource AppBackgroundBrush}">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="2">
@@ -136,6 +115,8 @@
                                                         <TextBlock Text="{Binding FreeCapacity, StringFormat={}{0:N0}}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
                                                         <TextBlock Text=" / " Foreground="{DynamicResource AppForegroundBrush}"/>
                                                         <TextBlock Text="{Binding Capacity, StringFormat={}{0:N0}}" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <TextBlock Text=" " Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <TextBlock Text="{Binding UnitOfMeasure}" Foreground="{DynamicResource AppForegroundBrush}"/>
                                                         <TextBlock Text="]" Foreground="{DynamicResource AppForegroundBrush}"/>
                                                     </StackPanel>
                                                     <Button Grid.Column="1" Content="✕" Click="RemoveLocationFromSelected_Click" Style="{StaticResource DangerButtonStyle}" Width="20" Height="20" Padding="0" Margin="6,0,0,0"/>
@@ -146,19 +127,51 @@
                                 </StackPanel>
                             </Grid>
 
-                            <StackPanel Orientation="Horizontal">
-                                <Button x:Name="AddStockLotButton"
+                            <!-- 4. НИЖНИЙ БЛОК: ОБЪЕМ, ВЫБОР ЕИ И ПРИНЯТЬ ПАРТИЮ -->
+                            <Grid Margin="0,5,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="90"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Поле объема -->
+                                <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                                    <TextBlock Text="{loc:Loc Key=LOT_QUANTITY}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                    <TextBox x:Name="StockQuantityTextBox" Text="500" Height="28" TextChanged="StockQuantityTextBox_TextChanged"/>
+                                </StackPanel>
+
+                                <!-- Дропдаун с выбором ЕИ -->
+                                <StackPanel Grid.Column="1" Margin="0,0,15,0">
+                                    <TextBlock Text="Ед. изм." FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                    <ComboBox x:Name="UnitOfMeasureComboBox" Height="28" SelectedIndex="0" SelectionChanged="UnitOfMeasureComboBox_SelectionChanged">
+                                        <ComboBoxItem Content="{loc:Loc Key=UOM_L}" Tag="l"/>
+                                        <ComboBoxItem Content="{loc:Loc Key=UOM_ML}" Tag="ml"/>
+                                        <ComboBoxItem Content="{loc:Loc Key=UOM_KG}" Tag="kg"/>
+                                        <ComboBoxItem Content="{loc:Loc Key=UOM_G}" Tag="g"/>
+                                        <ComboBoxItem Content="{loc:Loc Key=UOM_PCS}" Tag="pcs"/>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <!-- Кнопка принять партию -->
+                                <Button Grid.Column="2" 
+                                        x:Name="AddStockLotButton"
                                         Content="{loc:Loc Key=ADD_STOCK_LOT}" 
                                         Click="AddStockLot_Click" 
                                         Style="{StaticResource PrimaryButtonStyle}"
-                                        Height="30" 
-                                        Padding="14,0"/>
-                                <TextBlock x:Name="CapacityWarningTextBlock" 
+                                        Height="28" 
+                                        Padding="16,0"
+                                        VerticalAlignment="Bottom"/>
+
+                                <!-- Текст валидации -->
+                                <TextBlock Grid.Column="3" 
+                                           x:Name="CapacityWarningTextBlock" 
                                            VerticalAlignment="Center" 
-                                           Margin="15,0,0,0" 
+                                           Margin="15,15,0,0" 
                                            FontWeight="SemiBold" 
                                            FontSize="12"/>
-                            </StackPanel>
+                            </Grid>
                         </StackPanel>
                     </GroupBox>
 

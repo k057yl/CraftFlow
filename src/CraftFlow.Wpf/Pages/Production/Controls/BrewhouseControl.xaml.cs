@@ -25,13 +25,11 @@ public partial class BrewhouseControl : UserControl
 
     private const string DEFAULT_OVERHEAD_PERCENT = "15";
     private const string DEFAULT_UNITS_COUNT = "1";
-    private const string DRAFT_PLAN_ENDPOINT = "api/production/batches/plan";
 
     public ObservableCollection<LookupItem> Warehouses { get; } = [];
     public ObservableCollection<LookupItem> Recipes { get; } = [];
     public ObservableCollection<LookupItem> ActiveBatches { get; } = [];
     public ObservableCollection<ActiveBatchWpfModel> ActiveBatchesSummary { get; } = [];
-    public ObservableCollection<ActiveBatchWpfModel> PlannedBatchesSummary { get; } = [];
 
     private readonly ObservableCollection<RequirementCalculationDto> _requirements = [];
     private readonly DispatcherTimer _uiTimer = new();
@@ -76,11 +74,6 @@ public partial class BrewhouseControl : UserControl
         {
             batch.CurrentElapsed = batch.CurrentElapsed.Add(TimeSpan.FromSeconds(1));
         }
-
-        foreach (var planned in PlannedBatchesSummary)
-        {
-            planned.NotifyCountdownChanged();
-        }
     }
 
     public async Task LoadDataAsync()
@@ -100,7 +93,6 @@ public partial class BrewhouseControl : UserControl
             {
                 var summaryList = await ApiService.Instance.GetAsync<List<ActiveBatchSummaryDto>>(ProductionConstants.BATCHES_ACTIVE_SUMMARY);
 
-                PlannedBatchesSummary.Clear();
                 ActiveBatchesSummary.Clear();
                 ActiveBatches.Clear();
 
@@ -114,28 +106,24 @@ public partial class BrewhouseControl : UserControl
                         var isDraft = string.Equals(b.State, BatchState.Draft.ToString(), StringComparison.OrdinalIgnoreCase)
                                    || b.State == draftIntStr;
 
-                        var model = new ActiveBatchWpfModel
+                        if (!isDraft)
                         {
-                            Id = b.Id,
-                            BatchName = b.BatchName,
-                            RecipeName = b.RecipeName,
-                            StartedAt = b.StartedAt,
-                            ScheduledAt = b.ScheduledAt,
-                            TargetDurationMinutes = b.TargetDurationMinutes,
-                            ElapsedMinutes = b.ElapsedMinutes,
-                            IsOverdue = b.IsOverdue,
-                            Status = b.State,
-                            PlannedOutputQuantity = b.PlannedOutputQuantity,
-                            IsDraft = isDraft,
-                            CurrentElapsed = b.StartedAt.HasValue ? (now - b.StartedAt.Value) : TimeSpan.Zero
-                        };
+                            var model = new ActiveBatchWpfModel
+                            {
+                                Id = b.Id,
+                                BatchName = b.BatchName,
+                                RecipeName = b.RecipeName,
+                                StartedAt = b.StartedAt,
+                                ScheduledAt = b.ScheduledAt,
+                                TargetDurationMinutes = b.TargetDurationMinutes,
+                                ElapsedMinutes = b.ElapsedMinutes,
+                                IsOverdue = b.IsOverdue,
+                                Status = b.State,
+                                PlannedOutputQuantity = b.PlannedOutputQuantity,
+                                IsDraft = false,
+                                CurrentElapsed = b.StartedAt.HasValue ? (now - b.StartedAt.Value) : TimeSpan.Zero
+                            };
 
-                        if (isDraft)
-                        {
-                            PlannedBatchesSummary.Add(model);
-                        }
-                        else
-                        {
                             ActiveBatchesSummary.Add(model);
                             ActiveBatches.Add(new LookupItem(b.Id, b.BatchName));
                         }
@@ -191,10 +179,6 @@ public partial class BrewhouseControl : UserControl
     {
         var shortCode = Guid.NewGuid().ToString()[..8].ToUpperInvariant();
         BatchNameTextBox.Text = string.Concat(FormattingConstants.BATCH_PREFIX, shortCode);
-
-        var defaultScheduled = DateTime.Now.AddHours(1);
-        ScheduledDatePicker.SelectedDate = defaultScheduled.Date;
-        ScheduledTimeTextBox.Text = defaultScheduled.ToString("HH:mm");
     }
 
     private async void BatchInputs_Changed(object sender, RoutedEventArgs e)
@@ -261,86 +245,6 @@ public partial class BrewhouseControl : UserControl
         else
         {
             SetStatusRaw(contentOrError, Brushes.Red);
-        }
-    }
-
-    private async void PlanBatch_Click(object sender, RoutedEventArgs e)
-    {
-        if (BatchRecipeComboBox.SelectedValue is not Guid recipeId ||
-            BatchWarehouseComboBox.SelectedValue is not Guid rawWarehouseId ||
-            DestinationWarehouseComboBox.SelectedValue is not Guid destWarehouseId ||
-            !TryParseDecimal(BatchQuantityTextBox.Text, out var plannedQuantity))
-        {
-            SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
-            return;
-        }
-
-        var selectedDate = ScheduledDatePicker.SelectedDate ?? DateTime.Today;
-        if (!TimeSpan.TryParse(ScheduledTimeTextBox.Text.Trim(), out var selectedTime))
-        {
-            selectedTime = TimeSpan.FromHours(12);
-        }
-
-        var scheduledAtUtc = DateTime.SpecifyKind(selectedDate.Add(selectedTime), DateTimeKind.Local).ToUniversalTime();
-        var customName = BatchNameTextBox.Text?.Trim();
-
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(DRAFT_PLAN_ENDPOINT, new
-        {
-            RecipeId = recipeId,
-            WarehouseId = rawWarehouseId,
-            DestinationWarehouseId = destWarehouseId,
-            PlannedOutputQuantity = plannedQuantity,
-            Name = string.IsNullOrWhiteSpace(customName) ? null : customName,
-            ScheduledAt = scheduledAtUtc
-        });
-
-        if (isSuccess)
-        {
-            SetStatus("MSG_BATCH_PLANNED_SUCCESS", Brushes.Green);
-            BatchNameTextBox.Clear();
-            GenerateDefaultBatchName();
-
-            if (ParentPage != null) await ParentPage.LoadDataExternalAsync();
-        }
-        else
-        {
-            SetStatusRaw(contentOrError, Brushes.Red);
-        }
-    }
-
-    private async void StartDraftBatch_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is Guid batchId)
-        {
-            var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"api/production/batches/{batchId}/start", new { });
-
-            if (isSuccess)
-            {
-                SetStatus("UI_BATCH_STARTED_SUCCESS", Brushes.Green);
-                if (ParentPage != null) await ParentPage.LoadDataExternalAsync();
-            }
-            else
-            {
-                SetStatusRaw(contentOrError, Brushes.Red);
-            }
-        }
-    }
-
-    private async void DeleteDraftBatch_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is Guid batchId)
-        {
-            var (isSuccess, contentOrError) = await ApiService.Instance.DeleteAndReadAsync($"api/production/batches/{batchId}");
-
-            if (isSuccess)
-            {
-                SetStatus("MSG_DRAFT_DELETED_SUCCESS", Brushes.OrangeRed);
-                if (ParentPage != null) await ParentPage.LoadDataExternalAsync();
-            }
-            else
-            {
-                SetStatusRaw(contentOrError, Brushes.Red);
-            }
         }
     }
 

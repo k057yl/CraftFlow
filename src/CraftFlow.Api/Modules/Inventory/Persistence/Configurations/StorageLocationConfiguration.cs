@@ -21,6 +21,9 @@ public class StorageLocationConfiguration : IEntityTypeConfiguration<StorageLoca
             .IsRequired()
             .HasMaxLength(50);
 
+        builder.Property(sl => sl.UnitOfMeasure)
+            .HasMaxLength(10);
+
         builder.Property(sl => sl.Capacity)
             .HasPrecision(18, 4);
 

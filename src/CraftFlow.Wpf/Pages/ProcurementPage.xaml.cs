@@ -85,7 +85,7 @@ public partial class ProcurementPage : Page
 
             var raw = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.RAW_MATERIALS) ?? [];
             RawMaterials.Clear();
-            raw.ForEach(r => RawMaterials.Add(new LookupItem(r.Id, r.Name)));
+            raw.ForEach(r => RawMaterials.Add(new LookupItem(r.Id, r.Name, r.Code)));
 
             _isDataLoaded = true;
             await LoadStockLotsAsync();
@@ -97,6 +97,55 @@ public partial class ProcurementPage : Page
             SetStatusFormatted(UiConstants.Messages.DATA_LOAD_ERROR, Brushes.Red, ex.Message);
             AlertWindow.ShowError(Window.GetWindow(this), ex.Message);
         }
+    }
+
+    private void StockRawMaterialComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        AutoSelectUnitOfMeasure();
+        ValidateCapacity();
+    }
+
+    private void AutoSelectUnitOfMeasure()
+    {
+        if (StockRawMaterialComboBox.SelectedItem is LookupItem selectedRaw && !string.IsNullOrWhiteSpace(selectedRaw.Code))
+        {
+            SelectUnitInComboBox(selectedRaw.Code);
+        }
+    }
+
+    private void SelectUnitInComboBox(string unitTag)
+    {
+        foreach (ComboBoxItem item in UnitOfMeasureComboBox.Items)
+        {
+            if (string.Equals(item.Tag?.ToString(), unitTag, StringComparison.OrdinalIgnoreCase))
+            {
+                UnitOfMeasureComboBox.SelectedItem = item;
+                break;
+            }
+        }
+    }
+
+    private string GetSelectedUnitTag()
+    {
+        if (UnitOfMeasureComboBox.SelectedItem is ComboBoxItem item && item.Tag != null)
+        {
+            return item.Tag.ToString() ?? "l";
+        }
+        return "l";
+    }
+
+    private string GetSelectedUnitDisplayText()
+    {
+        if (UnitOfMeasureComboBox.SelectedItem is ComboBoxItem item)
+        {
+            return item.Content?.ToString() ?? "л";
+        }
+        return "л";
+    }
+
+    private void UnitOfMeasureComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        ValidateCapacity();
     }
 
     private async void StockWarehouseComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -130,6 +179,12 @@ public partial class ProcurementPage : Page
         {
             AvailableLocations.Remove(location);
             SelectedLocations.Add(location);
+
+            if (!string.IsNullOrWhiteSpace(location.UnitOfMeasure))
+            {
+                SelectUnitInComboBox(location.UnitOfMeasure);
+            }
+
             ValidateCapacity();
         }
     }
@@ -172,6 +227,8 @@ public partial class ProcurementPage : Page
             return;
         }
 
+        string unitDisplay = GetSelectedUnitDisplayText();
+
         decimal totalCapacity = 0;
         foreach (var loc in SelectedLocations)
         {
@@ -182,15 +239,13 @@ public partial class ProcurementPage : Page
 
         if (totalCapacity < requiredQuantity)
         {
-            var template = LocalizationService.Get(UiConstants.Capacity.WARNING_INSUFFICIENT);
-            CapacityWarningTextBlock.Text = string.Format(template, requiredQuantity, totalCapacity);
+            CapacityWarningTextBlock.Text = $"Недостаточно емкости: выбрано на {totalCapacity} {unitDisplay} из необходимых {requiredQuantity} {unitDisplay}";
             CapacityWarningTextBlock.Foreground = Brushes.Red;
             AddStockLotButton.IsEnabled = false;
         }
         else
         {
-            var template = LocalizationService.Get(UiConstants.Capacity.WARNING_SUFFICIENT);
-            CapacityWarningTextBlock.Text = string.Format(template, totalCapacity, requiredQuantity);
+            CapacityWarningTextBlock.Text = $"Вместимость подходит (выбрано на {totalCapacity} {unitDisplay} под партию в {requiredQuantity} {unitDisplay})";
             CapacityWarningTextBlock.Foreground = Brushes.Green;
             AddStockLotButton.IsEnabled = true;
         }
@@ -284,14 +339,9 @@ public partial class ProcurementPage : Page
         }
 
         int? unitsCount = null;
-        if (int.TryParse(StockUnitsCountTextBox.Text.Trim(), out var parsedUnits) && parsedUnits > 0)
-        {
-            unitsCount = parsedUnits;
-        }
-
         DateTime? expirationDate = ExpirationDatePicker.SelectedDate;
-
         var selectedLocationIds = SelectedLocations.Select(l => l.Id).ToList();
+        var unitOfMeasureTag = GetSelectedUnitTag();
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(InventoryConstants.STOCK_LOTS, new
         {
@@ -301,6 +351,7 @@ public partial class ProcurementPage : Page
             Quantity = quantity,
             UnitsCount = unitsCount,
             UnitPrice = unitPrice,
+            UnitOfMeasure = unitOfMeasureTag,
             BatchNumber = StockBatchTextBox.Text,
             ExpirationDate = expirationDate,
             StorageLocationIds = selectedLocationIds.Count > 0 ? selectedLocationIds : null
@@ -310,7 +361,6 @@ public partial class ProcurementPage : Page
         {
             SetStatus(UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS, Brushes.Green);
             AlertWindow.ShowSuccess(Window.GetWindow(this), UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS);
-            StockUnitsCountTextBox.Clear();
             ExpirationDatePicker.SelectedDate = null;
             SelectedLocations.Clear();
             await LoadStockLotsAsync();

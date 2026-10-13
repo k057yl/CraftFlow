@@ -9,7 +9,7 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        ShutdownMode = ShutdownMode.OnLastWindowClose;
+        ShutdownMode = ShutdownMode.OnExplicitShutdown;
 
         var splash = new SplashWindow();
         splash.Show();

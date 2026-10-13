@@ -11,6 +11,7 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
     public string Name { get; private set; } = null!;
     public string LocationType { get; private set; } = null!;
     public decimal? Capacity { get; private set; }
+    public string? UnitOfMeasure { get; private set; }
     public decimal CurrentVolume { get; private set; }
     public bool IsOccupied => CurrentVolume > 0;
 
@@ -28,6 +29,7 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
         Guid? warehouseId = null,
         Guid? chamberId = null,
         decimal? capacity = null,
+        string? unitOfMeasure = null,
         int washCycleBatchInterval = 1)
     {
         if (tenantId == Guid.Empty)
@@ -48,6 +50,7 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
             WarehouseId = warehouseId,
             ChamberId = chamberId,
             Capacity = capacity,
+            UnitOfMeasure = unitOfMeasure,
             CurrentVolume = 0,
             WashCycleBatchInterval = washCycleBatchInterval,
             LastWashedAt = DateTime.UtcNow

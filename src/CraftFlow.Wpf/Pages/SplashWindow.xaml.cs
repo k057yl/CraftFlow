@@ -6,15 +6,16 @@ namespace CraftFlow.Wpf.Pages;
 
 public partial class SplashWindow : Window
 {
+    private const string ERR_LOAD_FAILED = "ERR_LOAD_FAILED";
     private readonly AppStartupService _startupService = new();
 
     public SplashWindow()
     {
         InitializeComponent();
-        Loaded += async (s, e) => await StartLoadingAsync();
+        Loaded += OnSplashLoaded;
     }
 
-    private async Task StartLoadingAsync()
+    private async void OnSplashLoaded(object sender, RoutedEventArgs e)
     {
         var progress = new Progress<StartupProgress>(p =>
         {
@@ -26,7 +27,7 @@ public partial class SplashWindow : Window
 
         if (result.ResultType == StartupResultType.CriticalError)
         {
-            StatusTextBlock.Text = $"Ошибка загрузки: {result.ErrorMessage}";
+            StatusTextBlock.Text = $"{ERR_LOAD_FAILED}: {result.ErrorMessage}";
             StatusTextBlock.Foreground = System.Windows.Media.Brushes.Red;
             await Task.Delay(1500);
         }
@@ -37,6 +38,7 @@ public partial class SplashWindow : Window
     private void OpenMainApp(StartupResult result)
     {
         var summary = result.InitialData as DashboardSummaryDto;
+
         var mainWindow = new MainWindow(summary);
 
         if (result.ResultType != StartupResultType.Success)
@@ -44,8 +46,13 @@ public partial class SplashWindow : Window
             mainWindow.NavigateToAuth();
         }
 
+        mainWindow.Loaded += (s, e) =>
+        {
+            Application.Current.MainWindow = mainWindow;
+            Application.Current.ShutdownMode = ShutdownMode.OnMainWindowClose;
+            Close();
+        };
+
         mainWindow.Show();
-        Application.Current.MainWindow = mainWindow;
-        Close();
     }
 }
