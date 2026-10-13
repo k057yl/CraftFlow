@@ -1,14 +1,14 @@
-﻿using CraftFlow.Api.Modules.Inventory.AddStockLot;
-using CraftFlow.Api.Modules.Inventory.CreateStorageLocation;
-using CraftFlow.Api.Modules.Inventory.CreateWarehouse;
-using CraftFlow.Api.Modules.Inventory.DeleteStorageLocation;
-using CraftFlow.Api.Modules.Inventory.DeleteWarehouse;
-using CraftFlow.Api.Modules.Inventory.GetProductStockLots;
-using CraftFlow.Api.Modules.Inventory.GetRawStockLots;
-using CraftFlow.Api.Modules.Inventory.GetStockLots;
-using CraftFlow.Api.Modules.Inventory.GetStorageLocations;
-using CraftFlow.Api.Modules.Inventory.GetWarehouses;
-using CraftFlow.Api.Modules.Inventory.WriteOffStockLot;
+﻿using CraftFlow.Api.Modules.Inventory.StockLots.AddStockLot;
+using CraftFlow.Api.Modules.Inventory.StockLots.GetProductStockLots;
+using CraftFlow.Api.Modules.Inventory.StockLots.GetRawStockLots;
+using CraftFlow.Api.Modules.Inventory.StockLots.GetStockLots;
+using CraftFlow.Api.Modules.Inventory.StockLots.WriteOffStockLot;
+using CraftFlow.Api.Modules.Inventory.StorageLocations.CreateStorageLocation;
+using CraftFlow.Api.Modules.Inventory.StorageLocations.DeleteStorageLocation;
+using CraftFlow.Api.Modules.Inventory.StorageLocations.GetStorageLocations;
+using CraftFlow.Api.Modules.Inventory.Warehouses.CreateWarehouse;
+using CraftFlow.Api.Modules.Inventory.Warehouses.DeleteWarehouse;
+using CraftFlow.Api.Modules.Inventory.Warehouses.GetWarehouses;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Inventory;
@@ -41,7 +41,7 @@ public static class InventoryEndpoints
         });
 
         // --- STORAGE LOCATIONS (ЁМКОСТИ / СТЕЛЛАЖИ / ТАНКИ) ---
-        group.MapPost($"{InventoryConstants.WAREHOUSES}/locations", async (CreateStorageLocation.CreateStorageLocationCommand command, ISender sender) =>
+        group.MapPost($"{InventoryConstants.WAREHOUSES}/locations", async (CreateStorageLocationCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);

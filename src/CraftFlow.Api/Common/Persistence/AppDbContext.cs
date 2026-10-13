@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-using System.Text.Json;
-using CraftFlow.Api.Common.Audit;
+﻿using CraftFlow.Api.Common.Audit;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Catalog.Domain;
@@ -9,10 +7,13 @@ using CraftFlow.Api.Modules.Inventory.Domain;
 using CraftFlow.Api.Modules.Procurement.Domain;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.Api.Modules.Sales.Domain;
+using CraftFlow.Api.Modules.Sanitation.Domain;
 using CraftFlow.Api.Modules.Subscriptions.Domain;
 using CraftFlow.SharedKernel.Domain;
 using CraftFlow.SharedKernel.Enums.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
+using System.Text.Json;
 
 namespace CraftFlow.Api.Common.Persistence;
 
@@ -59,6 +60,9 @@ public class AppDbContext : DbContext
     public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
     public DbSet<TenantAccessKey> TenantAccessKeys => Set<TenantAccessKey>();
     public DbSet<SubscriptionPayment> SubscriptionPayments => Set<SubscriptionPayment>();
+    public DbSet<SanitationRule> SanitationRules => Set<SanitationRule>();
+    public DbSet<SanitationTask> SanitationTasks => Set<SanitationTask>();
+    public DbSet<SanitationLog> SanitationLogs => Set<SanitationLog>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

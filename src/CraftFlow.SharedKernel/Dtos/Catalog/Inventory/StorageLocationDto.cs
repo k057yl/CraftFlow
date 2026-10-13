@@ -14,6 +14,7 @@ public record StorageLocationDto(
     int BatchesProcessedCount,
     int WashCycleBatchInterval,
     DateTime? LastWashedAt,
+    DateTime? NextWashDueDate,
     string MaintenanceStatus,
     string? UnitOfMeasure = null
 )

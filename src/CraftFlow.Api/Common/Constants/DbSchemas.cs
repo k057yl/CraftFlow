@@ -10,4 +10,5 @@ public static class DbSchemas
     public const string PROCUREMENT = "procurement";
     public const string SALES = "sales";
     public const string SAAS = "saas";
+    public const string SANITATION = "sanitation";
 }

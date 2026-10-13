@@ -1,13 +1,13 @@
-﻿using CraftFlow.Api.Modules.Aging.CreateChamber;
-using CraftFlow.Api.Modules.Aging.DeleteChamber;
-using CraftFlow.Api.Modules.Aging.DiscardAgingLot;
-using CraftFlow.Api.Modules.Aging.DiscardSpecificAgingItems;
-using CraftFlow.Api.Modules.Aging.GetActiveAgingLots;
-using CraftFlow.Api.Modules.Aging.GetAgingChambers;
-using CraftFlow.Api.Modules.Aging.GetAgingLotDetails;
-using CraftFlow.Api.Modules.Aging.GetAgingLotItems;
-using CraftFlow.Api.Modules.Aging.ReleaseFromAging;
-using CraftFlow.Api.Modules.Aging.TransferToAging;
+﻿using CraftFlow.Api.Modules.Aging.AgingProcess.DiscardAgingLot;
+using CraftFlow.Api.Modules.Aging.AgingProcess.DiscardSpecificAgingItems;
+using CraftFlow.Api.Modules.Aging.AgingProcess.GetActiveAgingLots;
+using CraftFlow.Api.Modules.Aging.AgingProcess.GetAgingLotDetails;
+using CraftFlow.Api.Modules.Aging.AgingProcess.GetAgingLotItems;
+using CraftFlow.Api.Modules.Aging.AgingProcess.ReleaseFromAging;
+using CraftFlow.Api.Modules.Aging.AgingProcess.TransferToAging;
+using CraftFlow.Api.Modules.Aging.Chambers.CreateChamber;
+using CraftFlow.Api.Modules.Aging.Chambers.DeleteChamber;
+using CraftFlow.Api.Modules.Aging.Chambers.GetAgingChambers;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Aging;

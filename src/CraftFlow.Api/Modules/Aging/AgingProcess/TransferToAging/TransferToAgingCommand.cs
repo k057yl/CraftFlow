@@ -1,0 +1,22 @@
+﻿using CraftFlow.SharedKernel.Result;
+using MediatR;
+
+namespace CraftFlow.Api.Modules.Aging.AgingProcess.TransferToAging;
+
+public record TransferToAgingRequest(
+    Guid ProductionBatchId,
+    Guid AgingChamberId,
+    int MinAgingDays,
+    int UnitsCount = 1,
+    string? CustomBatchNumber = null,
+    Guid? StorageLocationId = null
+);
+
+public record TransferToAgingCommand(
+    Guid ProductionBatchId,
+    Guid AgingChamberId,
+    int MinAgingDays,
+    int UnitsCount = 1,
+    string? CustomBatchNumber = null,
+    Guid? StorageLocationId = null
+) : IRequest<Result<Guid>>;

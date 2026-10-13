@@ -1,14 +1,14 @@
-﻿using CraftFlow.Api.Modules.Catalog.CreateProduct;
-using CraftFlow.Api.Modules.Catalog.CreateRawMaterial;
-using CraftFlow.Api.Modules.Catalog.CreateRecipe;
-using CraftFlow.Api.Modules.Catalog.DeleteProduct;
-using CraftFlow.Api.Modules.Catalog.DeleteRawMaterial;
-using CraftFlow.Api.Modules.Catalog.DeleteRecipe;
-using CraftFlow.Api.Modules.Catalog.GetProducts;
-using CraftFlow.Api.Modules.Catalog.GetRawMaterials;
-using CraftFlow.Api.Modules.Catalog.GetRecipes;
-using CraftFlow.Api.Modules.Catalog.GetUnitsOfMeasure;
-using CraftFlow.Api.Modules.Catalog.SeedUnitsOfMeasure;
+﻿using CraftFlow.Api.Modules.Catalog.Products.CreateProduct;
+using CraftFlow.Api.Modules.Catalog.Products.DeleteProduct;
+using CraftFlow.Api.Modules.Catalog.Products.GetProducts;
+using CraftFlow.Api.Modules.Catalog.RawMaterials.CreateRawMaterial;
+using CraftFlow.Api.Modules.Catalog.RawMaterials.DeleteRawMaterial;
+using CraftFlow.Api.Modules.Catalog.RawMaterials.GetRawMaterials;
+using CraftFlow.Api.Modules.Catalog.Recipes.CreateRecipe;
+using CraftFlow.Api.Modules.Catalog.Recipes.DeleteRecipe;
+using CraftFlow.Api.Modules.Catalog.Recipes.GetRecipes;
+using CraftFlow.Api.Modules.Catalog.UnitsOfMeasure.GetUnitsOfMeasure;
+using CraftFlow.Api.Modules.Catalog.UnitsOfMeasure.SeedUnitsOfMeasure;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Catalog;

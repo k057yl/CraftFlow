@@ -15,7 +15,7 @@
 
         <Grid Grid.Row="1">
             <Grid.RowDefinitions>
-                <RowDefinition Height="230"/>
+                <RowDefinition Height="220"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
@@ -34,7 +34,6 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Поля с подписями -->
                         <Grid Grid.Row="0" Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -61,13 +60,18 @@
                                     VerticalAlignment="Bottom"/>
                         </Grid>
 
-                        <DataGrid Grid.Row="1" x:Name="WarehousesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                        <DataGrid Grid.Row="1" x:Name="WarehousesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" MouseDoubleClick="WarehousesDataGrid_MouseDoubleClick">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding Name}" Width="*"/>
-                                <DataGridTemplateColumn Width="45">
+
+                                <!-- Кнопки управления складом -->
+                                <DataGridTemplateColumn Width="75">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Button Content="✕" Click="DeleteWarehouse_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="⚙️" Click="OpenWarehouseSanitation_Click" Tag="{Binding}" ToolTip="Регламент мойки склада" Width="24" Height="24" Margin="0,0,4,0"/>
+                                                <Button Content="✕" Click="DeleteWarehouse_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
+                                            </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -84,7 +88,6 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <!-- Поля с подписями -->
                         <Grid Grid.Row="0" Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
@@ -117,13 +120,18 @@
                                     VerticalAlignment="Bottom"/>
                         </Grid>
 
-                        <DataGrid Grid.Row="1" x:Name="ChambersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                        <DataGrid Grid.Row="1" x:Name="ChambersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" MouseDoubleClick="ChambersDataGrid_MouseDoubleClick">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="{loc:Loc Key=AGING_CHAMBER_NAME}" Binding="{Binding Name}" Width="*"/>
-                                <DataGridTemplateColumn Width="45">
+
+                                <!-- Кнопки управления камерой -->
+                                <DataGridTemplateColumn Width="75">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Button Content="✕" Click="DeleteChamber_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="⚙️" Click="OpenChamberSanitation_Click" Tag="{Binding}" ToolTip="Регламент мойки камеры" Width="24" Height="24" Margin="0,0,4,0"/>
+                                                <Button Content="✕" Click="DeleteChamber_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
+                                            </StackPanel>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -133,26 +141,95 @@
                 </GroupBox>
             </Grid>
 
-            <!-- Нижняя часть: Ёмкости, танки и стеллажи -->
+            <!-- Нижняя часть: Ёмкости, танки, фильтры и алярмы мойки -->
             <GroupBox Grid.Row="1" Header="{loc:Loc Key=HEADER_EQUIPMENT}" Padding="10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <Button Grid.Row="0" Content="{loc:Loc Key=BTN_CREATE_EQUIPMENT}" Click="OpenCreateStorageLocationModal_Click" Style="{StaticResource PrimaryButtonStyle}" Height="30" Padding="14,0" HorizontalAlignment="Left" Margin="0,0,0,10"/>
+                    <!-- Плашка карточек-алярмов мойки -->
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                    <DataGrid Grid.Row="1" x:Name="StorageLocationsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                        <Button Grid.Column="0" Content="{loc:Loc Key=BTN_CREATE_EQUIPMENT}" Click="OpenCreateStorageLocationModal_Click" Style="{StaticResource PrimaryButtonStyle}" Height="32" Padding="14,0" VerticalAlignment="Center"/>
+
+                        <!-- Индикаторы состояния / Алярмы -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border Background="#F5F5F5" CornerRadius="6" Padding="10,6" Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Всего ёмкостей: " FontSize="11" Foreground="#666"/>
+                                    <TextBlock x:Name="TotalEquipmentCountTextBlock" Text="0" FontWeight="Bold" FontSize="11" Foreground="#333"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#FFF3E0" CornerRadius="6" Padding="10,6" Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="⚠️ Скоро мойка: " FontSize="11" Foreground="#EF6C00"/>
+                                    <TextBlock x:Name="WarningCountTextBlock" Text="0" FontWeight="Bold" FontSize="11" Foreground="#EF6C00"/>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Background="#FFEBEE" CornerRadius="6" Padding="10,6">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="🚨 Просрочено: " FontSize="11" Foreground="#C62828"/>
+                                    <TextBlock x:Name="OverdueCountTextBlock" Text="0" FontWeight="Bold" FontSize="11" Foreground="#C62828"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Панель фильтрации -->
+                    <Grid Grid.Row="1" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="180"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox x:Name="SearchFilterTextBox" Grid.Column="0" Height="28" Margin="0,0,8,0" TextChanged="FilterChanged" ToolTip="Поиск по названию, типу или локации"/>
+
+                        <ComboBox x:Name="StatusFilterComboBox" Grid.Column="1" Height="28" SelectedIndex="0" SelectionChanged="FilterChanged">
+                            <ComboBoxItem Content="Все статусы"/>
+                            <ComboBoxItem Content="🟢 В норме (ОК)"/>
+                            <ComboBoxItem Content="⚠️ Скоро мойка"/>
+                            <ComboBoxItem Content="🚨 Просрочено"/>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Таблица оборудования -->
+                    <DataGrid Grid.Row="2" x:Name="StorageLocationsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" MouseDoubleClick="StorageLocationsDataGrid_MouseDoubleClick">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_EQUIPMENT_NAME}" Binding="{Binding Name}" Width="180"/>
-                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_TYPE}" Binding="{Binding LocationType}" Width="130"/>
-                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_PARENT_LOCATION}" Binding="{Binding ParentName}" Width="200"/>
-                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_VOLUME}" Binding="{Binding VolumeInfo}" Width="*"/>
-                            <DataGridTemplateColumn Width="50">
+                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_EQUIPMENT_NAME}" Binding="{Binding Name}" Width="150"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_TYPE}" Binding="{Binding LocationType}" Width="110"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_PARENT_LOCATION}" Binding="{Binding ParentName}" Width="160"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_VOLUME}" Binding="{Binding VolumeInfo}" Width="180"/>
+
+                            <DataGridTextColumn Header="Пред. мойка" Binding="{Binding LastWashedText}" Width="120"/>
+                            <DataGridTextColumn Header="Срок мойки" Binding="{Binding NextWashText}" Width="100"/>
+
+                            <DataGridTemplateColumn Header="Статус мойки" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="✕" Click="DeleteStorageLocation_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
+                                        <Border Background="{Binding StatusBackground}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding SanitationStatusText}" Foreground="{Binding StatusForeground}" FontWeight="Bold" FontSize="11"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn Header="Действия" Width="80">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <Button Content="⚙️" Click="OpenSanitationWindow_Click" Tag="{Binding}" ToolTip="Настройка мойки и регламента" Width="26" Height="24" Margin="0,0,4,0"/>
+                                            <Button Content="✕" Click="DeleteStorageLocation_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

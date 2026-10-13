@@ -55,4 +55,13 @@ public static class DbIndexes
         public const string IX_SUBSCRIPTION_PLANS_CODE = "IX_SUBSCRIPTION_PLANS_CODE";
         public const string IX_ACCESS_KEYS_TENANT = "IX_ACCESS_KEYS_TENANT";
     }
+
+    public static class Sanitation
+    {
+        public const string IX_SANITATION_RULES_TENANT_TARGET = "IX_SANITATION_RULES_TENANT_TARGET";
+        public const string IX_SANITATION_TASKS_TENANT_STATUS = "IX_SANITATION_TASKS_TENANT_STATUS";
+        public const string IX_SANITATION_TASKS_TENANT_TARGET = "IX_SANITATION_TASKS_TENANT_TARGET";
+        public const string IX_SANITATION_LOGS_TENANT_TASK = "IX_SANITATION_LOGS_TENANT_TASK";
+        public const string IX_SANITATION_LOGS_TENANT_TARGET = "IX_SANITATION_LOGS_TENANT_TARGET";
+    }
 }

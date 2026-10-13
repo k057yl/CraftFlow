@@ -31,4 +31,7 @@ public static class DbTables
     public const string SUBSCRIPTION_PLANS = "subscription_plans";
     public const string TENANT_ACCESS_KEYS = "tenant_access_keys";
     public const string TENANT_SUBSCRIPTIONS = "tenant_subscriptions";
+    public const string SANITATION_RULES = "sanitation_rules";
+    public const string SANITATION_TASKS = "sanitation_tasks";
+    public const string SANITATION_LOGS = "sanitation_logs";
 }

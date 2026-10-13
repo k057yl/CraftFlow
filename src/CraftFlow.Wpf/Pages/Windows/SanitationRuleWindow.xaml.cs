@@ -1,0 +1,99 @@
+﻿using CraftFlow.SharedKernel.Enums.Sanitation;
+using CraftFlow.Wpf.Services;
+using System.Windows;
+using System.Windows.Controls;
+
+namespace CraftFlow.Wpf.Windows;
+
+public partial class SanitationRuleWindow : Window
+{
+    private readonly Guid _targetId;
+    private readonly SanitationTargetType _targetType;
+
+    public SanitationRuleWindow(
+        Guid targetId,
+        string objectName,
+        SanitationTargetType targetType = SanitationTargetType.StorageLocation)
+    {
+        InitializeComponent();
+        _targetId = targetId;
+        _targetType = targetType;
+
+        var typeTitle = targetType switch
+        {
+            SanitationTargetType.Warehouse => "Склад",
+            SanitationTargetType.AgingChamber => "Камера",
+            _ => "Ёмкость"
+        };
+
+        EquipmentTitleTextBlock.Text = $"{typeTitle}: {objectName}";
+    }
+
+    private void TriggerType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (BatchIntervalTextBox == null || DaysIntervalTextBox == null) return;
+
+        int selectedIndex = TriggerTypeComboBox.SelectedIndex;
+
+        bool enableBatch = selectedIndex == 0 || selectedIndex == 3;
+        bool enableDays = selectedIndex == 1 || selectedIndex == 3;
+
+        BatchIntervalTextBox.IsEnabled = enableBatch;
+        DaysIntervalTextBox.IsEnabled = enableDays;
+    }
+
+    private async void SaveRule_Click(object sender, RoutedEventArgs e)
+    {
+        var triggerType = TriggerTypeComboBox.SelectedIndex switch
+        {
+            1 => SanitationTriggerType.IntervalDays,
+            2 => SanitationTriggerType.ScheduledDate,
+            3 => SanitationTriggerType.Both,
+            _ => SanitationTriggerType.BatchCount
+        };
+
+        int.TryParse(BatchIntervalTextBox.Text, out var batchInterval);
+        int.TryParse(DaysIntervalTextBox.Text, out var daysInterval);
+
+        var result = await ApiService.Instance.PostAndReadAsync("api/sanitation/rules", new
+        {
+            TargetType = _targetType,
+            TargetId = _targetId,
+            TriggerType = triggerType,
+            RequiredChemicals = ChemicalsTextBox.Text.Trim(),
+            IntervalDays = daysInterval > 0 ? daysInterval : (int?)null,
+            MaxBatchCount = batchInterval > 0 ? batchInterval : (int?)null
+        });
+
+        if (result.IsSuccess)
+        {
+            MessageBox.Show("Регламент мойки успешно обновлен!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            DialogResult = true;
+        }
+        else
+        {
+            MessageBox.Show($"Ошибка сохранения: {result.ContentOrError}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private async void PerformSanitationNow_Click(object sender, RoutedEventArgs e)
+    {
+        var result = await ApiService.Instance.PostAndReadAsync($"api/inventory/locations/{_targetId}/sanitation", new
+        {
+            Notes = WashNotesTextBox.Text.Trim(),
+            ChemicalsUsed = ChemicalsTextBox.Text.Trim()
+        });
+
+        if (result.IsSuccess)
+        {
+            MessageBox.Show("Отметка о проведении мойки успешно внесена!", "Мойка завершена", MessageBoxButton.OK, MessageBoxImage.Information);
+            DialogResult = true;
+        }
+        else
+        {
+            MessageBox.Show($"Ошибка проведения мойки: {result.ContentOrError}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private void Close_Click(object sender, RoutedEventArgs e) => Close();
+}

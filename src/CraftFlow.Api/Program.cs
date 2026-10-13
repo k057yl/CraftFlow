@@ -10,6 +10,7 @@ using CraftFlow.Api.Modules.MRP;
 using CraftFlow.Api.Modules.Procurement;
 using CraftFlow.Api.Modules.Production;
 using CraftFlow.Api.Modules.Sales;
+using CraftFlow.Api.Modules.Sanitation;
 using CraftFlow.Api.Modules.Subscriptions;
 using CraftFlow.Api.Modules.Traceability;
 
@@ -49,5 +50,6 @@ app.MapAgingEndpoints();
 app.MapTraceabilityEndpoints();
 app.MapMrpEndpoints();
 app.MapSubscriptionsEndpoints();
+app.MapSanitationEndpoints();
 
 app.Run();

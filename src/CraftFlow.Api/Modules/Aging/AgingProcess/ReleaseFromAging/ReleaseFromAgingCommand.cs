@@ -1,0 +1,14 @@
+﻿using CraftFlow.SharedKernel.Result;
+using MediatR;
+
+namespace CraftFlow.Api.Modules.Aging.AgingProcess.ReleaseFromAging;
+
+public sealed record ReleaseFromAgingCommand(
+    Guid AgingLotId,
+    Guid TargetWarehouseId,
+    decimal ActualFinalQuantity,
+    int UnitsCount,
+    decimal UnitPrice,
+    List<Guid>? StorageLocationIds = null,
+    List<decimal>? HeadWeights = null
+) : IRequest<Result>;

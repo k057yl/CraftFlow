@@ -14,6 +14,7 @@ public static class ErrorCodes
         public const string VALIDATION_ERROR = "GENERAL.VALIDATION_ERROR";
         public const string MAX_LENGTH_EXCEEDED = "GENERAL.MAX_LENGTH_EXCEEDED";
         public const string INVALID_EMAIL_FORMAT = "GENERAL.INVALID_EMAIL_FORMAT";
+        public const string INVALID_AMOUNT = "GENERAL.INVALID_AMOUNT";
     }
 
     public static class Production
@@ -113,5 +114,19 @@ public static class ErrorCodes
     public static class Supplier
     {
         public const string PHONE_NUMBER_INVALID_FORMAT = "SUPPLIER.PHONE_NUMBER_INVALID_FORMAT";
+    }
+
+    public static class Sanitation
+    {
+        public const string CHEMICAL_REQUIRED = "SANITATION.CHEMICAL_REQUIRED";
+        public const string TASK_NOT_FOUND = "SANITATION.TASK_NOT_FOUND";
+        public const string RULE_NOT_FOUND = "SANITATION.RULE_NOT_FOUND";
+        public const string INVALID_STATUS_TRANSITION = "SANITATION.INVALID_STATUS_TRANSITION";
+        public const string PERFORMER_REQUIRED = "SANITATION.PERFORMER_REQUIRED";
+        public const string VERIFIER_REQUIRED = "SANITATION.VERIFIER_REQUIRED";
+        public const string INVALID_DURATION = "SANITATION.INVALID_DURATION";
+        public const string TARGET_ID_REQUIRED = "SANITATION.TARGET_ID_REQUIRED";
+        public const string INVALID_TRIGGER_CONFIG = "SANITATION.INVALID_TRIGGER_CONFIG";
+        public const string TASK_NOT_COMPLETED = "SANITATION.TASK_NOT_COMPLETED";
     }
 }
