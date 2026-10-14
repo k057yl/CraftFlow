@@ -1,6 +1,6 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Production.Domain;
-using CraftFlow.SharedKernel.Enums;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

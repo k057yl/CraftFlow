@@ -16,10 +16,8 @@ public class CreateStorageLocationValidator : AbstractValidator<CreateStorageLoc
             .WithErrorCode(ErrorCodes.General.MAX_LENGTH_EXCEEDED);
 
         RuleFor(x => x.LocationType)
-            .NotEmpty()
-            .WithErrorCode(ErrorCodes.Inventory.LOCATION_TYPE_REQUIRED)
-            .MaximumLength(50)
-            .WithErrorCode(ErrorCodes.General.MAX_LENGTH_EXCEEDED);
+            .IsInEnum()
+            .WithErrorCode(ErrorCodes.Inventory.LOCATION_TYPE_REQUIRED);
 
         RuleFor(x => x)
             .Must(x => x.WarehouseId.HasValue || x.ChamberId.HasValue)

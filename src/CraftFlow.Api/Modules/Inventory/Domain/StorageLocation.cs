@@ -1,5 +1,6 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
+using CraftFlow.SharedKernel.Enums.Inventory;
 
 namespace CraftFlow.Api.Modules.Inventory.Domain;
 
@@ -9,7 +10,7 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
     public Guid? WarehouseId { get; private set; }
     public Guid? ChamberId { get; private set; }
     public string Name { get; private set; } = null!;
-    public string LocationType { get; private set; } = null!;
+    public StorageLocationType LocationType { get; private set; }
     public decimal? Capacity { get; private set; }
     public string? UnitOfMeasure { get; private set; }
     public decimal CurrentVolume { get; private set; }
@@ -25,7 +26,7 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
     public static StorageLocation Create(
         Guid tenantId,
         string name,
-        string locationType,
+        StorageLocationType locationType,
         Guid? warehouseId = null,
         Guid? chamberId = null,
         decimal? capacity = null,

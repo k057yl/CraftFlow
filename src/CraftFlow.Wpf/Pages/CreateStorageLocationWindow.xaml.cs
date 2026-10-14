@@ -2,6 +2,7 @@
 using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.SharedKernel.Dtos.Aging;
 using CraftFlow.SharedKernel.Dtos.Common;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.Wpf.Services;
 using System.Globalization;
 using System.Windows;
@@ -66,7 +67,11 @@ public partial class CreateStorageLocationWindow : Window
     {
         var name = NameTextBox.Text.Trim();
         var selectedTypeItem = LocationTypeComboBox.SelectedItem as ComboBoxItem;
-        var locationType = selectedTypeItem?.Tag?.ToString() ?? "CONTAINER";
+        var rawTypeStr = selectedTypeItem?.Tag?.ToString();
+
+        var locationType = Enum.TryParse<StorageLocationType>(rawTypeStr, out var parsedType)
+            ? parsedType
+            : StorageLocationType.CONTAINER;
 
         Guid? warehouseId = WarehouseComboBox.SelectedValue as Guid?;
         Guid? chamberId = ChamberComboBox.SelectedValue as Guid?;

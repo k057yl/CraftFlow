@@ -3,7 +3,7 @@ using CraftFlow.Api.Modules.Aging.Domain;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.Api.Modules.Production.Events;
 using CraftFlow.SharedKernel.Constants;
-using CraftFlow.SharedKernel.Enums;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;

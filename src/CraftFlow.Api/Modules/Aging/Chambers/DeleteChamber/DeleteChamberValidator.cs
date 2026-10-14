@@ -1,6 +1,6 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging.Domain;
-using CraftFlow.SharedKernel.Enums;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,7 +1,7 @@
 ﻿using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.SharedKernel.Dtos.Production;
-using CraftFlow.SharedKernel.Enums;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Result;
 using Dapper;
 using MediatR;

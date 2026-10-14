@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.SharedKernel.Enums;
+﻿namespace CraftFlow.SharedKernel.Enums.Inventory;
 public enum AgingItemState
 {
     InChamber = 1,

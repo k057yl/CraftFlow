@@ -4,7 +4,7 @@ using CraftFlow.Api.Modules.Production;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Production;
-using CraftFlow.SharedKernel.Enums;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
 using System.Collections.ObjectModel;

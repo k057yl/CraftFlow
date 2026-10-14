@@ -3,6 +3,7 @@ using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Enums.Sanitation;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
@@ -227,7 +228,7 @@ public partial class StoragePage : Page
         {
             var matchesSearch = string.IsNullOrEmpty(searchText) ||
                                 item.Name.ToLower().Contains(searchText) ||
-                                item.LocationType.ToLower().Contains(searchText) ||
+                                item.LocationType.ToString().ToLower().Contains(searchText) ||
                                 item.ParentName.ToLower().Contains(searchText);
 
             var matchesStatus = selectedStatusIndex switch
@@ -409,7 +410,7 @@ public class StorageLocationViewItem
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public string LocationType { get; set; } = string.Empty;
+    public StorageLocationType LocationType { get; set; }
     public string ParentName { get; set; } = string.Empty;
     public string VolumeInfo { get; set; } = string.Empty;
     public string LastWashedText { get; set; } = string.Empty;

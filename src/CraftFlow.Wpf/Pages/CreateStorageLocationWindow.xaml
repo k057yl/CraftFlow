@@ -17,6 +17,7 @@
             <TextBlock Text="Тип емкости:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
             <ComboBox x:Name="LocationTypeComboBox" Height="28" SelectedIndex="0" Margin="0,0,0,10">
                 <ComboBoxItem Content="Ванна / Танк" Tag="VAT_TANK"/>
+                <ComboBoxItem Content="Ёмкость для варки" Tag="BREWING_VESSEL"/>
                 <ComboBoxItem Content="Стеллаж / Полка" Tag="RACK_SHELF"/>
                 <ComboBoxItem Content="Бочка" Tag="BARREL"/>
                 <ComboBoxItem Content="Контейнер" Tag="CONTAINER"/>

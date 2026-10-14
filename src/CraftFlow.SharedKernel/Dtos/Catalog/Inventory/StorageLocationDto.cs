@@ -1,9 +1,11 @@
-﻿namespace CraftFlow.SharedKernel.Dtos.Inventory;
+﻿using CraftFlow.SharedKernel.Enums.Inventory;
+
+namespace CraftFlow.SharedKernel.Dtos.Inventory;
 
 public record StorageLocationDto(
     Guid Id,
     string Name,
-    string LocationType,
+    StorageLocationType LocationType,
     Guid? WarehouseId,
     string? WarehouseName,
     Guid? ChamberId,
@@ -41,4 +43,6 @@ public record StorageLocationDto(
     public string ParentName => !string.IsNullOrWhiteSpace(WarehouseName)
         ? $"🏠 {WarehouseName}"
         : (!string.IsNullOrWhiteSpace(ChamberName) ? $"❄ {ChamberName}" : "—");
+
+    public string LocationTypeKey => $"STORAGE_LOCATION_TYPE_{LocationType}";
 }
