@@ -208,10 +208,18 @@ public class ApiService
 
             var user = new UserProfileDto();
 
+            if ((root.TryGetProperty(AuthConstants.Claims.USER_ID, out var idProp) ||
+                 root.TryGetProperty("sub", out idProp) ||
+                 root.TryGetProperty("nameid", out idProp) ||
+                 root.TryGetProperty("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", out idProp)) &&
+                Guid.TryParse(idProp.GetString(), out var userId))
+            {
+                user.Id = userId;
+            }
+
             if (root.TryGetProperty(AuthConstants.Claims.EMAIL, out var emailProp) ||
                 root.TryGetProperty("email", out emailProp) ||
-                root.TryGetProperty("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", out emailProp) ||
-                root.TryGetProperty("sub", out emailProp))
+                root.TryGetProperty("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress", out emailProp))
             {
                 user.Email = emailProp.GetString() ?? string.Empty;
             }

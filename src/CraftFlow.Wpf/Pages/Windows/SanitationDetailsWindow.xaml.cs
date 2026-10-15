@@ -1,4 +1,5 @@
-﻿using CraftFlow.SharedKernel.Enums.Sanitation;
+﻿using CraftFlow.SharedKernel.Dtos.Sanitation;
+using CraftFlow.SharedKernel.Enums.Sanitation;
 using CraftFlow.Wpf.Services;
 using System.Windows;
 
@@ -9,6 +10,8 @@ public partial class SanitationDetailsWindow : Window
     private readonly Guid _targetId;
     private readonly SanitationTargetType _targetType;
     private readonly string _targetName;
+    private string _defaultChemicals = string.Empty;
+    private Guid? _activeTaskId;
 
     public SanitationDetailsWindow(Guid targetId, string targetName, SanitationTargetType targetType)
     {
@@ -24,17 +27,32 @@ public partial class SanitationDetailsWindow : Window
     {
         try
         {
-            var data = await ApiService.Instance.GetAsync<SanitationDetailsResponseDto>($"api/sanitation/details/{_targetType}/{_targetId}");
+            var data = await ApiService.Instance.GetAsync<SanitationDetailsDto>($"api/sanitation/details/{_targetType}/{_targetId}");
             if (data != null)
             {
                 TargetTitleTextBlock.Text = $"{GetTypeName(_targetType)}: {data.TargetName}";
                 StatusTextBlock.Text = $"Статус: {data.StatusText}";
 
+                _activeTaskId = data.ActiveTaskId;
+
+                if (data.IsUnderSanitation)
+                {
+                    StartSanitationButton.Visibility = Visibility.Collapsed;
+                    CurrentSanitationButton.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    StartSanitationButton.Visibility = Visibility.Visible;
+                    CurrentSanitationButton.Visibility = Visibility.Collapsed;
+                }
+
                 LastWashDateTextBlock.Text = $"Дата: {(data.LastWashedAt.HasValue ? data.LastWashedAt.Value.ToString("dd.MM.yyyy HH:mm") : "—")}";
                 LastWashedByTextBlock.Text = $"Кто убирал: {data.LastWashedByUserName}";
 
                 NextWashDateTextBlock.Text = $"Срок: {(data.NextWashDueDate.HasValue ? data.NextWashDueDate.Value.ToString("dd.MM.yyyy") : "—")}";
-                ChemicalsTextBlock.Text = $"Химия: {data.RequiredChemicals ?? "—"}";
+
+                _defaultChemicals = data.RequiredChemicals ?? "Щелочной раствор CIP-30";
+                ChemicalsTextBlock.Text = $"Химия: {_defaultChemicals}";
 
                 LogsDataGrid.ItemsSource = data.Logs;
             }
@@ -52,6 +70,19 @@ public partial class SanitationDetailsWindow : Window
         _ => "Ёмкость"
     };
 
+    private async void PerformSanitation_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new SanitationExecutionWindow(_targetId, _targetName, _targetType, _activeTaskId, _defaultChemicals)
+        {
+            Owner = Window.GetWindow(this)
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            await LoadDetailsAsync();
+        }
+    }
+
     private async void EditRules_Click(object sender, RoutedEventArgs e)
     {
         var ruleWindow = new SanitationRuleWindow(_targetId, _targetName, _targetType)
@@ -67,30 +98,3 @@ public partial class SanitationDetailsWindow : Window
 
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
 }
-
-public record SanitationLogResponseDto(
-    Guid Id,
-    string PerformedByUserName,
-    string VerifiedByUserName,
-    DateTime CompletedAt,
-    DateTime VerifiedAt,
-    int DurationMinutes,
-    string ChemicalsUsed,
-    string? Notes,
-    bool IsPassed
-);
-
-public record SanitationDetailsResponseDto(
-    Guid TargetId,
-    SanitationTargetType TargetType,
-    string TargetName,
-    SanitationTriggerType? TriggerType,
-    int? IntervalDays,
-    int? MaxBatchCount,
-    string? RequiredChemicals,
-    DateTime? LastWashedAt,
-    string LastWashedByUserName,
-    DateTime? NextWashDueDate,
-    string StatusText,
-    List<SanitationLogResponseDto> Logs
-);

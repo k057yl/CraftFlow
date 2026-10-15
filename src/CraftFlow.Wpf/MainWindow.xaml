@@ -26,6 +26,7 @@
 
                         <!-- ОСНОВНОЕ МЕНЮ -->
                         <StackPanel x:Name="MainMenuPanel" Visibility="Collapsed">
+                            <Button Content="{loc:Loc Key=NAV_DASHBOARD}" Click="NavDashboard_Click" Style="{StaticResource NavButtonStyle}"/>
                             <Button Content="{loc:Loc Key=NAV_RECIPES}" Click="NavRecipes_Click" Style="{StaticResource NavButtonStyle}"/>
                             <Button Content="{loc:Loc Key=NAV_STORAGE}" Click="NavStorage_Click" Style="{StaticResource NavButtonStyle}"/>
                             <Button Content="{loc:Loc Key=NAV_PROCUREMENT}" Click="NavProcurement_Click" Style="{StaticResource NavButtonStyle}"/>

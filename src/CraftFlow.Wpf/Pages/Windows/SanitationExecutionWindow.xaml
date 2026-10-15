@@ -1,0 +1,54 @@
+﻿<Window x:Class="CraftFlow.Wpf.Windows.SanitationExecutionWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Обслуживание и мойка" 
+        Height="380" Width="460" 
+        WindowStartupLocation="CenterOwner" 
+        ResizeMode="NoResize"
+        Background="{DynamicResource CardBackgroundBrush}">
+    <Border Padding="20">
+        <StackPanel>
+            <TextBlock x:Name="TargetTitleTextBlock" Text="Мойка: ..." FontSize="18" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
+
+            <!-- ФАЗА 1: СТАРТ МОЙКИ -->
+            <StackPanel x:Name="StartPanel" Visibility="Visible">
+                <TextBlock Text="Исполнитель:" FontSize="11" Foreground="#666" Margin="0,0,0,3"/>
+                <TextBox x:Name="PerformerTextBox" Height="28" IsReadOnly="True" Margin="0,0,0,12"/>
+
+                <TextBlock Text="Заметки перед стартом:" FontSize="11" Foreground="#666" Margin="0,0,0,3"/>
+                <TextBox x:Name="StartNotesTextBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,20"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="StartButton" Grid.Column="0" Content="▶ Начать мойку" Click="Start_Click" Height="34" Margin="0,0,8,0" Style="{StaticResource PrimaryButtonStyle}"/>
+                    <Button Grid.Column="1" Content="Отмена" Click="Close_Click" Height="34" Width="90"/>
+                </Grid>
+            </StackPanel>
+
+            <!-- ФАЗА 2: ПРИЁМКА / ЗАВЕРШЕНИЕ МОЙКИ -->
+            <StackPanel x:Name="CompletePanel" Visibility="Collapsed">
+                <TextBlock Text="Использованные химические средства:" FontSize="11" Foreground="#666" Margin="0,0,0,3"/>
+                <TextBox x:Name="ChemicalsTextBox" Height="28" Margin="0,0,0,10"/>
+
+                <TextBlock Text="Замечания / Чек-лист проверки:" FontSize="11" Foreground="#666" Margin="0,0,0,3"/>
+                <TextBox x:Name="VerificationNotesTextBox" Height="50" TextWrapping="Wrap" AcceptsReturn="True" Margin="0,0,0,10"/>
+
+                <CheckBox x:Name="PassedCheckBox" Content="Смывы и качество мойки соответствуют норме" IsChecked="True" FontWeight="SemiBold" Margin="0,0,0,15"/>
+
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="✔ Принять" Click="CompleteAndVerify_Click" Height="34" Margin="0,0,4,0" Style="{StaticResource PrimaryButtonStyle}"/>
+                    <Button Grid.Column="1" Content="🔄 Повторная мойка" Click="ReWash_Click" Height="34" Margin="4,0,4,0"/>
+                    <Button Grid.Column="2" Content="Отмена" Click="Close_Click" Height="34" Width="80" Margin="4,0,0,0"/>
+                </Grid>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</Window>

@@ -11,10 +11,12 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
     public Guid? ChamberId { get; private set; }
     public string Name { get; private set; } = null!;
     public StorageLocationType LocationType { get; private set; }
+    public StorageLocationStatus Status { get; private set; }
+
     public decimal? Capacity { get; private set; }
     public string? UnitOfMeasure { get; private set; }
     public decimal CurrentVolume { get; private set; }
-    public bool IsOccupied => CurrentVolume > 0;
+    public bool IsOccupied => Status == StorageLocationStatus.OCCUPIED || CurrentVolume > 0;
 
     public int BatchesProcessedCount { get; private set; }
     public int WashCycleBatchInterval { get; private set; } = 1;
@@ -48,6 +50,7 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
             TenantId = tenantId,
             Name = name,
             LocationType = locationType,
+            Status = StorageLocationStatus.AVAILABLE,
             WarehouseId = warehouseId,
             ChamberId = chamberId,
             Capacity = capacity,
@@ -60,20 +63,59 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
 
     public void AddVolume(decimal volume)
     {
+        if (Status != StorageLocationStatus.AVAILABLE && Status != StorageLocationStatus.OCCUPIED)
+            throw new InvalidOperationException(ErrorCodes.Inventory.LOCATION_NOT_AVAILABLE);
+
         if (Capacity.HasValue && (CurrentVolume + volume) > Capacity.Value)
-            throw new InvalidOperationException("CAPACITY_EXCEEDED");
+            throw new InvalidOperationException(ErrorCodes.Inventory.CAPACITY_EXCEEDED);
 
         CurrentVolume += volume;
+        Status = StorageLocationStatus.OCCUPIED;
+    }
+
+    public void ClearVolume()
+    {
+        CurrentVolume = 0;
+        Status = StorageLocationStatus.SANITATION_REQUIRED;
     }
 
     public void RegisterBatchProcessed()
     {
         BatchesProcessedCount++;
+
+        if (BatchesProcessedCount >= WashCycleBatchInterval)
+        {
+            Status = StorageLocationStatus.SANITATION_REQUIRED;
+        }
     }
 
-    public void PerformSanitation()
+    public void StartSanitation()
     {
-        BatchesProcessedCount = 0;
-        LastWashedAt = DateTime.UtcNow;
+        if (CurrentVolume > 0 || Status == StorageLocationStatus.OCCUPIED)
+            throw new InvalidOperationException(ErrorCodes.Inventory.LOCATION_NOT_EMPTY_FOR_SANITATION);
+
+        Status = StorageLocationStatus.UNDER_SANITATION;
+    }
+
+    public void CompleteSanitation(bool isPassed)
+    {
+        if (isPassed)
+        {
+            Status = StorageLocationStatus.AVAILABLE;
+            BatchesProcessedCount = 0;
+            LastWashedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            Status = StorageLocationStatus.SANITATION_REQUIRED;
+        }
+    }
+
+    public void SetMaintenance()
+    {
+        if (CurrentVolume > 0)
+            throw new InvalidOperationException(ErrorCodes.Inventory.LOCATION_NOT_EMPTY_FOR_SANITATION);
+
+        Status = StorageLocationStatus.MAINTENANCE;
     }
 }

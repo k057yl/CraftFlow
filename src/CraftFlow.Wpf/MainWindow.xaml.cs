@@ -158,6 +158,7 @@ public partial class MainWindow : Window
         }
     }
 
+    private void NavDashboard_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new DashboardPage());
     private void NavRecipes_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RecipesPage());
     private void NavStorage_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new StoragePage());
     private void NavProcurement_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProcurementPage());

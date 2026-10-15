@@ -11,8 +11,10 @@ public sealed record SanitationDetailsDto(
     int? MaxBatchCount,
     string? RequiredChemicals,
     DateTime? LastWashedAt,
-    string? LastWashedByUserName,
+    string LastWashedByUserName,
     DateTime? NextWashDueDate,
     string StatusText,
+    Guid? ActiveTaskId,
+    bool IsUnderSanitation,
     List<SanitationLogItemDto> Logs
 );

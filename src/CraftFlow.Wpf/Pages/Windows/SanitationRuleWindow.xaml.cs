@@ -76,24 +76,5 @@ public partial class SanitationRuleWindow : Window
         }
     }
 
-    private async void PerformSanitationNow_Click(object sender, RoutedEventArgs e)
-    {
-        var result = await ApiService.Instance.PostAndReadAsync($"api/inventory/locations/{_targetId}/sanitation", new
-        {
-            Notes = WashNotesTextBox.Text.Trim(),
-            ChemicalsUsed = ChemicalsTextBox.Text.Trim()
-        });
-
-        if (result.IsSuccess)
-        {
-            MessageBox.Show("Отметка о проведении мойки успешно внесена!", "Мойка завершена", MessageBoxButton.OK, MessageBoxImage.Information);
-            DialogResult = true;
-        }
-        else
-        {
-            MessageBox.Show($"Ошибка проведения мойки: {result.ContentOrError}", "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
     private void Close_Click(object sender, RoutedEventArgs e) => Close();
 }

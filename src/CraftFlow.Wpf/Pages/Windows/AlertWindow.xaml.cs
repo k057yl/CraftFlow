@@ -73,6 +73,24 @@ public partial class AlertWindow : Window
         win.ShowDialog();
     }
 
+    public static void ShowInfo(Window owner, string rawOrKeyMessage, string? title = null)
+    {
+        var localizedTitle = title ?? LocalizationService.Get(UiConstants.Dialogs.TITLE_INFO);
+        var parsedMessage = ParseAndLocalizeError(rawOrKeyMessage);
+
+        var win = new AlertWindow(localizedTitle, parsedMessage, AlertType.Info) { Owner = owner };
+        win.ShowDialog();
+    }
+
+    public static void ShowWarning(Window owner, string rawOrKeyMessage, string? title = null)
+    {
+        var localizedTitle = title ?? LocalizationService.Get(UiConstants.Dialogs.TITLE_WARNING);
+        var parsedMessage = ParseAndLocalizeError(rawOrKeyMessage);
+
+        var win = new AlertWindow(localizedTitle, parsedMessage, AlertType.Warning) { Owner = owner };
+        win.ShowDialog();
+    }
+
     private static string ParseAndLocalizeError(string input)
     {
         if (string.IsNullOrWhiteSpace(input)) return string.Empty;

@@ -1,5 +1,11 @@
-﻿using CraftFlow.Api.Modules.Sanitation.CreateSanitationRule;
+﻿using CraftFlow.Api.Modules.Sanitation.CancelSanitationTask;
+using CraftFlow.Api.Modules.Sanitation.CompleteSanitationTask;
+using CraftFlow.Api.Modules.Sanitation.CreateSanitationRule;
 using CraftFlow.Api.Modules.Sanitation.GetSanitationDetails;
+using CraftFlow.Api.Modules.Sanitation.PerformAdHocSanitation;
+using CraftFlow.Api.Modules.Sanitation.StartNewSanitationTask;
+using CraftFlow.Api.Modules.Sanitation.StartSanitationTask;
+using CraftFlow.Api.Modules.Sanitation.VerifySanitationTask;
 using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Enums.Sanitation;
 using MediatR;
@@ -24,6 +30,42 @@ public static class SanitationEndpoints
         {
             var result = await sender.Send(new GetSanitationDetailsQuery(targetType, targetId));
             return Results.Ok(result);
+        });
+
+        group.MapPost($"{SanitationConstants.TASKS}/start", async (StartSanitationTaskCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapPost($"{SanitationConstants.TASKS}/complete", async (CompleteSanitationTaskCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapPost(SanitationConstants.TASKS_VERIFY, async (VerifySanitationTaskCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapPost($"{SanitationConstants.TASKS}/cancel", async (CancelSanitationTaskCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
+        });
+
+        group.MapPost($"{SanitationConstants.TASKS}/ad-hoc", async (PerformAdHocSanitationCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapPost($"{SanitationConstants.TASKS}/start-new", async (StartNewSanitationTaskCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
     }
 }

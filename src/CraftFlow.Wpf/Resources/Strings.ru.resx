@@ -84,9 +84,10 @@
 	<!-- ========================================== -->
 	<!-- 1: Навигация Сайдбара                      -->
 	<!-- ========================================== -->
+	<data name="NAV_DASHBOARD" xml:space="preserve"><value>Таблицы и Графики</value></data>
 	<data name="NAV_RECIPES" xml:space="preserve"><value>Сырьё и Рецепты</value></data>
-	<data name="NAV_STORAGE" xml:space="preserve"><value>Склады и Оборудование</value></data>
-	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>Покупки и Поставки</value></data>
+	<data name="NAV_STORAGE" xml:space="preserve"><value>Помещения и Оборудование</value></data>
+	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>Закупки и Поставки</value></data>
 	<data name="NAV_PRODUCTION" xml:space="preserve"><value>Варочный цех</value></data>
 	<data name="NAV_SALES" xml:space="preserve"><value>Продажи и Заказы</value></data>
 	<data name="NAV_TRACEABILITY" xml:space="preserve"><value>История партий</value></data>
@@ -129,8 +130,8 @@
 	<!-- ========================================== -->
 	<!-- 3: Склады и Оборудование                   -->
 	<!-- ========================================== -->
-	<data name="TITLE_STORAGE" xml:space="preserve"><value>Склады и Оборудование</value></data>
-	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>Склады</value></data>
+	<data name="TITLE_STORAGE" xml:space="preserve"><value>Помещения и Оборудование</value></data>
+	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>Помещения</value></data>
 	<data name="HEADER_AGING_CHAMBERS" xml:space="preserve"><value>Камеры созревания</value></data>
 	<data name="HEADER_EQUIPMENT" xml:space="preserve"><value>Емкости, танки и стеллажи</value></data>
 	<data name="WAREHOUSE_NAME" xml:space="preserve"><value>Название склада</value></data>

@@ -37,6 +37,7 @@
                         <Grid Grid.Row="0" Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="120"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
@@ -47,11 +48,19 @@
                             </StackPanel>
 
                             <StackPanel Grid.Column="1" Margin="0,0,6,0">
+                                <TextBlock Text="Тип зоны:" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                <ComboBox x:Name="WarehouseTypeComboBox" Height="28" SelectedIndex="0">
+                                    <ComboBoxItem Content="Склад" Tag="WAREHOUSE"/>
+                                    <ComboBoxItem Content="Варочный цех" Tag="BREWHOUSE"/>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Margin="0,0,6,0">
                                 <TextBlock Text="{loc:Loc Key=LABEL_ADDRESS}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
                                 <TextBox x:Name="WarehouseAddressTextBox" Height="28"/>
                             </StackPanel>
 
-                            <Button Grid.Column="2" 
+                            <Button Grid.Column="3" 
                                     Content="{loc:Loc Key=BTN_ADD}" 
                                     Click="CreateWarehouse_Click" 
                                     Style="{StaticResource PrimaryButtonStyle}" 

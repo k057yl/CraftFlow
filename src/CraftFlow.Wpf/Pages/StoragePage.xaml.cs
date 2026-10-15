@@ -263,6 +263,13 @@ public partial class StoragePage : Page
         var name = WarehouseNameTextBox.Text?.Trim();
         var address = WarehouseAddressTextBox.Text?.Trim();
 
+        var selectedItem = WarehouseTypeComboBox.SelectedItem as ComboBoxItem;
+        var rawTypeStr = selectedItem?.Tag?.ToString();
+
+        var type = Enum.TryParse<WarehouseType>(rawTypeStr, out var parsedType)
+            ? parsedType
+            : WarehouseType.WAREHOUSE;
+
         if (string.IsNullOrWhiteSpace(name))
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
@@ -272,6 +279,7 @@ public partial class StoragePage : Page
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(InventoryConstants.WAREHOUSES, new
         {
             Name = name,
+            Type = type,
             Address = address
         });
 
@@ -280,6 +288,7 @@ public partial class StoragePage : Page
             SetStatus(UiConstants.Messages.WAREHOUSE_CREATED_SUCCESS, Brushes.Green);
             WarehouseNameTextBox.Clear();
             WarehouseAddressTextBox.Clear();
+            WarehouseTypeComboBox.SelectedIndex = 0;
             await LoadDataAsync();
         }
         else
@@ -382,6 +391,22 @@ public partial class StoragePage : Page
             else
             {
                 SetStatusRaw(error, Brushes.Red);
+            }
+        }
+    }
+
+    private async void OpenExecutionSanitation_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is StorageLocationViewItem item)
+        {
+            var window = new SanitationExecutionWindow(item.Id, item.Name, SanitationTargetType.StorageLocation)
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (window.ShowDialog() == true)
+            {
+                await LoadDataAsync();
             }
         }
     }

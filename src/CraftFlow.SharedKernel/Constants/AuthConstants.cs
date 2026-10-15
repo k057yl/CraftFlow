@@ -48,6 +48,7 @@ public static class AuthConstants
 
     public static class Claims
     {
+        public const string USER_ID = "sub";
         public const string EMAIL = "email";
         public const string ROLE_SHORT = "role";
         public const string ROLE_FULL = "http://schemas.microsoft.com/ws/2008/06/identity/claims/role";

@@ -22,6 +22,11 @@ public class StorageLocationConfiguration : IEntityTypeConfiguration<StorageLoca
             .HasConversion<string>()
             .HasMaxLength(50);
 
+        builder.Property(sl => sl.Status)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(50);
+
         builder.Property(sl => sl.UnitOfMeasure)
             .HasMaxLength(10);
 

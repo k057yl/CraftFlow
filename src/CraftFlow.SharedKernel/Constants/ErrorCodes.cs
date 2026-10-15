@@ -42,6 +42,9 @@ public static class ErrorCodes
         public const string PARENT_CONTAINER_REQUIRED = "INVENTORY.PARENT_CONTAINER_REQUIRED";
         public const string STOCK_LOT_NOT_FOUND = "INVENTORY.STOCK_LOT_NOT_FOUND";
         public const string LOCATION_NOT_FOUND = "INVENTORY.LOCATION_NOT_FOUND";
+        public const string LOCATION_NOT_AVAILABLE = "INVENTORY.LOCATION_NOT_AVAILABLE";
+        public const string LOCATION_NOT_EMPTY_FOR_SANITATION = "INVENTORY.LOCATION_NOT_EMPTY_FOR_SANITATION";
+        public const string CAPACITY_EXCEEDED = "INVENTORY.CAPACITY_EXCEEDED";
     }
 
     public static class Catalog

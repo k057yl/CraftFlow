@@ -43,6 +43,14 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
             targetName = ch.Name;
         }
 
+        var activeTask = await _context.SanitationTasks.AsNoTracking()
+            .FirstOrDefaultAsync(t => t.TargetType == request.TargetType
+                                   && t.TargetId == request.TargetId
+                                   && t.Status == SanitationTaskStatus.InProgress, cancellationToken);
+
+        Guid? activeTaskId = activeTask?.Id;
+        bool isUnderSanitation = activeTask != null;
+
         var rule = await _context.SanitationRules.AsNoTracking()
             .FirstOrDefaultAsync(r => r.TargetType == request.TargetType && r.TargetId == request.TargetId, cancellationToken);
 
@@ -74,8 +82,15 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
         var lastLog = logDtos.FirstOrDefault();
         var lastWashedByUserName = lastLog?.PerformedByUserName ?? "—";
 
-        string statusText = "🟢 В норме";
-        if (nextWashDueDate.HasValue)
+        lastWashedAt ??= lastLog?.CompletedAt;
+
+        if (!nextWashDueDate.HasValue && rule?.IntervalDays.HasValue == true && lastWashedAt.HasValue)
+        {
+            nextWashDueDate = lastWashedAt.Value.AddDays(rule.IntervalDays.Value);
+        }
+
+        string statusText = isUnderSanitation ? "🧼 В процессе мойки" : "🟢 В норме";
+        if (!isUnderSanitation && nextWashDueDate.HasValue)
         {
             if (nextWashDueDate.Value < DateTime.UtcNow)
                 statusText = "🚨 Просрочено";
@@ -91,10 +106,12 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
             rule?.IntervalDays,
             rule?.MaxBatchCount,
             rule?.RequiredChemicals,
-            lastWashedAt ?? lastLog?.CompletedAt,
+            lastWashedAt,
             lastWashedByUserName,
             nextWashDueDate,
             statusText,
+            activeTaskId,
+            isUnderSanitation,
             logDtos
         );
     }

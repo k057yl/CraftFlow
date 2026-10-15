@@ -25,7 +25,12 @@ public class CreateWarehouseHandler : IRequestHandler<CreateWarehouseCommand, Re
             return Result.Failure<Guid>(ErrorCodes.Auth.UNAUTHORIZED);
         }
 
-        var warehouse = Warehouse.Create(_tenantContext.TenantId, request.Name, request.Address);
+        var warehouse = Warehouse.Create(
+            _tenantContext.TenantId,
+            request.Name,
+            request.Type,
+            request.Address
+        );
 
         _dbContext.Warehouses.Add(warehouse);
         await _dbContext.SaveChangesAsync(cancellationToken);
