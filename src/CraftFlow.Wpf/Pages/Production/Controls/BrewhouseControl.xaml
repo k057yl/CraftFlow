@@ -15,7 +15,7 @@
             </Grid.RowDefinitions>
 
             <!-- ========================================== -->
-            <!-- 1. ЛЕВАЯ ВЕРХНЯЯ СЕКЦИЯ (40%): Параметры запуска варки (В 1 столбец) -->
+            <!-- 1. ЛЕВАЯ ВЕРХНЯЯ СЕКЦИЯ (40%): Параметры запуска варки -->
             <!-- ========================================== -->
             <GroupBox Grid.Row="0" Grid.Column="0" Header="{loc:Loc Key=GROUP_START_BATCH}" Margin="0,0,6,6" Padding="10">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -28,11 +28,19 @@
                         <TextBlock Text="{loc:Loc Key=LABEL_SELECT_RECIPE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                         <ComboBox x:Name="BatchRecipeComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="BatchInputs_Changed"/>
 
-                        <!-- Склад списания -->
+                        <!-- Склад списания сырья -->
                         <TextBlock Text="{loc:Loc Key=LABEL_RAW_WAREHOUSE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                        <ComboBox x:Name="BatchWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="BatchInputs_Changed"/>
+                        <ComboBox x:Name="RawWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="BatchInputs_Changed"/>
 
-                        <!-- Склад зачисления -->
+                        <!-- Варочное помещение / Цех -->
+                        <TextBlock Text="Варочное помещение / Цех:" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                        <ComboBox x:Name="BreweryWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="BreweryWarehouseComboBox_SelectionChanged"/>
+
+                        <!-- Варочная ёмкость / Котел -->
+                        <TextBlock Text="Варочная ёмкость / котел:" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                        <ComboBox x:Name="EquipmentLocationComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8"/>
+
+                        <!-- Склад зачисления готовой продукции -->
                         <TextBlock Text="{loc:Loc Key=LABEL_DEST_WAREHOUSE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                         <ComboBox x:Name="DestinationWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8"/>
 
@@ -139,7 +147,7 @@
             </GroupBox>
 
             <!-- ========================================== -->
-            <!-- 4. ПРАВАЯ НИЖНЯЯ СЕКЦИЯ (60%): Завершение варки + Авто-калькуляция -->
+            <!-- 4. ПРАВАЯ НИЖНЯЯ СЕКЦИЯ (60%): Завершение варки -->
             <!-- ========================================== -->
             <GroupBox Grid.Row="1" Grid.Column="1" Header="{loc:Loc Key=GROUP_COMPLETE_BATCH}" Margin="6,6,0,0" Padding="10">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">

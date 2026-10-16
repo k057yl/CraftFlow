@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CraftFlow.Api.Modules.Catalog.Persistence.Configurations;
+
 public class UnitOfMeasureConfiguration : IEntityTypeConfiguration<UnitOfMeasure>
 {
     public void Configure(EntityTypeBuilder<UnitOfMeasure> builder)
@@ -27,6 +28,9 @@ public class UnitOfMeasureConfiguration : IEntityTypeConfiguration<UnitOfMeasure
         builder.Property(u => u.ConversionFactor)
             .HasPrecision(18, 6)
             .IsRequired();
+
+        builder.HasIndex(u => new { u.TenantId, u.Code })
+            .IsUnique();
 
         builder.HasOne<UnitOfMeasure>()
             .WithMany()

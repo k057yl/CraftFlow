@@ -9,6 +9,7 @@ public record StartProductionBatchCommand(
     Guid WarehouseId,
     Guid DestinationWarehouseId,
     decimal PlannedOutputQuantity,
+    Guid EquipmentLocationId,
     string? Name = null
 ) : IRequest<Result<Guid>>, IRequireQuotaValidation
 {

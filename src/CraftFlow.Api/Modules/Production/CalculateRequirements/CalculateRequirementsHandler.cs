@@ -46,7 +46,11 @@ public class CalculateRequirementsHandler : IRequestHandler<CalculateBatchRequir
         {
             var rawMaterial = rawMaterials.GetValueOrDefault(ingredient.RawMaterialId);
             var matName = rawMaterial?.Name ?? "Raw materials";
-            var requiredQty = Math.Round(ingredient.Quantity * multiplier, 3);
+            decimal conversionFactor = rawMaterial?.UnitOfMeasure?.ConversionFactor ?? 1.0m;
+            if (conversionFactor <= 0m) conversionFactor = 1.0m;
+
+            var requiredInBaseUnits = (ingredient.Quantity * multiplier) * conversionFactor;
+            var requiredQty = Math.Round(requiredInBaseUnits, 4);
             var totalAvailable = stockLots
                 .Where(s => s.ItemId == ingredient.RawMaterialId)
                 .Sum(s => s.Quantity);

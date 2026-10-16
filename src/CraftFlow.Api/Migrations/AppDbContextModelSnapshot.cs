@@ -361,6 +361,9 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasIndex("BaseUnitId");
 
+                    b.HasIndex("TenantId", "Code")
+                        .IsUnique();
+
                     b.ToTable("units_of_measure", "catalog");
                 });
 

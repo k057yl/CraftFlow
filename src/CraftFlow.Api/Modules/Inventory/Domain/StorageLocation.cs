@@ -63,14 +63,26 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
 
     public void AddVolume(decimal volume)
     {
-        if (Status != StorageLocationStatus.AVAILABLE && Status != StorageLocationStatus.OCCUPIED)
+        if (volume > 0 && Status != StorageLocationStatus.AVAILABLE && Status != StorageLocationStatus.OCCUPIED)
+        {
             throw new InvalidOperationException(ErrorCodes.Inventory.LOCATION_NOT_AVAILABLE);
+        }
 
         if (Capacity.HasValue && (CurrentVolume + volume) > Capacity.Value)
+        {
             throw new InvalidOperationException(ErrorCodes.Inventory.CAPACITY_EXCEEDED);
+        }
 
         CurrentVolume += volume;
-        Status = StorageLocationStatus.OCCUPIED;
+
+        if (CurrentVolume > 0)
+        {
+            Status = StorageLocationStatus.OCCUPIED;
+        }
+        else if (CurrentVolume == 0 && Status == StorageLocationStatus.OCCUPIED)
+        {
+            Status = StorageLocationStatus.SANITATION_REQUIRED;
+        }
     }
 
     public void ClearVolume()

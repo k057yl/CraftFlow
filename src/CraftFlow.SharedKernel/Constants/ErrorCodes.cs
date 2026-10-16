@@ -55,6 +55,15 @@ public static class ErrorCodes
         public const string RECIPE_INVALID_AGING_DAYS = "CATALOG.RECIPE_INVALID_AGING_DAYS";
         public const string PRODUCT_NOT_FOUND = "CATALOG.PRODUCT_NOT_FOUND";
         public const string RECIPE_NOT_FOUND = "CATALOG.RECIPE_NOT_FOUND";
+        public const string UOM_INVALID_NAME = "CATALOG.UOM_INVALID_NAME";
+        public const string UOM_INVALID_CODE = "CATALOG.UOM_INVALID_CODE";
+        public const string UOM_INVALID_TYPE = "CATALOG.UOM_INVALID_TYPE";
+        public const string UOM_INVALID_CONVERSION_FACTOR = "CATALOG.UOM_INVALID_CONVERSION_FACTOR";
+        public const string UOM_INVALID_BASE_UNIT_ID = "CATALOG.UOM_INVALID_BASE_UNIT_ID";
+        public const string UOM_BASE_UNIT_FACTOR_MUST_BE_ONE = "CATALOG.UOM_BASE_UNIT_FACTOR_MUST_BE_ONE";
+        public const string UOM_SOURCE_NULL = "CATALOG.UOM_SOURCE_NULL";
+        public const string UOM_TARGET_NULL = "CATALOG.UOM_TARGET_NULL";
+        public const string UOM_TYPE_MISMATCH = "CATALOG.UOM_TYPE_MISMATCH";
     }
 
     public static class Sales

@@ -6,6 +6,7 @@ using CraftFlow.SharedKernel.Dtos.Aging;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.SharedKernel.Dtos.Supplier;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
@@ -168,7 +169,11 @@ public partial class ProcurementPage : Page
         {
             var locations = await ApiService.Instance.GetAsync<List<StorageLocationDto>>($"{InventoryConstants.WAREHOUSES}/locations?warehouseId={warehouseId}");
             AvailableLocations.Clear();
-            locations?.ForEach(l => AvailableLocations.Add(l));
+
+            locations?.Where(l => l.LocationType != StorageLocationType.BREWING_VESSEL
+                               && l.Status == StorageLocationStatus.AVAILABLE)
+                     .ToList()
+                     .ForEach(l => AvailableLocations.Add(l));
         }
         catch { }
     }

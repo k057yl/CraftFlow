@@ -3,6 +3,7 @@ using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.Api.Modules.Production;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Common;
+using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.SharedKernel.Dtos.Production;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.Wpf.Models;
@@ -26,7 +27,11 @@ public partial class BrewhouseControl : UserControl
     private const string DEFAULT_OVERHEAD_PERCENT = "15";
     private const string DEFAULT_UNITS_COUNT = "1";
 
-    public ObservableCollection<LookupItem> Warehouses { get; } = [];
+    public ObservableCollection<LookupItem> RawMaterialWarehouses { get; } = [];
+    public ObservableCollection<LookupItem> BreweryWarehouses { get; } = [];
+    public ObservableCollection<LookupItem> DestinationWarehouses { get; } = [];
+    public ObservableCollection<LookupItem> EquipmentLocations { get; } = [];
+
     public ObservableCollection<LookupItem> Recipes { get; } = [];
     public ObservableCollection<LookupItem> ActiveBatches { get; } = [];
     public ObservableCollection<ActiveBatchWpfModel> ActiveBatchesSummary { get; } = [];
@@ -44,8 +49,11 @@ public partial class BrewhouseControl : UserControl
     {
         InitializeComponent();
 
-        BatchWarehouseComboBox.ItemsSource = Warehouses;
-        DestinationWarehouseComboBox.ItemsSource = Warehouses;
+        RawWarehouseComboBox.ItemsSource = RawMaterialWarehouses;
+        BreweryWarehouseComboBox.ItemsSource = BreweryWarehouses;
+        DestinationWarehouseComboBox.ItemsSource = DestinationWarehouses;
+        EquipmentLocationComboBox.ItemsSource = EquipmentLocations;
+
         BatchRecipeComboBox.ItemsSource = Recipes;
         ActiveBatchComboBox.ItemsSource = ActiveBatches;
         RequirementsListBox.ItemsSource = _requirements;
@@ -81,9 +89,34 @@ public partial class BrewhouseControl : UserControl
         _isInitializing = true;
         try
         {
-            var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(InventoryConstants.WAREHOUSES);
-            Warehouses.Clear();
-            warehouses?.ForEach(w => Warehouses.Add(new LookupItem(w.Id, w.Name)));
+            var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(InventoryConstants.WAREHOUSES) ?? [];
+
+            RawMaterialWarehouses.Clear();
+            BreweryWarehouses.Clear();
+            DestinationWarehouses.Clear();
+
+            foreach (var w in warehouses)
+            {
+                var item = new LookupItem(w.Id, w.Name);
+                if (w.Name.Contains("Варочн", StringComparison.OrdinalIgnoreCase) || w.Name.Contains("Цех", StringComparison.OrdinalIgnoreCase))
+                {
+                    BreweryWarehouses.Add(item);
+                }
+                else
+                {
+                    RawMaterialWarehouses.Add(item);
+                    DestinationWarehouses.Add(item);
+                }
+            }
+
+            if (BreweryWarehouses.Count == 0)
+            {
+                warehouses.ForEach(w => BreweryWarehouses.Add(new LookupItem(w.Id, w.Name)));
+            }
+            if (RawMaterialWarehouses.Count == 0)
+            {
+                warehouses.ForEach(w => RawMaterialWarehouses.Add(new LookupItem(w.Id, w.Name)));
+            }
 
             var recipes = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.RECIPES);
             Recipes.Clear();
@@ -139,11 +172,14 @@ public partial class BrewhouseControl : UserControl
             if (BatchRecipeComboBox.SelectedIndex < 0 && Recipes.Count > 0)
                 BatchRecipeComboBox.SelectedIndex = 0;
 
-            if (BatchWarehouseComboBox.SelectedIndex < 0 && Warehouses.Count > 0)
-                BatchWarehouseComboBox.SelectedIndex = 0;
+            if (RawWarehouseComboBox.SelectedIndex < 0 && RawMaterialWarehouses.Count > 0)
+                RawWarehouseComboBox.SelectedIndex = 0;
 
-            if (DestinationWarehouseComboBox.SelectedIndex < 0 && Warehouses.Count > 0)
-                DestinationWarehouseComboBox.SelectedIndex = Warehouses.Count > 1 ? 1 : 0;
+            if (BreweryWarehouseComboBox.SelectedIndex < 0 && BreweryWarehouses.Count > 0)
+                BreweryWarehouseComboBox.SelectedIndex = 0;
+
+            if (DestinationWarehouseComboBox.SelectedIndex < 0 && DestinationWarehouses.Count > 0)
+                DestinationWarehouseComboBox.SelectedIndex = DestinationWarehouses.Count > 1 ? 1 : 0;
 
             GenerateDefaultBatchName();
 
@@ -158,6 +194,39 @@ public partial class BrewhouseControl : UserControl
             _isInitializing = false;
             BatchInputs_Changed(this, null!);
         }
+    }
+
+    private async void BreweryWarehouseComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (BreweryWarehouseComboBox.SelectedValue is Guid breweryWarehouseId && breweryWarehouseId != Guid.Empty)
+        {
+            await LoadEquipmentLocationsAsync(breweryWarehouseId);
+        }
+        else
+        {
+            EquipmentLocations.Clear();
+        }
+    }
+
+    private async Task LoadEquipmentLocationsAsync(Guid warehouseId)
+    {
+        try
+        {
+            var locations = await ApiService.Instance.GetAsync<List<StorageLocationDto>>($"{InventoryConstants.WAREHOUSES}/locations?warehouseId={warehouseId}");
+            EquipmentLocations.Clear();
+
+            var validLocations = locations?.Where(l => (l.LocationType == StorageLocationType.BREWING_VESSEL || l.LocationType == StorageLocationType.VAT_TANK)
+                                                    && l.Status == StorageLocationStatus.AVAILABLE)
+                                           .ToList();
+
+            validLocations?.ForEach(l => EquipmentLocations.Add(new LookupItem(l.Id, $"{l.Name} (Свободно: {l.FreeCapacityDisplay} {l.UnitOfMeasure ?? "л"})")));
+
+            if (EquipmentLocations.Count > 0)
+            {
+                EquipmentLocationComboBox.SelectedIndex = 0;
+            }
+        }
+        catch { }
     }
 
     private static bool TryParseDecimal(string text, out decimal result)
@@ -186,7 +255,7 @@ public partial class BrewhouseControl : UserControl
         if (_isInitializing || EstimatedCostTextBlock == null || RequirementsListBox == null) return;
 
         if (BatchRecipeComboBox?.SelectedValue is not Guid recipeId || recipeId == Guid.Empty ||
-            BatchWarehouseComboBox?.SelectedValue is not Guid warehouseId || warehouseId == Guid.Empty ||
+            RawWarehouseComboBox?.SelectedValue is not Guid warehouseId || warehouseId == Guid.Empty ||
             !TryParseDecimal(BatchQuantityTextBox?.Text ?? string.Empty, out var plannedQty) || plannedQty <= 0)
         {
             _requirements.Clear();
@@ -215,8 +284,9 @@ public partial class BrewhouseControl : UserControl
     private async void StartBatch_Click(object sender, RoutedEventArgs e)
     {
         if (BatchRecipeComboBox.SelectedValue is not Guid recipeId ||
-            BatchWarehouseComboBox.SelectedValue is not Guid rawWarehouseId ||
+            RawWarehouseComboBox.SelectedValue is not Guid rawWarehouseId ||
             DestinationWarehouseComboBox.SelectedValue is not Guid destWarehouseId ||
+            EquipmentLocationComboBox.SelectedValue is not Guid equipmentLocationId ||
             !TryParseDecimal(BatchQuantityTextBox.Text, out var plannedQuantity))
         {
             SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
@@ -230,6 +300,7 @@ public partial class BrewhouseControl : UserControl
             RecipeId = recipeId,
             WarehouseId = rawWarehouseId,
             DestinationWarehouseId = destWarehouseId,
+            EquipmentLocationId = equipmentLocationId,
             PlannedOutputQuantity = plannedQuantity,
             Name = string.IsNullOrWhiteSpace(customName) ? null : customName
         });
@@ -388,7 +459,7 @@ public partial class BrewhouseControl : UserControl
     private async void CalculateMaxQuantity_Click(object sender, RoutedEventArgs e)
     {
         if (BatchRecipeComboBox.SelectedValue is not Guid recipeId ||
-            BatchWarehouseComboBox.SelectedValue is not Guid warehouseId)
+            RawWarehouseComboBox.SelectedValue is not Guid warehouseId)
         {
             SetStatus("UI_INVALID_INPUT_FIELDS", Brushes.Red);
             return;

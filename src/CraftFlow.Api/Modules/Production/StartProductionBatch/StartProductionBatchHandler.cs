@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +19,19 @@ public class StartProductionBatchHandler : IRequestHandler<StartProductionBatchC
 
     public async Task<Result<Guid>> Handle(StartProductionBatchCommand request, CancellationToken cancellationToken)
     {
+        var equipmentLocation = await _dbContext.StorageLocations
+            .FirstOrDefaultAsync(l => l.Id == request.EquipmentLocationId, cancellationToken);
+
+        if (equipmentLocation == null)
+        {
+            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Inventory.LOCATION_NOT_FOUND));
+        }
+
+        if (equipmentLocation.Status != StorageLocationStatus.AVAILABLE)
+        {
+            return Result.Failure<Guid>(Error.Validation(ErrorCodes.Inventory.LOCATION_NOT_AVAILABLE));
+        }
+
         var recipe = await _dbContext.Recipes
             .Include(r => r.Ingredients)
             .FirstAsync(r => r.Id == request.RecipeId, cancellationToken);
@@ -97,6 +111,9 @@ public class StartProductionBatchHandler : IRequestHandler<StartProductionBatchC
         );
 
         batch.Start();
+
+        equipmentLocation.AddVolume(request.PlannedOutputQuantity);
+
         _dbContext.ProductionBatches.Add(batch);
 
         foreach (var consumed in consumedIngredientsToSave)

@@ -21,6 +21,10 @@ public record StorageLocationDto(
     string? UnitOfMeasure = null
 )
 {
+    public StorageLocationStatus Status => Enum.TryParse<StorageLocationStatus>(MaintenanceStatus, true, out var parsedStatus)
+        ? parsedStatus
+        : StorageLocationStatus.AVAILABLE;
+
     public decimal FreeCapacity => Capacity.HasValue
         ? Math.Max(0m, Capacity.Value - CurrentVolume)
         : decimal.MaxValue;

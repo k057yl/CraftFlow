@@ -15,7 +15,10 @@ namespace CraftFlow.Wpf.Pages.Production;
 
 public partial class ProductionPage : Page
 {
-    public ObservableCollection<LookupItem> Warehouses => BrewhouseView.Warehouses;
+    public ObservableCollection<LookupItem> RawMaterialWarehouses => BrewhouseView.RawMaterialWarehouses;
+    public ObservableCollection<LookupItem> BreweryWarehouses => BrewhouseView.BreweryWarehouses;
+    public ObservableCollection<LookupItem> DestinationWarehouses => BrewhouseView.DestinationWarehouses;
+
     public ObservableCollection<LookupItem> Recipes => BrewhouseView.Recipes;
     public ObservableCollection<LookupItem> ActiveBatches => BrewhouseView.ActiveBatches;
     public ObservableCollection<ActiveBatchWpfModel> ActiveBatchesSummary => BrewhouseView.ActiveBatchesSummary;
@@ -39,7 +42,7 @@ public partial class ProductionPage : Page
         AgingView.ParentPage = this;
         DiscardView.ParentPage = this;
 
-        AgingView.Warehouses = Warehouses;
+        AgingView.Warehouses = DestinationWarehouses;
         AgingView.CompletedBatches = CompletedBatches;
         AgingView.AgingChambers = AgingChambers;
         AgingView.ActiveAgingLots = ActiveAgingLots;
