@@ -36,9 +36,23 @@
                         <TextBlock Text="Варочное помещение / Цех:" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                         <ComboBox x:Name="BreweryWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="BreweryWarehouseComboBox_SelectionChanged"/>
 
-                        <!-- Варочная ёмкость / Котел -->
+                        <!-- Варочная ёмкость / Котел + КНОПКА БЫСТРОГО СОЗДАНИЯ -->
                         <TextBlock Text="Варочная ёмкость / котел:" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                        <ComboBox x:Name="EquipmentLocationComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8"/>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ComboBox x:Name="EquipmentLocationComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26"/>
+                            <Button Grid.Column="1" 
+                                    Content="+" 
+                                    Click="QuickCreateEquipment_Click" 
+                                    Style="{StaticResource PrimaryButtonStyle}" 
+                                    Width="26" 
+                                    Height="26" 
+                                    Margin="4,0,0,0" 
+                                    ToolTip="Быстро добавить емкость/котел"/>
+                        </Grid>
 
                         <!-- Склад зачисления готовой продукции -->
                         <TextBlock Text="{loc:Loc Key=LABEL_DEST_WAREHOUSE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
@@ -122,7 +136,8 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <ListBox Grid.Row="0" x:Name="RequirementsListBox" DisplayMemberPath="DisplayInfo" BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}" Background="Transparent"/>
+                    <!-- ИСПРАВЛЕНО: DisplayMemberPath="FormattedInfo" вместо системного DisplayInfo -->
+                    <ListBox Grid.Row="0" x:Name="RequirementsListBox" DisplayMemberPath="FormattedInfo" BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}" Background="Transparent"/>
 
                     <Grid Grid.Row="1" Margin="0,8,0,0">
                         <Grid.RowDefinitions>

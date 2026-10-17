@@ -6,6 +6,7 @@ using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace CraftFlow.Api.Modules.Identity.CreateTenantUser;
 
@@ -13,11 +14,16 @@ public class CreateTenantUserHandler : IRequestHandler<CreateTenantUserCommand, 
 {
     private readonly AppDbContext _dbContext;
     private readonly ITenantContext _tenantContext;
+    private readonly IMemoryCache _cache;
 
-    public CreateTenantUserHandler(AppDbContext dbContext, ITenantContext tenantContext)
+    public CreateTenantUserHandler(
+        AppDbContext dbContext,
+        ITenantContext tenantContext,
+        IMemoryCache cache)
     {
         _dbContext = dbContext;
         _tenantContext = tenantContext;
+        _cache = cache;
     }
 
     public async Task<Result<Guid>> Handle(CreateTenantUserCommand request, CancellationToken cancellationToken)
@@ -47,12 +53,15 @@ public class CreateTenantUserHandler : IRequestHandler<CreateTenantUserCommand, 
 
         if (organization == null)
         {
-            return Result.Failure<Guid>(Error.NotFound("ORGANIZATION_NOT_FOUND"));
+            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
         }
 
         var member = organization.AddMember(user.Id, request.Role);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var cacheKey = $"quota:count:{nameof(OrganizationMember)}:{_tenantContext.TenantId}";
+        _cache.Remove(cacheKey);
 
         return Result.Success(member.Id);
     }

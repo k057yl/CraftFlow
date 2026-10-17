@@ -8,6 +8,7 @@ using CraftFlow.SharedKernel.Dtos.Production;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
+using CraftFlow.Wpf.Windows;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
@@ -36,7 +37,20 @@ public partial class BrewhouseControl : UserControl
     public ObservableCollection<LookupItem> ActiveBatches { get; } = [];
     public ObservableCollection<ActiveBatchWpfModel> ActiveBatchesSummary { get; } = [];
 
-    private readonly ObservableCollection<RequirementCalculationDto> _requirements = [];
+    // Вспомогательная модель для корректного вывода без фальшивых нулей
+    public class RequirementItemUiModel
+    {
+        public string MaterialName { get; set; } = string.Empty;
+        public decimal RequiredQty { get; set; }
+        public decimal AvailableQty { get; set; }
+        public bool IsSufficient { get; set; }
+
+        public string FormattedInfo =>
+            $"{MaterialName}: Нужно {RequiredQty:0.####} | Доступно {AvailableQty:0.####} {(IsSufficient ? "✔" : "❌")}";
+    }
+
+    private readonly ObservableCollection<RequirementItemUiModel> _uiRequirements = [];
+    private readonly List<RequirementCalculationDto> _rawRequirements = [];
     private readonly DispatcherTimer _uiTimer = new();
 
     private decimal _currentRawCost = 0m;
@@ -56,7 +70,7 @@ public partial class BrewhouseControl : UserControl
 
         BatchRecipeComboBox.ItemsSource = Recipes;
         ActiveBatchComboBox.ItemsSource = ActiveBatches;
-        RequirementsListBox.ItemsSource = _requirements;
+        RequirementsListBox.ItemsSource = _uiRequirements;
         ActiveBatchesDataGrid.ItemsSource = ActiveBatchesSummary;
 
         _uiTimer.Interval = TimeSpan.FromSeconds(1);
@@ -229,6 +243,21 @@ public partial class BrewhouseControl : UserControl
         catch { }
     }
 
+    private async void QuickCreateEquipment_Click(object sender, RoutedEventArgs e)
+    {
+        Guid? currentWarehouseId = BreweryWarehouseComboBox.SelectedValue as Guid?;
+
+        var dialog = new CreateStorageLocationWindow(currentWarehouseId)
+        {
+            Owner = Window.GetWindow(this)
+        };
+
+        if (dialog.ShowDialog() == true && currentWarehouseId.HasValue && currentWarehouseId != Guid.Empty)
+        {
+            await LoadEquipmentLocationsAsync(currentWarehouseId.Value);
+        }
+    }
+
     private static bool TryParseDecimal(string text, out decimal result)
     {
         if (string.IsNullOrWhiteSpace(text))
@@ -258,7 +287,8 @@ public partial class BrewhouseControl : UserControl
             RawWarehouseComboBox?.SelectedValue is not Guid warehouseId || warehouseId == Guid.Empty ||
             !TryParseDecimal(BatchQuantityTextBox?.Text ?? string.Empty, out var plannedQty) || plannedQty <= 0)
         {
-            _requirements.Clear();
+            _uiRequirements.Clear();
+            _rawRequirements.Clear();
             EstimatedCostTextBlock.Text = "$ 0.00";
             return;
         }
@@ -270,8 +300,23 @@ public partial class BrewhouseControl : UserControl
             var calc = await ApiService.Instance.GetAsync<List<RequirementCalculationDto>>(
                 $"{ProductionConstants.CALCULATE_REQUIREMENTS}?recipeId={recipeId}&warehouseId={warehouseId}&plannedQty={qtyStr}");
 
-            _requirements.Clear();
-            calc?.ForEach(_requirements.Add);
+            _uiRequirements.Clear();
+            _rawRequirements.Clear();
+
+            if (calc != null)
+            {
+                foreach (var req in calc)
+                {
+                    _rawRequirements.Add(req);
+                    _uiRequirements.Add(new RequirementItemUiModel
+                    {
+                        MaterialName = req.MaterialName,
+                        RequiredQty = req.RequiredQty,
+                        AvailableQty = req.AvailableQty,
+                        IsSufficient = req.IsSufficient
+                    });
+                }
+            }
 
             var estimatedCost = await ApiService.Instance.GetAsync<decimal>(
                 $"{ProductionConstants.ESTIMATE_COST}?recipeId={recipeId}&plannedQty={qtyStr}");
@@ -493,7 +538,7 @@ public partial class BrewhouseControl : UserControl
 
     private void PrintRecipeCard_Click(object sender, RoutedEventArgs e)
     {
-        if (_requirements.Count == 0)
+        if (_uiRequirements.Count == 0)
         {
             SetStatus("GENERAL_NOT_FOUND", Brushes.Red);
             return;
@@ -527,11 +572,11 @@ public partial class BrewhouseControl : UserControl
             });
 
             var list = new List();
-            foreach (var req in _requirements)
+            foreach (var req in _uiRequirements)
             {
                 list.ListItems.Add(new ListItem(
                     new Paragraph(
-                        new Run($"{req.MaterialName}: {req.RequiredQty:F3} ({LocalizationService.Get("AVAILABLE_STOCK")} {req.AvailableQty:F3})"))
+                        new Run($"{req.MaterialName}: {req.RequiredQty:0.####} ({LocalizationService.Get("AVAILABLE_STOCK")} {req.AvailableQty:0.####})"))
                     { FontSize = 14 }));
             }
 

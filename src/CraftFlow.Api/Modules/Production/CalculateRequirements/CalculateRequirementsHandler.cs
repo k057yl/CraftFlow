@@ -20,6 +20,8 @@ public class CalculateRequirementsHandler : IRequestHandler<CalculateBatchRequir
         var recipe = await _dbContext.Recipes
             .AsNoTracking()
             .Include(r => r.Ingredients)
+                .ThenInclude(i => i.RawMaterial)
+                    .ThenInclude(rm => rm.UnitOfMeasure)
             .FirstOrDefaultAsync(r => r.Id == request.RecipeId, cancellationToken);
 
         if (recipe == null || recipe.TargetOutputQuantity <= 0 || recipe.Ingredients == null || !recipe.Ingredients.Any())
@@ -28,11 +30,6 @@ public class CalculateRequirementsHandler : IRequestHandler<CalculateBatchRequir
         }
 
         var rawMaterialIds = recipe.Ingredients.Select(i => i.RawMaterialId).ToList();
-        var rawMaterials = await _dbContext.RawMaterials
-            .AsNoTracking()
-            .Include(rm => rm.UnitOfMeasure)
-            .Where(rm => rawMaterialIds.Contains(rm.Id))
-            .ToDictionaryAsync(rm => rm.Id, cancellationToken);
 
         var stockLots = await _dbContext.StockLots
             .AsNoTracking()
@@ -44,19 +41,21 @@ public class CalculateRequirementsHandler : IRequestHandler<CalculateBatchRequir
 
         foreach (var ingredient in recipe.Ingredients)
         {
-            var rawMaterial = rawMaterials.GetValueOrDefault(ingredient.RawMaterialId);
+            var rawMaterial = ingredient.RawMaterial;
             var matName = rawMaterial?.Name ?? "Raw materials";
+
             decimal conversionFactor = rawMaterial?.UnitOfMeasure?.ConversionFactor ?? 1.0m;
             if (conversionFactor <= 0m) conversionFactor = 1.0m;
 
-            var requiredInBaseUnits = (ingredient.Quantity * multiplier) * conversionFactor;
-            var requiredQty = Math.Round(requiredInBaseUnits, 4);
-            var totalAvailable = stockLots
+            decimal requiredInBaseUnits = ingredient.Quantity * multiplier * conversionFactor;
+            decimal requiredQty = Math.Round(requiredInBaseUnits, 4);
+
+            decimal totalAvailable = stockLots
                 .Where(s => s.ItemId == ingredient.RawMaterialId)
                 .Sum(s => s.Quantity);
 
-            var roundedAvailable = Math.Round(totalAvailable, 3);
-            var isSufficient = totalAvailable >= requiredQty;
+            decimal roundedAvailable = Math.Round(totalAvailable, 4);
+            bool isSufficient = totalAvailable >= requiredQty;
 
             items.Add(new RequirementItemDto(matName, requiredQty, roundedAvailable, isSufficient));
         }

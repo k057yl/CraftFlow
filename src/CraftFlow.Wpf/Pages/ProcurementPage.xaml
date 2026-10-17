@@ -58,12 +58,18 @@
                                 </StackPanel>
                             </Grid>
 
-                            <!-- 2. КНОПКА СОЗДАНИЯ ЕМКОСТЕЙ -->
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                                <Button Content="{loc:Loc Key=BTN_QUICK_NEW_LOCATION}" Click="QuickCreateLocation_Click" Style="{StaticResource PrimaryButtonStyle}" Height="26" Padding="12,0" FontSize="11"/>
-                            </StackPanel>
+                            <!-- 2. КНОПКА СОЗДАНИЯ ЕМКОСТЕЙ (ЧЕТКО ВЫДЕЛЕННАЯ) -->
+                            <DockPanel Margin="0,4,0,8">
+                                <Button Content="{loc:Loc Key=BTN_QUICK_NEW_LOCATION}" 
+                                        Click="QuickCreateLocation_Click" 
+                                        Style="{StaticResource PrimaryButtonStyle}" 
+                                        Height="28" 
+                                        Padding="14,0" 
+                                        FontSize="11"
+                                        HorizontalAlignment="Left"/>
+                            </DockPanel>
 
-                            <!-- 3. ЦЕНТРАЛЬНЫЕ БЛОКИ (ЕМКОСТИ) -->
+                            <!-- 3. ЦЕНТРАЛЬНЫЕ БЛОКИ (ЕМКОСТЕЙ) -->
                             <Grid Margin="0,0,0,12">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -73,7 +79,7 @@
                                 <!-- Доступные емкости -->
                                 <StackPanel Grid.Column="0" Margin="0,0,6,0">
                                     <TextBlock Text="{loc:Loc Key=LABEL_AVAILABLE_CONTAINERS_HINT}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
-                                    <ListBox x:Name="AvailableLocationsListBox" Height="95" Background="{DynamicResource AppBackgroundBrush}">
+                                    <ListBox x:Name="AvailableLocationsListBox" Height="100" Background="{DynamicResource AppBackgroundBrush}">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="2">
@@ -101,7 +107,7 @@
                                 <!-- Выбранные емкости -->
                                 <StackPanel Grid.Column="1" Margin="6,0,0,0">
                                     <TextBlock Text="{loc:Loc Key=LABEL_SELECTED_CONTAINERS_HINT}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
-                                    <ListBox x:Name="SelectedLocationsListBox" Height="95" Background="{DynamicResource AppBackgroundBrush}">
+                                    <ListBox x:Name="SelectedLocationsListBox" Height="100" Background="{DynamicResource AppBackgroundBrush}">
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
                                                 <Grid Margin="2">
@@ -206,7 +212,8 @@
                                     <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding WarehouseName}" Width="110"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=LABEL_STORAGE_CONTAINERS}" Binding="{Binding StorageLocationsInfo}" Width="*"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=LABEL_SELECT_SUPPLIER}" Binding="{Binding SupplierName}" Width="120"/>
-                                    <DataGridTextColumn Header="{loc:Loc Key=LABEL_REMAINING_STOCK}" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="85"/>
+                                    <!-- ИСПРАВЛЕНО: {0:0.####} вместо {0:N2} чтобы граммы не превращались в 0.00 -->
+                                    <DataGridTextColumn Header="{loc:Loc Key=LABEL_REMAINING_STOCK}" Binding="{Binding Quantity, StringFormat={}{0:0.####}}" Width="100"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=UNIT_PRICE}" Binding="{Binding UnitPrice, StringFormat={}{0:C2}}" Width="85"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=BATCH_NUMBER}" Binding="{Binding BatchNumber}" Width="110"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=LABEL_EXPIRATION_DATE}" Binding="{Binding ExpirationDate, StringFormat={}{0:dd.MM.yyyy}}" Width="100"/>
@@ -230,7 +237,7 @@
                                 <DataGridTextColumn Header="{loc:Loc Key=LABEL_RAW_MATERIAL}" Binding="{Binding ItemName}" Width="150"/>
                                 <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding WarehouseName}" Width="120"/>
                                 <DataGridTextColumn Header="{loc:Loc Key=LABEL_STORAGE_CONTAINERS}" Binding="{Binding StorageLocationsInfo}" Width="*"/>
-                                <DataGridTextColumn Header="{loc:Loc Key=LABEL_REMAINING_STOCK}" Binding="{Binding Quantity, StringFormat={}{0:N2}}" Width="120"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=LABEL_REMAINING_STOCK}" Binding="{Binding Quantity, StringFormat={}{0:0.####}}" Width="100"/>
                                 <DataGridTextColumn Header="{loc:Loc Key=BATCH_NUMBER}" Binding="{Binding BatchNumber}" Width="130"/>
                                 <DataGridTemplateColumn Header="{loc:Loc Key=LABEL_ACTION}" Width="120">
                                     <DataGridTemplateColumn.CellTemplate>

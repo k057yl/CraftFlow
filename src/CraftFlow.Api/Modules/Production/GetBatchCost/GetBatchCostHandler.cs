@@ -52,7 +52,7 @@ public class GetBatchCostHandler : IRequestHandler<GetBatchCostQuery, Result<Bat
 
             if (lot != null)
             {
-                totalRawMaterialCost += consumed.Quantity * lot.UnitPrice;
+                totalRawMaterialCost += Math.Round(consumed.Quantity * lot.UnitPrice, 4);
             }
         }
 
