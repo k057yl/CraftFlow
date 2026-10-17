@@ -10,7 +10,7 @@ using CraftFlow.Api.Infrastructure.BackgroundServices.Cleanup;
 using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.Api.Modules.Aging.AgingProcess.GetActiveAgingLots;
 using CraftFlow.Api.Modules.Aging.AgingProcess.GetAgingLotDetails;
-using CraftFlow.Api.Modules.Production.GetActiveBatchesSummary;
+using CraftFlow.Api.Modules.Production.Batches.GetActiveBatchesSummary;
 using CraftFlow.Api.Modules.Traceability.TraceabilityRead;
 using CraftFlow.SharedKernel.Constants;
 using FluentValidation;

@@ -1,0 +1,12 @@
+﻿using CraftFlow.SharedKernel.Dtos.Identity;
+using CraftFlow.SharedKernel.Result;
+using CraftFlow.SharedKernel.Security;
+using MediatR;
+
+namespace CraftFlow.Api.Modules.Identity.Auth.VerifyOtp;
+
+public record VerifyOtpCommand(
+    string Email,
+    [property: SkipSanitization] string OtpCode,
+    bool RememberMe = false
+) : IRequest<Result<LoginResponseDto>>;

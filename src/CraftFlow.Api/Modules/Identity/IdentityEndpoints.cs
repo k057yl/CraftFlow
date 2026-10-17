@@ -1,16 +1,15 @@
-﻿using CraftFlow.Api.Modules.Identity.CreateTenantUser;
-using CraftFlow.Api.Modules.Identity.DeleteAccount;
-using CraftFlow.Api.Modules.Identity.ExtendSubscription;
-using CraftFlow.Api.Modules.Identity.GetOrganizations;
-using CraftFlow.Api.Modules.Identity.GetSubscriptionPayments;
-using CraftFlow.Api.Modules.Identity.GetTenantUsers;
-using CraftFlow.Api.Modules.Identity.LoginUser;
-using CraftFlow.Api.Modules.Identity.ManageSubscription;
-using CraftFlow.Api.Modules.Identity.RegisterOrganization;
-using CraftFlow.Api.Modules.Identity.ResendOtp;
-using CraftFlow.Api.Modules.Identity.ToggleOrganizationStatus;
-using CraftFlow.Api.Modules.Identity.ToggleUserStatus;
-using CraftFlow.Api.Modules.Identity.VerifyOtp;
+﻿using CraftFlow.Api.Modules.Identity.Auth.LoginUser;
+using CraftFlow.Api.Modules.Identity.Auth.VerifyOtp;
+using CraftFlow.Api.Modules.Identity.Organizations.GetOrganizations;
+using CraftFlow.Api.Modules.Identity.Organizations.RegisterOrganization;
+using CraftFlow.Api.Modules.Identity.Organizations.ToggleOrganizationStatus;
+using CraftFlow.Api.Modules.Identity.Subscriptions.ExtendSubscription;
+using CraftFlow.Api.Modules.Identity.Subscriptions.GetSubscriptionPayments;
+using CraftFlow.Api.Modules.Identity.Subscriptions.ManageSubscription;
+using CraftFlow.Api.Modules.Identity.Users.CreateTenantUser;
+using CraftFlow.Api.Modules.Identity.Users.DeleteAccount;
+using CraftFlow.Api.Modules.Identity.Users.GetTenantUsers;
+using CraftFlow.Api.Modules.Identity.Users.ToggleUserStatus;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Identity;
@@ -52,7 +51,7 @@ public static class IdentityEndpoints
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost(IdentityConstants.RESEND_OTP, async (ResendOtp.ResendOtp command, ISender sender) =>
+        group.MapPost(IdentityConstants.RESEND_OTP, async (Auth.ResendOtp.ResendOtp command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);

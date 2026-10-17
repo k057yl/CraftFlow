@@ -1,0 +1,8 @@
+﻿using CraftFlow.SharedKernel.Dtos.Sale;
+using CraftFlow.SharedKernel.Result;
+using MediatR;
+
+namespace CraftFlow.Api.Modules.Sales.Customers.GetCustomers
+{
+    public record GetCustomersQuery : IRequest<Result<List<CustomerDto>>>;
+}

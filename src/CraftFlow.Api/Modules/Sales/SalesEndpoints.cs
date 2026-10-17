@@ -1,8 +1,8 @@
-﻿using CraftFlow.Api.Modules.Sales.CreateAndShipSalesOrder;
-using CraftFlow.Api.Modules.Sales.CreateCustomer;
-using CraftFlow.Api.Modules.Sales.GetCustomers;
-using CraftFlow.Api.Modules.Sales.GetSalesStockInfo;
-using CraftFlow.Api.Modules.Sales.GetStockLotDetails;
+﻿using CraftFlow.Api.Modules.Sales.Customers.CreateCustomer;
+using CraftFlow.Api.Modules.Sales.Customers.GetCustomers;
+using CraftFlow.Api.Modules.Sales.Orders.CreateAndShipSalesOrder;
+using CraftFlow.Api.Modules.Sales.Stock.GetSalesStockInfo;
+using CraftFlow.Api.Modules.Sales.Stock.GetStockLotDetails;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Sales;
