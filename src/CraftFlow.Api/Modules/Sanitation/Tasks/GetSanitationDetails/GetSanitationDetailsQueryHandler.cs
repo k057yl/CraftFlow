@@ -80,7 +80,28 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
         )).ToList();
 
         var lastLog = logDtos.FirstOrDefault();
-        var lastWashedByUserName = lastLog?.PerformedByUserName ?? "—";
+        string lastWashedByUserName = lastLog?.PerformedByUserName ?? "—";
+
+        if (lastWashedByUserName == "—")
+        {
+            var lastCompletedTask = await _context.SanitationTasks.AsNoTracking()
+                .Where(t => t.TargetType == request.TargetType && t.TargetId == request.TargetId && (t.Status == SanitationTaskStatus.Completed || t.Status == SanitationTaskStatus.Verified))
+                .OrderByDescending(t => t.CompletedAt)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (lastCompletedTask?.PerformedByUserId != null)
+            {
+                var userName = await _context.Users.AsNoTracking()
+                    .Where(u => u.Id == lastCompletedTask.PerformedByUserId.Value)
+                    .Select(u => u.FullName)
+                    .FirstOrDefaultAsync(cancellationToken);
+
+                if (!string.IsNullOrEmpty(userName))
+                {
+                    lastWashedByUserName = userName;
+                }
+            }
+        }
 
         lastWashedAt ??= lastLog?.CompletedAt;
 
