@@ -23,6 +23,7 @@ public static class DbIndexes
     public static class Inventory
     {
         public const string IX_STOCK_LOTS_LOOKUP = "IX_STOCK_LOTS_LOOKUP";
+        public const string IX_STORAGE_LOCATIONS_TENANT_WAREHOUSE = "IX_STORAGE_LOCATIONS_TENANT_WAREHOUSE";
     }
     
     public static class Aging

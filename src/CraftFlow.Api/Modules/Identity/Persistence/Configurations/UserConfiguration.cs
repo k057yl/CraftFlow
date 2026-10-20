@@ -28,7 +28,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Status)
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(UserStatus.Active);
+            .HasDefaultValue(UserStatus.ACTIVE);
 
         builder.Property(u => u.OtpCodeHash)
             .HasMaxLength(100);

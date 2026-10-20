@@ -22,7 +22,7 @@ public sealed class GetAuditLogsQueryHandler : IRequestHandler<GetAuditLogsQuery
 
     public async Task<Result<List<AuditLogDto>>> Handle(GetAuditLogsQuery request, CancellationToken cancellationToken)
     {
-        if (_tenantContext.Role != TenantRole.Owner && !_tenantContext.IsSuperAdmin)
+        if (_tenantContext.Role != TenantRole.OWNER && !_tenantContext.IsSuperAdmin)
         {
             return Result.Failure<List<AuditLogDto>>(Error.Validation(ErrorCodes.Auth.ACCESS_DENIED));
         }

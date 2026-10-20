@@ -1,3 +1,5 @@
-﻿namespace CraftFlow.SharedKernel.Dtos.Inventory;
+﻿using CraftFlow.SharedKernel.Enums.Inventory;
 
-public record WarehouseDto(Guid Id, string Name, string? Address);
+namespace CraftFlow.SharedKernel.Dtos.Inventory;
+
+public record WarehouseDto(Guid Id, string Name, string? Address, WarehouseType Type);

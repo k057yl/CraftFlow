@@ -2,15 +2,15 @@
 
 public enum AgingState
 {
-    InChamber = 1,
-    ReadyForRelease = 2,
-    Released = 3,
-    Discarded = 4
+    IN_CHAMBER = 1,
+    READY_FOR_RELEASE = 2,
+    RELEASED = 3,
+    DISCARDED = 4
 }
 
 public enum AgingTrigger
 {
-    MarkReadyForRelease,
-    Release,
-    Discard
+    MARK_READY_FOR_RELEASE,
+    RELEASE,
+    DISCARD
 }

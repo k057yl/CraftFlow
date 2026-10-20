@@ -17,4 +17,9 @@ public sealed class StockLotStorageLocation
             AllocatedQuantity = allocatedQuantity
         };
     }
+
+    public void UpdateQuantity(decimal allocatedQuantity)
+    {
+        AllocatedQuantity = allocatedQuantity;
+    }
 }

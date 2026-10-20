@@ -28,7 +28,7 @@ public class CreateTenantUserHandler : IRequestHandler<CreateTenantUserCommand, 
 
     public async Task<Result<Guid>> Handle(CreateTenantUserCommand request, CancellationToken cancellationToken)
     {
-        if (_tenantContext.Role != TenantRole.Owner && !_tenantContext.IsSuperAdmin)
+        if (_tenantContext.Role != TenantRole.OWNER && !_tenantContext.IsSuperAdmin)
         {
             return Result.Failure<Guid>(Error.Validation(ErrorCodes.Auth.ACCESS_DENIED));
         }

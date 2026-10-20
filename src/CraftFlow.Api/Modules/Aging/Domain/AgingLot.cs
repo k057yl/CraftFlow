@@ -19,9 +19,9 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
 
     public IReadOnlyCollection<AgingLotItem> Items => _items.AsReadOnly();
 
-    public int UnitsCount => _items.Count(i => i.State == AgingItemState.InChamber);
+    public int UnitsCount => _items.Count(i => i.State == AgingItemState.IN_CHAMBER);
     public decimal InitialQuantity { get; private set; }
-    public decimal CurrentQuantity => _items.Where(i => i.State == AgingItemState.InChamber).Sum(i => i.CurrentWeight);
+    public decimal CurrentQuantity => _items.Where(i => i.State == AgingItemState.IN_CHAMBER).Sum(i => i.CurrentWeight);
 
     public AgingState State { get; private set; }
 
@@ -55,7 +55,7 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
             StorageLocationId = storageLocationId,
             BatchNumber = batchNumber,
             InitialQuantity = initialQuantity,
-            State = AgingState.InChamber,
+            State = AgingState.IN_CHAMBER,
             PlacedAt = now,
             TargetReleaseDate = now.AddDays(minAgingDays)
         };
@@ -84,10 +84,10 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
     {
         EnsureMachine();
 
-        if (_stateMachine!.State != AgingState.InChamber && _stateMachine!.State != AgingState.ReadyForRelease)
+        if (_stateMachine!.State != AgingState.IN_CHAMBER && _stateMachine!.State != AgingState.READY_FOR_RELEASE)
             throw new InvalidOperationException(ErrorCodes.Aging.INVALID_LOT_STATE);
 
-        var activeItems = _items.Where(i => i.State == AgingItemState.InChamber).ToList();
+        var activeItems = _items.Where(i => i.State == AgingItemState.IN_CHAMBER).ToList();
 
         if (activeItems.Count == 0)
             return;
@@ -100,7 +100,7 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
                 item.Discard(reason);
             }
 
-            activeItems = _items.Where(i => i.State == AgingItemState.InChamber).ToList();
+            activeItems = _items.Where(i => i.State == AgingItemState.IN_CHAMBER).ToList();
         }
 
         if (quantity > 0 && unitsToRemove == 0 && activeItems.Count > 0)
@@ -112,10 +112,10 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
             }
         }
 
-        if (_items.Count > 0 && _items.All(i => i.State == AgingItemState.Discarded))
+        if (_items.Count > 0 && _items.All(i => i.State == AgingItemState.DISCARDED))
         {
             ActualReleaseDate = DateTime.UtcNow;
-            _stateMachine!.Fire(AgingTrigger.Discard);
+            _stateMachine!.Fire(AgingTrigger.DISCARD);
         }
     }
 
@@ -123,12 +123,12 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
     {
         EnsureMachine();
 
-        if (_stateMachine!.State != AgingState.InChamber && _stateMachine!.State != AgingState.ReadyForRelease)
+        if (_stateMachine!.State != AgingState.IN_CHAMBER && _stateMachine!.State != AgingState.READY_FOR_RELEASE)
             throw new InvalidOperationException(ErrorCodes.Aging.INVALID_LOT_STATE);
 
         var targetIds = itemIds.ToHashSet();
         var itemsToDiscard = _items
-            .Where(i => targetIds.Contains(i.Id) && i.State == AgingItemState.InChamber)
+            .Where(i => targetIds.Contains(i.Id) && i.State == AgingItemState.IN_CHAMBER)
             .ToList();
 
         foreach (var item in itemsToDiscard)
@@ -136,10 +136,10 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
             item.Discard(reason);
         }
 
-        if (_items.Count > 0 && _items.All(i => i.State == AgingItemState.Discarded))
+        if (_items.Count > 0 && _items.All(i => i.State == AgingItemState.DISCARDED))
         {
             ActualReleaseDate = DateTime.UtcNow;
-            _stateMachine!.Fire(AgingTrigger.Discard);
+            _stateMachine!.Fire(AgingTrigger.DISCARD);
         }
     }
 
@@ -147,7 +147,7 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
     {
         EnsureMachine();
 
-        if (_stateMachine!.State != AgingState.InChamber && _stateMachine!.State != AgingState.ReadyForRelease)
+        if (_stateMachine!.State != AgingState.IN_CHAMBER && _stateMachine!.State != AgingState.READY_FOR_RELEASE)
             throw new InvalidOperationException(ErrorCodes.Aging.INVALID_LOT_STATE);
 
         if (actualQuantity <= 0 || actualUnitsCount <= 0)
@@ -163,33 +163,33 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
     {
         EnsureMachine();
 
-        foreach (var item in _items.Where(i => i.State == AgingItemState.InChamber))
+        foreach (var item in _items.Where(i => i.State == AgingItemState.IN_CHAMBER))
         {
             item.Release();
         }
 
         ActualReleaseDate = DateTime.UtcNow;
-        _stateMachine!.Fire(AgingTrigger.Release);
+        _stateMachine!.Fire(AgingTrigger.RELEASE);
     }
 
     public void Discard()
     {
         EnsureMachine();
 
-        foreach (var item in _items.Where(i => i.State == AgingItemState.InChamber))
+        foreach (var item in _items.Where(i => i.State == AgingItemState.IN_CHAMBER))
         {
             item.Discard(ErrorCodes.Aging.DISCARD_REASON_MANUAL_DISCARD);
         }
 
         ActualReleaseDate = DateTime.UtcNow;
-        _stateMachine!.Fire(AgingTrigger.Discard);
+        _stateMachine!.Fire(AgingTrigger.DISCARD);
     }
 
     public void UpdateHeadWeights(IReadOnlyList<decimal> newWeights)
     {
         EnsureMachine();
 
-        var activeItems = _items.Where(i => i.State == AgingItemState.InChamber).ToList();
+        var activeItems = _items.Where(i => i.State == AgingItemState.IN_CHAMBER).ToList();
         int count = Math.Min(activeItems.Count, newWeights.Count);
 
         for (int i = 0; i < count; i++)
@@ -214,13 +214,13 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
             s => State = s
         );
 
-        _stateMachine.Configure(AgingState.InChamber)
-            .Permit(AgingTrigger.MarkReadyForRelease, AgingState.ReadyForRelease)
-            .Permit(AgingTrigger.Release, AgingState.Released)
-            .Permit(AgingTrigger.Discard, AgingState.Discarded);
+        _stateMachine.Configure(AgingState.IN_CHAMBER)
+            .Permit(AgingTrigger.MARK_READY_FOR_RELEASE, AgingState.READY_FOR_RELEASE)
+            .Permit(AgingTrigger.RELEASE, AgingState.RELEASED)
+            .Permit(AgingTrigger.DISCARD, AgingState.DISCARDED);
 
-        _stateMachine.Configure(AgingState.ReadyForRelease)
-            .Permit(AgingTrigger.Release, AgingState.Released)
-            .Permit(AgingTrigger.Discard, AgingState.Discarded);
+        _stateMachine.Configure(AgingState.READY_FOR_RELEASE)
+            .Permit(AgingTrigger.RELEASE, AgingState.RELEASED)
+            .Permit(AgingTrigger.DISCARD, AgingState.DISCARDED);
     }
 }

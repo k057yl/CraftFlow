@@ -33,9 +33,18 @@ public class StorageLocationConfiguration : IEntityTypeConfiguration<StorageLoca
         builder.Property(sl => sl.Capacity)
             .HasPrecision(18, 4);
 
+        builder.Property(sl => sl.CurrentVolume)
+            .HasPrecision(18, 4);
+
+        builder.Property(sl => sl.CurrentProductionBatchId)
+            .IsRequired(false);
+
         builder.HasOne<Warehouse>()
             .WithMany()
             .HasForeignKey(sl => sl.WarehouseId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(sl => new { sl.TenantId, sl.WarehouseId })
+            .HasDatabaseName(DbIndexes.Inventory.IX_STORAGE_LOCATIONS_TENANT_WAREHOUSE);
     }
 }

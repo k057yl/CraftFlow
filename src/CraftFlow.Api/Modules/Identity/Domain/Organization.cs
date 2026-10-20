@@ -23,7 +23,7 @@ public sealed class Organization : AggregateRoot
         {
             Id = Guid.NewGuid(),
             Name = name.Trim(),
-            Status = OrganizationStatus.Active,
+            Status = OrganizationStatus.ACTIVE,
             CreatedAtUtc = DateTime.UtcNow
         };
     }
@@ -50,7 +50,7 @@ public sealed class Organization : AggregateRoot
 
     public void DeactivateByOwner()
     {
-        Status = OrganizationStatus.DeactivatedByOwner;
+        Status = OrganizationStatus.DEACTIVATED_BY_OWNER;
         DeactivatedAtUtc = DateTime.UtcNow;
 
         foreach (var member in _members)
@@ -61,13 +61,13 @@ public sealed class Organization : AggregateRoot
 
     public void Activate()
     {
-        Status = OrganizationStatus.Active;
+        Status = OrganizationStatus.ACTIVE;
         DeactivatedAtUtc = null;
         LastRetentionNoticeSentAtUtc = null;
     }
 
     public void Deactivate()
     {
-        Status = OrganizationStatus.Suspended;
+        Status = OrganizationStatus.SUSPENDED;
     }
 }

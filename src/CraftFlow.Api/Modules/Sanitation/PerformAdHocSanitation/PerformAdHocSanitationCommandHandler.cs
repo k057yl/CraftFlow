@@ -36,7 +36,7 @@ public sealed class PerformAdHocSanitationCommandHandler : IRequestHandler<Perfo
         _context.SanitationTasks.Add(task);
         _context.SanitationLogs.Add(log);
 
-        if (request.TargetType == SanitationTargetType.StorageLocation)
+        if (request.TargetType == SanitationTargetType.STORAGE_LOCATION)
         {
             var location = await _context.StorageLocations
                 .FirstOrDefaultAsync(l => l.Id == request.TargetId, cancellationToken);

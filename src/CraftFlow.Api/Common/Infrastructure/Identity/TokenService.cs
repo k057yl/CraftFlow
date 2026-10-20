@@ -21,8 +21,8 @@ public class TokenService : ITokenService
     public string GenerateJwtToken(User user, OrganizationMember? member = null, bool isSystemAdmin = false)
     {
         var effectiveRole = isSystemAdmin
-            ? TenantRole.SuperAdmin
-            : (member?.Role ?? TenantRole.None);
+            ? TenantRole.SUPER_ADMIN
+            : (member?.Role ?? TenantRole.NONE);
 
         var tenantId = isSystemAdmin
             ? Guid.Empty

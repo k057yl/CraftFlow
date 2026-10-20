@@ -65,7 +65,7 @@ public class VerifyOtpHandler : IRequestHandler<VerifyOtpCommand, Result<LoginRe
         var tokenString = _tokenService.GenerateJwtToken(user, member, isSystemAdmin);
 
         var tenantId = member?.TenantId ?? Guid.Empty;
-        var role = isSystemAdmin ? TenantRole.SuperAdmin : (member?.Role ?? TenantRole.None);
+        var role = isSystemAdmin ? TenantRole.SUPER_ADMIN : (member?.Role ?? TenantRole.NONE);
 
         return Result.Success(new LoginResponseDto(tokenString, tenantId, user.FullName, user.Email, role));
     }

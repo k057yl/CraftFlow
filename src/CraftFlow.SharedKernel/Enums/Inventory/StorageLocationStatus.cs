@@ -6,5 +6,6 @@ public enum StorageLocationStatus
     OCCUPIED = 1,
     SANITATION_REQUIRED = 2,
     UNDER_SANITATION = 3,
-    MAINTENANCE = 4
+    MAINTENANCE = 4,
+    DISABLED = 5
 }

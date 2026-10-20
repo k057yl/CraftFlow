@@ -60,7 +60,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
             PlannedOutputQuantity = plannedOutputQuantity,
             TargetDurationMinutes = targetDurationMinutes > 0 ? targetDurationMinutes : 180,
             ActualOutputQuantity = 0,
-            State = BatchState.Draft,
+            State = BatchState.DRAFT,
             StartedAt = scheduledAt ?? DateTime.UtcNow,
             IsTelegramNotified = false
         };
@@ -72,7 +72,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
     public void Start()
     {
         EnsureMachine();
-        _stateMachine!.Fire(BatchTrigger.Start);
+        _stateMachine!.Fire(BatchTrigger.START);
     }
 
     public void Complete(decimal actualOutputQuantity, int unitsCount = 1, decimal? overheadPercentage = null)
@@ -83,7 +83,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         SetOverheadPercentage(overheadPercentage);
         BrewingCompletedAt = DateTime.UtcNow;
         CompletedAt = DateTime.UtcNow;
-        _stateMachine!.Fire(BatchTrigger.Complete);
+        _stateMachine!.Fire(BatchTrigger.COMPLETE);
     }
 
     public void SetOverheadPercentage(decimal? percentage)
@@ -111,14 +111,14 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         ActualOutputQuantity = actualOutputQuantity;
         UnitsCount = unitsCount > 0 ? unitsCount : 1;
         BrewingCompletedAt = DateTime.UtcNow;
-        _stateMachine!.Fire(BatchTrigger.Complete);
+        _stateMachine!.Fire(BatchTrigger.COMPLETE);
     }
 
     public void MarkAsTransferredToAging()
     {
         EnsureMachine();
         AgingStartedAt = DateTime.UtcNow;
-        _stateMachine!.Fire(BatchTrigger.TransferToAging);
+        _stateMachine!.Fire(BatchTrigger.TRANSFER_TO_AGING);
     }
 
     public void ReleaseFromAging(decimal finalQuantity)
@@ -126,7 +126,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         EnsureMachine();
         ActualOutputQuantity = finalQuantity;
         CompletedAt = DateTime.UtcNow;
-        _stateMachine!.Fire(BatchTrigger.ReleaseFromAging);
+        _stateMachine!.Fire(BatchTrigger.RELEASE_FROM_AGING);
     }
 
     public void Discard(string reason)
@@ -134,7 +134,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         EnsureMachine();
         DiscardReason = reason;
         CompletedAt = DateTime.UtcNow;
-        _stateMachine!.Fire(BatchTrigger.Discard);
+        _stateMachine!.Fire(BatchTrigger.DISCARD);
     }
 
     public void MarkTelegramNotified()
@@ -163,23 +163,23 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
             s => State = s
         );
 
-        _stateMachine.Configure(BatchState.Draft)
-            .Permit(BatchTrigger.Start, BatchState.InProgress);
+        _stateMachine.Configure(BatchState.DRAFT)
+            .Permit(BatchTrigger.START, BatchState.IN_PROGRESS);
 
-        _stateMachine.Configure(BatchState.InProgress)
-            .Permit(BatchTrigger.Complete, BatchState.Completed)
-            .Permit(BatchTrigger.TransferToAging, BatchState.InAging)
-            .Permit(BatchTrigger.Discard, BatchState.Discarded);
+        _stateMachine.Configure(BatchState.IN_PROGRESS)
+            .Permit(BatchTrigger.COMPLETE, BatchState.COMPLETED)
+            .Permit(BatchTrigger.TRANSFER_TO_AGING, BatchState.IN_AGING)
+            .Permit(BatchTrigger.DISCARD, BatchState.DISCARDED);
 
-        _stateMachine.Configure(BatchState.Completed)
-            .Permit(BatchTrigger.TransferToAging, BatchState.InAging);
+        _stateMachine.Configure(BatchState.COMPLETED)
+            .Permit(BatchTrigger.TRANSFER_TO_AGING, BatchState.IN_AGING);
 
-        _stateMachine.Configure(BatchState.ReadyForAging)
-            .Permit(BatchTrigger.TransferToAging, BatchState.InAging)
-            .Permit(BatchTrigger.Discard, BatchState.Discarded);
+        _stateMachine.Configure(BatchState.READY_FOR_AGING)
+            .Permit(BatchTrigger.TRANSFER_TO_AGING, BatchState.IN_AGING)
+            .Permit(BatchTrigger.DISCARD, BatchState.DISCARDED);
 
-        _stateMachine.Configure(BatchState.InAging)
-            .Permit(BatchTrigger.ReleaseFromAging, BatchState.Completed)
-            .Permit(BatchTrigger.Discard, BatchState.Discarded);
+        _stateMachine.Configure(BatchState.IN_AGING)
+            .Permit(BatchTrigger.RELEASE_FROM_AGING, BatchState.COMPLETED)
+            .Permit(BatchTrigger.DISCARD, BatchState.DISCARDED);
     }
 }

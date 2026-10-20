@@ -73,7 +73,7 @@ public class AppDbContext : DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         modelBuilder.Entity<AuditLog>().HasQueryFilter(e =>
-            _tenantContext.Role == TenantRole.SuperAdmin || e.TenantId == _tenantContext.TenantId);
+            _tenantContext.Role == TenantRole.SUPER_ADMIN || e.TenantId == _tenantContext.TenantId);
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
         {
@@ -196,14 +196,14 @@ public class AppDbContext : DbContext
         where TEntity : Entity, ITenantEntity
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
-            (_tenantContext.Role == TenantRole.SuperAdmin || e.TenantId == _tenantContext.TenantId));
+            (_tenantContext.Role == TenantRole.SUPER_ADMIN || e.TenantId == _tenantContext.TenantId));
     }
 
     private void SetTenantFilter<TEntity>(ModelBuilder modelBuilder)
         where TEntity : class, ITenantEntity
     {
         modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
-            _tenantContext.Role == TenantRole.SuperAdmin || e.TenantId == _tenantContext.TenantId);
+            _tenantContext.Role == TenantRole.SUPER_ADMIN || e.TenantId == _tenantContext.TenantId);
     }
 
     private void SetActiveFilter<TEntity>(ModelBuilder modelBuilder)
@@ -216,7 +216,7 @@ public class AppDbContext : DbContext
         public Guid TenantId => Guid.Empty;
         public Guid UserId => Guid.Empty;
         public string? UserEmail => null;
-        public TenantRole Role => TenantRole.SuperAdmin;
+        public TenantRole Role => TenantRole.SUPER_ADMIN;
         public bool IsResolved => true;
     }
 }

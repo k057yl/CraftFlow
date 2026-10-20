@@ -7,5 +7,5 @@ public record CreateTenantUserCommand(
     string Email,
     string Password,
     string FullName,
-    TenantRole Role = TenantRole.Technologist
+    TenantRole Role = TenantRole.TECHNOLOGIST
 ) : IRequest<Result<Guid>>;

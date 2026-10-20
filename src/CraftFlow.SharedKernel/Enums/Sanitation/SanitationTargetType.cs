@@ -2,7 +2,7 @@
 
 public enum SanitationTargetType
 {
-    Warehouse = 1,
-    AgingChamber = 2,
-    StorageLocation = 3
+    WAREHOUSE = 1,
+    AGING_CHAMBER = 2,
+    STORAGE_LOCATION = 3
 }

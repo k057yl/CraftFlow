@@ -62,14 +62,14 @@ public class TenantContext : ITenantContext
 
         if (httpContext?.User is null || !httpContext.User.Identity?.IsAuthenticated == true)
         {
-            return TenantRole.None;
+            return TenantRole.NONE;
         }
 
         if (httpContext.User.IsInRole(AuthConstants.Roles.ADMIN) ||
             httpContext.User.HasClaim(c => (c.Type == ClaimTypes.Role || c.Type == AuthConstants.Claims.ROLE_SHORT) &&
                                            c.Value.Equals(AuthConstants.Roles.ADMIN, StringComparison.OrdinalIgnoreCase)))
         {
-            return TenantRole.SuperAdmin;
+            return TenantRole.SUPER_ADMIN;
         }
 
         var roleClaim = httpContext.User.FindFirst(ClaimTypes.Role)?.Value
@@ -80,7 +80,7 @@ public class TenantContext : ITenantContext
             return parsedRole;
         }
 
-        return TenantRole.None;
+        return TenantRole.NONE;
     }
 
     private bool TryFetchTenantId(out Guid tenantId)

@@ -22,7 +22,7 @@ public sealed class CalculateRequirementsQueryHandler : IRequestHandler<Calculat
     {
         var plannedBatches = await _dbContext.ProductionBatches
             .AsNoTracking()
-            .Where(b => b.State == BatchState.Draft)
+            .Where(b => b.State == BatchState.DRAFT)
             .ToListAsync(cancellationToken);
 
         if (plannedBatches.Count == 0)

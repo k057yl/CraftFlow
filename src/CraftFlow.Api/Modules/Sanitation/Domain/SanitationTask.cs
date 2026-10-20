@@ -47,14 +47,14 @@ public sealed class SanitationTask : AggregateRoot, ITenantEntity
             RuleId = ruleId,
             TargetType = targetType,
             TargetId = targetId,
-            Status = SanitationTaskStatus.Pending,
+            Status = SanitationTaskStatus.PENDING,
             ScheduledAt = scheduledAt
         };
     }
 
     public void Start(Guid performerUserId, DateTime startedAt)
     {
-        if (Status != SanitationTaskStatus.Pending)
+        if (Status != SanitationTaskStatus.PENDING)
             throw new InvalidOperationException(ErrorCodes.Sanitation.INVALID_STATUS_TRANSITION);
 
         if (performerUserId == Guid.Empty)
@@ -62,12 +62,12 @@ public sealed class SanitationTask : AggregateRoot, ITenantEntity
 
         PerformedByUserId = performerUserId;
         StartedAt = startedAt;
-        Status = SanitationTaskStatus.InProgress;
+        Status = SanitationTaskStatus.IN_PROGRESS;
     }
 
     public void Complete(DateTime completedAt, string chemicalsUsed, string? notes = null)
     {
-        if (Status != SanitationTaskStatus.InProgress)
+        if (Status != SanitationTaskStatus.IN_PROGRESS)
             throw new InvalidOperationException(ErrorCodes.Sanitation.INVALID_STATUS_TRANSITION);
 
         if (!StartedAt.HasValue || completedAt < StartedAt.Value)
@@ -80,12 +80,12 @@ public sealed class SanitationTask : AggregateRoot, ITenantEntity
         DurationMinutes = (int)(completedAt - StartedAt.Value).TotalMinutes;
         ChemicalsUsed = chemicalsUsed;
         Notes = notes;
-        Status = SanitationTaskStatus.Completed;
+        Status = SanitationTaskStatus.COMPLETED;
     }
 
     public SanitationLog Verify(Guid verifierUserId, DateTime verifiedAt, bool isPassed, string? verificationNotes = null)
     {
-        if (Status != SanitationTaskStatus.Completed)
+        if (Status != SanitationTaskStatus.COMPLETED)
             throw new InvalidOperationException(ErrorCodes.Sanitation.TASK_NOT_COMPLETED);
 
         if (verifierUserId == Guid.Empty)
@@ -95,17 +95,17 @@ public sealed class SanitationTask : AggregateRoot, ITenantEntity
         VerifiedAt = verifiedAt;
         VerificationNotes = verificationNotes;
 
-        Status = isPassed ? SanitationTaskStatus.Verified : SanitationTaskStatus.Failed;
+        Status = isPassed ? SanitationTaskStatus.VERIFIED : SanitationTaskStatus.FAILED;
 
         return SanitationLog.CreateFromTask(this);
     }
 
     public void Cancel(string reason)
     {
-        if (Status == SanitationTaskStatus.Verified || Status == SanitationTaskStatus.Completed)
+        if (Status == SanitationTaskStatus.VERIFIED || Status == SanitationTaskStatus.COMPLETED)
             throw new InvalidOperationException(ErrorCodes.Sanitation.INVALID_STATUS_TRANSITION);
 
         Notes = reason;
-        Status = SanitationTaskStatus.Cancelled;
+        Status = SanitationTaskStatus.CANCELLED;
     }
 }

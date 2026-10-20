@@ -24,12 +24,12 @@ public sealed class OrganizationMember : Entity, ITenantEntity
             TenantId = organizationId,
             UserId = userId,
             Role = role,
-            Status = MemberStatus.Active,
+            Status = MemberStatus.ACTIVE,
             JoinedAtUtc = DateTime.UtcNow
         };
     }
 
     public void ChangeRole(TenantRole newRole) => Role = newRole;
-    public void Deactivate() => Status = MemberStatus.Disabled;
-    public void Activate() => Status = MemberStatus.Active;
+    public void Deactivate() => Status = MemberStatus.DISABLED;
+    public void Activate() => Status = MemberStatus.ACTIVE;
 }

@@ -21,7 +21,7 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
         builder.Property(o => o.Status)
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(OrganizationStatus.Active);
+            .HasDefaultValue(OrganizationStatus.ACTIVE);
 
         builder.Property(o => o.CreatedAtUtc)
             .IsRequired();

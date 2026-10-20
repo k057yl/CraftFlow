@@ -27,12 +27,12 @@ public class GetAgingLotDetailsQueryHandler
                 uom."Code" AS "UnitName",
                 COALESCE((
                     SELECT 
-                        SUM(ci."Quantity" * sl."UnitPrice") * (1.0 + COALESCE(MAX(pb."OverheadPercentage"), 0.0) / 100.0)
+                        (SUM(ci."Quantity" * sl."UnitPrice") * (1.00::numeric + COALESCE(MAX(pb."OverheadPercentage"), 0.00)::numeric / 100.00::numeric))::numeric(18, 4)
                     FROM {DbSchemas.PRODUCTION}.{DbTables.CONSUMED_INGREDIENTS} ci
                     JOIN {DbSchemas.INVENTORY}.{DbTables.STOCK_LOTS} sl ON sl."Id" = ci."StockLotId"
                     LEFT JOIN {DbSchemas.PRODUCTION}.{DbTables.PRODUCTION_BATCHES} pb ON pb."Id" = ci."ProductionBatchId"
                     WHERE ci."ProductionBatchId" = al."ProductionBatchId"
-                ), 0.0)::numeric AS "TotalBatchCost",
+                ), 0.00)::numeric(18, 4) AS "TotalBatchCost",
                 COALESCE(SUM(CASE WHEN ali."State" = 1 THEN ali."CurrentWeight" ELSE 0 END), al."InitialQuantity") AS "InitialQuantity",
                 COALESCE(SUM(CASE WHEN ali."State" = 1 THEN 1 ELSE 0 END), 0)::integer AS "UnitsCount"
             FROM {DbSchemas.AGING}.{DbTables.AGING_LOTS} al

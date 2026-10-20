@@ -8,6 +8,6 @@ public interface ITenantContext
     Guid UserId { get; }
     string? UserEmail { get; }
     TenantRole Role { get; }
-    bool IsSuperAdmin => Role == TenantRole.SuperAdmin || (TenantId == Guid.Empty && Role == TenantRole.Owner);
+    bool IsSuperAdmin => Role == TenantRole.SUPER_ADMIN || (TenantId == Guid.Empty && Role == TenantRole.OWNER);
     bool IsResolved { get; }
 }

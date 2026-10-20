@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Common.Persistence;
+﻿using CraftFlow.Api.Common.MultiTenancy;
+using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Inventory.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
@@ -10,14 +11,21 @@ namespace CraftFlow.Api.Modules.Inventory.StockLots.AddStockLot;
 public class AddStockLotHandler : IRequestHandler<AddStockLotCommand, Result<Guid>>
 {
     private readonly AppDbContext _dbContext;
+    private readonly ITenantContext _tenantContext;
 
-    public AddStockLotHandler(AppDbContext dbContext)
+    public AddStockLotHandler(AppDbContext dbContext, ITenantContext tenantContext)
     {
         _dbContext = dbContext;
+        _tenantContext = tenantContext;
     }
 
     public async Task<Result<Guid>> Handle(AddStockLotCommand request, CancellationToken cancellationToken)
     {
+        if (!_tenantContext.IsResolved || _tenantContext.TenantId == Guid.Empty)
+        {
+            return Result.Failure<Guid>(Error.Unauthorized(ErrorCodes.Tenant.INVALID_TENANT_ID));
+        }
+
         Guid finalUnitOfMeasureId = request.UnitOfMeasureId;
 
         if (finalUnitOfMeasureId == Guid.Empty)
@@ -53,6 +61,7 @@ public class AddStockLotHandler : IRequestHandler<AddStockLotCommand, Result<Gui
         int finalUnitsCount = request.UnitsCount ?? 1;
 
         var stockLot = StockLot.Create(
+            tenantId: _tenantContext.TenantId,
             warehouseId: request.WarehouseId,
             itemId: request.ItemId,
             unitOfMeasureId: finalUnitOfMeasureId,

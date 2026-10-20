@@ -3,7 +3,7 @@ using CraftFlow.Api.Modules.Inventory.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace CraftFlow.Api.Modules.Inventory.Persistence;
+namespace CraftFlow.Api.Modules.Inventory.Persistence.Configurations;
 
 public class StockLotConfiguration : IEntityTypeConfiguration<StockLot>
 {

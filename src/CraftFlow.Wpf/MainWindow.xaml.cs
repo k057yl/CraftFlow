@@ -68,8 +68,8 @@ public partial class MainWindow : Window
         MainMenuPanel.Visibility = Visibility.Visible;
 
         var currentUser = ApiService.Instance.CurrentUser;
-        bool isSuperAdmin = currentUser?.Role == TenantRole.SuperAdmin;
-        bool isOwner = currentUser?.Role == TenantRole.Owner;
+        bool isSuperAdmin = currentUser?.Role == TenantRole.SUPER_ADMIN;
+        bool isOwner = currentUser?.Role == TenantRole.OWNER;
 
         GuestPanel.Visibility = Visibility.Collapsed;
         UserProfilePanel.Visibility = Visibility.Visible;
@@ -77,11 +77,11 @@ public partial class MainWindow : Window
         UserNameTextBlock.Text = currentUser?.FullName ?? string.Empty;
         UserRoleTextBlock.Text = currentUser?.Role switch
         {
-            TenantRole.SuperAdmin => LocalizationService.Get(UiConstants.Roles.SUPER_ADMIN_DISPLAY),
-            TenantRole.Owner => LocalizationService.Get(UiConstants.Roles.OWNER_DISPLAY),
-            TenantRole.Technologist => LocalizationService.Get(UiConstants.Roles.TECHNOLOGIST_DISPLAY),
-            TenantRole.Storekeeper => LocalizationService.Get(UiConstants.Roles.STOREKEEPER_DISPLAY),
-            TenantRole.SalesManager => LocalizationService.Get(UiConstants.Roles.SALES_MANAGER_DISPLAY),
+            TenantRole.SUPER_ADMIN => LocalizationService.Get(UiConstants.Roles.SUPER_ADMIN_DISPLAY),
+            TenantRole.OWNER => LocalizationService.Get(UiConstants.Roles.OWNER_DISPLAY),
+            TenantRole.TECHNOLOGIST => LocalizationService.Get(UiConstants.Roles.TECHNOLOGIST_DISPLAY),
+            TenantRole.STOREKEEPER => LocalizationService.Get(UiConstants.Roles.STOREKEEPER_DISPLAY),
+            TenantRole.SALES_MANAGER => LocalizationService.Get(UiConstants.Roles.SALES_MANAGER_DISPLAY),
             _ => LocalizationService.Get(UiConstants.Roles.EMPLOYEE_DISPLAY)
         };
 

@@ -589,8 +589,12 @@ namespace CraftFlow.Api.Migrations
                     b.Property<Guid?>("ChamberId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("CurrentProductionBatchId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("CurrentVolume")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -632,6 +636,9 @@ namespace CraftFlow.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("WarehouseId");
+
+                    b.HasIndex("TenantId", "WarehouseId")
+                        .HasDatabaseName("IX_STORAGE_LOCATIONS_TENANT_WAREHOUSE");
 
                     b.ToTable("storage_locations", "inventory");
                 });

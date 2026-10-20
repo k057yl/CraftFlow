@@ -25,7 +25,7 @@ public sealed class GetActiveBatchesSummaryQueryHandler
         GetActiveBatchesSummaryQuery request,
         CancellationToken cancellationToken)
     {
-        var sql = $"""
+        const string sql = """
             SELECT 
                 pb."Id" AS Id,
                 pb."Name" AS BatchName,
@@ -35,23 +35,23 @@ public sealed class GetActiveBatchesSummaryQueryHandler
                 pb."StartedAt" AS ScheduledAt,
                 pb."TargetDurationMinutes" AS TargetDurationMinutes,
                 CASE 
-                    WHEN pb."State" = {(int)BatchState.InProgress} 
+                    WHEN pb."State"::text IN ('2', 'IN_PROGRESS', 'InProgress')
                         THEN GREATEST(0, EXTRACT(EPOCH FROM (NOW() - pb."StartedAt")) / 60)::INT 
                     ELSE 0 
                 END AS ElapsedMinutes,
                 CASE 
-                    WHEN pb."State" = {(int)BatchState.InProgress} 
+                    WHEN pb."State"::text IN ('2', 'IN_PROGRESS', 'InProgress')
                         THEN (EXTRACT(EPOCH FROM (NOW() - pb."StartedAt")) / 60) >= pb."TargetDurationMinutes" 
                     ELSE FALSE 
                 END AS IsOverdue,
-                CASE pb."State"
-                    WHEN {(int)BatchState.Draft} THEN '{BatchState.Draft}'
-                    WHEN {(int)BatchState.InProgress} THEN '{BatchState.InProgress}'
-                    ELSE pb."State"::TEXT
+                CASE pb."State"::text
+                    WHEN '1' THEN 'DRAFT'
+                    WHEN '2' THEN 'IN_PROGRESS'
+                    ELSE UPPER(pb."State"::text)
                 END AS State
             FROM production.production_batches pb
             JOIN catalog.recipes r ON r."Id" = pb."RecipeId"
-            WHERE pb."State" IN ({(int)BatchState.Draft}, {(int)BatchState.InProgress})
+            WHERE pb."State"::text IN ('1', '2', 'DRAFT', 'IN_PROGRESS', 'Draft', 'InProgress')
               AND pb."TenantId" = @TenantId
             ORDER BY pb."StartedAt" DESC;
             """;

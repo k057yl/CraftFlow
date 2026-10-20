@@ -54,7 +54,7 @@ public sealed class SanitationLog : Entity, ITenantEntity
             ChemicalsUsed = task.ChemicalsUsed ?? string.Empty,
             Notes = task.Notes,
             VerificationNotes = task.VerificationNotes,
-            IsPassed = task.Status == SanitationTaskStatus.Verified
+            IsPassed = task.Status == SanitationTaskStatus.VERIFIED
         };
     }
 }

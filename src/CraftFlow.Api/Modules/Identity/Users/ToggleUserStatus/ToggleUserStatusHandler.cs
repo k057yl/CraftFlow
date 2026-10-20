@@ -21,7 +21,7 @@ public class ToggleUserStatusHandler : IRequestHandler<ToggleUserStatusCommand, 
 
     public async Task<Result<bool>> Handle(ToggleUserStatusCommand request, CancellationToken cancellationToken)
     {
-        if (_tenantContext.Role != TenantRole.Owner && !_tenantContext.IsSuperAdmin)
+        if (_tenantContext.Role != TenantRole.OWNER && !_tenantContext.IsSuperAdmin)
         {
             return Result.Failure<bool>(Error.Validation(ErrorCodes.Auth.ACCESS_DENIED));
         }
@@ -34,7 +34,7 @@ public class ToggleUserStatusHandler : IRequestHandler<ToggleUserStatusCommand, 
             return Result.Failure<bool>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
         }
 
-        if (member.UserId == _tenantContext.UserId || member.Role == TenantRole.SuperAdmin)
+        if (member.UserId == _tenantContext.UserId || member.Role == TenantRole.SUPER_ADMIN)
         {
             return Result.Failure<bool>(Error.Validation(ErrorCodes.Auth.ACCESS_DENIED));
         }

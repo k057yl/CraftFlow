@@ -26,7 +26,7 @@ public class GetBatchesReadyForAgingHandler : IRequestHandler<GetBatchesReadyFor
 
         var batches = await _dbContext.ProductionBatches
             .AsNoTracking()
-            .Where(b => (b.State == BatchState.Completed || b.State == BatchState.ReadyForAging)
+            .Where(b => (b.State == BatchState.COMPLETED || b.State == BatchState.READY_FOR_AGING)
                      && !existingAgingBatchIds.Contains(b.Id))
             .Join(_dbContext.Recipes,
                   batch => batch.RecipeId,

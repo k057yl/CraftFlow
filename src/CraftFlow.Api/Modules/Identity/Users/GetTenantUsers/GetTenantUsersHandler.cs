@@ -22,7 +22,7 @@ public class GetTenantUsersHandler : IRequestHandler<GetTenantUsersQuery, Result
 
     public async Task<Result<List<TenantUserDto>>> Handle(GetTenantUsersQuery request, CancellationToken cancellationToken)
     {
-        if (_tenantContext.Role != TenantRole.Owner && !_tenantContext.IsSuperAdmin)
+        if (_tenantContext.Role != TenantRole.OWNER && !_tenantContext.IsSuperAdmin)
         {
             return Result.Failure<List<TenantUserDto>>(Error.Validation(ErrorCodes.Auth.ACCESS_DENIED));
         }

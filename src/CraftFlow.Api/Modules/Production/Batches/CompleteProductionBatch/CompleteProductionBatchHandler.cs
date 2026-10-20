@@ -31,7 +31,7 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
             return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Production.BATCH_NOT_FOUND));
         }
 
-        if (batch.State == BatchState.Draft)
+        if (batch.State == BatchState.DRAFT)
         {
             return Result.Failure<Guid>(Error.Validation(ErrorCodes.Production.BATCH_CANNOT_BE_DELETED));
         }

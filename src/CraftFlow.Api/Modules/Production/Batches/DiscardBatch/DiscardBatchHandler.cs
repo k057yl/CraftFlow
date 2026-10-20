@@ -27,7 +27,7 @@ public class DiscardBatchHandler : IRequestHandler<DiscardBatchCommand, Result>
             return Result.Failure(Error.NotFound(ErrorCodes.Production.BATCH_NOT_FOUND));
         }
 
-        if (batch.State == BatchState.InAging)
+        if (batch.State == BatchState.IN_AGING)
         {
             return Result.Failure(Error.Validation(ErrorCodes.General.VALIDATION_ERROR));
         }

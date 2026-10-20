@@ -13,7 +13,7 @@ public partial class SanitationRuleWindow : Window
     public SanitationRuleWindow(
         Guid targetId,
         string objectName,
-        SanitationTargetType targetType = SanitationTargetType.StorageLocation)
+        SanitationTargetType targetType = SanitationTargetType.STORAGE_LOCATION)
     {
         InitializeComponent();
         _targetId = targetId;
@@ -21,8 +21,8 @@ public partial class SanitationRuleWindow : Window
 
         var typeTitle = targetType switch
         {
-            SanitationTargetType.Warehouse => "Склад",
-            SanitationTargetType.AgingChamber => "Камера",
+            SanitationTargetType.WAREHOUSE => "Склад",
+            SanitationTargetType.AGING_CHAMBER => "Камера",
             _ => "Ёмкость"
         };
 
@@ -46,10 +46,10 @@ public partial class SanitationRuleWindow : Window
     {
         var triggerType = TriggerTypeComboBox.SelectedIndex switch
         {
-            1 => SanitationTriggerType.IntervalDays,
-            2 => SanitationTriggerType.ScheduledDate,
-            3 => SanitationTriggerType.Both,
-            _ => SanitationTriggerType.BatchCount
+            1 => SanitationTriggerType.INTERVAL_DAYS,
+            2 => SanitationTriggerType.SCHEDULED_DATE,
+            3 => SanitationTriggerType.BOTH,
+            _ => SanitationTriggerType.BATCH_COUNT
         };
 
         int.TryParse(BatchIntervalTextBox.Text, out var batchInterval);

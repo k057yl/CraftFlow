@@ -1,7 +1,6 @@
 ﻿using CraftFlow.Api.Modules.Catalog;
 using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.Api.Modules.Production;
-using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.SharedKernel.Dtos.Production;
@@ -21,13 +20,6 @@ namespace CraftFlow.Wpf.Pages.Production.Controls;
 
 public partial class BrewhouseControl : UserControl
 {
-    public const string SUCCESS_LOAD = "UI_DATA_LOADED_SUCCESS";
-    public const string ERROR_LOAD = "UI_DATA_LOAD_ERROR";
-    public const string ERROR_API = "UI_API_ERROR_PREFIX";
-
-    private const string DEFAULT_OVERHEAD_PERCENT = "15";
-    private const string DEFAULT_UNITS_COUNT = "1";
-
     public ObservableCollection<LookupItem> RawMaterialWarehouses { get; } = [];
     public ObservableCollection<LookupItem> BreweryWarehouses { get; } = [];
     public ObservableCollection<LookupItem> DestinationWarehouses { get; } = [];
@@ -37,7 +29,6 @@ public partial class BrewhouseControl : UserControl
     public ObservableCollection<LookupItem> ActiveBatches { get; } = [];
     public ObservableCollection<ActiveBatchWpfModel> ActiveBatchesSummary { get; } = [];
 
-    // Вспомогательная модель для корректного вывода без фальшивых нулей
     public class RequirementItemUiModel
     {
         public string MaterialName { get; set; } = string.Empty;
@@ -103,7 +94,7 @@ public partial class BrewhouseControl : UserControl
         _isInitializing = true;
         try
         {
-            var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(InventoryConstants.WAREHOUSES) ?? [];
+            var warehouses = await ApiService.Instance.GetAsync<List<WarehouseDto>>(InventoryConstants.WAREHOUSES) ?? [];
 
             RawMaterialWarehouses.Clear();
             BreweryWarehouses.Clear();
@@ -112,7 +103,8 @@ public partial class BrewhouseControl : UserControl
             foreach (var w in warehouses)
             {
                 var item = new LookupItem(w.Id, w.Name);
-                if (w.Name.Contains("Варочн", StringComparison.OrdinalIgnoreCase) || w.Name.Contains("Цех", StringComparison.OrdinalIgnoreCase))
+
+                if (w.Type == WarehouseType.BREWHOUSE)
                 {
                     BreweryWarehouses.Add(item);
                 }
@@ -146,12 +138,12 @@ public partial class BrewhouseControl : UserControl
                 if (summaryList != null)
                 {
                     var now = DateTime.UtcNow;
-                    var draftIntStr = ((int)BatchState.Draft).ToString();
 
                     foreach (var b in summaryList)
                     {
-                        var isDraft = string.Equals(b.State, BatchState.Draft.ToString(), StringComparison.OrdinalIgnoreCase)
-                                   || b.State == draftIntStr;
+                        var isDraft = string.Equals(b.State, BatchState.DRAFT.ToString(), StringComparison.OrdinalIgnoreCase)
+                                   || string.Equals(b.State, "Draft", StringComparison.OrdinalIgnoreCase)
+                                   || string.Equals(b.State, "1", StringComparison.OrdinalIgnoreCase);
 
                         if (!isDraft)
                         {
@@ -179,8 +171,7 @@ public partial class BrewhouseControl : UserControl
             }
             catch (Exception ex)
             {
-                SetStatusFormatted(ERROR_API, Brushes.Red, ex.Message);
-                return;
+                SetStatusRaw($"Ошибка API активных варок: {ex.Message}", Brushes.Red);
             }
 
             if (BatchRecipeComboBox.SelectedIndex < 0 && Recipes.Count > 0)
@@ -197,11 +188,16 @@ public partial class BrewhouseControl : UserControl
 
             GenerateDefaultBatchName();
 
-            SetStatus(SUCCESS_LOAD, Brushes.Green);
+            if (BreweryWarehouseComboBox.SelectedValue is Guid selectedBreweryId && selectedBreweryId != Guid.Empty)
+            {
+                await LoadEquipmentLocationsAsync(selectedBreweryId);
+            }
+
+            SetStatus("UI_DATA_LOADED_SUCCESS", Brushes.Green);
         }
         catch (Exception ex)
         {
-            SetStatusFormatted(ERROR_LOAD, Brushes.Red, ex.Message);
+            SetStatusRaw($"Ошибка загрузки данных: {ex.Message}", Brushes.Red);
         }
         finally
         {
@@ -226,21 +222,39 @@ public partial class BrewhouseControl : UserControl
     {
         try
         {
-            var locations = await ApiService.Instance.GetAsync<List<StorageLocationDto>>($"{InventoryConstants.WAREHOUSES}/locations?warehouseId={warehouseId}");
+            var url = $"{InventoryConstants.WAREHOUSES_LOCATIONS}?warehouseId={warehouseId}";
+            var locations = await ApiService.Instance.GetAsync<List<StorageLocationDto>>(url);
+
             EquipmentLocations.Clear();
 
-            var validLocations = locations?.Where(l => (l.LocationType == StorageLocationType.BREWING_VESSEL || l.LocationType == StorageLocationType.VAT_TANK)
-                                                    && l.Status == StorageLocationStatus.AVAILABLE)
-                                           .ToList();
-
-            validLocations?.ForEach(l => EquipmentLocations.Add(new LookupItem(l.Id, $"{l.Name} (Свободно: {l.FreeCapacityDisplay} {l.UnitOfMeasure ?? "л"})")));
-
-            if (EquipmentLocations.Count > 0)
+            if (locations != null && locations.Count > 0)
             {
-                EquipmentLocationComboBox.SelectedIndex = 0;
+                var validLocations = locations.Where(l =>
+                    l.LocationType == StorageLocationType.BREWING_VESSEL
+                    || l.LocationType == StorageLocationType.VAT_TANK
+                    || l.LocationType == StorageLocationType.CONTAINER
+                ).ToList();
+
+                if (validLocations.Count == 0)
+                {
+                    validLocations = locations;
+                }
+
+                foreach (var l in validLocations)
+                {
+                    EquipmentLocations.Add(new LookupItem(l.Id, $"{l.Name} (Свободно: {l.FreeCapacityDisplay} {l.UnitOfMeasure ?? "л"})"));
+                }
+
+                if (EquipmentLocations.Count > 0)
+                {
+                    EquipmentLocationComboBox.SelectedIndex = 0;
+                }
             }
         }
-        catch { }
+        catch (Exception ex)
+        {
+            SetStatusRaw($"Ошибка загрузки емкостей: {ex.Message}", Brushes.Red);
+        }
     }
 
     private async void QuickCreateEquipment_Click(object sender, RoutedEventArgs e)
@@ -276,7 +290,7 @@ public partial class BrewhouseControl : UserControl
     private void GenerateDefaultBatchName()
     {
         var shortCode = Guid.NewGuid().ToString()[..8].ToUpperInvariant();
-        BatchNameTextBox.Text = string.Concat(FormattingConstants.BATCH_PREFIX, shortCode);
+        BatchNameTextBox.Text = string.Concat("BATCH-", shortCode);
     }
 
     private async void BatchInputs_Changed(object sender, RoutedEventArgs e)
@@ -355,6 +369,8 @@ public partial class BrewhouseControl : UserControl
             SetStatus("UI_BATCH_STARTED_SUCCESS", Brushes.Green);
             BatchNameTextBox.Clear();
             GenerateDefaultBatchName();
+
+            await LoadDataAsync();
 
             if (ParentPage != null) await ParentPage.LoadDataExternalAsync();
         }
@@ -436,7 +452,7 @@ public partial class BrewhouseControl : UserControl
         RawMaterialCostTextBlock.Text = $"${rawCost:F2}";
         OverheadCostTextBlock.Text = $"+${overheadAmount:F2} ({overheadPercent:0.##}%)";
         TotalBatchCostTextBlock.Text = $"${totalBatchCost:F2}";
-        UnitCostTextBlock.Text = $"${unitCostPerKg:F2} / {FormattingConstants.DEFAULT_WEIGHT_UNIT}";
+        UnitCostTextBlock.Text = $"${unitCostPerKg:F2} / кг";
     }
 
     private async void CompleteBatch_Click(object sender, RoutedEventArgs e)
@@ -478,10 +494,12 @@ public partial class BrewhouseControl : UserControl
         {
             SetStatus("UI_BATCH_COMPLETED_SUCCESS", Brushes.Green);
             ActualOutputQuantityTextBox.Clear();
-            ActualUnitsCountTextBox.Text = DEFAULT_UNITS_COUNT;
+            ActualUnitsCountTextBox.Text = "1";
             CompleteBatchNameTextBox.Clear();
             UseOverheadCheckBox.IsChecked = false;
-            OverheadPercentageTextBox.Text = DEFAULT_OVERHEAD_PERCENT;
+            OverheadPercentageTextBox.Text = "15";
+
+            await LoadDataAsync();
 
             if (ParentPage != null)
             {
@@ -564,7 +582,7 @@ public partial class BrewhouseControl : UserControl
             });
 
             flowDocument.Blocks.Add(new Paragraph(
-                new Run($"Дата: {DateTime.Now:dd.MM.yyyy HH:mm} | {LocalizationService.Get("LABEL_BATCH_CODE")} {BatchNameTextBox.Text} | {LocalizationService.Get("LABEL_PLANNED_OUTPUT")} {BatchQuantityTextBox.Text}"))
+                new Run($"Дата: {DateTime.Now:dd.MM.yyyy HH:mm} | Партия: {BatchNameTextBox.Text} | Объем: {BatchQuantityTextBox.Text}"))
             {
                 FontSize = 12,
                 FontStyle = FontStyles.Italic,
@@ -576,14 +594,14 @@ public partial class BrewhouseControl : UserControl
             {
                 list.ListItems.Add(new ListItem(
                     new Paragraph(
-                        new Run($"{req.MaterialName}: {req.RequiredQty:0.####} ({LocalizationService.Get("AVAILABLE_STOCK")} {req.AvailableQty:0.####})"))
+                        new Run($"{req.MaterialName}: {req.RequiredQty:0.####} (Доступно {req.AvailableQty:0.####})"))
                     { FontSize = 14 }));
             }
 
             flowDocument.Blocks.Add(list);
 
             var idp = ((IDocumentPaginatorSource)flowDocument).DocumentPaginator;
-            printDialog.PrintDocument(idp, $"TechCard_{recipeName}");
+            printDialog.PrintDocument(idp, recipeName);
         }
     }
 

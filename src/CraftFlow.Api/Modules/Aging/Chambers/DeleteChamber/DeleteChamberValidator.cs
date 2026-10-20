@@ -13,7 +13,7 @@ public class DeleteChamberValidator : AbstractValidator<DeleteChamberCommand>
             .MustAsync(async (id, ct) =>
             {
                 var hasActiveLots = await dbContext.AgingLots
-                    .AnyAsync(l => l.AgingChamberId == id && l.State == AgingState.InChamber, ct);
+                    .AnyAsync(l => l.AgingChamberId == id && l.State == AgingState.IN_CHAMBER, ct);
                 return !hasActiveLots;
             })
             .WithErrorCode("CHAMBER_HAS_ACTIVE_LOTS");

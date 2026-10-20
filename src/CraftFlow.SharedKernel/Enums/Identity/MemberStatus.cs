@@ -2,6 +2,6 @@
 
 public enum MemberStatus
 {
-    Active = 0,
-    Disabled = 1
+    ACTIVE = 0,
+    DISABLED = 1
 }

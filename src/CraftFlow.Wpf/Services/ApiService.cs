@@ -281,7 +281,7 @@ public class ApiService
             }
         }
 
-        return TenantRole.None;
+        return TenantRole.NONE;
     }
 
     public async Task<T?> GetAsync<T>(string endpoint)

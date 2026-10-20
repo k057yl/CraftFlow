@@ -2,10 +2,10 @@
 
 public enum TenantRole
 {
-    None = 0,
-    SuperAdmin = 1,
-    Owner = 2,
-    Technologist = 3,
-    Storekeeper = 4,
-    SalesManager = 5
+    NONE = 0,
+    SUPER_ADMIN = 1,
+    OWNER = 2,
+    TECHNOLOGIST = 3,
+    STOREKEEPER = 4,
+    SALES_MANAGER = 5
 }

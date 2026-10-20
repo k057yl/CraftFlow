@@ -17,6 +17,11 @@ public static class ErrorCodes
         public const string INVALID_AMOUNT = "GENERAL.INVALID_AMOUNT";
     }
 
+    public static class Tenant
+    {
+        public const string INVALID_TENANT_ID = "TENANT_INVALID_ID";
+    }
+
     public static class Production
     {
         public const string BATCH_NOT_FOUND = "PRODUCTION.BATCH_NOT_FOUND";
@@ -41,10 +46,16 @@ public static class ErrorCodes
         public const string INVALID_CAPACITY = "INVENTORY.INVALID_CAPACITY";
         public const string PARENT_CONTAINER_REQUIRED = "INVENTORY.PARENT_CONTAINER_REQUIRED";
         public const string STOCK_LOT_NOT_FOUND = "INVENTORY.STOCK_LOT_NOT_FOUND";
+        public const string STOCK_LOT_NEGATIVE_PRICE = "INV_STOCK_LOT_NEGATIVE_PRICE";
         public const string LOCATION_NOT_FOUND = "INVENTORY.LOCATION_NOT_FOUND";
         public const string LOCATION_NOT_AVAILABLE = "INVENTORY.LOCATION_NOT_AVAILABLE";
         public const string LOCATION_NOT_EMPTY_FOR_SANITATION = "INVENTORY.LOCATION_NOT_EMPTY_FOR_SANITATION";
         public const string CAPACITY_EXCEEDED = "INVENTORY.CAPACITY_EXCEEDED";
+        public const string LOCATION_HAS_VOLUME = "INV_LOCATION_HAS_VOLUME";
+        public const string AMBIGUOUS_PARENT_CONTAINER = "INV_AMBIGUOUS_PARENT_CONTAINER";
+        public const string INVALID_ALLOCATED_QUANTITY = "INV_INVALID_ALLOCATED_QUANTITY";
+        public const string ALLOCATED_QUANTITY_EXCEEDS_TOTAL = "INV_ALLOCATED_QUANTITY_EXCEEDS_TOTAL";
+        public const string INVALID_PRODUCTION_BATCH_ID = "INVENTORY.INVALID_PRODUCTION_BATCH_ID";
     }
 
     public static class Catalog

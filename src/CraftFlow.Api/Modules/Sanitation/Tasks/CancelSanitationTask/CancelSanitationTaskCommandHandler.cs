@@ -26,7 +26,7 @@ public sealed class CancelSanitationTaskCommandHandler : IRequestHandler<CancelS
 
         task.Cancel(request.Reason);
 
-        if (task.TargetType == SanitationTargetType.StorageLocation)
+        if (task.TargetType == SanitationTargetType.STORAGE_LOCATION)
         {
             var location = await _context.StorageLocations
                 .FirstOrDefaultAsync(l => l.Id == task.TargetId, cancellationToken);

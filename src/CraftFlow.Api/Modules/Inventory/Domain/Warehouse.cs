@@ -20,7 +20,7 @@ public sealed class Warehouse : AggregateRoot, ITenantEntity
         string? address = null)
     {
         if (tenantId == Guid.Empty)
-            throw new ArgumentException(ErrorCodes.Auth.INVALID_CREDENTIALS);
+            throw new ArgumentException(ErrorCodes.Tenant.INVALID_TENANT_ID);
 
         if (string.IsNullOrWhiteSpace(name))
             throw new ArgumentException(ErrorCodes.Inventory.WAREHOUSE_NAME_REQUIRED);

@@ -23,9 +23,9 @@ public sealed class CreateSanitationRuleCommandHandler : IRequestHandler<CreateS
     {
         var targetExists = request.TargetType switch
         {
-            SanitationTargetType.Warehouse => await _context.Warehouses.AnyAsync(w => w.Id == request.TargetId, cancellationToken),
-            SanitationTargetType.AgingChamber => await _context.AgingChambers.AnyAsync(c => c.Id == request.TargetId, cancellationToken),
-            SanitationTargetType.StorageLocation => await _context.StorageLocations.AnyAsync(l => l.Id == request.TargetId, cancellationToken),
+            SanitationTargetType.WAREHOUSE => await _context.Warehouses.AnyAsync(w => w.Id == request.TargetId, cancellationToken),
+            SanitationTargetType.AGING_CHAMBER => await _context.AgingChambers.AnyAsync(c => c.Id == request.TargetId, cancellationToken),
+            SanitationTargetType.STORAGE_LOCATION => await _context.StorageLocations.AnyAsync(l => l.Id == request.TargetId, cancellationToken),
             _ => false
         };
 

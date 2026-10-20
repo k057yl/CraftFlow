@@ -26,6 +26,7 @@ public sealed class StockLot : AggregateRoot, ITenantEntity
     private StockLot() { }
 
     public static StockLot Create(
+        Guid tenantId,
         Guid warehouseId,
         Guid itemId,
         Guid unitOfMeasureId,
@@ -33,20 +34,23 @@ public sealed class StockLot : AggregateRoot, ITenantEntity
         int unitsCount,
         decimal unitPrice,
         string? batchNumber = null,
-        Guid tenantId = default,
         Guid? productionBatchId = null,
         Guid? supplierId = null,
         DateTime? expirationDate = null)
     {
+        if (tenantId == Guid.Empty)
+            throw new ArgumentException(ErrorCodes.Tenant.INVALID_TENANT_ID);
+
         if (initialQuantity < 0)
             throw new ArgumentException(ErrorCodes.Inventory.STOCK_LOT_NEGATIVE_QUANTITY);
 
         if (unitPrice < 0)
-            throw new ArgumentException(ErrorCodes.Inventory.UNIT_LOT_NEGATIVE_QUANTITY);
+            throw new ArgumentException(ErrorCodes.Inventory.STOCK_LOT_NEGATIVE_PRICE);
 
         return new StockLot
         {
             Id = Guid.NewGuid(),
+            TenantId = tenantId,
             WarehouseId = warehouseId,
             ItemId = itemId,
             UnitOfMeasureId = unitOfMeasureId,
@@ -55,7 +59,6 @@ public sealed class StockLot : AggregateRoot, ITenantEntity
             UnitsCount = unitsCount,
             UnitPrice = unitPrice,
             BatchNumber = batchNumber,
-            TenantId = tenantId,
             ProductionBatchId = productionBatchId,
             CreatedDate = DateTime.UtcNow,
             ExpirationDate = expirationDate
@@ -64,7 +67,23 @@ public sealed class StockLot : AggregateRoot, ITenantEntity
 
     public void AssignStorageLocation(Guid storageLocationId, decimal allocatedQuantity)
     {
-        _storageLocations.Add(StockLotStorageLocation.Create(Id, storageLocationId, allocatedQuantity));
+        if (allocatedQuantity <= 0)
+            throw new ArgumentException(ErrorCodes.Inventory.INVALID_ALLOCATED_QUANTITY);
+
+        var existingAllocation = _storageLocations.FirstOrDefault(x => x.StorageLocationId == storageLocationId);
+        var currentAllocatedTotal = _storageLocations.Where(x => x.StorageLocationId != storageLocationId).Sum(x => x.AllocatedQuantity);
+
+        if (currentAllocatedTotal + allocatedQuantity > Quantity)
+            throw new InvalidOperationException(ErrorCodes.Inventory.ALLOCATED_QUANTITY_EXCEEDS_TOTAL);
+
+        if (existingAllocation != null)
+        {
+            existingAllocation.UpdateQuantity(allocatedQuantity);
+        }
+        else
+        {
+            _storageLocations.Add(StockLotStorageLocation.Create(Id, storageLocationId, allocatedQuantity));
+        }
     }
 
     public void AdjustQuantity(decimal delta)

@@ -2,19 +2,19 @@
 
 public enum BatchState
 {
-    Draft = 1,
-    InProgress = 2,
-    ReadyForAging = 3,
-    InAging = 4,
-    Completed = 5,
-    Discarded = 6
+    DRAFT = 1,
+    IN_PROGRESS = 2,
+    READY_FOR_AGING = 3,
+    IN_AGING = 4,
+    COMPLETED = 5,
+    DISCARDED = 6
 }
 
 public enum BatchTrigger
 {
-    Start,
-    Complete,
-    TransferToAging,
-    ReleaseFromAging,
-    Discard
+    START,
+    COMPLETE,
+    TRANSFER_TO_AGING,
+    RELEASE_FROM_AGING,
+    DISCARD
 }

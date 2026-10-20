@@ -26,7 +26,7 @@ public sealed class StartSanitationTaskCommandHandler : IRequestHandler<StartSan
 
         task.Start(request.PerformerUserId, DateTime.UtcNow);
 
-        if (task.TargetType == SanitationTargetType.StorageLocation)
+        if (task.TargetType == SanitationTargetType.STORAGE_LOCATION)
         {
             var location = await _context.StorageLocations
                 .FirstOrDefaultAsync(l => l.Id == task.TargetId, cancellationToken);

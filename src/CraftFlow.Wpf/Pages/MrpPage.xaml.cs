@@ -136,11 +136,11 @@ public partial class MrpPage : Page
 
             if (summaryList != null)
             {
-                var draftIntStr = ((int)BatchState.Draft).ToString();
+                var draftIntStr = ((int)BatchState.DRAFT).ToString();
 
                 foreach (var b in summaryList)
                 {
-                    var isDraft = string.Equals(b.State, BatchState.Draft.ToString(), StringComparison.OrdinalIgnoreCase)
+                    var isDraft = string.Equals(b.State, BatchState.DRAFT.ToString(), StringComparison.OrdinalIgnoreCase)
                                || b.State == draftIntStr;
 
                     if (isDraft)

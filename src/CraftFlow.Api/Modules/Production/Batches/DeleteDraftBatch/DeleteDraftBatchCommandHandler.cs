@@ -27,7 +27,7 @@ public sealed class DeleteDraftBatchCommandHandler : IRequestHandler<DeleteDraft
             return Result.Failure(Error.NotFound(ErrorCodes.Production.BATCH_NOT_FOUND));
         }
 
-        if (batch.State != BatchState.Draft)
+        if (batch.State != BatchState.DRAFT)
         {
             return Result.Failure(Error.Validation(ErrorCodes.Production.BATCH_CANNOT_BE_DELETED));
         }

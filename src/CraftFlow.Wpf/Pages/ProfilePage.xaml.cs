@@ -37,9 +37,9 @@ public partial class ProfilePage : Page
     {
         NewUserRoleComboBox.ItemsSource = new[]
         {
-            new { Role = TenantRole.Technologist, Display = "Технолог" },
-            new { Role = TenantRole.Storekeeper, Display = "Кладовщик" },
-            new { Role = TenantRole.SalesManager, Display = "Менеджер / Продажи" }
+            new { Role = TenantRole.TECHNOLOGIST, Display = "Технолог" },
+            new { Role = TenantRole.STOREKEEPER, Display = "Кладовщик" },
+            new { Role = TenantRole.SALES_MANAGER, Display = "Менеджер / Продажи" }
         };
         NewUserRoleComboBox.DisplayMemberPath = "Display";
         NewUserRoleComboBox.SelectedValuePath = "Role";
@@ -79,7 +79,7 @@ public partial class ProfilePage : Page
             }
         }
 
-        bool isOwner = user.Role == TenantRole.Owner;
+        bool isOwner = user.Role == TenantRole.OWNER;
 
         TeamManagementBorder.Visibility = isOwner ? Visibility.Visible : Visibility.Collapsed;
         SubscriptionManagementBorder.Visibility = isOwner ? Visibility.Visible : Visibility.Collapsed;
@@ -182,7 +182,7 @@ public partial class ProfilePage : Page
         var currentUserId = ApiService.Instance.CurrentUser?.Email;
 
         var viewModels = users
-            .Where(u => u.Role != TenantRole.SuperAdmin)
+            .Where(u => u.Role != TenantRole.SUPER_ADMIN)
             .Select(u => new
             {
                 u.Id,
@@ -191,7 +191,7 @@ public partial class ProfilePage : Page
                 RoleDisplay = GetRoleDisplayName(u.Role),
                 StatusDisplay = u.IsActive ? "Активен" : "Заблокирован",
                 ActionButtonText = u.IsActive ? "Деактивировать" : "Активировать",
-                CanToggle = u.Role != TenantRole.Owner && u.Email != currentUserId
+                CanToggle = u.Role != TenantRole.OWNER && u.Email != currentUserId
             }).ToList();
 
         TeamUsersDataGrid.ItemsSource = viewModels;
@@ -225,7 +225,7 @@ public partial class ProfilePage : Page
             return;
         }
 
-        var selectedRole = (TenantRole)(NewUserRoleComboBox.SelectedValue ?? TenantRole.Technologist);
+        var selectedRole = (TenantRole)(NewUserRoleComboBox.SelectedValue ?? TenantRole.TECHNOLOGIST);
         var requestPayload = new CreateTenantUserRequest(email, password, fullName, selectedRole);
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(IdentityConstants.USERS, requestPayload);
@@ -289,10 +289,10 @@ public partial class ProfilePage : Page
 
     private static string GetRoleDisplayName(TenantRole role) => role switch
     {
-        TenantRole.Owner => "Владелец сыроварни",
-        TenantRole.Technologist => "Главный технолог",
-        TenantRole.Storekeeper => "Кладовщик",
-        TenantRole.SalesManager => "Менеджер по продажам",
+        TenantRole.OWNER => "Владелец сыроварни",
+        TenantRole.TECHNOLOGIST => "Главный технолог",
+        TenantRole.STOREKEEPER => "Кладовщик",
+        TenantRole.SALES_MANAGER => "Менеджер по продажам",
         _ => "Сотрудник"
     };
 }

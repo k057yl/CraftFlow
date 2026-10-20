@@ -130,7 +130,7 @@ public partial class StoragePage : Page
     {
         if (sender is Button btn && btn.Tag is StorageLocationViewItem item)
         {
-            var dialog = new SanitationRuleWindow(item.Id, item.Name, SanitationTargetType.StorageLocation)
+            var dialog = new SanitationRuleWindow(item.Id, item.Name, SanitationTargetType.STORAGE_LOCATION)
             {
                 Owner = Window.GetWindow(this)
             };
@@ -146,7 +146,7 @@ public partial class StoragePage : Page
     {
         if (sender is Button btn && btn.Tag is LookupItem item)
         {
-            var dialog = new SanitationRuleWindow(item.Id, item.Name, SanitationTargetType.Warehouse)
+            var dialog = new SanitationRuleWindow(item.Id, item.Name, SanitationTargetType.WAREHOUSE)
             {
                 Owner = Window.GetWindow(this)
             };
@@ -162,7 +162,7 @@ public partial class StoragePage : Page
     {
         if (sender is Button btn && btn.Tag is LookupItem item)
         {
-            var dialog = new SanitationRuleWindow(item.Id, item.Name, SanitationTargetType.AgingChamber)
+            var dialog = new SanitationRuleWindow(item.Id, item.Name, SanitationTargetType.AGING_CHAMBER)
             {
                 Owner = Window.GetWindow(this)
             };
@@ -182,7 +182,7 @@ public partial class StoragePage : Page
     {
         if (WarehousesDataGrid.SelectedItem is LookupItem item)
         {
-            var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.Warehouse)
+            var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.WAREHOUSE)
             {
                 Owner = Window.GetWindow(this)
             };
@@ -195,7 +195,7 @@ public partial class StoragePage : Page
     {
         if (ChambersDataGrid.SelectedItem is LookupItem item)
         {
-            var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.AgingChamber)
+            var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.AGING_CHAMBER)
             {
                 Owner = Window.GetWindow(this)
             };
@@ -208,7 +208,7 @@ public partial class StoragePage : Page
     {
         if (StorageLocationsDataGrid.SelectedItem is StorageLocationViewItem item)
         {
-            var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.StorageLocation)
+            var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.STORAGE_LOCATION)
             {
                 Owner = Window.GetWindow(this)
             };
@@ -399,7 +399,7 @@ public partial class StoragePage : Page
     {
         if (sender is Button btn && btn.Tag is StorageLocationViewItem item)
         {
-            var window = new SanitationExecutionWindow(item.Id, item.Name, SanitationTargetType.StorageLocation)
+            var window = new SanitationExecutionWindow(item.Id, item.Name, SanitationTargetType.STORAGE_LOCATION)
             {
                 Owner = Window.GetWindow(this)
             };

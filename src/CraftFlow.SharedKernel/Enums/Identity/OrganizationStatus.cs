@@ -2,7 +2,7 @@
 
 public enum OrganizationStatus
 {
-    Active = 0,
-    Suspended = 1,
-    DeactivatedByOwner = 2
+    ACTIVE = 0,
+    SUSPENDED = 1,
+    DEACTIVATED_BY_OWNER = 2
 }

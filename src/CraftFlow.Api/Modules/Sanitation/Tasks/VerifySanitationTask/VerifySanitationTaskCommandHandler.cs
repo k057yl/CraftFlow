@@ -28,7 +28,7 @@ public sealed class VerifySanitationTaskCommandHandler : IRequestHandler<VerifyS
         var log = task.Verify(request.VerifierUserId, DateTime.UtcNow, request.IsPassed, request.VerificationNotes);
         _context.SanitationLogs.Add(log);
 
-        if (task.TargetType == SanitationTargetType.StorageLocation)
+        if (task.TargetType == SanitationTargetType.STORAGE_LOCATION)
         {
             var location = await _context.StorageLocations
                 .FirstOrDefaultAsync(l => l.Id == task.TargetId, cancellationToken);

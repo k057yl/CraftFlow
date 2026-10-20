@@ -2,10 +2,10 @@
 
 public enum SanitationTaskStatus
 {
-    Pending = 1,
-    InProgress = 2,
-    Completed = 3,
-    Verified = 4,
-    Cancelled = 5,
-    Failed = 6
+    PENDING = 1,
+    IN_PROGRESS = 2,
+    COMPLETED = 3,
+    VERIFIED = 4,
+    CANCELLED = 5,
+    FAILED = 6
 }

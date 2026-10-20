@@ -27,13 +27,13 @@ public class AgingLotItem : Entity
             ItemNumber = itemNumber,
             InitialWeight = weight,
             CurrentWeight = weight,
-            State = AgingItemState.InChamber
+            State = AgingItemState.IN_CHAMBER
         };
     }
 
     public void RegisterWeightLoss(decimal lossQuantity)
     {
-        if (State != AgingItemState.InChamber)
+        if (State != AgingItemState.IN_CHAMBER)
             throw new InvalidOperationException(ErrorCodes.Aging.INVALID_LOT_STATE);
 
         if (lossQuantity <= 0)
@@ -44,25 +44,25 @@ public class AgingLotItem : Entity
 
     public void Release()
     {
-        if (State != AgingItemState.InChamber)
+        if (State != AgingItemState.IN_CHAMBER)
             throw new InvalidOperationException(ErrorCodes.Aging.INVALID_LOT_STATE);
 
-        State = AgingItemState.Released;
+        State = AgingItemState.RELEASED;
     }
 
     public void Discard(string reason)
     {
-        if (State == AgingItemState.Discarded)
+        if (State == AgingItemState.DISCARDED)
             return;
 
-        State = AgingItemState.Discarded;
+        State = AgingItemState.DISCARDED;
         DiscardReason = reason;
         CurrentWeight = 0;
     }
 
     public void SetFinalWeight(decimal weight)
     {
-        if (State != AgingItemState.InChamber)
+        if (State != AgingItemState.IN_CHAMBER)
             throw new InvalidOperationException(ErrorCodes.Aging.INVALID_LOT_STATE);
 
         if (weight <= 0)

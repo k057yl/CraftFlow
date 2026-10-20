@@ -2,8 +2,8 @@
 
 public enum SanitationTriggerType
 {
-    IntervalDays = 1,
-    BatchCount = 2,
-    ScheduledDate = 3,
-    Both = 4
+    INTERVAL_DAYS = 1,
+    BATCH_COUNT = 2,
+    SCHEDULED_DATE = 3,
+    BOTH = 4
 }

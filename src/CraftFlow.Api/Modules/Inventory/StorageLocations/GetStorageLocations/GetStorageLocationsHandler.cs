@@ -45,7 +45,7 @@ public class GetStorageLocationsHandler : IRequestHandler<GetStorageLocationsQue
         var locationIds = rawLocations.Select(x => x.Location.Id).ToList();
 
         var rules = await _dbContext.SanitationRules.AsNoTracking()
-            .Where(r => r.TargetType == SanitationTargetType.StorageLocation && locationIds.Contains(r.TargetId))
+            .Where(r => r.TargetType == SanitationTargetType.STORAGE_LOCATION && locationIds.Contains(r.TargetId))
             .ToDictionaryAsync(r => r.TargetId, cancellationToken);
 
         var result = rawLocations.Select(x =>
@@ -73,7 +73,7 @@ public class GetStorageLocationsHandler : IRequestHandler<GetStorageLocationsQue
                 l.WashCycleBatchInterval,
                 l.LastWashedAt,
                 nextWashDueDate,
-                l.BatchesProcessedCount >= l.WashCycleBatchInterval ? "WASH_REQUIRED" : "OK",
+                l.Status.ToString(),
                 l.UnitOfMeasure
             );
         }).ToList();

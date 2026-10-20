@@ -35,7 +35,7 @@ public class ToggleOrganizationStatusHandler : IRequestHandler<ToggleOrganizatio
             return Result.Failure<bool>(Error.NotFound(ErrorCodes.Auth.USER_NOT_FOUND));
         }
 
-        if (organization.Status == OrganizationStatus.Active)
+        if (organization.Status == OrganizationStatus.ACTIVE)
         {
             organization.Deactivate();
         }

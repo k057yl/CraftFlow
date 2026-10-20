@@ -23,12 +23,12 @@ public class OrganizationMemberConfiguration : IEntityTypeConfiguration<Organiza
         builder.Property(m => m.Role)
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(TenantRole.Technologist);
+            .HasDefaultValue(TenantRole.TECHNOLOGIST);
 
         builder.Property(m => m.Status)
             .IsRequired()
             .HasConversion<int>()
-            .HasDefaultValue(MemberStatus.Active);
+            .HasDefaultValue(MemberStatus.ACTIVE);
 
         builder.Property(m => m.JoinedAtUtc)
             .IsRequired();

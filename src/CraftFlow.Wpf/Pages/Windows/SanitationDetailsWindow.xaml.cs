@@ -65,8 +65,8 @@ public partial class SanitationDetailsWindow : Window
 
     private static string GetTypeName(SanitationTargetType type) => type switch
     {
-        SanitationTargetType.Warehouse => "Склад",
-        SanitationTargetType.AgingChamber => "Камера",
+        SanitationTargetType.WAREHOUSE => "Склад",
+        SanitationTargetType.AGING_CHAMBER => "Камера",
         _ => "Ёмкость"
     };
 

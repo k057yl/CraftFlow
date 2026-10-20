@@ -35,9 +35,9 @@ public class CreateStorageLocationHandler : IRequestHandler<CreateStorageLocatio
 
         var defaultRule = SanitationRule.Create(
             _tenantContext.TenantId,
-            SanitationTargetType.StorageLocation,
+            SanitationTargetType.STORAGE_LOCATION,
             storageLocation.Id,
-            SanitationTriggerType.BatchCount,
+            SanitationTriggerType.BATCH_COUNT,
             requiredChemicals: "Щелочной раствор / Дезинфектант",
             maxBatchCount: storageLocation.WashCycleBatchInterval,
             intervalDays: 7

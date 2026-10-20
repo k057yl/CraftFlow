@@ -20,7 +20,7 @@ public class DeleteAccountHandler : IRequestHandler<DeleteAccountCommand, Result
 
     public async Task<Result<bool>> Handle(DeleteAccountCommand request, CancellationToken cancellationToken)
     {
-        if (_tenantContext.Role != TenantRole.Owner && !_tenantContext.IsSuperAdmin)
+        if (_tenantContext.Role != TenantRole.OWNER && !_tenantContext.IsSuperAdmin)
         {
             return Result.Failure<bool>(Error.Validation("ONLY_OWNER_CAN_DELETE_ACCOUNT"));
         }

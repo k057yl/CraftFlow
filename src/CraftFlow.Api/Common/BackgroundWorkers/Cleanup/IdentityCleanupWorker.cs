@@ -48,7 +48,7 @@ public class IdentityCleanupWorker : BackgroundService
 
         var deletedCount = await dbContext.Users
             .IgnoreQueryFilters()
-            .Where(u => u.Status == UserStatus.PendingActivation && u.OtpExpiresAtUtc != null && u.OtpExpiresAtUtc < nowUtc)
+            .Where(u => u.Status == UserStatus.PENDING_ACTIVATION && u.OtpExpiresAtUtc != null && u.OtpExpiresAtUtc < nowUtc)
             .ExecuteDeleteAsync(cancellationToken);
 
         if (deletedCount > 0)
@@ -69,7 +69,7 @@ public class IdentityCleanupWorker : BackgroundService
 
         var expiredTenantIds = await dbContext.Organizations
             .IgnoreQueryFilters()
-            .Where(o => o.Status == OrganizationStatus.DeactivatedByOwner && o.DeactivatedAtUtc <= twoYearsAgo)
+            .Where(o => o.Status == OrganizationStatus.DEACTIVATED_BY_OWNER && o.DeactivatedAtUtc <= twoYearsAgo)
             .Select(o => o.Id)
             .ToListAsync(cancellationToken);
 
@@ -81,7 +81,7 @@ public class IdentityCleanupWorker : BackgroundService
 
         var tenantsToNotify = await dbContext.Organizations
             .IgnoreQueryFilters()
-            .Where(o => o.Status == OrganizationStatus.DeactivatedByOwner
+            .Where(o => o.Status == OrganizationStatus.DEACTIVATED_BY_OWNER
                      && o.DeactivatedAtUtc <= sixMonthsAgo
                      && (o.LastRetentionNoticeSentAtUtc == null || o.LastRetentionNoticeSentAtUtc <= sixMonthsAgo))
             .ToListAsync(cancellationToken);
@@ -91,7 +91,7 @@ public class IdentityCleanupWorker : BackgroundService
             var ownerMember = await dbContext.OrganizationMembers
                 .IgnoreQueryFilters()
                 .Include(m => m.User)
-                .FirstOrDefaultAsync(m => m.TenantId == org.Id && m.Role == TenantRole.Owner, cancellationToken);
+                .FirstOrDefaultAsync(m => m.TenantId == org.Id && m.Role == TenantRole.OWNER, cancellationToken);
 
             var ownerUser = ownerMember?.User;
 

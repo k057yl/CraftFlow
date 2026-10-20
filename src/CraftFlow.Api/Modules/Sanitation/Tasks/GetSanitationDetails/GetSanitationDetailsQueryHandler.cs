@@ -22,7 +22,7 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
         DateTime? lastWashedAt = null;
         DateTime? nextWashDueDate = null;
 
-        if (request.TargetType == SanitationTargetType.StorageLocation)
+        if (request.TargetType == SanitationTargetType.STORAGE_LOCATION)
         {
             var loc = await _context.StorageLocations.AsNoTracking().FirstOrDefaultAsync(l => l.Id == request.TargetId, cancellationToken);
             if (loc == null) throw new KeyNotFoundException(ErrorCodes.General.NOT_FOUND);
@@ -30,13 +30,13 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
             lastWashedAt = loc.LastWashedAt;
             nextWashDueDate = loc.NextWashDueDate;
         }
-        else if (request.TargetType == SanitationTargetType.Warehouse)
+        else if (request.TargetType == SanitationTargetType.WAREHOUSE)
         {
             var wh = await _context.Warehouses.AsNoTracking().FirstOrDefaultAsync(w => w.Id == request.TargetId, cancellationToken);
             if (wh == null) throw new KeyNotFoundException(ErrorCodes.General.NOT_FOUND);
             targetName = wh.Name;
         }
-        else if (request.TargetType == SanitationTargetType.AgingChamber)
+        else if (request.TargetType == SanitationTargetType.AGING_CHAMBER)
         {
             var ch = await _context.AgingChambers.AsNoTracking().FirstOrDefaultAsync(c => c.Id == request.TargetId, cancellationToken);
             if (ch == null) throw new KeyNotFoundException(ErrorCodes.General.NOT_FOUND);
@@ -46,7 +46,7 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
         var activeTask = await _context.SanitationTasks.AsNoTracking()
             .FirstOrDefaultAsync(t => t.TargetType == request.TargetType
                                    && t.TargetId == request.TargetId
-                                   && t.Status == SanitationTaskStatus.InProgress, cancellationToken);
+                                   && t.Status == SanitationTaskStatus.IN_PROGRESS, cancellationToken);
 
         Guid? activeTaskId = activeTask?.Id;
         bool isUnderSanitation = activeTask != null;
@@ -85,7 +85,7 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
         if (lastWashedByUserName == "—")
         {
             var lastCompletedTask = await _context.SanitationTasks.AsNoTracking()
-                .Where(t => t.TargetType == request.TargetType && t.TargetId == request.TargetId && (t.Status == SanitationTaskStatus.Completed || t.Status == SanitationTaskStatus.Verified))
+                .Where(t => t.TargetType == request.TargetType && t.TargetId == request.TargetId && (t.Status == SanitationTaskStatus.COMPLETED || t.Status == SanitationTaskStatus.VERIFIED))
                 .OrderByDescending(t => t.CompletedAt)
                 .FirstOrDefaultAsync(cancellationToken);
 

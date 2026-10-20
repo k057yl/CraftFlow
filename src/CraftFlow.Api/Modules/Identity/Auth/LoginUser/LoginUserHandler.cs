@@ -65,7 +65,7 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginRe
         var tokenString = _tokenService.GenerateJwtToken(user, activeMember, isSystemAdmin);
 
         var tenantId = activeMember?.TenantId ?? Guid.Empty;
-        var role = isSystemAdmin ? TenantRole.SuperAdmin : (activeMember?.Role ?? TenantRole.None);
+        var role = isSystemAdmin ? TenantRole.SUPER_ADMIN : (activeMember?.Role ?? TenantRole.NONE);
 
         return Result.Success(new LoginResponseDto(
             tokenString,

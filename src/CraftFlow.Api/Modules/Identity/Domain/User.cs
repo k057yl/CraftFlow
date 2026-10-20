@@ -24,7 +24,7 @@ public sealed class User : AggregateRoot
             Email = email.Trim().ToLowerInvariant(),
             PasswordHash = passwordHash,
             FullName = fullName.Trim(),
-            Status = requireOtp ? UserStatus.PendingActivation : UserStatus.Active
+            Status = requireOtp ? UserStatus.PENDING_ACTIVATION : UserStatus.ACTIVE
         };
     }
 
@@ -40,7 +40,7 @@ public sealed class User : AggregateRoot
         OtpExpiresAtUtc = null;
     }
 
-    public void Activate() => Status = UserStatus.Active;
-    public void Deactivate() => Status = UserStatus.Blocked;
-    public void Block() => Status = UserStatus.Blocked;
+    public void Activate() => Status = UserStatus.ACTIVE;
+    public void Deactivate() => Status = UserStatus.BLOCKED;
+    public void Block() => Status = UserStatus.BLOCKED;
 }

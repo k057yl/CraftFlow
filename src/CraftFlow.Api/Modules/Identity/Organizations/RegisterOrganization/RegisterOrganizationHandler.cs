@@ -50,7 +50,7 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
 
         _dbContext.Users.Add(ownerUser);
 
-        organization.AddMember(ownerUser.Id, TenantRole.Owner);
+        organization.AddMember(ownerUser.Id, TenantRole.OWNER);
 
         var freePlan = await _dbContext.SubscriptionPlans
             .FirstOrDefaultAsync(p => p.Code == CoreConstants.Billing.PLAN_FREE_CODE, cancellationToken)

@@ -60,22 +60,22 @@ public sealed class SanitationRule : AggregateRoot, ITenantEntity
     {
         switch (triggerType)
         {
-            case SanitationTriggerType.IntervalDays:
+            case SanitationTriggerType.INTERVAL_DAYS:
                 if (!intervalDays.HasValue || intervalDays.Value <= 0)
                     throw new ArgumentException(ErrorCodes.Sanitation.INVALID_TRIGGER_CONFIG);
                 break;
 
-            case SanitationTriggerType.BatchCount:
+            case SanitationTriggerType.BATCH_COUNT:
                 if (!maxBatchCount.HasValue || maxBatchCount.Value <= 0)
                     throw new ArgumentException(ErrorCodes.Sanitation.INVALID_TRIGGER_CONFIG);
                 break;
 
-            case SanitationTriggerType.Both:
+            case SanitationTriggerType.BOTH:
                 if ((!intervalDays.HasValue || intervalDays.Value <= 0) && (!maxBatchCount.HasValue || maxBatchCount.Value <= 0))
                     throw new ArgumentException(ErrorCodes.Sanitation.INVALID_TRIGGER_CONFIG);
                 break;
 
-            case SanitationTriggerType.ScheduledDate:
+            case SanitationTriggerType.SCHEDULED_DATE:
                 if (!nextScheduledAt.HasValue)
                     throw new ArgumentException(ErrorCodes.Sanitation.INVALID_TRIGGER_CONFIG);
                 break;

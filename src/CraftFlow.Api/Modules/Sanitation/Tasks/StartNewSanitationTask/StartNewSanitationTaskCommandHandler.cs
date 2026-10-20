@@ -32,7 +32,7 @@ public sealed class StartNewSanitationTaskCommandHandler : IRequestHandler<Start
 
         _context.SanitationTasks.Add(task);
 
-        if (request.TargetType == SanitationTargetType.StorageLocation)
+        if (request.TargetType == SanitationTargetType.STORAGE_LOCATION)
         {
             var location = await _context.StorageLocations
                 .FirstOrDefaultAsync(l => l.Id == request.TargetId, cancellationToken);
