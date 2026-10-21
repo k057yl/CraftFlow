@@ -14,73 +14,53 @@
         <TextBlock Text="{loc:Loc Key=TITLE_STORAGE}" FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,16"/>
 
         <Grid Grid.Row="1">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="220"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="320"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
 
-            <!-- Верхняя часть: Склады и Камеры -->
-            <Grid Grid.Row="0" Margin="0,0,0,12">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
+            <!-- Левый блок: А (Склады) и Б (Камеры) -->
+            <Grid Grid.Column="0" Margin="0,0,12,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
 
-                <!-- Склады -->
-                <GroupBox Grid.Column="0" Header="{loc:Loc Key=WAREHOUSES_HEADER}" Margin="0,0,6,0" Padding="10">
+                <!-- БЛОК А: Склады -->
+                <GroupBox Grid.Row="0" Header="{loc:Loc Key=WAREHOUSES_HEADER}" Margin="0,0,0,6" Padding="10">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <Grid Grid.Row="0" Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="120"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                            <TextBlock Text="{loc:Loc Key=WAREHOUSE_NAME}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                            <TextBox x:Name="WarehouseNameTextBox" Height="28" Margin="0,0,0,8"/>
 
-                            <StackPanel Grid.Column="0" Margin="0,0,6,0">
-                                <TextBlock Text="{loc:Loc Key=WAREHOUSE_NAME}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-                                <TextBox x:Name="WarehouseNameTextBox" Height="28"/>
-                            </StackPanel>
+                            <TextBlock Text="{loc:Loc Key=LABEL_ZONE_TYPE}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                            <ComboBox x:Name="WarehouseTypeComboBox" Height="28" SelectedIndex="0" Margin="0,0,0,8">
+                                <ComboBoxItem Content="{loc:Loc Key=TYPE_WAREHOUSE}" Tag="WAREHOUSE"/>
+                                <ComboBoxItem Content="{loc:Loc Key=TYPE_BREWHOUSE}" Tag="BREWHOUSE"/>
+                            </ComboBox>
 
-                            <StackPanel Grid.Column="1" Margin="0,0,6,0">
-                                <TextBlock Text="Тип зоны:" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-                                <ComboBox x:Name="WarehouseTypeComboBox" Height="28" SelectedIndex="0">
-                                    <ComboBoxItem Content="Склад" Tag="WAREHOUSE"/>
-                                    <ComboBoxItem Content="Варочный цех" Tag="BREWHOUSE"/>
-                                </ComboBox>
-                            </StackPanel>
+                            <TextBlock Text="{loc:Loc Key=LABEL_ADDRESS}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                            <TextBox x:Name="WarehouseAddressTextBox" Height="28" Margin="0,0,0,8"/>
 
-                            <StackPanel Grid.Column="2" Margin="0,0,6,0">
-                                <TextBlock Text="{loc:Loc Key=LABEL_ADDRESS}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-                                <TextBox x:Name="WarehouseAddressTextBox" Height="28"/>
-                            </StackPanel>
+                            <Button Content="{loc:Loc Key=BTN_ADD}" Click="CreateWarehouse_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
 
-                            <Button Grid.Column="3" 
-                                    Content="{loc:Loc Key=BTN_ADD}" 
-                                    Click="CreateWarehouse_Click" 
-                                    Style="{StaticResource PrimaryButtonStyle}" 
-                                    Height="28" 
-                                    Padding="12,0" 
-                                    VerticalAlignment="Bottom"/>
-                        </Grid>
-
-                        <DataGrid Grid.Row="1" x:Name="WarehousesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" MouseDoubleClick="WarehousesDataGrid_MouseDoubleClick">
+                        <DataGrid Grid.Row="1" x:Name="WarehousesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding Name}" Width="*"/>
 
-                                <!-- Кнопки управления складом -->
-                                <DataGridTemplateColumn Width="75">
+                                <DataGridTemplateColumn Width="50">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                <Button Content="⚙️" Click="OpenWarehouseSanitation_Click" Tag="{Binding}" ToolTip="Регламент мойки склада" Width="24" Height="24" Margin="0,0,4,0"/>
-                                                <Button Content="✕" Click="DeleteWarehouse_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
-                                            </StackPanel>
+                                            <Button Style="{StaticResource ActionButtonStyle}" 
+                                                    Click="OpenWarehouseMenu_Click" 
+                                                    Tag="{Binding}" 
+                                                    ToolTip="Действия"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -89,58 +69,50 @@
                     </Grid>
                 </GroupBox>
 
-                <!-- Камеры выдержки -->
-                <GroupBox Grid.Column="1" Header="{loc:Loc Key=HEADER_AGING_CHAMBERS}" Margin="6,0,0,0" Padding="10">
+                <!-- БЛОК Б: Камеры выдержки -->
+                <GroupBox Grid.Row="1" Header="{loc:Loc Key=HEADER_AGING_CHAMBERS}" Margin="0,6,0,0" Padding="10">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
-                        <Grid Grid.Row="0" Margin="0,0,0,10">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="50"/>
-                                <ColumnDefinition Width="50"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+                            <TextBlock Text="{loc:Loc Key=AGING_CHAMBER_NAME}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                            <TextBox x:Name="ChamberNameTextBox" Height="28" Margin="0,0,0,8"/>
 
-                            <StackPanel Grid.Column="0" Margin="0,0,6,0">
-                                <TextBlock Text="{loc:Loc Key=AGING_CHAMBER_NAME}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-                                <TextBox x:Name="ChamberNameTextBox" Height="28"/>
-                            </StackPanel>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="8"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
 
-                            <StackPanel Grid.Column="1" Margin="0,0,6,0">
-                                <TextBlock Text="{loc:Loc Key=LABEL_TEMP_SHORT}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-                                <TextBox x:Name="ChamberTempTextBox" Text="12.0" Height="28"/>
-                            </StackPanel>
+                                <StackPanel Grid.Column="0">
+                                    <TextBlock Text="{loc:Loc Key=LABEL_TEMP_SHORT}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                    <TextBox x:Name="ChamberTempTextBox" Text="12.0" Height="28"/>
+                                </StackPanel>
 
-                            <StackPanel Grid.Column="2" Margin="0,0,6,0">
-                                <TextBlock Text="{loc:Loc Key=LABEL_HUMIDITY_SHORT}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-                                <TextBox x:Name="ChamberHumidityTextBox" Text="85.0" Height="28"/>
-                            </StackPanel>
+                                <StackPanel Grid.Column="2">
+                                    <TextBlock Text="{loc:Loc Key=LABEL_HUMIDITY_SHORT}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                    <TextBox x:Name="ChamberHumidityTextBox" Text="85.0" Height="28"/>
+                                </StackPanel>
+                            </Grid>
 
-                            <Button Grid.Column="3" 
-                                    Content="{loc:Loc Key=BTN_ADD}" 
-                                    Click="CreateChamber_Click" 
-                                    Style="{StaticResource PrimaryButtonStyle}" 
-                                    Height="28" 
-                                    Padding="12,0" 
-                                    VerticalAlignment="Bottom"/>
-                        </Grid>
+                            <Button Content="{loc:Loc Key=BTN_ADD}" Click="CreateChamber_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" HorizontalAlignment="Stretch"/>
+                        </StackPanel>
 
-                        <DataGrid Grid.Row="1" x:Name="ChambersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" MouseDoubleClick="ChambersDataGrid_MouseDoubleClick">
+                        <DataGrid Grid.Row="1" x:Name="ChambersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="{loc:Loc Key=AGING_CHAMBER_NAME}" Binding="{Binding Name}" Width="*"/>
 
-                                <!-- Кнопки управления камерой -->
-                                <DataGridTemplateColumn Width="75">
+                                <DataGridTemplateColumn Width="50">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                <Button Content="⚙️" Click="OpenChamberSanitation_Click" Tag="{Binding}" ToolTip="Регламент мойки камеры" Width="24" Height="24" Margin="0,0,4,0"/>
-                                                <Button Content="✕" Click="DeleteChamber_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
-                                            </StackPanel>
+                                            <Button Style="{StaticResource ActionButtonStyle}" 
+                                                    Click="OpenChamberMenu_Click" 
+                                                    Tag="{Binding}" 
+                                                    ToolTip="Действия"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -150,8 +122,8 @@
                 </GroupBox>
             </Grid>
 
-            <!-- Нижняя часть: Ёмкости, танки, фильтры и алярмы мойки -->
-            <GroupBox Grid.Row="1" Header="{loc:Loc Key=HEADER_EQUIPMENT}" Padding="10">
+            <!-- БЛОК С: Оборудование -->
+            <GroupBox Grid.Column="1" Header="{loc:Loc Key=HEADER_EQUIPMENT}" Padding="10">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -159,7 +131,6 @@
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Плашка карточек-алярмов мойки -->
                     <Grid Grid.Row="0" Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="Auto"/>
@@ -169,60 +140,57 @@
 
                         <Button Grid.Column="0" Content="{loc:Loc Key=BTN_CREATE_EQUIPMENT}" Click="OpenCreateStorageLocationModal_Click" Style="{StaticResource PrimaryButtonStyle}" Height="32" Padding="14,0" VerticalAlignment="Center"/>
 
-                        <!-- Индикаторы состояния / Алярмы -->
                         <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
                             <Border Background="#F5F5F5" CornerRadius="6" Padding="10,6" Margin="0,0,8,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="Всего ёмкостей: " FontSize="11" Foreground="#666"/>
+                                    <TextBlock Text="{loc:Loc Key=LABEL_TOTAL_EQUIPMENT}" FontSize="11" Foreground="#666"/>
                                     <TextBlock x:Name="TotalEquipmentCountTextBlock" Text="0" FontWeight="Bold" FontSize="11" Foreground="#333"/>
                                 </StackPanel>
                             </Border>
 
                             <Border Background="#FFF3E0" CornerRadius="6" Padding="10,6" Margin="0,0,8,0">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="⚠️ Скоро мойка: " FontSize="11" Foreground="#EF6C00"/>
+                                    <TextBlock Text="{loc:Loc Key=LABEL_WASH_SOON}" FontSize="11" Foreground="#EF6C00"/>
                                     <TextBlock x:Name="WarningCountTextBlock" Text="0" FontWeight="Bold" FontSize="11" Foreground="#EF6C00"/>
                                 </StackPanel>
                             </Border>
 
                             <Border Background="#FFEBEE" CornerRadius="6" Padding="10,6">
                                 <StackPanel Orientation="Horizontal">
-                                    <TextBlock Text="🚨 Просрочено: " FontSize="11" Foreground="#C62828"/>
+                                    <TextBlock Text="{loc:Loc Key=LABEL_WASH_OVERDUE}" FontSize="11" Foreground="#C62828"/>
                                     <TextBlock x:Name="OverdueCountTextBlock" Text="0" FontWeight="Bold" FontSize="11" Foreground="#C62828"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
                     </Grid>
 
-                    <!-- Панель фильтрации -->
                     <Grid Grid.Row="1" Margin="0,0,0,10">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="180"/>
                         </Grid.ColumnDefinitions>
 
-                        <TextBox x:Name="SearchFilterTextBox" Grid.Column="0" Height="28" Margin="0,0,8,0" TextChanged="FilterChanged" ToolTip="Поиск по названию, типу или локации"/>
+                        <TextBox x:Name="SearchFilterTextBox" Grid.Column="0" Height="28" Margin="0,0,8,0" TextChanged="FilterChanged" ToolTip="{loc:Loc Key=TOOLTIP_SEARCH_FILTER}"/>
 
                         <ComboBox x:Name="StatusFilterComboBox" Grid.Column="1" Height="28" SelectedIndex="0" SelectionChanged="FilterChanged">
-                            <ComboBoxItem Content="Все статусы"/>
-                            <ComboBoxItem Content="🟢 В норме (ОК)"/>
-                            <ComboBoxItem Content="⚠️ Скоро мойка"/>
-                            <ComboBoxItem Content="🚨 Просрочено"/>
+                            <ComboBoxItem Content="{loc:Loc Key=FILTER_STATUS_ALL}"/>
+                            <ComboBoxItem Content="{loc:Loc Key=FILTER_STATUS_OK}"/>
+                            <ComboBoxItem Content="{loc:Loc Key=FILTER_STATUS_WARNING}"/>
+                            <ComboBoxItem Content="{loc:Loc Key=FILTER_STATUS_OVERDUE}"/>
                         </ComboBox>
                     </Grid>
 
-                    <!-- Таблица оборудования -->
-                    <DataGrid Grid.Row="2" x:Name="StorageLocationsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False" MouseDoubleClick="StorageLocationsDataGrid_MouseDoubleClick">
+                    <DataGrid Grid.Row="2" x:Name="StorageLocationsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="{loc:Loc Key=LABEL_EQUIPMENT_NAME}" Binding="{Binding Name}" Width="150"/>
                             <DataGridTextColumn Header="{loc:Loc Key=LABEL_TYPE}" Binding="{Binding LocationType}" Width="110"/>
                             <DataGridTextColumn Header="{loc:Loc Key=LABEL_PARENT_LOCATION}" Binding="{Binding ParentName}" Width="160"/>
                             <DataGridTextColumn Header="{loc:Loc Key=LABEL_VOLUME}" Binding="{Binding VolumeInfo}" Width="180"/>
 
-                            <DataGridTextColumn Header="Пред. мойка" Binding="{Binding LastWashedText}" Width="120"/>
-                            <DataGridTextColumn Header="Срок мойки" Binding="{Binding NextWashText}" Width="100"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_PREV_WASH}" Binding="{Binding LastWashedText}" Width="120"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=LABEL_NEXT_WASH}" Binding="{Binding NextWashText}" Width="100"/>
 
-                            <DataGridTemplateColumn Header="Статус мойки" Width="*">
+                            <DataGridTemplateColumn Header="{loc:Loc Key=LABEL_WASH_STATUS}" Width="*">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <Border Background="{Binding StatusBackground}" CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Center">
@@ -232,13 +200,14 @@
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
 
-                            <DataGridTemplateColumn Header="Действия" Width="80">
+                            <DataGridTemplateColumn Header="{loc:Loc Key=LABEL_ACTIONS}" Width="50">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                            <Button Content="⚙️" Click="OpenSanitationWindow_Click" Tag="{Binding}" ToolTip="Настройка мойки и регламента" Width="26" Height="24" Margin="0,0,4,0"/>
-                                            <Button Content="✕" Click="DeleteStorageLocation_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
-                                        </StackPanel>
+                                        <Button Style="{StaticResource ActionButtonStyle}" 
+                                                Click="OpenLocationMenu_Click" 
+                                                Tag="{Binding}" 
+                                                ToolTip="Действия" 
+                                                HorizontalAlignment="Center"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>

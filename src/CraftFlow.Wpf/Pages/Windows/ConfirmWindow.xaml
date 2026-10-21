@@ -1,0 +1,41 @@
+﻿<Window x:Class="CraftFlow.Wpf.Windows.ConfirmWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
+        Title="CraftFlow" 
+        Height="180" 
+        Width="400" 
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent">
+
+    <Border Background="{DynamicResource CardBackgroundBrush}" 
+            BorderBrush="{DynamicResource BorderBrush}" 
+            BorderThickness="1" 
+            CornerRadius="10" 
+            Padding="20">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+                <TextBlock Text="❓" FontSize="20" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                <TextBlock x:Name="TitleTextBlock" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" VerticalAlignment="Center"/>
+            </StackPanel>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,0,0,15">
+                <TextBlock x:Name="MessageTextBlock" FontSize="12" Foreground="{DynamicResource AppForegroundBrush}" TextWrapping="Wrap" LineHeight="18"/>
+            </ScrollViewer>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Content="{loc:Loc Key=BTN_CANCEL}" Click="Cancel_Click" Width="90" Height="30" Margin="0,0,8,0"/>
+                <Button Content="{loc:Loc Key=BTN_CONFIRM}" Click="Confirm_Click" Style="{StaticResource DangerButtonStyle}" Width="90" Height="30"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

@@ -144,6 +144,34 @@
 	<data name="LABEL_ADDRESS" xml:space="preserve"><value>Адрес:</value></data>
 	<data name="LABEL_TEMP_SHORT" xml:space="preserve"><value>Т, °C:</value></data>
 	<data name="LABEL_HUMIDITY_SHORT" xml:space="preserve"><value>Вл, %:</value></data>
+	<data name="LABEL_ZONE_TYPE" xml:space="preserve"><value>Тип зоны:</value></data>
+	<data name="TYPE_WAREHOUSE" xml:space="preserve"><value>Склад</value></data>
+	<data name="TYPE_BREWHOUSE" xml:space="preserve"><value>Варочный цех</value></data>
+	<data name="LABEL_TOTAL_EQUIPMENT" xml:space="preserve"><value>Всего ёмкостей: </value></data>
+	<data name="LABEL_WASH_SOON" xml:space="preserve"><value>⚠️ Скоро мойка: </value></data>
+	<data name="LABEL_WASH_OVERDUE" xml:space="preserve"><value>🚨 Просрочено: </value></data>
+	<data name="TOOLTIP_SEARCH_FILTER" xml:space="preserve"><value>Поиск по названию, типу или локации</value></data>
+	<data name="FILTER_STATUS_ALL" xml:space="preserve"><value>Все статусы</value></data>
+	<data name="FILTER_STATUS_OK" xml:space="preserve"><value>🟢 В норме (ОК)</value></data>
+	<data name="FILTER_STATUS_WARNING" xml:space="preserve"><value>⚠️ Скоро мойка</value></data>
+	<data name="FILTER_STATUS_OVERDUE" xml:space="preserve"><value>🚨 Просрочено</value></data>
+	<data name="LABEL_PREV_WASH" xml:space="preserve"><value>Пред. мойка</value></data>
+	<data name="LABEL_NEXT_WASH" xml:space="preserve"><value>Срок мойки</value></data>
+	<data name="LABEL_WASH_STATUS" xml:space="preserve"><value>Статус мойки</value></data>
+	<data name="LABEL_ACTIONS" xml:space="preserve"><value>Действия</value></data>
+	<data name="MENU_SANITATION_PLAN" xml:space="preserve"><value>Планирование мойки</value></data>
+	<data name="MENU_SANITATION_DETAILS" xml:space="preserve"><value>Мойка и История</value></data>
+	<data name="MENU_DELETE" xml:space="preserve"><value>Удалить</value></data>
+
+	<!-- ========================================== -->
+	<!-- 3.1: Модалка удаления	                    -->
+	<!-- ========================================== -->
+	<data name="CONFIRM_ACTION_TITLE" xml:space="preserve"><value>Подтверждение действия</value></data>
+	<data name="CONFIRM_DELETE_WAREHOUSE" xml:space="preserve"><value>Вы уверены, что хотите удалить этот склад?</value></data>
+	<data name="CONFIRM_DELETE_CHAMBER" xml:space="preserve"><value>Вы уверены, что хотите удалить эту камеру?</value></data>
+	<data name="CONFIRM_DELETE_LOCATION" xml:space="preserve"><value>Вы уверены, что хотите удалить это оборудование?</value></data>
+	<data name="BTN_CANCEL" xml:space="preserve"><value>Отмена</value></data>
+	<data name="BTN_CONFIRM" xml:space="preserve"><value>Подтвердить</value></data>
 
 	<!-- ========================================== -->
 	<!-- 4: Закупки и Поставки                       -->

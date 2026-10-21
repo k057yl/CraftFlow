@@ -12,7 +12,6 @@ using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
 
 namespace CraftFlow.Wpf.Pages;
@@ -124,96 +123,196 @@ public partial class StoragePage : Page
         }
     }
 
-    #region Регламенты моек (Шестеренки)
+    #region Выпадающие меню (Дропдауны)
 
-    private async void OpenSanitationWindow_Click(object sender, RoutedEventArgs e)
+    private void OpenWarehouseMenu_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is LookupItem item)
+        {
+            var menu = new ContextMenu();
+
+            var planItem = new MenuItem { Header = LocalizationService.Get("MENU_SANITATION_PLAN") };
+            planItem.Click += (s, args) => OpenWarehouseSanitation(item);
+
+            var detailsItem = new MenuItem { Header = LocalizationService.Get("MENU_SANITATION_DETAILS") };
+            detailsItem.Click += (s, args) => OpenWarehouseDetails(item);
+
+            var deleteItem = new MenuItem { Header = LocalizationService.Get("MENU_DELETE") };
+            deleteItem.Click += async (s, args) => await DeleteWarehouseAsync(item.Id);
+
+            menu.Items.Add(planItem);
+            menu.Items.Add(detailsItem);
+            menu.Items.Add(new Separator());
+            menu.Items.Add(deleteItem);
+
+            menu.PlacementTarget = btn;
+            menu.IsOpen = true;
+        }
+    }
+
+    private void OpenChamberMenu_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is LookupItem item)
+        {
+            var menu = new ContextMenu();
+
+            var planItem = new MenuItem { Header = LocalizationService.Get("MENU_SANITATION_PLAN") };
+            planItem.Click += (s, args) => OpenChamberSanitation(item);
+
+            var detailsItem = new MenuItem { Header = LocalizationService.Get("MENU_SANITATION_DETAILS") };
+            detailsItem.Click += (s, args) => OpenChamberDetails(item);
+
+            var deleteItem = new MenuItem { Header = LocalizationService.Get("MENU_DELETE") };
+            deleteItem.Click += async (s, args) => await DeleteChamberAsync(item.Id);
+
+            menu.Items.Add(planItem);
+            menu.Items.Add(detailsItem);
+            menu.Items.Add(new Separator());
+            menu.Items.Add(deleteItem);
+
+            menu.PlacementTarget = btn;
+            menu.IsOpen = true;
+        }
+    }
+
+    private void OpenLocationMenu_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Button btn && btn.Tag is StorageLocationViewItem item)
         {
-            var dialog = new SanitationRuleWindow(item.Id, item.Name, SanitationTargetType.STORAGE_LOCATION)
-            {
-                Owner = Window.GetWindow(this)
-            };
+            var menu = new ContextMenu();
 
-            if (dialog.ShowDialog() == true)
-            {
-                await LoadDataAsync();
-            }
-        }
-    }
+            var planItem = new MenuItem { Header = LocalizationService.Get("MENU_SANITATION_PLAN") };
+            planItem.Click += (s, args) => OpenLocationSanitation(item);
 
-    private async void OpenWarehouseSanitation_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is LookupItem item)
-        {
-            var dialog = new SanitationRuleWindow(item.Id, item.Name, SanitationTargetType.WAREHOUSE)
-            {
-                Owner = Window.GetWindow(this)
-            };
+            var detailsItem = new MenuItem { Header = LocalizationService.Get("MENU_SANITATION_DETAILS") };
+            detailsItem.Click += (s, args) => OpenLocationDetails(item);
 
-            if (dialog.ShowDialog() == true)
-            {
-                await LoadDataAsync();
-            }
-        }
-    }
+            var deleteItem = new MenuItem { Header = LocalizationService.Get("MENU_DELETE") };
+            deleteItem.Click += async (s, args) => await DeleteStorageLocationAsync(item.Id);
 
-    private async void OpenChamberSanitation_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is LookupItem item)
-        {
-            var dialog = new SanitationRuleWindow(item.Id, item.Name, SanitationTargetType.AGING_CHAMBER)
-            {
-                Owner = Window.GetWindow(this)
-            };
+            menu.Items.Add(planItem);
+            menu.Items.Add(detailsItem);
+            menu.Items.Add(new Separator());
+            menu.Items.Add(deleteItem);
 
-            if (dialog.ShowDialog() == true)
-            {
-                await LoadDataAsync();
-            }
+            menu.PlacementTarget = btn;
+            menu.IsOpen = true;
         }
     }
 
     #endregion
 
-    #region Просмотр истории и состояния (Дабл-клик по строке)
+    #region Логика вызовов диалогов
 
-    private async void WarehousesDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private async void OpenWarehouseSanitation(LookupItem item)
     {
-        if (WarehousesDataGrid.SelectedItem is LookupItem item)
+        var dialog = new SanitationRuleWindow(item.Id, item.Name, SanitationTargetType.WAREHOUSE)
         {
-            var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.WAREHOUSE)
-            {
-                Owner = Window.GetWindow(this)
-            };
-            detailsWindow.ShowDialog();
+            Owner = Window.GetWindow(this)
+        };
+        if (dialog.ShowDialog() == true) await LoadDataAsync();
+    }
+
+    private async void OpenWarehouseDetails(LookupItem item)
+    {
+        var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.WAREHOUSE)
+        {
+            Owner = Window.GetWindow(this)
+        };
+        detailsWindow.ShowDialog();
+        await LoadDataAsync();
+    }
+
+    private async void OpenChamberSanitation(LookupItem item)
+    {
+        var dialog = new SanitationRuleWindow(item.Id, item.Name, SanitationTargetType.AGING_CHAMBER)
+        {
+            Owner = Window.GetWindow(this)
+        };
+        if (dialog.ShowDialog() == true) await LoadDataAsync();
+    }
+
+    private async void OpenChamberDetails(LookupItem item)
+    {
+        var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.AGING_CHAMBER)
+        {
+            Owner = Window.GetWindow(this)
+        };
+        detailsWindow.ShowDialog();
+        await LoadDataAsync();
+    }
+
+    private async void OpenLocationSanitation(StorageLocationViewItem item)
+    {
+        var dialog = new SanitationRuleWindow(item.Id, item.Name, SanitationTargetType.STORAGE_LOCATION)
+        {
+            Owner = Window.GetWindow(this)
+        };
+        if (dialog.ShowDialog() == true) await LoadDataAsync();
+    }
+
+    private async void OpenLocationDetails(StorageLocationViewItem item)
+    {
+        var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.STORAGE_LOCATION)
+        {
+            Owner = Window.GetWindow(this)
+        };
+        detailsWindow.ShowDialog();
+        await LoadDataAsync();
+    }
+
+    #endregion
+
+    #region Удаление с подтверждением
+
+    private async Task DeleteWarehouseAsync(Guid id)
+    {
+        var owner = Window.GetWindow(this);
+        if (!ConfirmWindow.Show(owner, "CONFIRM_DELETE_WAREHOUSE")) return;
+
+        var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{InventoryConstants.WAREHOUSES}/{id}");
+        if (isSuccess)
+        {
+            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
             await LoadDataAsync();
+        }
+        else
+        {
+            AlertWindow.ShowError(owner, error);
         }
     }
 
-    private async void ChambersDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private async Task DeleteChamberAsync(Guid id)
     {
-        if (ChambersDataGrid.SelectedItem is LookupItem item)
+        var owner = Window.GetWindow(this);
+        if (!ConfirmWindow.Show(owner, "CONFIRM_DELETE_CHAMBER")) return;
+
+        var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{AgingConstants.AGING_CHAMBERS}/{id}");
+        if (isSuccess)
         {
-            var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.AGING_CHAMBER)
-            {
-                Owner = Window.GetWindow(this)
-            };
-            detailsWindow.ShowDialog();
+            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
             await LoadDataAsync();
+        }
+        else
+        {
+            AlertWindow.ShowError(owner, error);
         }
     }
 
-    private async void StorageLocationsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    private async Task DeleteStorageLocationAsync(Guid id)
     {
-        if (StorageLocationsDataGrid.SelectedItem is StorageLocationViewItem item)
+        var owner = Window.GetWindow(this);
+        if (!ConfirmWindow.Show(owner, "CONFIRM_DELETE_LOCATION")) return;
+
+        var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{InventoryConstants.WAREHOUSES}/locations/{id}");
+        if (isSuccess)
         {
-            var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.STORAGE_LOCATION)
-            {
-                Owner = Window.GetWindow(this)
-            };
-            detailsWindow.ShowDialog();
+            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
             await LoadDataAsync();
+        }
+        else
+        {
+            AlertWindow.ShowError(owner, error);
         }
     }
 
@@ -341,73 +440,6 @@ public partial class StoragePage : Page
         {
             await LoadDataAsync();
             SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
-        }
-    }
-
-    private async void DeleteWarehouse_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is Guid id)
-        {
-            var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{InventoryConstants.WAREHOUSES}/{id}");
-            if (isSuccess)
-            {
-                SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
-                await LoadDataAsync();
-            }
-            else
-            {
-                SetStatusRaw(error, Brushes.Red);
-            }
-        }
-    }
-
-    private async void DeleteChamber_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is Guid id)
-        {
-            var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{AgingConstants.AGING_CHAMBERS}/{id}");
-            if (isSuccess)
-            {
-                SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
-                await LoadDataAsync();
-            }
-            else
-            {
-                SetStatusRaw(error, Brushes.Red);
-            }
-        }
-    }
-
-    private async void DeleteStorageLocation_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is Guid id)
-        {
-            var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{InventoryConstants.WAREHOUSES}/locations/{id}");
-            if (isSuccess)
-            {
-                SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
-                await LoadDataAsync();
-            }
-            else
-            {
-                SetStatusRaw(error, Brushes.Red);
-            }
-        }
-    }
-
-    private async void OpenExecutionSanitation_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is StorageLocationViewItem item)
-        {
-            var window = new SanitationExecutionWindow(item.Id, item.Name, SanitationTargetType.STORAGE_LOCATION)
-            {
-                Owner = Window.GetWindow(this)
-            };
-
-            if (window.ShowDialog() == true)
-            {
-                await LoadDataAsync();
-            }
         }
     }
 

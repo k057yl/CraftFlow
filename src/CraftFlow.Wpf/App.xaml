@@ -291,6 +291,51 @@
                 <Setter Property="Background" Value="#475569"/>
             </Style>
 
+            <!-- 5.3 КНОПКА ДЕЙСТВЯ (••• / 💬 / ⚙️) В ТАБЛИЦАХ -->
+            <Style x:Key="ActionButtonStyle" TargetType="Button">
+                <Setter Property="Background" Value="Transparent"/>
+                <Setter Property="Foreground" Value="{DynamicResource AppForegroundBrush}"/>
+                <Setter Property="BorderThickness" Value="0"/>
+                <Setter Property="Cursor" Value="Hand"/>
+                <Setter Property="Width" Value="24"/>
+                <Setter Property="Height" Value="24"/>
+                <Setter Property="Padding" Value="0"/>
+                <Setter Property="HorizontalAlignment" Value="Center"/>
+                <Setter Property="VerticalAlignment" Value="Center"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <!-- Обычный круглый фон 24x24 -->
+                            <Border x:Name="border" 
+                                    Background="{TemplateBinding Background}" 
+                                    CornerRadius="12" 
+                                    Width="24" 
+                                    Height="24"
+                                    SnapsToDevicePixels="True">
+
+                                <!-- 3 точки через StackPanel ровно по центру -->
+                                <StackPanel Orientation="Vertical" 
+                                HorizontalAlignment="Center" 
+                                VerticalAlignment="Center">
+                                    <Ellipse Width="2.5" Height="2.5" Fill="{TemplateBinding Foreground}" Margin="0,1"/>
+                                    <Ellipse Width="2.5" Height="2.5" Fill="{TemplateBinding Foreground}" Margin="0,1"/>
+                                    <Ellipse Width="2.5" Height="2.5" Fill="{TemplateBinding Foreground}" Margin="0,1"/>
+                                </StackPanel>
+                            </Border>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#25000000"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#40000000"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
             <!-- 6. КНОПКА ОПАСНОГО ДЕЙСТВИЯ -->
             <Style x:Key="DangerButtonStyle" TargetType="Button">
                 <Setter Property="Background" Value="Transparent"/>

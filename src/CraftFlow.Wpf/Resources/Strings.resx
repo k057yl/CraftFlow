@@ -120,10 +120,10 @@
 	<!-- ========================================== -->
 	<!-- 3: Warehouses & Equipment                  -->
 	<!-- ========================================== -->
-	<data name="TITLE_STORAGE" xml:space="preserve"><value>Warehouses &amp; Equipment</value></data>
-	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>Warehouses</value></data>
+	<data name="TITLE_STORAGE" xml:space="preserve"><value>Rooms &amp; Equipment</value></data>
+	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>Rooms</value></data>
 	<data name="HEADER_AGING_CHAMBERS" xml:space="preserve"><value>Aging Chambers</value></data>
-	<data name="HEADER_EQUIPMENT" xml:space="preserve"><value>Containers, Tanks &amp; Racks</value></data>
+	<data name="HEADER_EQUIPMENT" xml:space="preserve"><value>Vessels, Tanks &amp; Racks</value></data>
 	<data name="WAREHOUSE_NAME" xml:space="preserve"><value>Warehouse Name</value></data>
 	<data name="AGING_CHAMBER_NAME" xml:space="preserve"><value>Chamber Name</value></data>
 	<data name="BTN_CREATE_EQUIPMENT" xml:space="preserve"><value>Add Equipment</value></data>
@@ -132,8 +132,36 @@
 	<data name="LABEL_PARENT_LOCATION" xml:space="preserve"><value>Location</value></data>
 	<data name="LABEL_VOLUME" xml:space="preserve"><value>Volume / Capacity</value></data>
 	<data name="LABEL_ADDRESS" xml:space="preserve"><value>Address:</value></data>
-	<data name="LABEL_TEMP_SHORT" xml:space="preserve"><value>Temp, °C:</value></data>
+	<data name="LABEL_TEMP_SHORT" xml:space="preserve"><value>T, °C:</value></data>
 	<data name="LABEL_HUMIDITY_SHORT" xml:space="preserve"><value>Hum, %:</value></data>
+	<data name="LABEL_ZONE_TYPE" xml:space="preserve"><value>Zone Type:</value></data>
+	<data name="TYPE_WAREHOUSE" xml:space="preserve"><value>Warehouse</value></data>
+	<data name="TYPE_BREWHOUSE" xml:space="preserve"><value>Brewhouse</value></data>
+	<data name="LABEL_TOTAL_EQUIPMENT" xml:space="preserve"><value>Total Vessels: </value></data>
+	<data name="LABEL_WASH_SOON" xml:space="preserve"><value>⚠️ Wash Soon: </value></data>
+	<data name="LABEL_WASH_OVERDUE" xml:space="preserve"><value>🚨 Overdue: </value></data>
+	<data name="TOOLTIP_SEARCH_FILTER" xml:space="preserve"><value>Search by name, type or location</value></data>
+	<data name="FILTER_STATUS_ALL" xml:space="preserve"><value>All Statuses</value></data>
+	<data name="FILTER_STATUS_OK" xml:space="preserve"><value>🟢 Normal (OK)</value></data>
+	<data name="FILTER_STATUS_WARNING" xml:space="preserve"><value>⚠️ Wash Soon</value></data>
+	<data name="FILTER_STATUS_OVERDUE" xml:space="preserve"><value>🚨 Overdue</value></data>
+	<data name="LABEL_PREV_WASH" xml:space="preserve"><value>Last Wash</value></data>
+	<data name="LABEL_NEXT_WASH" xml:space="preserve"><value>Wash Due</value></data>
+	<data name="LABEL_WASH_STATUS" xml:space="preserve"><value>Wash Status</value></data>
+	<data name="LABEL_ACTIONS" xml:space="preserve"><value>Actions</value></data>
+	<data name="MENU_SANITATION_PLAN" xml:space="preserve"><value>Sanitation Planning</value></data>
+	<data name="MENU_SANITATION_DETAILS" xml:space="preserve"><value>Washing &amp; History</value></data>
+	<data name="MENU_DELETE" xml:space="preserve"><value>Delete</value></data>
+
+	<!-- ========================================== -->
+	<!-- 3.1: Delete modal		                    -->
+	<!-- ========================================== -->
+	<data name="CONFIRM_ACTION_TITLE" xml:space="preserve"><value>Action Confirmation</value></data>
+	<data name="CONFIRM_DELETE_WAREHOUSE" xml:space="preserve"><value>Are you sure you want to delete this warehouse?</value></data>
+	<data name="CONFIRM_DELETE_CHAMBER" xml:space="preserve"><value>Are you sure you want to delete this chamber?</value></data>
+	<data name="CONFIRM_DELETE_LOCATION" xml:space="preserve"><value>Are you sure you want to delete this equipment?</value></data>
+	<data name="BTN_CANCEL" xml:space="preserve"><value>Cancel</value></data>
+	<data name="BTN_CONFIRM" xml:space="preserve"><value>Confirm</value></data>
 
 	<!-- ========================================== -->
 	<!-- 4: Procurement & Deliveries                -->

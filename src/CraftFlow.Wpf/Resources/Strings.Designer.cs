@@ -115,6 +115,24 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Cancel.
+        /// </summary>
+        public static string BTN_CANCEL {
+            get {
+                return ResourceManager.GetString("BTN_CANCEL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Confirm.
+        /// </summary>
+        public static string BTN_CONFIRM {
+            get {
+                return ResourceManager.GetString("BTN_CONFIRM", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Add Equipment.
         /// </summary>
         public static string BTN_CREATE_EQUIPMENT {
@@ -223,6 +241,42 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Action Confirmation.
+        /// </summary>
+        public static string CONFIRM_ACTION_TITLE {
+            get {
+                return ResourceManager.GetString("CONFIRM_ACTION_TITLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Are you sure you want to delete this chamber?.
+        /// </summary>
+        public static string CONFIRM_DELETE_CHAMBER {
+            get {
+                return ResourceManager.GetString("CONFIRM_DELETE_CHAMBER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Are you sure you want to delete this equipment?.
+        /// </summary>
+        public static string CONFIRM_DELETE_LOCATION {
+            get {
+                return ResourceManager.GetString("CONFIRM_DELETE_LOCATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Are you sure you want to delete this warehouse?.
+        /// </summary>
+        public static string CONFIRM_DELETE_WAREHOUSE {
+            get {
+                return ResourceManager.GetString("CONFIRM_DELETE_WAREHOUSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Add Material.
         /// </summary>
         public static string CREATE_RAW_MATERIAL {
@@ -246,6 +300,42 @@ namespace CraftFlow.Wpf.Resources {
         public static string CREATE_SUPPLIER {
             get {
                 return ResourceManager.GetString("CREATE_SUPPLIER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на All Statuses.
+        /// </summary>
+        public static string FILTER_STATUS_ALL {
+            get {
+                return ResourceManager.GetString("FILTER_STATUS_ALL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на 🟢 Normal (OK).
+        /// </summary>
+        public static string FILTER_STATUS_OK {
+            get {
+                return ResourceManager.GetString("FILTER_STATUS_OK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на 🚨 Overdue.
+        /// </summary>
+        public static string FILTER_STATUS_OVERDUE {
+            get {
+                return ResourceManager.GetString("FILTER_STATUS_OVERDUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на ⚠️ Wash Soon.
+        /// </summary>
+        public static string FILTER_STATUS_WARNING {
+            get {
+                return ResourceManager.GetString("FILTER_STATUS_WARNING", resourceCulture);
             }
         }
         
@@ -331,7 +421,7 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Containers, Tanks &amp; Racks.
+        ///   Ищет локализованную строку, похожую на Vessels, Tanks &amp; Racks.
         /// </summary>
         public static string HEADER_EQUIPMENT {
             get {
@@ -403,6 +493,15 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Actions.
+        /// </summary>
+        public static string LABEL_ACTIONS {
+            get {
+                return ResourceManager.GetString("LABEL_ACTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Address:.
         /// </summary>
         public static string LABEL_ADDRESS {
@@ -466,11 +565,29 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Wash Due.
+        /// </summary>
+        public static string LABEL_NEXT_WASH {
+            get {
+                return ResourceManager.GetString("LABEL_NEXT_WASH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Location.
         /// </summary>
         public static string LABEL_PARENT_LOCATION {
             get {
                 return ResourceManager.GetString("LABEL_PARENT_LOCATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Last Wash.
+        /// </summary>
+        public static string LABEL_PREV_WASH {
+            get {
+                return ResourceManager.GetString("LABEL_PREV_WASH", resourceCulture);
             }
         }
         
@@ -529,7 +646,7 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Temp, °C:.
+        ///   Ищет локализованную строку, похожую на T, °C:.
         /// </summary>
         public static string LABEL_TEMP_SHORT {
             get {
@@ -543,6 +660,15 @@ namespace CraftFlow.Wpf.Resources {
         public static string LABEL_THEME {
             get {
                 return ResourceManager.GetString("LABEL_THEME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Total Vessels: .
+        /// </summary>
+        public static string LABEL_TOTAL_EQUIPMENT {
+            get {
+                return ResourceManager.GetString("LABEL_TOTAL_EQUIPMENT", resourceCulture);
             }
         }
         
@@ -583,6 +709,42 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на 🚨 Overdue: .
+        /// </summary>
+        public static string LABEL_WASH_OVERDUE {
+            get {
+                return ResourceManager.GetString("LABEL_WASH_OVERDUE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на ⚠️ Wash Soon: .
+        /// </summary>
+        public static string LABEL_WASH_SOON {
+            get {
+                return ResourceManager.GetString("LABEL_WASH_SOON", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Wash Status.
+        /// </summary>
+        public static string LABEL_WASH_STATUS {
+            get {
+                return ResourceManager.GetString("LABEL_WASH_STATUS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Zone Type:.
+        /// </summary>
+        public static string LABEL_ZONE_TYPE {
+            get {
+                return ResourceManager.GetString("LABEL_ZONE_TYPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на English.
         /// </summary>
         public static string LANG_EN_DISPLAY {
@@ -615,6 +777,33 @@ namespace CraftFlow.Wpf.Resources {
         public static string LOT_QUANTITY {
             get {
                 return ResourceManager.GetString("LOT_QUANTITY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Delete.
+        /// </summary>
+        public static string MENU_DELETE {
+            get {
+                return ResourceManager.GetString("MENU_DELETE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Washing &amp; History.
+        /// </summary>
+        public static string MENU_SANITATION_DETAILS {
+            get {
+                return ResourceManager.GetString("MENU_SANITATION_DETAILS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Sanitation Planning.
+        /// </summary>
+        public static string MENU_SANITATION_PLAN {
+            get {
+                return ResourceManager.GetString("MENU_SANITATION_PLAN", resourceCulture);
             }
         }
         
@@ -916,7 +1105,7 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Warehouses &amp; Equipment.
+        ///   Ищет локализованную строку, похожую на Rooms &amp; Equipment.
         /// </summary>
         public static string TITLE_STORAGE {
             get {
@@ -939,6 +1128,33 @@ namespace CraftFlow.Wpf.Resources {
         public static string TITLE_WARNING {
             get {
                 return ResourceManager.GetString("TITLE_WARNING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Search by name, type or location.
+        /// </summary>
+        public static string TOOLTIP_SEARCH_FILTER {
+            get {
+                return ResourceManager.GetString("TOOLTIP_SEARCH_FILTER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Brewhouse.
+        /// </summary>
+        public static string TYPE_BREWHOUSE {
+            get {
+                return ResourceManager.GetString("TYPE_BREWHOUSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Warehouse.
+        /// </summary>
+        public static string TYPE_WAREHOUSE {
+            get {
+                return ResourceManager.GetString("TYPE_WAREHOUSE", resourceCulture);
             }
         }
         
@@ -1114,7 +1330,7 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Warehouses.
+        ///   Ищет локализованную строку, похожую на Rooms.
         /// </summary>
         public static string WAREHOUSES_HEADER {
             get {
