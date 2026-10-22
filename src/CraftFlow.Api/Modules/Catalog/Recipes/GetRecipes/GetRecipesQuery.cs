@@ -4,5 +4,5 @@ using MediatR;
 
 namespace CraftFlow.Api.Modules.Catalog.Recipes.GetRecipes
 {
-    public record GetRecipesQuery : IRequest<Result<List<RecipeDto>>>;
+    public record GetRecipesQuery(bool IncludeArchived = false) : IRequest<Result<List<RecipeDto>>>;
 }

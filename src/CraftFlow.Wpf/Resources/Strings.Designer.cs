@@ -115,11 +115,29 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Max Output by Stock.
+        /// </summary>
+        public static string BTN_CALC_MAX {
+            get {
+                return ResourceManager.GetString("BTN_CALC_MAX", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Cancel.
         /// </summary>
         public static string BTN_CANCEL {
             get {
                 return ResourceManager.GetString("BTN_CANCEL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Complete Batch.
+        /// </summary>
+        public static string BTN_COMPLETE_BATCH {
+            get {
+                return ResourceManager.GetString("BTN_COMPLETE_BATCH", resourceCulture);
             }
         }
         
@@ -142,11 +160,47 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Discard Batch.
+        /// </summary>
+        public static string BTN_DISCARD_BATCH_SUBMIT {
+            get {
+                return ResourceManager.GetString("BTN_DISCARD_BATCH_SUBMIT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Discard.
+        /// </summary>
+        public static string BTN_DISCARD_ROW {
+            get {
+                return ResourceManager.GetString("BTN_DISCARD_ROW", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Log Out.
         /// </summary>
         public static string BTN_LOGOUT {
             get {
                 return ResourceManager.GetString("BTN_LOGOUT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Schedule (to Draft).
+        /// </summary>
+        public static string BTN_PLAN_BATCH {
+            get {
+                return ResourceManager.GetString("BTN_PLAN_BATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Print Recipe Card.
+        /// </summary>
+        public static string BTN_PRINT_CARD {
+            get {
+                return ResourceManager.GetString("BTN_PRINT_CARD", resourceCulture);
             }
         }
         
@@ -165,6 +219,33 @@ namespace CraftFlow.Wpf.Resources {
         public static string BTN_REFRESH {
             get {
                 return ResourceManager.GetString("BTN_REFRESH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Release for Sale.
+        /// </summary>
+        public static string BTN_RELEASE_AGING {
+            get {
+                return ResourceManager.GetString("BTN_RELEASE_AGING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Start Batch.
+        /// </summary>
+        public static string BTN_START_BATCH {
+            get {
+                return ResourceManager.GetString("BTN_START_BATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Place in Chamber.
+        /// </summary>
+        public static string BTN_TRANSFER_AGING {
+            get {
+                return ResourceManager.GetString("BTN_TRANSFER_AGING", resourceCulture);
             }
         }
         
@@ -205,6 +286,15 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Include overhead costs.
+        /// </summary>
+        public static string CHECKBOX_OVERHEAD {
+            get {
+                return ResourceManager.GetString("CHECKBOX_OVERHEAD", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Action.
         /// </summary>
         public static string COL_ACTION {
@@ -237,6 +327,186 @@ namespace CraftFlow.Wpf.Resources {
         public static string COL_ENTITY_NAME {
             get {
                 return ResourceManager.GetString("COL_ENTITY_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Action.
+        /// </summary>
+        public static string COLUMN_ACTION {
+            get {
+                return ResourceManager.GetString("COLUMN_ACTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Actions.
+        /// </summary>
+        public static string COLUMN_ACTIONS {
+            get {
+                return ResourceManager.GetString("COLUMN_ACTIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Batch Code.
+        /// </summary>
+        public static string COLUMN_BATCH_CODE {
+            get {
+                return ResourceManager.GetString("COLUMN_BATCH_CODE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Batch Name.
+        /// </summary>
+        public static string COLUMN_BATCH_NAME {
+            get {
+                return ResourceManager.GetString("COLUMN_BATCH_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Chamber.
+        /// </summary>
+        public static string COLUMN_CHAMBER {
+            get {
+                return ResourceManager.GetString("COLUMN_CHAMBER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Starts In.
+        /// </summary>
+        public static string COLUMN_COUNTDOWN {
+            get {
+                return ResourceManager.GetString("COLUMN_COUNTDOWN", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Weight (kg).
+        /// </summary>
+        public static string COLUMN_CURRENT_STOCK {
+            get {
+                return ResourceManager.GetString("COLUMN_CURRENT_STOCK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Days in Aging.
+        /// </summary>
+        public static string COLUMN_DAYS_IN_AGING {
+            get {
+                return ResourceManager.GetString("COLUMN_DAYS_IN_AGING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Days in Chamber.
+        /// </summary>
+        public static string COLUMN_DAYS_IN_CHAMBER {
+            get {
+                return ResourceManager.GetString("COLUMN_DAYS_IN_CHAMBER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Elapsed Time.
+        /// </summary>
+        public static string COLUMN_ELAPSED {
+            get {
+                return ResourceManager.GetString("COLUMN_ELAPSED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Ready.
+        /// </summary>
+        public static string COLUMN_IS_READY {
+            get {
+                return ResourceManager.GetString("COLUMN_IS_READY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Batch / Lot.
+        /// </summary>
+        public static string COLUMN_LOT_BATCH {
+            get {
+                return ResourceManager.GetString("COLUMN_LOT_BATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Planned (kg).
+        /// </summary>
+        public static string COLUMN_PLANNED_QTY {
+            get {
+                return ResourceManager.GetString("COLUMN_PLANNED_QTY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Recipe.
+        /// </summary>
+        public static string COLUMN_RECIPE {
+            get {
+                return ResourceManager.GetString("COLUMN_RECIPE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Scheduled For.
+        /// </summary>
+        public static string COLUMN_SCHEDULED_AT {
+            get {
+                return ResourceManager.GetString("COLUMN_SCHEDULED_AT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Started At.
+        /// </summary>
+        public static string COLUMN_STARTED_AT {
+            get {
+                return ResourceManager.GetString("COLUMN_STARTED_AT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Target (days).
+        /// </summary>
+        public static string COLUMN_TARGET_DAYS {
+            get {
+                return ResourceManager.GetString("COLUMN_TARGET_DAYS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Target (min).
+        /// </summary>
+        public static string COLUMN_TARGET_DURATION {
+            get {
+                return ResourceManager.GetString("COLUMN_TARGET_DURATION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Heads / Units.
+        /// </summary>
+        public static string COLUMN_UNITS_COUNT {
+            get {
+                return ResourceManager.GetString("COLUMN_UNITS_COUNT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Volume.
+        /// </summary>
+        public static string COLUMN_VOLUME {
+            get {
+                return ResourceManager.GetString("COLUMN_VOLUME", resourceCulture);
             }
         }
         
@@ -376,6 +646,42 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Current Lots in Aging Chambers.
+        /// </summary>
+        public static string GROUP_ACTIVE_AGING_LOTS {
+            get {
+                return ResourceManager.GetString("GROUP_ACTIVE_AGING_LOTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Batches in Progress.
+        /// </summary>
+        public static string GROUP_ACTIVE_BATCHES {
+            get {
+                return ResourceManager.GetString("GROUP_ACTIVE_BATCHES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Batch Costing.
+        /// </summary>
+        public static string GROUP_BATCH_COSTING {
+            get {
+                return ResourceManager.GetString("GROUP_BATCH_COSTING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Batch Completion.
+        /// </summary>
+        public static string GROUP_COMPLETE_BATCH {
+            get {
+                return ResourceManager.GetString("GROUP_COMPLETE_BATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Current Stock Balances in Warehouses.
         /// </summary>
         public static string GROUP_CURRENT_STOCK {
@@ -385,11 +691,74 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Discard from Aging Chambers.
+        /// </summary>
+        public static string GROUP_DISCARD_AGING_LOTS {
+            get {
+                return ResourceManager.GetString("GROUP_DISCARD_AGING_LOTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Discard Batch from Kettle.
+        /// </summary>
+        public static string GROUP_DISCARD_IN_KETTLE {
+            get {
+                return ResourceManager.GetString("GROUP_DISCARD_IN_KETTLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Planned Batches (Drafts).
+        /// </summary>
+        public static string GROUP_PLANNED_BATCHES {
+            get {
+                return ResourceManager.GetString("GROUP_PLANNED_BATCHES", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Raw Material Requirements.
+        /// </summary>
+        public static string GROUP_RAW_REQUIREMENTS {
+            get {
+                return ResourceManager.GetString("GROUP_RAW_REQUIREMENTS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Receive Stock Lot into Warehouse.
         /// </summary>
         public static string GROUP_RECEIVE_STOCK_LOT {
             get {
                 return ResourceManager.GetString("GROUP_RECEIVE_STOCK_LOT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Release from Aging Chamber.
+        /// </summary>
+        public static string GROUP_RELEASE_AGING {
+            get {
+                return ResourceManager.GetString("GROUP_RELEASE_AGING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Batch Launch Parameters.
+        /// </summary>
+        public static string GROUP_START_BATCH {
+            get {
+                return ResourceManager.GetString("GROUP_START_BATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Transfer to Aging.
+        /// </summary>
+        public static string GROUP_TRANSFER_AGING {
+            get {
+                return ResourceManager.GetString("GROUP_TRANSFER_AGING", resourceCulture);
             }
         }
         
@@ -502,11 +871,56 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Select Lot from Chamber:.
+        /// </summary>
+        public static string LABEL_ACTIVE_AGING_LOT {
+            get {
+                return ResourceManager.GetString("LABEL_ACTIVE_AGING_LOT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select Active Batch (In Progress):.
+        /// </summary>
+        public static string LABEL_ACTIVE_BATCH {
+            get {
+                return ResourceManager.GetString("LABEL_ACTIVE_BATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Actual Weight (kg/l):.
+        /// </summary>
+        public static string LABEL_ACTUAL_OUTPUT {
+            get {
+                return ResourceManager.GetString("LABEL_ACTUAL_OUTPUT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Address:.
         /// </summary>
         public static string LABEL_ADDRESS {
             get {
                 return ResourceManager.GetString("LABEL_ADDRESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select Climate Chamber:.
+        /// </summary>
+        public static string LABEL_AGING_CHAMBER {
+            get {
+                return ResourceManager.GetString("LABEL_AGING_CHAMBER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Aging Lot Label:.
+        /// </summary>
+        public static string LABEL_AGING_LOT_NAME {
+            get {
+                return ResourceManager.GetString("LABEL_AGING_LOT_NAME", resourceCulture);
             }
         }
         
@@ -529,6 +943,60 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Batch Code / Name:.
+        /// </summary>
+        public static string LABEL_BATCH_CODE {
+            get {
+                return ResourceManager.GetString("LABEL_BATCH_CODE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Calculated Cost per 1 {0}:.
+        /// </summary>
+        public static string LABEL_CALCULATED_UNIT_COST {
+            get {
+                return ResourceManager.GetString("LABEL_CALCULATED_UNIT_COST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Finished Batch Name / Label:.
+        /// </summary>
+        public static string LABEL_COMPLETE_BATCH_NAME {
+            get {
+                return ResourceManager.GetString("LABEL_COMPLETE_BATCH_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select Completed Batch:.
+        /// </summary>
+        public static string LABEL_COMPLETED_BATCH {
+            get {
+                return ResourceManager.GetString("LABEL_COMPLETED_BATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Product Credit Warehouse:.
+        /// </summary>
+        public static string LABEL_DEST_WAREHOUSE {
+            get {
+                return ResourceManager.GetString("LABEL_DEST_WAREHOUSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Discard Reason:.
+        /// </summary>
+        public static string LABEL_DISCARD_REASON {
+            get {
+                return ResourceManager.GetString("LABEL_DISCARD_REASON", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Name.
         /// </summary>
         public static string LABEL_EQUIPMENT_NAME {
@@ -538,11 +1006,29 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Estimated Raw Material Cost:.
+        /// </summary>
+        public static string LABEL_ESTIMATED_RAW_COST {
+            get {
+                return ResourceManager.GetString("LABEL_ESTIMATED_RAW_COST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Expiration Date:.
         /// </summary>
         public static string LABEL_EXPIRATION_DATE {
             get {
                 return ResourceManager.GetString("LABEL_EXPIRATION_DATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Actual Weight After Shrinkage (kg):.
+        /// </summary>
+        public static string LABEL_FINAL_WEIGHT {
+            get {
+                return ResourceManager.GetString("LABEL_FINAL_WEIGHT", resourceCulture);
             }
         }
         
@@ -565,11 +1051,29 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Aging Period (days):.
+        /// </summary>
+        public static string LABEL_MIN_AGING_DAYS {
+            get {
+                return ResourceManager.GetString("LABEL_MIN_AGING_DAYS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Wash Due.
         /// </summary>
         public static string LABEL_NEXT_WASH {
             get {
                 return ResourceManager.GetString("LABEL_NEXT_WASH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Overhead Costs:.
+        /// </summary>
+        public static string LABEL_OVERHEAD_COST {
+            get {
+                return ResourceManager.GetString("LABEL_OVERHEAD_COST", resourceCulture);
             }
         }
         
@@ -583,11 +1087,29 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Planned Output (kg/l):.
+        /// </summary>
+        public static string LABEL_PLANNED_OUTPUT {
+            get {
+                return ResourceManager.GetString("LABEL_PLANNED_OUTPUT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Last Wash.
         /// </summary>
         public static string LABEL_PREV_WASH {
             get {
                 return ResourceManager.GetString("LABEL_PREV_WASH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Raw Material Cost:.
+        /// </summary>
+        public static string LABEL_RAW_COST {
+            get {
+                return ResourceManager.GetString("LABEL_RAW_COST", resourceCulture);
             }
         }
         
@@ -601,11 +1123,65 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Raw Material Deduction Warehouse:.
+        /// </summary>
+        public static string LABEL_RAW_WAREHOUSE {
+            get {
+                return ResourceManager.GetString("LABEL_RAW_WAREHOUSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Finished Batch / Lot Label:.
+        /// </summary>
+        public static string LABEL_RELEASE_LOT_NAME {
+            get {
+                return ResourceManager.GetString("LABEL_RELEASE_LOT_NAME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Balance.
         /// </summary>
         public static string LABEL_REMAINING_STOCK {
             get {
                 return ResourceManager.GetString("LABEL_REMAINING_STOCK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Scheduled Start Date.
+        /// </summary>
+        public static string LABEL_SCHEDULED_DATE {
+            get {
+                return ResourceManager.GetString("LABEL_SCHEDULED_DATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Time (HH:MM).
+        /// </summary>
+        public static string LABEL_SCHEDULED_TIME {
+            get {
+                return ResourceManager.GetString("LABEL_SCHEDULED_TIME", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select Active Batch:.
+        /// </summary>
+        public static string LABEL_SELECT_ACTIVE_BATCH {
+            get {
+                return ResourceManager.GetString("LABEL_SELECT_ACTIVE_BATCH", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Select Recipe:.
+        /// </summary>
+        public static string LABEL_SELECT_RECIPE {
+            get {
+                return ResourceManager.GetString("LABEL_SELECT_RECIPE", resourceCulture);
             }
         }
         
@@ -628,6 +1204,24 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Selling Price per 1 kg:.
+        /// </summary>
+        public static string LABEL_SELLING_PRICE_KG {
+            get {
+                return ResourceManager.GetString("LABEL_SELLING_PRICE_KG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Selling Price per 1 {0}:.
+        /// </summary>
+        public static string LABEL_SELLING_PRICE_PER_UNIT {
+            get {
+                return ResourceManager.GetString("LABEL_SELLING_PRICE_PER_UNIT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Storage Containers.
         /// </summary>
         public static string LABEL_STORAGE_CONTAINERS {
@@ -642,6 +1236,24 @@ namespace CraftFlow.Wpf.Resources {
         public static string LABEL_SUPPLIER_FILTER {
             get {
                 return ResourceManager.GetString("LABEL_SUPPLIER_FILTER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Warehouse Storage Cells:.
+        /// </summary>
+        public static string LABEL_TARGET_LOCATIONS {
+            get {
+                return ResourceManager.GetString("LABEL_TARGET_LOCATIONS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Cheese Credit Warehouse:.
+        /// </summary>
+        public static string LABEL_TARGET_WAREHOUSE {
+            get {
+                return ResourceManager.GetString("LABEL_TARGET_WAREHOUSE", resourceCulture);
             }
         }
         
@@ -664,6 +1276,15 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Total Cost:.
+        /// </summary>
+        public static string LABEL_TOTAL_COST {
+            get {
+                return ResourceManager.GetString("LABEL_TOTAL_COST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Total Vessels: .
         /// </summary>
         public static string LABEL_TOTAL_EQUIPMENT {
@@ -682,7 +1303,25 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Container Count (opt.):.
+        ///   Ищет локализованную строку, похожую на Cost per 1 kg/l:.
+        /// </summary>
+        public static string LABEL_UNIT_COST {
+            get {
+                return ResourceManager.GetString("LABEL_UNIT_COST", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Calculated Unit Cost per 1 kg:.
+        /// </summary>
+        public static string LABEL_UNIT_COST_KG {
+            get {
+                return ResourceManager.GetString("LABEL_UNIT_COST_KG", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Containers / Units Count (opt.):.
         /// </summary>
         public static string LABEL_UNITS_COUNT {
             get {
@@ -808,6 +1447,24 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Batch successfully planned!.
+        /// </summary>
+        public static string MSG_BATCH_PLANNED_SUCCESS {
+            get {
+                return ResourceManager.GetString("MSG_BATCH_PLANNED_SUCCESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Draft successfully deleted!.
+        /// </summary>
+        public static string MSG_DRAFT_DELETED_SUCCESS {
+            get {
+                return ResourceManager.GetString("MSG_DRAFT_DELETED_SUCCESS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Access Keys (Admin).
         /// </summary>
         public static string NAV_ADMIN_KEYS {
@@ -916,6 +1573,15 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Production &amp; Brewhouse.
+        /// </summary>
+        public static string PRODUCTION_HEADER {
+            get {
+                return ResourceManager.GetString("PRODUCTION_HEADER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Insufficient raw materials!.
         /// </summary>
         public static string PRODUCTION_INSUFFICIENT_RAW_MATERIAL {
@@ -970,7 +1636,7 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
-        ///   Ищет локализованную строку, похожую на Select Warehouse:.
+        ///   Ищет локализованную строку, похожую на Select destination warehouse.
         /// </summary>
         public static string SELECT_WAREHOUSE {
             get {
@@ -1011,6 +1677,33 @@ namespace CraftFlow.Wpf.Resources {
         public static string SUPPLIER_PHONE_NUMBER_INVALID_FORMAT {
             get {
                 return ResourceManager.GetString("SUPPLIER.PHONE_NUMBER_INVALID_FORMAT", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Aging &amp; Affinage.
+        /// </summary>
+        public static string TAB_AGING {
+            get {
+                return ResourceManager.GetString("TAB_AGING", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Brewhouse.
+        /// </summary>
+        public static string TAB_BREWHOUSE {
+            get {
+                return ResourceManager.GetString("TAB_BREWHOUSE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Discard &amp; Write-Off.
+        /// </summary>
+        public static string TAB_DISCARD_ACTS {
+            get {
+                return ResourceManager.GetString("TAB_DISCARD_ACTS", resourceCulture);
             }
         }
         
@@ -1096,6 +1789,15 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на CRAFTFLOW — Production.
+        /// </summary>
+        public static string TITLE_PRODUCTION {
+            get {
+                return ResourceManager.GetString("TITLE_PRODUCTION", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Raw Materials &amp; Tech Recipes.
         /// </summary>
         public static string TITLE_RECIPES {
@@ -1132,11 +1834,29 @@ namespace CraftFlow.Wpf.Resources {
         }
         
         /// <summary>
+        ///   Ищет локализованную строку, похожую на Delete draft.
+        /// </summary>
+        public static string TOOLTIP_DELETE {
+            get {
+                return ResourceManager.GetString("TOOLTIP_DELETE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Ищет локализованную строку, похожую на Search by name, type or location.
         /// </summary>
         public static string TOOLTIP_SEARCH_FILTER {
             get {
                 return ResourceManager.GetString("TOOLTIP_SEARCH_FILTER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Ищет локализованную строку, похожую на Start batch.
+        /// </summary>
+        public static string TOOLTIP_START {
+            get {
+                return ResourceManager.GetString("TOOLTIP_START", resourceCulture);
             }
         }
         

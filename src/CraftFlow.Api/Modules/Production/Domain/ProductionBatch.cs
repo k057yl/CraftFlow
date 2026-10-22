@@ -15,6 +15,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
     public Guid TargetProductId { get; private set; }
     public Guid WarehouseId { get; private set; }
     public Guid DestinationWarehouseId { get; private set; }
+    public Guid EquipmentLocationId { get; private set; }
 
     public decimal PlannedOutputQuantity { get; private set; }
     public decimal ActualOutputQuantity { get; private set; }
@@ -38,6 +39,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         Guid targetProductId,
         Guid warehouseId,
         Guid destinationWarehouseId,
+        Guid equipmentLocationId,
         decimal plannedOutputQuantity,
         int targetDurationMinutes,
         string? customName = null,
@@ -57,6 +59,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
             TargetProductId = targetProductId,
             WarehouseId = warehouseId,
             DestinationWarehouseId = destinationWarehouseId,
+            EquipmentLocationId = equipmentLocationId,
             PlannedOutputQuantity = plannedOutputQuantity,
             TargetDurationMinutes = targetDurationMinutes > 0 ? targetDurationMinutes : 180,
             ActualOutputQuantity = 0,

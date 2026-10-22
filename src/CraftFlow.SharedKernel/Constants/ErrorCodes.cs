@@ -75,6 +75,9 @@ public static class ErrorCodes
         public const string UOM_SOURCE_NULL = "CATALOG.UOM_SOURCE_NULL";
         public const string UOM_TARGET_NULL = "CATALOG.UOM_TARGET_NULL";
         public const string UOM_TYPE_MISMATCH = "CATALOG.UOM_TYPE_MISMATCH";
+        public const string RAW_MATERIAL_HAS_STOCK = "CATALOG.RAW_MATERIAL_HAS_STOCK";
+        public const string RAW_MATERIAL_IN_ACTIVE_RECIPE = "CATALOG.RAW_MATERIAL_IN_ACTIVE_RECIPE";
+        public const string RECIPE_HAS_ACTIVE_BATCHES = "CATALOG.RECIPE_HAS_ACTIVE_BATCHES";
     }
 
     public static class Sales

@@ -242,4 +242,106 @@
 	<data name="PRODUCTION_INSUFFICIENT_RAW_MATERIAL" xml:space="preserve"><value>Недостатньо сировини для варки!</value></data>
 	<data name="PRODUCTION_BATCH_NOT_FOUND" xml:space="preserve"><value>Партію виробництва не знайдено</value></data>
 	<data name="GENERAL_NOT_FOUND" xml:space="preserve"><value>Запитуваний ресурс не знайдено</value></data>
+
+	<!-- ========================================== -->
+	<!-- 5: Варильний цех                           -->
+	<!-- ========================================== -->
+	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>CRAFTFLOW — Виробництво</value></data>
+	<data name="PRODUCTION_HEADER" xml:space="preserve"><value>Виробництво та Варильний цех</value></data>
+	<!-- Вкладки -->
+	<data name="TAB_BREWHOUSE" xml:space="preserve"><value>Варильний цех</value></data>
+	<data name="TAB_AGING" xml:space="preserve"><value>Дозрівання та Афінаж</value></data>
+	<data name="TAB_DISCARD_ACTS" xml:space="preserve"><value>Брак та Списання</value></data>
+	<!-- Групи (GroupBox) -->
+	<data name="GROUP_START_BATCH" xml:space="preserve"><value>Параметри запуску варки</value></data>
+	<data name="GROUP_RAW_REQUIREMENTS" xml:space="preserve"><value>Розрахунок потреби в сировині</value></data>
+	<data name="GROUP_PLANNED_BATCHES" xml:space="preserve"><value>Заплановані варки (Чернетки)</value></data>
+	<data name="GROUP_ACTIVE_BATCHES" xml:space="preserve"><value>Варки в процесі</value></data>
+	<data name="GROUP_COMPLETE_BATCH" xml:space="preserve"><value>Завершення варки</value></data>
+	<data name="GROUP_BATCH_COSTING" xml:space="preserve"><value>Калькуляція собівартості</value></data>
+	<!-- Лейбли полів -->
+	<data name="LABEL_BATCH_CODE" xml:space="preserve"><value>Код / Найменування партії:</value></data>
+	<data name="LABEL_SELECT_RECIPE" xml:space="preserve"><value>Оберіть Рецептуру:</value></data>
+	<data name="LABEL_RAW_WAREHOUSE" xml:space="preserve"><value>Склад списання сировини:</value></data>
+	<data name="LABEL_DEST_WAREHOUSE" xml:space="preserve"><value>Склад зарахування продукції:</value></data>
+	<data name="LABEL_PLANNED_OUTPUT" xml:space="preserve"><value>Запланований об'єм (кг/л):</value></data>
+	<data name="LABEL_SCHEDULED_DATE" xml:space="preserve"><value>Запланована дата старту</value></data>
+	<data name="LABEL_SCHEDULED_TIME" xml:space="preserve"><value>Час (ГГ:ХХ)</value></data>
+	<data name="LABEL_ESTIMATED_RAW_COST" xml:space="preserve"><value>Попередня собівартість сировини:</value></data>
+	<data name="LABEL_ACTIVE_BATCH" xml:space="preserve"><value>Оберіть активну варку (В процесі):</value></data>
+	<data name="LABEL_COMPLETE_BATCH_NAME" xml:space="preserve"><value>Найменування готової партії / Маркування:</value></data>
+	<data name="LABEL_ACTUAL_OUTPUT" xml:space="preserve"><value>Фактична вага (кг/л):</value></data>
+	<data name="LABEL_UNITS_COUNT" xml:space="preserve"><value>Кількість тар / місць (опц.):</value></data>
+	<data name="LABEL_RAW_COST" xml:space="preserve"><value>Собівартість сировини:</value></data>
+	<data name="LABEL_OVERHEAD_COST" xml:space="preserve"><value>Накладні витрати:</value></data>
+	<data name="LABEL_TOTAL_COST" xml:space="preserve"><value>Підсумкова собівартість:</value></data>
+	<data name="LABEL_UNIT_COST" xml:space="preserve"><value>Собівартість за 1 кг/л:</value></data>
+	<!-- Чекбокси та Кнопки -->
+	<data name="CHECKBOX_OVERHEAD" xml:space="preserve"><value>Врахувати накладні витрати</value></data>
+	<data name="BTN_CALC_MAX" xml:space="preserve"><value>Максимум за залишками</value></data>
+	<data name="BTN_PRINT_CARD" xml:space="preserve"><value>Друк тех. карти</value></data>
+	<data name="BTN_START_BATCH" xml:space="preserve"><value>Запустити Варку</value></data>
+	<data name="BTN_PLAN_BATCH" xml:space="preserve"><value>Запланувати (в Чернетку)</value></data>
+	<data name="BTN_COMPLETE_BATCH" xml:space="preserve"><value>Завершити Варку</value></data>
+	<!-- Колонки таблиць -->
+	<data name="COLUMN_BATCH_CODE" xml:space="preserve"><value>Код партії</value></data>
+	<data name="COLUMN_BATCH_NAME" xml:space="preserve"><value>Партія</value></data>
+	<data name="COLUMN_RECIPE" xml:space="preserve"><value>Рецептура</value></data>
+	<data name="COLUMN_VOLUME" xml:space="preserve"><value>Об'єм</value></data>
+	<data name="COLUMN_PLANNED_QTY" xml:space="preserve"><value>План (кг)</value></data>
+	<data name="COLUMN_SCHEDULED_AT" xml:space="preserve"><value>Заплановано на</value></data>
+	<data name="COLUMN_STARTED_AT" xml:space="preserve"><value>Старт</value></data>
+	<data name="COLUMN_COUNTDOWN" xml:space="preserve"><value>До старту</value></data>
+	<data name="COLUMN_ELAPSED" xml:space="preserve"><value>Минуло часу</value></data>
+	<data name="COLUMN_TARGET_DURATION" xml:space="preserve"><value>План (хв)</value></data>
+	<data name="COLUMN_ACTIONS" xml:space="preserve"><value>Дії</value></data>
+	<!-- Тултипи та Повідомлення -->
+	<data name="TOOLTIP_START" xml:space="preserve"><value>Запустити варку</value></data>
+	<data name="TOOLTIP_DELETE" xml:space="preserve"><value>Видалити чернетку</value></data>
+	<data name="MSG_BATCH_PLANNED_SUCCESS" xml:space="preserve"><value>Партію успішно заплановано!</value></data>
+	<data name="MSG_DRAFT_DELETED_SUCCESS" xml:space="preserve"><value>Чернетку успішно видалено!</value></data>
+
+	<!-- ========================================== -->
+	<!-- 5.1: Дозрівання та Афінаж                  -->
+	<!-- ========================================== -->
+	<data name="GROUP_TRANSFER_AGING" xml:space="preserve"><value>Переміщення на дозрівання</value></data>
+	<data name="LABEL_COMPLETED_BATCH" xml:space="preserve"><value>Вибір завершеної варки:</value></data>
+	<data name="LABEL_AGING_CHAMBER" xml:space="preserve"><value>Вибір Кліматичної Камери:</value></data>
+	<data name="LABEL_AGING_LOT_NAME" xml:space="preserve"><value>Маркування лота на дозріванні:</value></data>
+	<data name="LABEL_MIN_AGING_DAYS" xml:space="preserve"><value>Термін витримки (днів):</value></data>
+	<data name="BTN_TRANSFER_AGING" xml:space="preserve"><value>Розмістити в Камеру</value></data>
+
+	<data name="GROUP_ACTIVE_AGING_LOTS" xml:space="preserve"><value>Поточні партії в камерах дозрівання</value></data>
+	<data name="COLUMN_LOT_BATCH" xml:space="preserve"><value>Партія / Лот</value></data>
+	<data name="COLUMN_CHAMBER" xml:space="preserve"><value>Камера</value></data>
+	<data name="COLUMN_CURRENT_STOCK" xml:space="preserve"><value>Маса (кг)</value></data>
+	<data name="COLUMN_UNITS_COUNT" xml:space="preserve"><value>Голів / Штук</value></data>
+	<data name="COLUMN_DAYS_IN_CHAMBER" xml:space="preserve"><value>Днів у камері</value></data>
+	<data name="COLUMN_TARGET_DAYS" xml:space="preserve"><value>План (днів)</value></data>
+	<data name="COLUMN_IS_READY" xml:space="preserve"><value>Готово</value></data>
+
+	<data name="GROUP_RELEASE_AGING" xml:space="preserve"><value>Вилучення з камери дозрівання</value></data>
+	<data name="LABEL_ACTIVE_AGING_LOT" xml:space="preserve"><value>Оберіть партію з камери:</value></data>
+	<data name="LABEL_TARGET_WAREHOUSE" xml:space="preserve"><value>Склад зарахування сиру:</value></data>
+	<data name="LABEL_TARGET_LOCATIONS" xml:space="preserve"><value>Коміркі зберігання на складі:</value></data>
+	<data name="LABEL_RELEASE_LOT_NAME" xml:space="preserve"><value>Маркування готової партії / Лота:</value></data>
+	<data name="LABEL_FINAL_WEIGHT" xml:space="preserve"><value>Фактична вага після усушки (кг):</value></data>
+	<data name="LABEL_UNIT_COST_KG" xml:space="preserve"><value>Розрахункова собівартість за 1 кг:</value></data>
+	<data name="LABEL_SELLING_PRICE_KG" xml:space="preserve"><value>Ціна продажу за 1 кг:</value></data>
+	<data name="BTN_RELEASE_AGING" xml:space="preserve"><value>Випустити в Продаж</value></data>
+	<data name="LABEL_CALCULATED_UNIT_COST" xml:space="preserve"><value>Розрахункова собівартість за 1 {0}:</value></data>
+	<data name="LABEL_SELLING_PRICE_PER_UNIT" xml:space="preserve"><value>Ціна продажу за 1 {0}:</value></data>
+	<data name="SELECT_WAREHOUSE" xml:space="preserve"><value>Оберіть склад зарахування</value></data>
+
+	<!-- ========================================== -->
+	<!-- 5.2: Брак та Списання                      -->
+	<!-- ========================================== -->
+	<data name="GROUP_DISCARD_IN_KETTLE" xml:space="preserve"><value>Списання варки з котла</value></data>
+	<data name="LABEL_SELECT_ACTIVE_BATCH" xml:space="preserve"><value>Оберіть активну варку:</value></data>
+	<data name="LABEL_DISCARD_REASON" xml:space="preserve"><value>Причина списання:</value></data>
+	<data name="BTN_DISCARD_BATCH_SUBMIT" xml:space="preserve"><value>Списати варку</value></data>
+	<data name="GROUP_DISCARD_AGING_LOTS" xml:space="preserve"><value>Списання з камер дозрівання</value></data>
+	<data name="COLUMN_DAYS_IN_AGING" xml:space="preserve"><value>Днів на витримці</value></data>
+	<data name="COLUMN_ACTION" xml:space="preserve"><value>Дія</value></data>
+	<data name="BTN_DISCARD_ROW" xml:space="preserve"><value>Списати</value></data>
 </root>

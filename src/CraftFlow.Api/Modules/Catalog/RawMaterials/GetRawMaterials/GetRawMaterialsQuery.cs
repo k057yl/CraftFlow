@@ -4,5 +4,5 @@ using MediatR;
 
 namespace CraftFlow.Api.Modules.Catalog.RawMaterials.GetRawMaterials
 {
-    public record GetRawMaterialsQuery : IRequest<Result<List<RawMaterialDto>>>;
+    public record GetRawMaterialsQuery(bool IncludeArchived = false) : IRequest<Result<List<RawMaterialDto>>>;
 }

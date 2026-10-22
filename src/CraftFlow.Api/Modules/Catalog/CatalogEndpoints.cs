@@ -72,9 +72,9 @@ public static class CatalogEndpoints
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet(CatalogConstants.RAW_MATERIALS, async (ISender sender) =>
+        group.MapGet(CatalogConstants.RAW_MATERIALS, async (bool includeArchived, ISender sender) =>
         {
-            var result = await sender.Send(new GetRawMaterialsQuery());
+            var result = await sender.Send(new GetRawMaterialsQuery(includeArchived));
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
@@ -84,9 +84,9 @@ public static class CatalogEndpoints
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet(CatalogConstants.RECIPES, async (ISender sender) =>
+        group.MapGet(CatalogConstants.RECIPES, async (bool includeArchived, ISender sender) =>
         {
-            var result = await sender.Send(new GetRecipesQuery());
+            var result = await sender.Send(new GetRecipesQuery(includeArchived));
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
     }

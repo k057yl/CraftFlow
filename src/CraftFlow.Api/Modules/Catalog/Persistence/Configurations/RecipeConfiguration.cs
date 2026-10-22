@@ -22,11 +22,6 @@ public class RecipeConfiguration : IEntityTypeConfiguration<Recipe>
             .HasPrincipalKey(p => new { p.TenantId, p.Id })
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(r => r.Ingredients)
-            .WithOne()
-            .HasForeignKey(i => i.RecipeId)
-            .OnDelete(DeleteBehavior.Cascade);
-
         builder.Navigation(r => r.Ingredients).UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

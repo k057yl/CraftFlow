@@ -40,6 +40,7 @@ public sealed class PlanProductionBatchCommandHandler : IRequestHandler<PlanProd
             recipe.ProductId,
             request.WarehouseId,
             request.DestinationWarehouseId,
+            equipmentLocationId: Guid.Empty,
             request.PlannedOutputQuantity,
             recipe.TargetDurationMinutes,
             request.Name,

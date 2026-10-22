@@ -12,6 +12,7 @@ public record Error(string Code)
     public static Error Validation(string code) => new(code);
     public static Error Conflict(string code) => new(code);
     public static Error Unauthorized(string code) => new(code);
+    public static Error Forbidden(string code) => new(code);
 
     public static implicit operator Error(string code) => Failure(code);
 }

@@ -1,6 +1,5 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Aging.Domain;
-using CraftFlow.Api.Modules.Production.Domain;
 using CraftFlow.Api.Modules.Production.Events;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Enums.Inventory;
@@ -42,6 +41,21 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
         }
 
         int unitsCount = request.UnitsCount > 0 ? request.UnitsCount : 1;
+
+        if (batch.EquipmentLocationId != Guid.Empty)
+        {
+            var equipmentLocation = await _dbContext.StorageLocations
+                .FirstOrDefaultAsync(l => l.Id == batch.EquipmentLocationId, cancellationToken);
+
+            if (equipmentLocation != null)
+            {
+                // Если после варки котел требует мойки:
+                //equipmentLocation.ReleaseFromProduction();
+
+                // Если нужно сразу сделать котел доступным без санитарного цикла, раскомментируй:
+                equipmentLocation.CompleteSanitation(isPassed: true);
+            }
+        }
 
         if (request.RequiresAging && request.AgingChamberId.HasValue)
         {

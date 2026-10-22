@@ -403,6 +403,20 @@ public class ApiService
         });
     }
 
+    public async Task<bool> CheckHealthAsync()
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+            var response = await _client.GetAsync(CoreConstants.ApiServiceConstants.API_BASE_URL, cts.Token);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
     // --- Identity ---
     public async Task<List<TenantUserDto>> GetTenantUsersAsync()
     {

@@ -17,8 +17,14 @@ public class GetRecipesHandler : IRequestHandler<GetRecipesQuery, Result<List<Re
 
     public async Task<Result<List<RecipeDto>>> Handle(GetRecipesQuery request, CancellationToken cancellationToken)
     {
-        var recipes = await _dbContext.Recipes
-            .AsNoTracking()
+        var query = _dbContext.Recipes.AsNoTracking();
+
+        if (!request.IncludeArchived)
+        {
+            query = query.Where(r => r.IsActive);
+        }
+
+        var recipes = await query
             .Select(r => new RecipeDto(
                 r.Id,
                 r.ProductId,

@@ -240,9 +240,14 @@ public partial class BrewhouseControl : UserControl
                     validLocations = locations;
                 }
 
-                foreach (var l in validLocations)
+                var availableLocations = validLocations
+                    .Where(l => l.Status == StorageLocationStatus.AVAILABLE || string.Equals(l.Status.ToString(), "AVAILABLE", StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                foreach (var l in availableLocations)
                 {
-                    EquipmentLocations.Add(new LookupItem(l.Id, $"{l.Name} (Свободно: {l.FreeCapacityDisplay} {l.UnitOfMeasure ?? "л"})"));
+                    var capacityText = l.Capacity.HasValue ? $" ({l.Capacity.Value:0.##} {l.UnitOfMeasure ?? "л"})" : string.Empty;
+                    EquipmentLocations.Add(new LookupItem(l.Id, $"{l.Name}{capacityText}"));
                 }
 
                 if (EquipmentLocations.Count > 0)

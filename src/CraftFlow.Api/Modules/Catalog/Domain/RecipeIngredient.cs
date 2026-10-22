@@ -5,8 +5,11 @@ namespace CraftFlow.Api.Modules.Catalog.Domain;
 public sealed class RecipeIngredient : Entity
 {
     public Guid RecipeId { get; private set; }
+    public Recipe Recipe { get; private set; } = null!;
+
     public Guid RawMaterialId { get; private set; }
     public RawMaterial RawMaterial { get; private set; } = null!;
+
     public decimal Quantity { get; private set; }
 
     internal RecipeIngredient(Guid recipeId, Guid rawMaterialId, decimal quantity)

@@ -30,6 +30,7 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
 
@@ -43,13 +44,18 @@
                         <Button Content="{loc:Loc Key=CREATE_RAW_MATERIAL}" Click="CreateRawMaterial_Click" Style="{StaticResource PrimaryButtonStyle}" Height="30"/>
                     </StackPanel>
 
-                    <DataGrid Grid.Row="1" x:Name="RawMaterialsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                    <!-- Чекбокс показа скрытых -->
+                    <CheckBox x:Name="ShowArchivedRawCheckBox" Grid.Row="1" Content="{loc:Loc Key=CHECKBOX_SHOW_ARCHIVED}" 
+                              FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,8" 
+                              Checked="ShowArchived_Changed" Unchecked="ShowArchived_Changed"/>
+
+                    <DataGrid Grid.Row="2" x:Name="RawMaterialsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="{loc:Loc Key=RAW_MATERIAL_NAME}" Binding="{Binding Name}" Width="*"/>
-                            <DataGridTemplateColumn Width="45">
+                            <DataGridTemplateColumn x:Name="RawMaterialDeleteColumn" Width="45">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
-                                        <Button Content="✕" Click="DeleteRawMaterial_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
+                                        <Button Content="•••" Click="DeleteRawMaterial_Click" Tag="{Binding Id}" Style="{StaticResource ActionButtonStyle}" Width="28" Height="24" Padding="0"/>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
@@ -89,7 +95,6 @@
 
                         <Button Content="{loc:Loc Key=BTN_ADD}" Click="AddIngredient_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Margin="0,0,0,8"/>
 
-                        <!-- Используем кастомный ItemTemplate с конвертером ед. измерения -->
                         <ListBox x:Name="AddedIngredientsListBox" Height="100" Margin="0,0,0,12">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -116,29 +121,40 @@
 
             <!-- 3. Список сохранённых рецептов -->
             <GroupBox Grid.Column="2" Header="{loc:Loc Key=HEADER_RECIPES}" Padding="10">
-                <DataGrid x:Name="RecipesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
-                    <DataGrid.Columns>
-                        <DataGridTemplateColumn Header="{loc:Loc Key=RECIPE_NAME}" Width="*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock VerticalAlignment="Center" Margin="5,0">
-                                        <Hyperlink Click="OpenRecipeDetails_Click">
-                                            <Run Text="{Binding Name}"/>
-                                        </Hyperlink>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                        <DataGridTemplateColumn Width="45">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Content="✕" Click="DeleteRecipe_Click" Tag="{Binding Id}" Style="{StaticResource DangerButtonStyle}" Width="24" Height="24" Padding="0"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
+                    <CheckBox x:Name="ShowArchivedRecipesCheckBox" Grid.Row="0" Content="{loc:Loc Key=CHECKBOX_SHOW_ARCHIVED}" 
+                              FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,8" 
+                              Checked="ShowArchived_Changed" Unchecked="ShowArchived_Changed"/>
+
+                    <DataGrid Grid.Row="1" x:Name="RecipesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTemplateColumn Header="{loc:Loc Key=RECIPE_NAME}" Width="*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock VerticalAlignment="Center" Margin="5,0">
+                                            <Hyperlink Click="OpenRecipeDetails_Click">
+                                                <Run Text="{Binding Name}"/>
+                                            </Hyperlink>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+
+                            <DataGridTemplateColumn x:Name="RecipeDeleteColumn" Width="45">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <Button Content="•••" Click="DeleteRecipe_Click" Tag="{Binding Id}" Style="{StaticResource ActionButtonStyle}" Width="28" Height="24" Padding="0"/>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
             </GroupBox>
         </Grid>
 

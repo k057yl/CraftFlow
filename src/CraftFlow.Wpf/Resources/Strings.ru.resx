@@ -127,6 +127,21 @@
 	<data name="CREATE_RECIPE" xml:space="preserve"><value>Сохранить рецепт</value></data>
 	<data name="BTN_ADD" xml:space="preserve"><value>Добавить</value></data>
 
+	<!-- Warning -->
+	<data name="CATALOG.RAW_MATERIAL_HAS_STOCK" xml:space="preserve"><value>Невозможно скрыть сырьё: на складе есть положительные остатки.</value></data>
+	<data name="CATALOG.RAW_MATERIAL_IN_ACTIVE_RECIPE" xml:space="preserve"><value>Невозможно скрыть сырьё: оно используется в активных рецептурах.</value></data>
+	<data name="CATALOG.RECIPE_HAS_ACTIVE_BATCHES" xml:space="preserve"><value>Невозможно скрыть рецепт: по нему прямо сейчас есть активные или запланированные варки.</value></data>
+
+	<!-- ========================================== -->
+	<!-- 2.1: Модалка								-->
+	<!-- ========================================== -->
+	<data name="CHECKBOX_SHOW_ARCHIVED" xml:space="preserve"><value>Показать скрытые</value></data>
+	<data name="CONFIRM_ARCHIVE_RAW_MATERIAL" xml:space="preserve"><value>Вы уверены, что хотите скрыть данное сырьё?</value></data>
+	<data name="CONFIRM_ARCHIVE_RECIPE" xml:space="preserve"><value>Вы уверены, что хотите скрыть этот рецепт?</value></data>
+	<data name="CONFIRM_ACTION_TITLE" xml:space="preserve"><value>Подтверждение действия</value></data>
+	<data name="BTN_CANCEL" xml:space="preserve"><value>Отмена</value></data>
+	<data name="BTN_CONFIRM" xml:space="preserve"><value>Подтвердить</value></data>
+
 	<!-- ========================================== -->
 	<!-- 3: Склады и Оборудование                   -->
 	<!-- ========================================== -->
@@ -174,7 +189,7 @@
 	<data name="BTN_CONFIRM" xml:space="preserve"><value>Подтвердить</value></data>
 
 	<!-- ========================================== -->
-	<!-- 4: Закупки и Поставки                       -->
+	<!-- 4: Закупки и Поставки                      -->
 	<!-- ========================================== -->
 	<data name="TITLE_PROCUREMENT" xml:space="preserve"><value>Закупки и Поставки</value></data>
 	<data name="TAB_STOCK_RECEIPT" xml:space="preserve"><value>Приход и Остатки сырья</value></data>
@@ -283,7 +298,7 @@
 	<data name="MSG_DRAFT_DELETED_SUCCESS" xml:space="preserve"><value>Черновик успешно удален!</value></data>
 
 	<!-- ========================================== -->
-	<!-- 5: Созревание и Аффинаж                    -->
+	<!-- 5.1: Созревание и Аффинаж                  -->
 	<!-- ========================================== -->
 	<data name="GROUP_TRANSFER_AGING" xml:space="preserve"><value>Перемещение на созревание</value></data>
 	<data name="LABEL_COMPLETED_BATCH" xml:space="preserve"><value>Выбор завершённой варки:</value></data>
@@ -315,6 +330,22 @@
 	<data name="LABEL_SELLING_PRICE_PER_UNIT" xml:space="preserve"><value>Цена продажи за 1 {0}:</value></data>
 	<data name="LABEL_ACTIVE_AGING_LOT" xml:space="preserve"><value>Выберите партию из камеры</value></data>
 	<data name="SELECT_WAREHOUSE" xml:space="preserve"><value>Выберите склад зачисления</value></data>
+
+	<!-- ========================================== -->
+	<!-- 5.2: Брак и Списания                       -->
+	<!-- ========================================== -->
+	<data name="GROUP_DISCARD_IN_KETTLE" xml:space="preserve"><value>Списание варки из котла</value></data>
+	<data name="LABEL_SELECT_ACTIVE_BATCH" xml:space="preserve"><value>Выберите активную варку:</value></data>
+	<data name="LABEL_DISCARD_REASON" xml:space="preserve"><value>Причина списания:</value></data>
+	<data name="BTN_DISCARD_BATCH_SUBMIT" xml:space="preserve"><value>Списать варку</value></data>
+	<data name="GROUP_DISCARD_AGING_LOTS" xml:space="preserve"><value>Списание с камер созревания</value></data>
+	<data name="COLUMN_LOT_BATCH" xml:space="preserve"><value>Партия / Лот</value></data>
+	<data name="COLUMN_CHAMBER" xml:space="preserve"><value>Камера</value></data>
+	<data name="COLUMN_CURRENT_STOCK" xml:space="preserve"><value>Масса (кг/л)</value></data>
+	<data name="COLUMN_UNITS_COUNT" xml:space="preserve"><value>Голов / Штук</value></data>
+	<data name="COLUMN_DAYS_IN_AGING" xml:space="preserve"><value>Дней на выдержке</value></data>
+	<data name="COLUMN_ACTION" xml:space="preserve"><value>Действие</value></data>
+	<data name="BTN_DISCARD_ROW" xml:space="preserve"><value>Списать</value></data>
 
 	<!-- ========================================== -->
 	<!-- 6. Production Page & Costing Labels        -->

@@ -17,8 +17,14 @@ public class GetRawMaterialsHandler : IRequestHandler<GetRawMaterialsQuery, Resu
 
     public async Task<Result<List<RawMaterialDto>>> Handle(GetRawMaterialsQuery request, CancellationToken cancellationToken)
     {
-        var materials = await _dbContext.RawMaterials
-            .AsNoTracking()
+        var query = _dbContext.RawMaterials.AsNoTracking();
+
+        if (!request.IncludeArchived)
+        {
+            query = query.Where(raw => raw.IsActive);
+        }
+
+        var materials = await query
             .Join(
                 _dbContext.UnitsOfMeasure.AsNoTracking(),
                 raw => raw.UnitOfMeasureId,

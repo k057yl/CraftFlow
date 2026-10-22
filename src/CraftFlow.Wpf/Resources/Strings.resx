@@ -242,4 +242,106 @@
 	<data name="PRODUCTION_INSUFFICIENT_RAW_MATERIAL" xml:space="preserve"><value>Insufficient raw materials!</value></data>
 	<data name="PRODUCTION_BATCH_NOT_FOUND" xml:space="preserve"><value>Production batch not found</value></data>
 	<data name="GENERAL_NOT_FOUND" xml:space="preserve"><value>Requested resource not found</value></data>
+
+	<!-- ========================================== -->
+	<!-- 5: Production & Brewhouse                  -->
+	<!-- ========================================== -->
+	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>CRAFTFLOW — Production</value></data>
+	<data name="PRODUCTION_HEADER" xml:space="preserve"><value>Production &amp; Brewhouse</value></data>
+	<!-- Вкладки -->
+	<data name="TAB_BREWHOUSE" xml:space="preserve"><value>Brewhouse</value></data>
+	<data name="TAB_AGING" xml:space="preserve"><value>Aging &amp; Affinage</value></data>
+	<data name="TAB_DISCARD_ACTS" xml:space="preserve"><value>Discard &amp; Write-Off</value></data>
+	<!-- Групи (GroupBox) -->
+	<data name="GROUP_START_BATCH" xml:space="preserve"><value>Batch Launch Parameters</value></data>
+	<data name="GROUP_RAW_REQUIREMENTS" xml:space="preserve"><value>Raw Material Requirements</value></data>
+	<data name="GROUP_PLANNED_BATCHES" xml:space="preserve"><value>Planned Batches (Drafts)</value></data>
+	<data name="GROUP_ACTIVE_BATCHES" xml:space="preserve"><value>Batches in Progress</value></data>
+	<data name="GROUP_COMPLETE_BATCH" xml:space="preserve"><value>Batch Completion</value></data>
+	<data name="GROUP_BATCH_COSTING" xml:space="preserve"><value>Batch Costing</value></data>
+	<!-- Лейбли полів -->
+	<data name="LABEL_BATCH_CODE" xml:space="preserve"><value>Batch Code / Name:</value></data>
+	<data name="LABEL_SELECT_RECIPE" xml:space="preserve"><value>Select Recipe:</value></data>
+	<data name="LABEL_RAW_WAREHOUSE" xml:space="preserve"><value>Raw Material Deduction Warehouse:</value></data>
+	<data name="LABEL_DEST_WAREHOUSE" xml:space="preserve"><value>Product Credit Warehouse:</value></data>
+	<data name="LABEL_PLANNED_OUTPUT" xml:space="preserve"><value>Planned Output (kg/l):</value></data>
+	<data name="LABEL_SCHEDULED_DATE" xml:space="preserve"><value>Scheduled Start Date</value></data>
+	<data name="LABEL_SCHEDULED_TIME" xml:space="preserve"><value>Time (HH:MM)</value></data>
+	<data name="LABEL_ESTIMATED_RAW_COST" xml:space="preserve"><value>Estimated Raw Material Cost:</value></data>
+	<data name="LABEL_ACTIVE_BATCH" xml:space="preserve"><value>Select Active Batch (In Progress):</value></data>
+	<data name="LABEL_COMPLETE_BATCH_NAME" xml:space="preserve"><value>Finished Batch Name / Label:</value></data>
+	<data name="LABEL_ACTUAL_OUTPUT" xml:space="preserve"><value>Actual Weight (kg/l):</value></data>
+	<data name="LABEL_UNITS_COUNT" xml:space="preserve"><value>Containers / Units Count (opt.):</value></data>
+	<data name="LABEL_RAW_COST" xml:space="preserve"><value>Raw Material Cost:</value></data>
+	<data name="LABEL_OVERHEAD_COST" xml:space="preserve"><value>Overhead Costs:</value></data>
+	<data name="LABEL_TOTAL_COST" xml:space="preserve"><value>Total Cost:</value></data>
+	<data name="LABEL_UNIT_COST" xml:space="preserve"><value>Cost per 1 kg/l:</value></data>
+	<!-- Чекбокси та Кнопки -->
+	<data name="CHECKBOX_OVERHEAD" xml:space="preserve"><value>Include overhead costs</value></data>
+	<data name="BTN_CALC_MAX" xml:space="preserve"><value>Max Output by Stock</value></data>
+	<data name="BTN_PRINT_CARD" xml:space="preserve"><value>Print Recipe Card</value></data>
+	<data name="BTN_START_BATCH" xml:space="preserve"><value>Start Batch</value></data>
+	<data name="BTN_PLAN_BATCH" xml:space="preserve"><value>Schedule (to Draft)</value></data>
+	<data name="BTN_COMPLETE_BATCH" xml:space="preserve"><value>Complete Batch</value></data>
+	<!-- Колонки таблиць -->
+	<data name="COLUMN_BATCH_CODE" xml:space="preserve"><value>Batch Code</value></data>
+	<data name="COLUMN_BATCH_NAME" xml:space="preserve"><value>Batch Name</value></data>
+	<data name="COLUMN_RECIPE" xml:space="preserve"><value>Recipe</value></data>
+	<data name="COLUMN_VOLUME" xml:space="preserve"><value>Volume</value></data>
+	<data name="COLUMN_PLANNED_QTY" xml:space="preserve"><value>Planned (kg)</value></data>
+	<data name="COLUMN_SCHEDULED_AT" xml:space="preserve"><value>Scheduled For</value></data>
+	<data name="COLUMN_STARTED_AT" xml:space="preserve"><value>Started At</value></data>
+	<data name="COLUMN_COUNTDOWN" xml:space="preserve"><value>Starts In</value></data>
+	<data name="COLUMN_ELAPSED" xml:space="preserve"><value>Elapsed Time</value></data>
+	<data name="COLUMN_TARGET_DURATION" xml:space="preserve"><value>Target (min)</value></data>
+	<data name="COLUMN_ACTIONS" xml:space="preserve"><value>Actions</value></data>
+	<!-- Тултипи та Повідомлення -->
+	<data name="TOOLTIP_START" xml:space="preserve"><value>Start batch</value></data>
+	<data name="TOOLTIP_DELETE" xml:space="preserve"><value>Delete draft</value></data>
+	<data name="MSG_BATCH_PLANNED_SUCCESS" xml:space="preserve"><value>Batch successfully planned!</value></data>
+	<data name="MSG_DRAFT_DELETED_SUCCESS" xml:space="preserve"><value>Draft successfully deleted!</value></data>
+
+	<!-- ========================================== -->
+	<!-- 5.1: Aging &amp; Affinage                  -->
+	<!-- ========================================== -->
+	<data name="GROUP_TRANSFER_AGING" xml:space="preserve"><value>Transfer to Aging</value></data>
+	<data name="LABEL_COMPLETED_BATCH" xml:space="preserve"><value>Select Completed Batch:</value></data>
+	<data name="LABEL_AGING_CHAMBER" xml:space="preserve"><value>Select Climate Chamber:</value></data>
+	<data name="LABEL_AGING_LOT_NAME" xml:space="preserve"><value>Aging Lot Label:</value></data>
+	<data name="LABEL_MIN_AGING_DAYS" xml:space="preserve"><value>Aging Period (days):</value></data>
+	<data name="BTN_TRANSFER_AGING" xml:space="preserve"><value>Place in Chamber</value></data>
+
+	<data name="GROUP_ACTIVE_AGING_LOTS" xml:space="preserve"><value>Current Lots in Aging Chambers</value></data>
+	<data name="COLUMN_LOT_BATCH" xml:space="preserve"><value>Batch / Lot</value></data>
+	<data name="COLUMN_CHAMBER" xml:space="preserve"><value>Chamber</value></data>
+	<data name="COLUMN_CURRENT_STOCK" xml:space="preserve"><value>Weight (kg)</value></data>
+	<data name="COLUMN_UNITS_COUNT" xml:space="preserve"><value>Heads / Units</value></data>
+	<data name="COLUMN_DAYS_IN_CHAMBER" xml:space="preserve"><value>Days in Chamber</value></data>
+	<data name="COLUMN_TARGET_DAYS" xml:space="preserve"><value>Target (days)</value></data>
+	<data name="COLUMN_IS_READY" xml:space="preserve"><value>Ready</value></data>
+
+	<data name="GROUP_RELEASE_AGING" xml:space="preserve"><value>Release from Aging Chamber</value></data>
+	<data name="LABEL_ACTIVE_AGING_LOT" xml:space="preserve"><value>Select Lot from Chamber:</value></data>
+	<data name="LABEL_TARGET_WAREHOUSE" xml:space="preserve"><value>Cheese Credit Warehouse:</value></data>
+	<data name="LABEL_TARGET_LOCATIONS" xml:space="preserve"><value>Warehouse Storage Cells:</value></data>
+	<data name="LABEL_RELEASE_LOT_NAME" xml:space="preserve"><value>Finished Batch / Lot Label:</value></data>
+	<data name="LABEL_FINAL_WEIGHT" xml:space="preserve"><value>Actual Weight After Shrinkage (kg):</value></data>
+	<data name="LABEL_UNIT_COST_KG" xml:space="preserve"><value>Calculated Unit Cost per 1 kg:</value></data>
+	<data name="LABEL_SELLING_PRICE_KG" xml:space="preserve"><value>Selling Price per 1 kg:</value></data>
+	<data name="BTN_RELEASE_AGING" xml:space="preserve"><value>Release for Sale</value></data>
+	<data name="LABEL_CALCULATED_UNIT_COST" xml:space="preserve"><value>Calculated Cost per 1 {0}:</value></data>
+	<data name="LABEL_SELLING_PRICE_PER_UNIT" xml:space="preserve"><value>Selling Price per 1 {0}:</value></data>
+	<data name="SELECT_WAREHOUSE" xml:space="preserve"><value>Select destination warehouse</value></data>
+
+	<!-- ========================================== -->
+	<!-- 5.2: Discard &amp; Write-Off               -->
+	<!-- ========================================== -->
+	<data name="GROUP_DISCARD_IN_KETTLE" xml:space="preserve"><value>Discard Batch from Kettle</value></data>
+	<data name="LABEL_SELECT_ACTIVE_BATCH" xml:space="preserve"><value>Select Active Batch:</value></data>
+	<data name="LABEL_DISCARD_REASON" xml:space="preserve"><value>Discard Reason:</value></data>
+	<data name="BTN_DISCARD_BATCH_SUBMIT" xml:space="preserve"><value>Discard Batch</value></data>
+	<data name="GROUP_DISCARD_AGING_LOTS" xml:space="preserve"><value>Discard from Aging Chambers</value></data>
+	<data name="COLUMN_DAYS_IN_AGING" xml:space="preserve"><value>Days in Aging</value></data>
+	<data name="COLUMN_ACTION" xml:space="preserve"><value>Action</value></data>
+	<data name="BTN_DISCARD_ROW" xml:space="preserve"><value>Discard</value></data>
 </root>

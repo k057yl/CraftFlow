@@ -5,7 +5,10 @@ public enum TenantRole
     NONE = 0,
     SUPER_ADMIN = 1,
     OWNER = 2,
-    TECHNOLOGIST = 3,
-    STOREKEEPER = 4,
-    SALES_MANAGER = 5
+    ACCOUNTANT = 3,
+    TECHNOLOGIST = 4,
+    OPERATOR = 5,
+    STOREKEEPER = 6,
+    SALES_MANAGER = 7,
+    AUDITOR = 8
 }

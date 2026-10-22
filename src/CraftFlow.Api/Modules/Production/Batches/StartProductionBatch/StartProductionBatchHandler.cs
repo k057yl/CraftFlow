@@ -126,6 +126,7 @@ public class StartProductionBatchHandler : IRequestHandler<StartProductionBatchC
             recipe.ProductId,
             request.WarehouseId,
             destinationWarehouse,
+            request.EquipmentLocationId,
             request.PlannedOutputQuantity,
             recipe.TargetDurationMinutes,
             request.Name
@@ -133,7 +134,7 @@ public class StartProductionBatchHandler : IRequestHandler<StartProductionBatchC
 
         batch.Start();
 
-        equipmentLocation.AddVolume(request.PlannedOutputQuantity);
+        equipmentLocation.LockForProduction(batch.Id);
 
         _dbContext.ProductionBatches.Add(batch);
 

@@ -2,6 +2,7 @@
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature;
 using CraftFlow.SharedKernel.Dtos.Common;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Services.Converters;
@@ -34,7 +35,32 @@ public partial class RecipesPage : Page
         RawMaterialsDataGrid.ItemsSource = RawMaterials;
         RecipesDataGrid.ItemsSource = Recipes;
 
-        Loaded += async (s, e) => await LoadDataAsync();
+        Loaded += async (s, e) =>
+        {
+            ApplyRolePermissions();
+            await LoadDataAsync();
+        };
+    }
+
+    private void ApplyRolePermissions()
+    {
+        var userRole = ApiService.Instance.CurrentUser?.Role;
+        bool canManageArchived = userRole == TenantRole.OWNER || userRole == TenantRole.ACCOUNTANT;
+        var targetVisibility = canManageArchived ? Visibility.Visible : Visibility.Collapsed;
+
+        RawMaterialDeleteColumn.Visibility = targetVisibility;
+        RecipeDeleteColumn.Visibility = targetVisibility;
+
+        ShowArchivedRawCheckBox.Visibility = targetVisibility;
+        ShowArchivedRecipesCheckBox.Visibility = targetVisibility;
+    }
+
+    private async void ShowArchived_Changed(object sender, RoutedEventArgs e)
+    {
+        if (IsLoaded)
+        {
+            await LoadDataAsync();
+        }
     }
 
     private static bool TryParseDecimal(string text, out decimal result)
@@ -70,7 +96,10 @@ public partial class RecipesPage : Page
             UnitsOfMeasure.Clear();
             uoms?.ForEach(u => UnitsOfMeasure.Add(new LookupItem(u.Id, u.Name, u.Code)));
 
-            var raw = await ApiService.Instance.GetAsync<List<RawMaterialDto>>(CatalogConstants.RAW_MATERIALS);
+            bool showRawArchived = ShowArchivedRawCheckBox.IsChecked ?? false;
+            var rawUrl = $"{CatalogConstants.RAW_MATERIALS}?includeArchived={showRawArchived}";
+            var raw = await ApiService.Instance.GetAsync<List<RawMaterialDto>>(rawUrl);
+
             RawMaterials.Clear();
             raw?.ForEach(r =>
             {
@@ -78,7 +107,10 @@ public partial class RecipesPage : Page
                 RawMaterials.Add(new LookupItem(r.Id, displayName, r.UnitOfMeasureCode));
             });
 
-            var recs = await ApiService.Instance.GetAsync<List<RecipeDto>>(CatalogConstants.RECIPES);
+            bool showRecipesArchived = ShowArchivedRecipesCheckBox.IsChecked ?? false;
+            var recipesUrl = $"{CatalogConstants.RECIPES}?includeArchived={showRecipesArchived}";
+            var recs = await ApiService.Instance.GetAsync<List<RecipeDto>>(recipesUrl);
+
             Recipes.Clear();
             recs?.ForEach(r => Recipes.Add(r));
 
@@ -99,7 +131,6 @@ public partial class RecipesPage : Page
             _selectedIngredients.Add(new IngredientItemDto(rawItem.Id, rawItem.Name, uomCode, qty));
             RecipeIngredientQuantityTextBox.Text = "1";
 
-            // Пример применения форматирования напрямую в C# для уведомления
             var formattedQty = UnitFormatter.Format(qty, uomCode);
             SetStatusRaw($"Добавлено: {rawItem.Name} — {formattedQty}", Brushes.Green);
         }
@@ -209,6 +240,9 @@ public partial class RecipesPage : Page
     {
         if (sender is Button btn && btn.Tag is Guid id)
         {
+            bool confirmed = ConfirmWindow.Show(Window.GetWindow(this), "CONFIRM_ARCHIVE_RAW_MATERIAL", "CONFIRM_ACTION_TITLE");
+            if (!confirmed) return;
+
             await ApiService.Instance.DeleteAsync($"{CatalogConstants.RAW_MATERIALS}/{id}");
             await LoadDataAsync();
         }
@@ -218,6 +252,9 @@ public partial class RecipesPage : Page
     {
         if (sender is Button btn && btn.Tag is Guid id)
         {
+            bool confirmed = ConfirmWindow.Show(Window.GetWindow(this), "CONFIRM_ARCHIVE_RECIPE", "CONFIRM_ACTION_TITLE");
+            if (!confirmed) return;
+
             await ApiService.Instance.DeleteAsync($"{CatalogConstants.RECIPES}/{id}");
             await LoadDataAsync();
         }

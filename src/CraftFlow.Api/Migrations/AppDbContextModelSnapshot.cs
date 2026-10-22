@@ -308,7 +308,8 @@ namespace CraftFlow.Api.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric");
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<Guid>("RawMaterialId")
                         .HasColumnType("uuid");
@@ -418,7 +419,7 @@ namespace CraftFlow.Api.Migrations
                     b.Property<int>("Role")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasDefaultValue(3);
+                        .HasDefaultValue(4);
 
                     b.Property<int>("Status")
                         .ValueGeneratedOnAdd()
@@ -832,6 +833,9 @@ namespace CraftFlow.Api.Migrations
 
                     b.Property<string>("DiscardReason")
                         .HasColumnType("text");
+
+                    b.Property<Guid>("EquipmentLocationId")
+                        .HasColumnType("uuid");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
@@ -1393,16 +1397,18 @@ namespace CraftFlow.Api.Migrations
                     b.HasOne("CraftFlow.Api.Modules.Catalog.Domain.RawMaterial", "RawMaterial")
                         .WithMany()
                         .HasForeignKey("RawMaterialId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("CraftFlow.Api.Modules.Catalog.Domain.Recipe", null)
+                    b.HasOne("CraftFlow.Api.Modules.Catalog.Domain.Recipe", "Recipe")
                         .WithMany("Ingredients")
                         .HasForeignKey("RecipeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("RawMaterial");
+
+                    b.Navigation("Recipe");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.Catalog.Domain.UnitOfMeasure", b =>
