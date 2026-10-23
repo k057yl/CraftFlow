@@ -27,24 +27,24 @@ public sealed class TraceabilityReadService
 
         if (header is null) return null;
 
-        var batchRows = (await _dbConnection.QueryAsync<dynamic>(
+        var batchRows = (await _dbConnection.QueryAsync<ForwardBatchRow>(
             TraceabilityConstants.SQL_GET_FORWARD_BATCHES,
-            new { StockLotId = stockLotId, TenantId = tenantId }))?.ToList() ?? new List<dynamic>();
+            new { StockLotId = stockLotId, TenantId = tenantId }))?.ToList() ?? [];
 
         var batches = batchRows
-            .Where(r => r.production_batch_id != null)
-            .GroupBy(r => (Guid)r.production_batch_id)
+            .Where(r => r.ProductionBatchId != Guid.Empty)
+            .GroupBy(r => r.ProductionBatchId)
             .Select(g =>
             {
                 var first = g.First();
                 return new TraceabilityProductionBatchDto(
                     g.Key,
-                    Convert.ToInt32(first.batch_status_int ?? 0),
-                    (DateTime?)(first.started_at) ?? DateTime.MinValue,
-                    (DateTime?)first.completed_at,
-                    0m,
-                    0m,
-                    0m,
+                    first.BatchStatusInt,
+                    first.StartedAt ?? DateTime.MinValue,
+                    first.CompletedAt,
+                    first.PlannedQuantity,
+                    first.ActualQuantity,
+                    first.PlannedQuantity > 0 ? Math.Round((first.ActualQuantity / first.PlannedQuantity) * 100m, 2) : 0m,
                     new List<TraceabilityIngredientDto>()
                 );
             }).ToList();
@@ -59,7 +59,7 @@ public sealed class TraceabilityReadService
 
     public async Task<BackwardTraceabilityDto?> GetBackwardTraceabilityAsync(Guid productStockLotId, Guid tenantId)
     {
-        var header = await _dbConnection.QueryFirstOrDefaultAsync<dynamic>(
+        var header = await _dbConnection.QueryFirstOrDefaultAsync<BackwardHeaderRow>(
             TraceabilityConstants.SQL_GET_BACKWARD_HEADER,
             new { ProductStockLotId = productStockLotId, TenantId = tenantId });
 
@@ -67,37 +67,35 @@ public sealed class TraceabilityReadService
 
         TraceabilityProductionBatchDto? originBatch = null;
 
-        if (header.production_batch_id != null)
+        if (header.ProductionBatchId.HasValue && header.ProductionBatchId.Value != Guid.Empty)
         {
-            var rawIngredients = await _dbConnection.QueryAsync<dynamic>(
+            var rawIngredients = await _dbConnection.QueryAsync<BackwardIngredientRow>(
                 TraceabilityConstants.SQL_GET_BACKWARD_CONSUMED,
-                new { BatchId = (Guid)header.production_batch_id, TenantId = tenantId });
+                new { BatchId = header.ProductionBatchId.Value, TenantId = tenantId });
 
             var ingredients = rawIngredients?
                 .Select(i => new TraceabilityIngredientDto(
-                    (Guid)(i.raw_material_stock_lot_id ?? Guid.Empty),
-                    (string)(i.raw_material_name ?? string.Empty),
-                    (string)(i.batch_number ?? string.Empty),
-                    Convert.ToDecimal(i.quantity_used ?? 0m),
-                    (string)(i.unit_of_measure ?? string.Empty),
-                    (Guid?)i.supplier_id,
-                    (string)(i.supplier_name ?? string.Empty)
+                    i.RawMaterialStockLotId ?? Guid.Empty,
+                    i.RawMaterialName ?? string.Empty,
+                    i.BatchNumber ?? string.Empty,
+                    i.QuantityUsed,
+                    i.UnitOfMeasure ?? string.Empty,
+                    i.SupplierId,
+                    i.SupplierName ?? string.Empty
                 )).ToList() ?? [];
 
-            decimal plannedQty = Convert.ToDecimal(header.planned_quantity ?? 0m);
-            decimal brewOutputQty = Convert.ToDecimal(header.brew_output_quantity ?? 0m);
+            decimal plannedQty = header.PlannedQuantity;
+            decimal brewOutputQty = header.BrewOutputQuantity;
 
             decimal yieldPercentage = plannedQty > 0
                 ? Math.Round((brewOutputQty / plannedQty) * 100m, 2)
                 : 0m;
 
-            int batchStatusInt = Convert.ToInt32(header.batch_status_int ?? 0);
-
             originBatch = new TraceabilityProductionBatchDto(
-                (Guid)header.production_batch_id,
-                batchStatusInt,
-                (DateTime?)header.started_at ?? DateTime.MinValue,
-                (DateTime?)header.completed_at,
+                header.ProductionBatchId.Value,
+                header.BatchStatusInt,
+                header.StartedAt ?? DateTime.MinValue,
+                header.CompletedAt,
                 plannedQty,
                 brewOutputQty,
                 yieldPercentage,
@@ -105,17 +103,18 @@ public sealed class TraceabilityReadService
             );
         }
 
-        decimal currentStockQty = Convert.ToDecimal(header.actual_quantity ?? 0m);
-        decimal brewOutput = Convert.ToDecimal(header.brew_output_quantity ?? 0m);
-        int agingDays = Convert.ToInt32(header.aging_days ?? 0);
+        decimal currentStockQty = header.ActualQuantity;
+        decimal brewOutput = header.BrewOutputQuantity;
+        int agingDays = header.AgingDays;
         decimal agingLossPercentage = 0m;
+
         if (agingDays > 0 && brewOutput > 0 && currentStockQty > 0 && currentStockQty < brewOutput)
         {
             agingLossPercentage = Math.Round(((brewOutput - currentStockQty) / brewOutput) * 100m, 2);
         }
 
-        string chamberName = (string)(header.chamber_name ?? string.Empty);
-        string locationName = (string)(header.location_name ?? string.Empty);
+        string chamberName = header.ChamberName ?? string.Empty;
+        string locationName = header.LocationName ?? string.Empty;
 
         string displayLocation = !string.IsNullOrWhiteSpace(locationName)
             ? (!string.IsNullOrWhiteSpace(chamberName) ? $"{chamberName} ({locationName})" : locationName)
@@ -126,16 +125,13 @@ public sealed class TraceabilityReadService
             displayLocation = FormattingConstants.CONST_DEFAULT_CHAMBER_NAME;
         }
 
-        Guid? salesOrderId = (Guid?)header.sales_order_id;
-        Guid? customerId = (Guid?)header.customer_id;
-
         return new BackwardTraceabilityDto(
-            salesOrderId,
-            customerId,
-            (string)(header.customer_name ?? FormattingConstants.CONST_DEFAULT_CUSTOMER_NAME),
-            (Guid)header.product_stock_lot_id,
-            (string)(header.product_batch_number ?? string.Empty),
-            (string)(header.product_name ?? string.Empty),
+            header.SalesOrderId,
+            header.CustomerId,
+            header.CustomerName ?? FormattingConstants.CONST_DEFAULT_CUSTOMER_NAME,
+            header.ProductStockLotId,
+            header.ProductBatchNumber ?? string.Empty,
+            header.ProductName ?? string.Empty,
             currentStockQty,
             agingDays,
             agingLossPercentage,
@@ -144,9 +140,52 @@ public sealed class TraceabilityReadService
         );
     }
 
-    private record ForwardTraceabilityHeader(
-        Guid RawMaterialStockLotId,
-        string RawMaterialBatchNumber,
-        string RawMaterialName
-    );
+    // Жесткие DTO для Dapper
+    private sealed class ForwardTraceabilityHeader
+    {
+        public Guid RawMaterialStockLotId { get; set; }
+        public string RawMaterialBatchNumber { get; set; } = string.Empty;
+        public string RawMaterialName { get; set; } = string.Empty;
+    }
+
+    private sealed class ForwardBatchRow
+    {
+        public Guid ProductionBatchId { get; set; }
+        public int BatchStatusInt { get; set; }
+        public DateTime? StartedAt { get; set; }
+        public DateTime? CompletedAt { get; set; }
+        public decimal PlannedQuantity { get; set; }
+        public decimal ActualQuantity { get; set; }
+    }
+
+    private sealed class BackwardHeaderRow
+    {
+        public Guid ProductStockLotId { get; set; }
+        public string? ProductBatchNumber { get; set; }
+        public string? ProductName { get; set; }
+        public decimal ActualQuantity { get; set; }
+        public Guid? ProductionBatchId { get; set; }
+        public int BatchStatusInt { get; set; }
+        public DateTime? StartedAt { get; set; }
+        public DateTime? CompletedAt { get; set; }
+        public decimal PlannedQuantity { get; set; }
+        public decimal BrewOutputQuantity { get; set; }
+        public int AgingDays { get; set; }
+        public string? ChamberName { get; set; }
+        public string? LocationName { get; set; }
+        public Guid? SalesOrderId { get; set; }
+        public Guid? CustomerId { get; set; }
+        public string? CustomerName { get; set; }
+    }
+
+    private sealed class BackwardIngredientRow
+    {
+        public Guid? RawMaterialStockLotId { get; set; }
+        public string? RawMaterialName { get; set; }
+        public string? BatchNumber { get; set; }
+        public decimal QuantityUsed { get; set; }
+        public string? UnitOfMeasure { get; set; }
+        public Guid? SupplierId { get; set; }
+        public string? SupplierName { get; set; }
+    }
 }

@@ -37,9 +37,12 @@ public partial class ProfilePage : Page
     {
         NewUserRoleComboBox.ItemsSource = new[]
         {
-            new { Role = TenantRole.TECHNOLOGIST, Display = "Технолог" },
+            new { Role = TenantRole.ACCOUNTANT, Display = "Бухгалтер" },
+            new { Role = TenantRole.TECHNOLOGIST, Display = "Главный технолог" },
+            new { Role = TenantRole.OPERATOR, Display = "Оператор / Сыровар" },
             new { Role = TenantRole.STOREKEEPER, Display = "Кладовщик" },
-            new { Role = TenantRole.SALES_MANAGER, Display = "Менеджер / Продажи" }
+            new { Role = TenantRole.SALES_MANAGER, Display = "Менеджер по продажам" },
+            new { Role = TenantRole.AUDITOR, Display = "Аудитор" }
         };
         NewUserRoleComboBox.DisplayMemberPath = "Display";
         NewUserRoleComboBox.SelectedValuePath = "Role";
@@ -76,19 +79,24 @@ public partial class ProfilePage : Page
                 user.Email = profile.Email;
                 user.Role = profile.Role;
                 EmailTextBlock.Text = profile.Email;
+                RoleTextBlock.Text = GetRoleDisplayName(profile.Role);
             }
         }
 
         bool isOwner = user.Role == TenantRole.OWNER;
+        bool isSuperAdmin = user.Role == TenantRole.SUPER_ADMIN;
 
-        TeamManagementBorder.Visibility = isOwner ? Visibility.Visible : Visibility.Collapsed;
-        SubscriptionManagementBorder.Visibility = isOwner ? Visibility.Visible : Visibility.Collapsed;
-        DangerZoneBorder.Visibility = isOwner ? Visibility.Visible : Visibility.Collapsed;
+        TeamManagementBorder.Visibility = (isOwner || isSuperAdmin) ? Visibility.Visible : Visibility.Collapsed;
+        SubscriptionManagementBorder.Visibility = isSuperAdmin ? Visibility.Visible : Visibility.Collapsed;
+        DangerZoneBorder.Visibility = (isOwner || isSuperAdmin) ? Visibility.Visible : Visibility.Collapsed;
 
-        if (isOwner)
+        if (isOwner || isSuperAdmin)
         {
             await LoadTeamUsersAsync();
-            await LoadAccessKeysAsync();
+            if (isSuperAdmin)
+            {
+                await LoadAccessKeysAsync();
+            }
         }
     }
 
@@ -289,10 +297,14 @@ public partial class ProfilePage : Page
 
     private static string GetRoleDisplayName(TenantRole role) => role switch
     {
+        TenantRole.SUPER_ADMIN => "Супер Администратор",
         TenantRole.OWNER => "Владелец сыроварни",
+        TenantRole.ACCOUNTANT => "Бухгалтер",
         TenantRole.TECHNOLOGIST => "Главный технолог",
+        TenantRole.OPERATOR => "Оператор / Сыровар",
         TenantRole.STOREKEEPER => "Кладовщик",
         TenantRole.SALES_MANAGER => "Менеджер по продажам",
+        TenantRole.AUDITOR => "Аудитор",
         _ => "Сотрудник"
     };
 }

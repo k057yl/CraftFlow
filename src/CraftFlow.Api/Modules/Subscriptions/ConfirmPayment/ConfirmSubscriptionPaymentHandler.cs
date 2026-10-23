@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Subscriptions.Domain;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,11 @@ public class ConfirmSubscriptionPaymentHandler : IRequestHandler<ConfirmSubscrip
 
     public async Task<Result> Handle(ConfirmSubscriptionPaymentCommand request, CancellationToken ct)
     {
+        if (!_tenantContext.IsSuperAdmin)
+        {
+            return Result.Failure(Error.Validation(ErrorCodes.Auth.ACCESS_DENIED));
+        }
+
         var tenantId = _tenantContext.TenantId;
 
         var plan = await _dbContext.Set<SubscriptionPlan>()

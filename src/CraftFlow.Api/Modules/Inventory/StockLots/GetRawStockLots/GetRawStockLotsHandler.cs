@@ -18,12 +18,13 @@ public class GetRawStockLotsHandler : IRequestHandler<GetRawStockLotsQuery, Resu
     {
         var rawLots = await _dbContext.StockLots
             .AsNoTracking()
-            .Join(_dbContext.RawMaterials,
+            .Where(sl => sl.Quantity > 0)
+            .Join(_dbContext.RawMaterials.IgnoreQueryFilters(),
                 sl => sl.ItemId,
                 rm => rm.Id,
                 (sl, rm) => new RawStockLotLookupDto(
                     sl.Id,
-                    rm.Name + " (" + (sl.BatchNumber ?? "NoN") + " | Remainder: " + sl.Quantity + ")"
+                    $"{rm.Name} (Партия: {sl.BatchNumber ?? "б/н"} | Остаток: {sl.Quantity:0.##})"
                 ))
             .ToListAsync(cancellationToken);
 

@@ -18,12 +18,13 @@ public class GetProductStockLotsHandler : IRequestHandler<GetProductStockLotsQue
     {
         var productLots = await _dbContext.StockLots
             .AsNoTracking()
-            .Join(_dbContext.Products,
+            .Where(sl => sl.Quantity > 0)
+            .Join(_dbContext.Products.IgnoreQueryFilters(),
                 sl => sl.ItemId,
                 p => p.Id,
                 (sl, p) => new ProductStockLotLookupDto(
                     sl.Id,
-                    p.Name + " (" + (sl.BatchNumber ?? "NoN") + " | In stock: " + sl.Quantity + " kg)"
+                    $"{p.Name} (Партия: {sl.BatchNumber ?? "б/н"} | Остаток: {sl.Quantity:0.##})"
                 ))
             .ToListAsync(cancellationToken);
 

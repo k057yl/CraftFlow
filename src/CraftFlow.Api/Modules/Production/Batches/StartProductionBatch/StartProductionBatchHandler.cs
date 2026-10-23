@@ -42,8 +42,14 @@ public class StartProductionBatchHandler : IRequestHandler<StartProductionBatchC
         }
 
         var recipe = await _dbContext.Recipes
+            .IgnoreQueryFilters()
             .Include(r => r.Ingredients)
-            .FirstAsync(r => r.Id == request.RecipeId, cancellationToken);
+            .FirstOrDefaultAsync(r => r.Id == request.RecipeId, cancellationToken);
+
+        if (recipe == null)
+        {
+            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Catalog.RECIPE_NOT_FOUND));
+        }
 
         var rawMaterialIds = recipe.Ingredients.Select(i => i.RawMaterialId).ToList();
 

@@ -92,7 +92,7 @@ public partial class MrpPage : Page
             Warehouses.Clear();
             warehouses?.ForEach(w => Warehouses.Add(new LookupItem(w.Id, w.Name)));
 
-            var recipes = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.RECIPES);
+            var recipes = await ApiService.Instance.GetAsync<List<LookupDto>>($"{CatalogConstants.RECIPES}?includeArchived=false");
             Recipes.Clear();
             recipes?.ForEach(r => Recipes.Add(new LookupItem(r.Id, r.Name)));
 

@@ -84,7 +84,7 @@ public partial class ProcurementPage : Page
             });
             FilterWarehouseComboBox.SelectedIndex = 0;
 
-            var raw = await ApiService.Instance.GetAsync<List<LookupDto>>(CatalogConstants.RAW_MATERIALS) ?? [];
+            var raw = await ApiService.Instance.GetAsync<List<LookupDto>>($"{CatalogConstants.RAW_MATERIALS}?includeArchived=false") ?? [];
             RawMaterials.Clear();
             raw.ForEach(r => RawMaterials.Add(new LookupItem(r.Id, r.Name, r.Code)));
 

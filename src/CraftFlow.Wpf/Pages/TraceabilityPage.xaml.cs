@@ -1,13 +1,14 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media;
+﻿using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.Api.Modules.Traceability;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Traceability;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
+using System.Collections.ObjectModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -62,9 +63,10 @@ public partial class TraceabilityPage : Page
             StockLots.Clear();
 
             bool isForward = ForwardRadioButton?.IsChecked ?? true;
+
             string endpoint = isForward
-                ? "api/inventory/stock-lots/raw"
-                : "api/inventory/stock-lots/products";
+                ? InventoryConstants.STOCK_LOTS_RAW
+                : InventoryConstants.STOCK_LOTS_PRODUCTS;
 
             var stockLots = await ApiService.Instance.GetAsync<List<LookupDto>>(endpoint);
             stockLots?.ForEach(l => StockLots.Add(new LookupItem(l.Id, l.Name)));
