@@ -6,6 +6,7 @@ using CraftFlow.SharedKernel.Dtos.Aging;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.SharedKernel.Dtos.Supplier;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
@@ -34,6 +35,7 @@ public partial class ProcurementPage : Page
     public ObservableCollection<StorageLocationDto> SelectedLocations { get; } = [];
 
     private bool _isDataLoaded = false;
+    private Guid? _editingSupplierId = null;
 
     public ProcurementPage()
     {
@@ -56,13 +58,33 @@ public partial class ProcurementPage : Page
         Loaded += async (s, e) => await LoadDataAsync();
     }
 
+    private void ApplyRolePermissions()
+    {
+        var currentUser = ApiService.Instance.CurrentUser;
+        bool hasManagementAccess = currentUser != null &&
+            (currentUser.Role == TenantRole.OWNER || currentUser.Role == TenantRole.ACCOUNTANT);
+
+        SuppliersTabItem.Visibility = hasManagementAccess ? Visibility.Visible : Visibility.Collapsed;
+
+        SupplierActionsColumn.Visibility = hasManagementAccess ? Visibility.Visible : Visibility.Collapsed;
+        ShowInactiveSuppliersCheckBox.Visibility = hasManagementAccess ? Visibility.Visible : Visibility.Collapsed;
+
+        SupplierFormGroupBox.IsEnabled = hasManagementAccess;
+    }
+
     private async Task LoadDataAsync()
     {
         try
         {
             _isDataLoaded = false;
 
-            var suppliers = await ApiService.Instance.GetAsync<List<SupplierGridDto>>(ProcurementConstants.SUPPLIERS) ?? [];
+            ApplyRolePermissions();
+
+            bool includeInactive = (ShowInactiveSuppliersCheckBox.Visibility == Visibility.Visible)
+                && (ShowInactiveSuppliersCheckBox.IsChecked ?? false);
+
+            var suppliers = await ApiService.Instance.GetAsync<List<SupplierDto>>($"{ProcurementConstants.SUPPLIERS}?includeInactive={includeInactive}") ?? [];
+
             FormSuppliers.Clear();
             FilterSuppliers.Clear();
             SuppliersList.Clear();
@@ -71,11 +93,32 @@ public partial class ProcurementPage : Page
 
             suppliers.ForEach(s =>
             {
-                var item = new LookupItem(s.Id, s.Name);
-                FormSuppliers.Add(item);
-                FilterSuppliers.Add(item);
-                SuppliersList.Add(s);
+                if (s.IsActive)
+                {
+                    var lookupItem = new LookupItem(s.Id, s.Name);
+                    FormSuppliers.Add(lookupItem);
+                    FilterSuppliers.Add(lookupItem);
+                }
+
+                SuppliersList.Add(new SupplierGridDto
+                {
+                    Id = s.Id,
+                    Name = s.Name,
+                    LegalName = s.LegalName,
+                    TaxId = s.TaxId,
+                    Phone = s.Phone,
+                    Email = s.Email,
+                    Address = s.Address,
+                    Notes = s.Notes,
+                    IsActive = s.IsActive
+                });
             });
+
+            if (FormSuppliers.Count > 0)
+            {
+                StockSupplierComboBox.SelectedIndex = 0;
+            }
+
             FilterSupplierComboBox.SelectedIndex = 0;
 
             var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(InventoryConstants.WAREHOUSES) ?? [];
@@ -104,6 +147,138 @@ public partial class ProcurementPage : Page
             SetStatusFormatted(UiConstants.Messages.DATA_LOAD_ERROR, Brushes.Red, ex.Message);
             AlertWindow.ShowError(Window.GetWindow(this), ex.Message);
         }
+    }
+
+    private async void SaveSupplier_Click(object sender, RoutedEventArgs e)
+    {
+        var currentUser = ApiService.Instance.CurrentUser;
+        if (currentUser == null || (currentUser.Role != TenantRole.OWNER && currentUser.Role != TenantRole.ACCOUNTANT))
+        {
+            AlertWindow.ShowError(Window.GetWindow(this), "Недостаточно прав для выполнения операции.");
+            return;
+        }
+
+        var name = NameTextBox.Text.Trim();
+        var legalName = string.IsNullOrWhiteSpace(LegalNameTextBox.Text) ? null : LegalNameTextBox.Text.Trim();
+        var taxId = string.IsNullOrWhiteSpace(TaxIdTextBox.Text) ? null : TaxIdTextBox.Text.Trim();
+        var phone = string.IsNullOrWhiteSpace(PhoneTextBox.Text) ? null : PhoneTextBox.Text.Trim();
+        var email = string.IsNullOrWhiteSpace(EmailTextBox.Text) ? null : EmailTextBox.Text.Trim();
+        var address = string.IsNullOrWhiteSpace(AddressTextBox.Text) ? null : AddressTextBox.Text.Trim();
+        var notes = string.IsNullOrWhiteSpace(NotesTextBox.Text) ? null : NotesTextBox.Text.Trim();
+
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            AlertWindow.ShowError(Window.GetWindow(this), UiConstants.Messages.INVALID_INPUT_FIELDS);
+            return;
+        }
+
+        bool isSuccess;
+        string responseStr;
+
+        if (_editingSupplierId.HasValue)
+        {
+            var updateRequest = new UpdateSupplierRequest(name, legalName, taxId, phone, email, address, notes);
+            (isSuccess, responseStr) = await ApiService.Instance.PutAndReadAsync($"{ProcurementConstants.SUPPLIERS}/{_editingSupplierId.Value}", updateRequest);
+        }
+        else
+        {
+            var createRequest = new CreateSupplierRequest(name, legalName, taxId, phone, email, address, notes);
+            (isSuccess, responseStr) = await ApiService.Instance.PostAndReadAsync(ProcurementConstants.SUPPLIERS, createRequest);
+        }
+
+        if (isSuccess)
+        {
+            SetStatus(UiConstants.Messages.SUPPLIER_CREATED_SUCCESS, Brushes.Green);
+            AlertWindow.ShowSuccess(Window.GetWindow(this), _editingSupplierId.HasValue ? "Данные поставщика обновлены" : UiConstants.Messages.SUPPLIER_CREATED_SUCCESS);
+
+            ResetSupplierForm();
+            await LoadDataAsync();
+        }
+        else
+        {
+            SetStatusRaw(responseStr, Brushes.Red);
+            AlertWindow.ShowError(Window.GetWindow(this), responseStr);
+        }
+    }
+
+    private void EditSupplierRow_Click(object sender, RoutedEventArgs e)
+    {
+        var currentUser = ApiService.Instance.CurrentUser;
+        if (currentUser == null || (currentUser.Role != TenantRole.OWNER && currentUser.Role != TenantRole.ACCOUNTANT))
+            return;
+
+        if (sender is Button btn && btn.Tag is SupplierGridDto supplier)
+        {
+            PopulateFormForEdit(supplier);
+        }
+    }
+
+    private void SuppliersDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        var currentUser = ApiService.Instance.CurrentUser;
+        if (currentUser == null || (currentUser.Role != TenantRole.OWNER && currentUser.Role != TenantRole.ACCOUNTANT))
+            return;
+
+        if (SuppliersDataGrid.SelectedItem is SupplierGridDto supplier)
+        {
+            PopulateFormForEdit(supplier);
+        }
+    }
+
+    private void PopulateFormForEdit(SupplierGridDto supplier)
+    {
+        _editingSupplierId = supplier.Id;
+        NameTextBox.Text = supplier.Name;
+        LegalNameTextBox.Text = supplier.LegalName;
+        TaxIdTextBox.Text = supplier.TaxId;
+        PhoneTextBox.Text = supplier.Phone;
+        EmailTextBox.Text = supplier.Email;
+        AddressTextBox.Text = supplier.Address;
+        NotesTextBox.Text = supplier.Notes;
+
+        SupplierFormGroupBox.Header = "Редактирование поставщика";
+        SaveSupplierButton.Content = "Сохранить изменения";
+        ResetFormButton.Visibility = Visibility.Visible;
+    }
+
+    private void ResetSupplierForm_Click(object sender, RoutedEventArgs e) => ResetSupplierForm();
+
+    private void ResetSupplierForm()
+    {
+        _editingSupplierId = null;
+        NameTextBox.Clear();
+        LegalNameTextBox.Clear();
+        TaxIdTextBox.Clear();
+        PhoneTextBox.Clear();
+        EmailTextBox.Clear();
+        AddressTextBox.Clear();
+        NotesTextBox.Clear();
+
+        SupplierFormGroupBox.Header = LocalizationService.Get("HEADER_SUPPLIERS");
+        SaveSupplierButton.Content = LocalizationService.Get("CREATE_SUPPLIER");
+        ResetFormButton.Visibility = Visibility.Collapsed;
+    }
+
+    private async void ToggleSupplierActive_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is SupplierGridDto supplier)
+        {
+            var (isSuccess, responseStr) = await ApiService.Instance.PutAndReadAsync($"{ProcurementConstants.SUPPLIERS}/{supplier.Id}/toggle-active", new { });
+            if (isSuccess)
+            {
+                await LoadDataAsync();
+            }
+            else
+            {
+                AlertWindow.ShowError(Window.GetWindow(this), responseStr);
+            }
+        }
+    }
+
+    private async void ShowInactiveSuppliers_Click(object sender, RoutedEventArgs e)
+    {
+        await LoadDataAsync();
     }
 
     private void StockRawMaterialComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -294,48 +469,6 @@ public partial class ProcurementPage : Page
 
     private async void FilterStockLots_Changed(object sender, RoutedEventArgs e) => await LoadStockLotsAsync();
     private async void RefreshStockLots_Click(object sender, RoutedEventArgs e) => await LoadStockLotsAsync();
-
-    private async void CreateSupplier_Click(object sender, RoutedEventArgs e)
-    {
-        var name = NameTextBox.Text.Trim();
-        var legalName = string.IsNullOrWhiteSpace(LegalNameTextBox.Text) ? null : LegalNameTextBox.Text.Trim();
-        var taxId = string.IsNullOrWhiteSpace(TaxIdTextBox.Text) ? null : TaxIdTextBox.Text.Trim();
-        var phone = string.IsNullOrWhiteSpace(PhoneTextBox.Text) ? null : PhoneTextBox.Text.Trim();
-        var email = string.IsNullOrWhiteSpace(EmailTextBox.Text) ? null : EmailTextBox.Text.Trim();
-        var address = string.IsNullOrWhiteSpace(AddressTextBox.Text) ? null : AddressTextBox.Text.Trim();
-        var notes = string.IsNullOrWhiteSpace(NotesTextBox.Text) ? null : NotesTextBox.Text.Trim();
-
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-            AlertWindow.ShowError(Window.GetWindow(this), UiConstants.Messages.INVALID_INPUT_FIELDS);
-            return;
-        }
-
-        var request = new CreateSupplierRequest(name, legalName, taxId, phone, email, address, notes);
-        var (isSuccess, responseStr) = await ApiService.Instance.PostAndReadAsync(ProcurementConstants.SUPPLIERS, request);
-
-        if (isSuccess)
-        {
-            SetStatus(UiConstants.Messages.SUPPLIER_CREATED_SUCCESS, Brushes.Green);
-            AlertWindow.ShowSuccess(Window.GetWindow(this), UiConstants.Messages.SUPPLIER_CREATED_SUCCESS);
-
-            NameTextBox.Clear();
-            LegalNameTextBox.Clear();
-            TaxIdTextBox.Clear();
-            PhoneTextBox.Clear();
-            EmailTextBox.Clear();
-            AddressTextBox.Clear();
-            NotesTextBox.Clear();
-
-            await LoadDataAsync();
-        }
-        else
-        {
-            SetStatusRaw(responseStr, Brushes.Red);
-            AlertWindow.ShowError(Window.GetWindow(this), responseStr);
-        }
-    }
 
     private async void AddStockLot_Click(object sender, RoutedEventArgs e)
     {

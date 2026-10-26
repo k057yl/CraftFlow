@@ -70,6 +70,18 @@ public sealed partial class Supplier : AggregateRoot, ITenantEntity
         Notes = SanitizeNullableString(notes);
     }
 
+    public void UpdateDetails(
+        string name,
+        string? legalName,
+        string? taxId,
+        string? phone,
+        string? email,
+        string? address,
+        string? notes) => UpdateInfo(name, legalName, taxId, phone, email, address, notes);
+
+    public void Deactivate() => Archive();
+    public void Activate() => Restore();
+
     private static string SanitizeString(string input) => input.Trim();
     private static string? SanitizeNullableString(string? input) => string.IsNullOrWhiteSpace(input) ? null : input.Trim();
 

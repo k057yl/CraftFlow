@@ -1,4 +1,9 @@
-﻿using CraftFlow.Api.Common.Constants;
+﻿using System.IO;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Text.Json;
+using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Modules.Aging;
 using CraftFlow.Api.Modules.Identity;
 using CraftFlow.Api.Modules.MRP;
@@ -11,12 +16,6 @@ using CraftFlow.SharedKernel.Dtos.MRP;
 using CraftFlow.SharedKernel.Dtos.Supplier;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
-using System.IO;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Text.Json;
-using System.Windows;
 
 namespace CraftFlow.Wpf.Services;
 
@@ -344,6 +343,34 @@ public class ApiService
         }
     }
 
+    public async Task<(bool IsSuccess, string ContentOrError)> PutAndReadAsync<T>(string endpoint, T data)
+    {
+        try
+        {
+            var response = await _client.PutAsJsonAsync(endpoint, data);
+
+            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                HandleUnauthorized();
+                return (false, UiConstants.Messages.RELEASE_ERROR);
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            var cleanContent = content.Trim('"').Trim();
+
+            if (response.IsSuccessStatusCode)
+            {
+                return (true, cleanContent);
+            }
+
+            return (false, string.IsNullOrWhiteSpace(cleanContent) ? response.StatusCode.ToString() : cleanContent);
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
+
     public async Task<bool> DeleteAsync(string endpoint)
     {
         try
@@ -394,9 +421,9 @@ public class ApiService
     {
         ClearAuthToken();
 
-        Application.Current?.Dispatcher.Invoke(() =>
+        System.Windows.Application.Current?.Dispatcher.Invoke(() =>
         {
-            if (Application.Current.MainWindow is MainWindow mainWindow)
+            if (System.Windows.Application.Current.MainWindow is MainWindow mainWindow)
             {
                 mainWindow.NavigateToAuth();
             }

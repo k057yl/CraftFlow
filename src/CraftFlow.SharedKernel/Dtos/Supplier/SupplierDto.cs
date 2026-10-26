@@ -7,5 +7,6 @@ public record SupplierDto(
     string? Phone,
     string? Email,
     string? Address,
-    string? Notes
+    string? Notes,
+    bool IsActive
 );

@@ -4,7 +4,7 @@ using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
-namespace CraftFlow.Api.Modules.Procurement.Suppliers;
+namespace CraftFlow.Api.Modules.Procurement.Suppliers.CreateSupplier;
 
 public class CreateSupplierValidator : AbstractValidator<CreateSupplierCommand>
 {

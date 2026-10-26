@@ -1,11 +1,16 @@
 ﻿<Application x:Class="CraftFlow.Wpf.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:converters="clr-namespace:CraftFlow.Wpf.Services.Converters">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/CraftFlow.Wpf;component/Themes/LightTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
+
+            <!-- Конвертеры -->
+            <converters:SupplierStatusTextConverter x:Key="SupplierStatusTextConverter"/>
+            <converters:SupplierStatusStyleConverter x:Key="SupplierStatusStyleConverter"/>
 
             <!-- 1. СТРАНИЦЫ -->
             <Style TargetType="Page">

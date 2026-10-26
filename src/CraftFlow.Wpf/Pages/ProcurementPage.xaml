@@ -2,7 +2,13 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
+      xmlns:converters="clr-namespace:CraftFlow.Wpf.Services.Converters"
       Title="{loc:Loc Key=TITLE_PROCUREMENT}">
+
+    <Page.Resources>
+        <converters:SupplierStatusTextConverter x:Key="SupplierStatusTextConverter"/>
+        <converters:SupplierStatusStyleConverter x:Key="SupplierStatusStyleConverter"/>
+    </Page.Resources>
 
     <Grid Margin="15">
         <Grid.RowDefinitions>
@@ -58,7 +64,7 @@
                                 </StackPanel>
                             </Grid>
 
-                            <!-- 2. КНОПКА СОЗДАНИЯ ЕМКОСТЕЙ (ЧЕТКО ВЫДЕЛЕННАЯ) -->
+                            <!-- 2. КНОПКА СОЗДАНИЯ ЕМКОСТЕЙ -->
                             <DockPanel Margin="0,4,0,8">
                                 <Button Content="{loc:Loc Key=BTN_QUICK_NEW_LOCATION}" 
                                         Click="QuickCreateLocation_Click" 
@@ -212,7 +218,6 @@
                                     <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding WarehouseName}" Width="110"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=LABEL_STORAGE_CONTAINERS}" Binding="{Binding StorageLocationsInfo}" Width="*"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=LABEL_SELECT_SUPPLIER}" Binding="{Binding SupplierName}" Width="120"/>
-                                    <!-- ИСПРАВЛЕНО: {0:0.####} вместо {0:N2} чтобы граммы не превращались в 0.00 -->
                                     <DataGridTextColumn Header="{loc:Loc Key=LABEL_REMAINING_STOCK}" Binding="{Binding Quantity, StringFormat={}{0:0.####}}" Width="100"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=UNIT_PRICE}" Binding="{Binding UnitPrice, StringFormat={}{0:C2}}" Width="85"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=BATCH_NUMBER}" Binding="{Binding BatchNumber}" Width="110"/>
@@ -257,10 +262,10 @@
             </TabItem>
 
             <!-- 3. Поставщики -->
-            <TabItem Header="{loc:Loc Key=TAB_SUPPLIERS}">
+            <TabItem x:Name="SuppliersTabItem" Header="{loc:Loc Key=TAB_SUPPLIERS}">
                 <Grid Margin="10">
                     <Grid.ColumnDefinitions>
-                        <!-- Секция A: Форма добавления -->
+                        <!-- Секция A: Форма добавления/редактирования -->
                         <ColumnDefinition Width="420"/>
                         <ColumnDefinition Width="15"/>
                         <!-- Секция B: Реестр поставщиков -->
@@ -268,7 +273,7 @@
                     </Grid.ColumnDefinitions>
 
                     <!-- СЕКЦИЯ A: ФОРМА -->
-                    <GroupBox Grid.Column="0" Header="{loc:Loc Key=HEADER_SUPPLIERS}" Padding="12">
+                    <GroupBox Grid.Column="0" x:Name="SupplierFormGroupBox" Header="{loc:Loc Key=HEADER_SUPPLIERS}" Padding="12">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
                                 <!-- Название (Обязательное) -->
@@ -308,34 +313,82 @@
                                 <TextBlock Text="Заметки / Условия работы:" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="NotesTextBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Margin="0,0,0,12"/>
 
-                                <!-- Кнопка создания -->
-                                <Button Content="{loc:Loc Key=CREATE_SUPPLIER}" 
-                            Style="{StaticResource PrimaryButtonStyle}"
-                            Height="32"
-                            Padding="16,0"
-                            HorizontalAlignment="Left" 
-                            Click="CreateSupplier_Click"/>
+                                <!-- Кнопки действия -->
+                                <StackPanel Orientation="Horizontal">
+                                    <Button x:Name="SaveSupplierButton" 
+                                            Content="{loc:Loc Key=CREATE_SUPPLIER}" 
+                                            Style="{StaticResource PrimaryButtonStyle}"
+                                            Height="32"
+                                            Padding="16,0"
+                                            Click="SaveSupplier_Click"/>
+
+                                    <Button x:Name="ResetFormButton" 
+                                            Content="Сброс" 
+                                            Visibility="Collapsed"
+                                            Style="{StaticResource SecondaryButtonStyle}"
+                                            Height="32"
+                                            Margin="8,0,0,0"
+                                            Padding="12,0"
+                                            Click="ResetSupplierForm_Click"/>
+                                </StackPanel>
                             </StackPanel>
                         </ScrollViewer>
                     </GroupBox>
 
                     <!-- СЕКЦИЯ B: ТАБЛИЦА С ПОСТАВЩИКАМИ -->
                     <GroupBox Grid.Column="2" Header="Реестр поставщиков" Padding="10">
-                        <DataGrid x:Name="SuppliersDataGrid" 
-                      AutoGenerateColumns="False" 
-                      IsReadOnly="True" 
-                      GridLinesVisibility="Horizontal" 
-                      HeadersVisibility="Column">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="150"/>
-                                <DataGridTextColumn Header="Юр. Имя" Binding="{Binding LegalName}" Width="140"/>
-                                <DataGridTextColumn Header="ИНН / ЕДРПОУ" Binding="{Binding TaxId}" Width="100"/>
-                                <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="110"/>
-                                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="130"/>
-                                <DataGridTextColumn Header="Адрес" Binding="{Binding Address}" Width="*"/>
-                                <DataGridTextColumn Header="Заметки" Binding="{Binding Notes}" Width="150"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <CheckBox x:Name="ShowInactiveSuppliersCheckBox" 
+                                      Content="Показывать неактивных поставщиков" 
+                                      Visibility="Collapsed"
+                                      Margin="0,0,0,10" 
+                                      Foreground="{DynamicResource AppForegroundBrush}"
+                                      Click="ShowInactiveSuppliers_Click"/>
+
+                            <DataGrid Grid.Row="1"
+                                      x:Name="SuppliersDataGrid" 
+                                      AutoGenerateColumns="False" 
+                                      IsReadOnly="True" 
+                                      GridLinesVisibility="Horizontal" 
+                                      HeadersVisibility="Column"
+                                      MouseDoubleClick="SuppliersDataGrid_MouseDoubleClick">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="140"/>
+                                    <DataGridTextColumn Header="Юр. Имя" Binding="{Binding LegalName}" Width="120"/>
+                                    <DataGridTextColumn Header="ИНН / ЕДРПОУ" Binding="{Binding TaxId}" Width="90"/>
+                                    <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="100"/>
+                                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="120"/>
+                                    <DataGridTextColumn Header="Адрес" Binding="{Binding Address}" Width="*"/>
+
+                                    <!-- Действия (Управляются правами OWNER / ACCOUNTANT) -->
+                                    <DataGridTemplateColumn x:Name="SupplierActionsColumn" Header="Действие" Width="170" Visibility="Collapsed">
+                                        <DataGridTemplateColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                    <Button Content="✏️" 
+                                                            ToolTip="Редактировать"
+                                                            Click="EditSupplierRow_Click" 
+                                                            Tag="{Binding}" 
+                                                            Style="{StaticResource SecondaryButtonStyle}" 
+                                                            Height="24" Width="28" Padding="0" Margin="0,0,5,0"/>
+
+                                                    <Button Content="{Binding IsActive, Converter={StaticResource SupplierStatusTextConverter}}" 
+                                                            Click="ToggleSupplierActive_Click" 
+                                                            Tag="{Binding}" 
+                                                            Style="{Binding IsActive, Converter={StaticResource SupplierStatusStyleConverter}}" 
+                                                            Height="24" Padding="8,0"/>
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </DataGridTemplateColumn.CellTemplate>
+                                    </DataGridTemplateColumn>
+                                </DataGrid.Columns>
+                            </DataGrid>
+                        </Grid>
                     </GroupBox>
                 </Grid>
             </TabItem>

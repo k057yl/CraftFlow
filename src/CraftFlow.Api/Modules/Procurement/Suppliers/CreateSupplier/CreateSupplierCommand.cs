@@ -1,7 +1,7 @@
 ﻿using CraftFlow.SharedKernel.Result;
 using MediatR;
 
-namespace CraftFlow.Api.Modules.Procurement.Suppliers;
+namespace CraftFlow.Api.Modules.Procurement.Suppliers.CreateSupplier;
 
 public record CreateSupplierCommand(
     string Name,
