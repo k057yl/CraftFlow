@@ -37,6 +37,7 @@ public static class DbIndexes
     public static class Procurement
     {
         public const string IX_SUPPLIERS_TENANT_NAME = "IX_SUPPLIERS_TENANT_NAME";
+        public const string IX_SUPPLIERS_TENANT_TAX_ID = "IX_SUPPLIERS_TENANT_TAX_ID";
         public const string IX_PURCHASE_ORDERS_SUPPLIER = "IX_PURCHASE_ORDERS_SUPPLIER";
         public const string IX_PURCHASE_ORDERS_STATUS = "IX_PURCHASE_ORDERS_STATUS";
         public const string IX_PURCHASE_ORDER_ITEMS_ORDER = "IX_PURCHASE_ORDER_ITEMS_ORDER";

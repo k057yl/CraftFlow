@@ -14,17 +14,19 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace CraftFlow.Wpf.Pages;
+namespace CraftFlow.Wpf.Pages.ProductionSettings.Controls;
 
-public partial class StoragePage : Page
+public partial class StorageControl : UserControl
 {
+    public event Action<string, Brush>? StatusUpdated;
+
     private List<StorageLocationViewItem> _allStorageLocations = [];
 
     public ObservableCollection<LookupItem> Warehouses { get; } = [];
     public ObservableCollection<LookupItem> Chambers { get; } = [];
     public ObservableCollection<StorageLocationViewItem> StorageLocations { get; } = [];
 
-    public StoragePage()
+    public StorageControl()
     {
         InitializeComponent();
 
@@ -445,35 +447,17 @@ public partial class StoragePage : Page
 
     private void SetStatus(string resourceKey, Brush color)
     {
-        StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = LocalizationService.Get(resourceKey);
+        StatusUpdated?.Invoke(LocalizationService.Get(resourceKey), color);
     }
 
     private void SetStatusFormatted(string resourceKey, Brush color, params object[] args)
     {
-        StatusTextBlock.Foreground = color;
         var format = LocalizationService.Get(resourceKey);
-        StatusTextBlock.Text = string.Format(format, args);
+        StatusUpdated?.Invoke(string.Format(format, args), color);
     }
 
     private void SetStatusRaw(string rawText, Brush color)
     {
-        StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = rawText;
+        StatusUpdated?.Invoke(rawText, color);
     }
-}
-
-public class StorageLocationViewItem
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; } = string.Empty;
-    public StorageLocationType LocationType { get; set; }
-    public string ParentName { get; set; } = string.Empty;
-    public string VolumeInfo { get; set; } = string.Empty;
-    public string LastWashedText { get; set; } = string.Empty;
-    public string NextWashText { get; set; } = string.Empty;
-    public string SanitationStatusCode { get; set; } = "OK";
-    public string SanitationStatusText { get; set; } = "ОК";
-    public Brush StatusForeground { get; set; } = Brushes.Green;
-    public Brush StatusBackground { get; set; } = Brushes.LightGreen;
 }

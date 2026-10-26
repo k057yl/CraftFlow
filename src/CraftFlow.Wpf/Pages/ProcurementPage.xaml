@@ -258,42 +258,86 @@
 
             <!-- 3. Поставщики -->
             <TabItem Header="{loc:Loc Key=TAB_SUPPLIERS}">
-                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="10">
-                    <StackPanel MaxWidth="600" HorizontalAlignment="Left" Width="600">
-                        <GroupBox Header="{loc:Loc Key=HEADER_SUPPLIERS}" Padding="12">
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <!-- Секция A: Форма добавления -->
+                        <ColumnDefinition Width="420"/>
+                        <ColumnDefinition Width="15"/>
+                        <!-- Секция B: Реестр поставщиков -->
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- СЕКЦИЯ A: ФОРМА -->
+                    <GroupBox Grid.Column="0" Header="{loc:Loc Key=HEADER_SUPPLIERS}" Padding="12">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
-                                <Grid Margin="0,0,0,10">
+                                <!-- Название (Обязательное) -->
+                                <TextBlock Text="{loc:Loc Key=SUPPLIER_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="NameTextBox" Height="28" Margin="0,0,0,8"/>
+
+                                <!-- Юр. Наименование -->
+                                <TextBlock Text="Юридическое наименование:" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="LegalNameTextBox" Height="28" Margin="0,0,0,8"/>
+
+                                <!-- ИНН / ЕДРПОУ и Телефон -->
+                                <Grid Margin="0,0,0,8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="8"/>
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
-
-                                    <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                                        <TextBlock Text="{loc:Loc Key=SUPPLIER_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                        <TextBox x:Name="NameTextBox" Height="28"/>
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="ИНН / ЕДРПОУ:" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                        <TextBox x:Name="TaxIdTextBox" Height="28"/>
                                     </StackPanel>
-
-                                    <StackPanel Grid.Column="1" Margin="4,0,0,0">
+                                    <StackPanel Grid.Column="2">
                                         <TextBlock Text="{loc:Loc Key=SUPPLIER_PHONE}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                         <TextBox x:Name="PhoneTextBox" Height="28"/>
                                     </StackPanel>
                                 </Grid>
 
-                                <StackPanel Margin="0,0,0,15">
-                                    <TextBlock Text="{loc:Loc Key=SUPPLIER_EMAIL}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    <TextBox x:Name="EmailTextBox" Height="28"/>
-                                </StackPanel>
+                                <!-- Email -->
+                                <TextBlock Text="{loc:Loc Key=SUPPLIER_EMAIL}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="EmailTextBox" Height="28" Margin="0,0,0,8"/>
 
+                                <!-- Юр. Адрес -->
+                                <TextBlock Text="Адрес компании:" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="AddressTextBox" Height="28" Margin="0,0,0,8"/>
+
+                                <!-- Примечания / Заметки -->
+                                <TextBlock Text="Заметки / Условия работы:" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="NotesTextBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Margin="0,0,0,12"/>
+
+                                <!-- Кнопка создания -->
                                 <Button Content="{loc:Loc Key=CREATE_SUPPLIER}" 
-                                        Style="{StaticResource PrimaryButtonStyle}"
-                                        Height="32"
-                                        Padding="14,0"
-                                        HorizontalAlignment="Left" 
-                                        Click="CreateSupplier_Click"/>
+                            Style="{StaticResource PrimaryButtonStyle}"
+                            Height="32"
+                            Padding="16,0"
+                            HorizontalAlignment="Left" 
+                            Click="CreateSupplier_Click"/>
                             </StackPanel>
-                        </GroupBox>
-                    </StackPanel>
-                </ScrollViewer>
+                        </ScrollViewer>
+                    </GroupBox>
+
+                    <!-- СЕКЦИЯ B: ТАБЛИЦА С ПОСТАВЩИКАМИ -->
+                    <GroupBox Grid.Column="2" Header="Реестр поставщиков" Padding="10">
+                        <DataGrid x:Name="SuppliersDataGrid" 
+                      AutoGenerateColumns="False" 
+                      IsReadOnly="True" 
+                      GridLinesVisibility="Horizontal" 
+                      HeadersVisibility="Column">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="150"/>
+                                <DataGridTextColumn Header="Юр. Имя" Binding="{Binding LegalName}" Width="140"/>
+                                <DataGridTextColumn Header="ИНН / ЕДРПОУ" Binding="{Binding TaxId}" Width="100"/>
+                                <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="110"/>
+                                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="130"/>
+                                <DataGridTextColumn Header="Адрес" Binding="{Binding Address}" Width="*"/>
+                                <DataGridTextColumn Header="Заметки" Binding="{Binding Notes}" Width="150"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </GroupBox>
+                </Grid>
             </TabItem>
         </TabControl>
 

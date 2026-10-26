@@ -140,6 +140,8 @@ public static class ErrorCodes
     public static class Supplier
     {
         public const string PHONE_NUMBER_INVALID_FORMAT = "SUPPLIER.PHONE_NUMBER_INVALID_FORMAT";
+        public const string TAX_ID_INVALID_FORMAT = "SUPPLIER.TAX_ID_INVALID_FORMAT";
+        public const string TAX_ID_ALREADY_EXISTS = "SUPPLIER.TAX_ID_ALREADY_EXISTS";
     }
 
     public static class Sanitation

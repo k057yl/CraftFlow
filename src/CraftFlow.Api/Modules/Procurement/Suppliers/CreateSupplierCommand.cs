@@ -3,4 +3,12 @@ using MediatR;
 
 namespace CraftFlow.Api.Modules.Procurement.Suppliers;
 
-public sealed record CreateSupplierCommand(string Name, string? Phone, string? Email) : IRequest<Result<Guid>>;
+public record CreateSupplierCommand(
+    string Name,
+    string? LegalName,
+    string? TaxId,
+    string? Phone,
+    string? Email,
+    string? Address,
+    string? Notes
+) : IRequest<Result<Guid>>;

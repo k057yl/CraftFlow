@@ -85,8 +85,7 @@
 	<!-- 1: Навигация Сайдбара                      -->
 	<!-- ========================================== -->
 	<data name="NAV_DASHBOARD" xml:space="preserve"><value>Таблицы и Графики</value></data>
-	<data name="NAV_RECIPES" xml:space="preserve"><value>Сырьё и Рецепты</value></data>
-	<data name="NAV_STORAGE" xml:space="preserve"><value>Помещения и Оборудование</value></data>
+	<data name="NAV_PRODUCTION_SETTINGS" xml:space="preserve"><value>Настройки производства</value></data>
 	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>Закупки и Поставки</value></data>
 	<data name="NAV_PRODUCTION" xml:space="preserve"><value>Варочный цех</value></data>
 	<data name="NAV_SALES" xml:space="preserve"><value>Продажи и Заказы</value></data>
@@ -111,7 +110,15 @@
 	<data name="LANG_EN_DISPLAY" xml:space="preserve"><value>English</value></data>
 
 	<!-- ========================================== -->
-	<!-- 2: Сырьё и Рецепты                         -->
+	<!-- 2: НАСТРОЙКИ ПРОИЗВОДСТВА (ОБЩЕЕ)          -->
+	<!-- ========================================== -->
+	<data name="NAV_PRODUCTION_SETTINGS" xml:space="preserve"><value>Настройки производства</value></data>
+	<data name="TITLE_PRODUCTION_SETTINGS" xml:space="preserve"><value>Настройки производства</value></data>
+	<data name="HEADER_TECHNOLOGY_AND_RECIPES" xml:space="preserve"><value>Технология и Рецептуры</value></data>
+	<data name="HEADER_INFRASTRUCTURE_AND_EQUIPMENT" xml:space="preserve"><value>Инфраструктура и Оборудование</value></data>
+
+	<!-- ========================================== -->
+	<!-- 2.1: ТЕХНОЛОГИЯ И РЕЦЕПТУРЫ                -->
 	<!-- ========================================== -->
 	<data name="TITLE_RECIPES" xml:space="preserve"><value>Сырьё и Технологические Рецепты</value></data>
 	<data name="HEADER_RAW_MATERIALS" xml:space="preserve"><value>Сырьё и Ингредиенты</value></data>
@@ -126,24 +133,17 @@
 	<data name="INGREDIENT_SECTION" xml:space="preserve"><value>СОСТАВ РЕЦЕПТА</value></data>
 	<data name="CREATE_RECIPE" xml:space="preserve"><value>Сохранить рецепт</value></data>
 	<data name="BTN_ADD" xml:space="preserve"><value>Добавить</value></data>
+	<data name="CHECKBOX_SHOW_ARCHIVED" xml:space="preserve"><value>Показать скрытые</value></data>
 
-	<!-- Warning -->
+	<!-- Предупреждения и ошибки сырья/рецептов -->
 	<data name="CATALOG.RAW_MATERIAL_HAS_STOCK" xml:space="preserve"><value>Невозможно скрыть сырьё: на складе есть положительные остатки.</value></data>
 	<data name="CATALOG.RAW_MATERIAL_IN_ACTIVE_RECIPE" xml:space="preserve"><value>Невозможно скрыть сырьё: оно используется в активных рецептурах.</value></data>
 	<data name="CATALOG.RECIPE_HAS_ACTIVE_BATCHES" xml:space="preserve"><value>Невозможно скрыть рецепт: по нему прямо сейчас есть активные или запланированные варки.</value></data>
-
-	<!-- ========================================== -->
-	<!-- 2.1: Модалка								-->
-	<!-- ========================================== -->
-	<data name="CHECKBOX_SHOW_ARCHIVED" xml:space="preserve"><value>Показать скрытые</value></data>
 	<data name="CONFIRM_ARCHIVE_RAW_MATERIAL" xml:space="preserve"><value>Вы уверены, что хотите скрыть данное сырьё?</value></data>
 	<data name="CONFIRM_ARCHIVE_RECIPE" xml:space="preserve"><value>Вы уверены, что хотите скрыть этот рецепт?</value></data>
-	<data name="CONFIRM_ACTION_TITLE" xml:space="preserve"><value>Подтверждение действия</value></data>
-	<data name="BTN_CANCEL" xml:space="preserve"><value>Отмена</value></data>
-	<data name="BTN_CONFIRM" xml:space="preserve"><value>Подтвердить</value></data>
 
 	<!-- ========================================== -->
-	<!-- 3: Склады и Оборудование                   -->
+	<!-- 2.2: ИНФРАСТРУКТУРА И ОБОРУДОВАНИЕ        -->
 	<!-- ========================================== -->
 	<data name="TITLE_STORAGE" xml:space="preserve"><value>Помещения и Оборудование</value></data>
 	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>Помещения</value></data>
@@ -178,18 +178,20 @@
 	<data name="MENU_SANITATION_DETAILS" xml:space="preserve"><value>Мойка и История</value></data>
 	<data name="MENU_DELETE" xml:space="preserve"><value>Удалить</value></data>
 
-	<!-- ========================================== -->
-	<!-- 3.1: Модалка удаления	                    -->
-	<!-- ========================================== -->
-	<data name="CONFIRM_ACTION_TITLE" xml:space="preserve"><value>Подтверждение действия</value></data>
+	<!-- Удаление объектов инфраструктуры -->
 	<data name="CONFIRM_DELETE_WAREHOUSE" xml:space="preserve"><value>Вы уверены, что хотите удалить этот склад?</value></data>
 	<data name="CONFIRM_DELETE_CHAMBER" xml:space="preserve"><value>Вы уверены, что хотите удалить эту камеру?</value></data>
 	<data name="CONFIRM_DELETE_LOCATION" xml:space="preserve"><value>Вы уверены, что хотите удалить это оборудование?</value></data>
+
+	<!-- ========================================== -->
+	<!-- ОБЩИЕ ЭЛЕМЕНТЫ ДИАЛОГОВ И МОДАЛОК          -->
+	<!-- ========================================== -->
+	<data name="CONFIRM_ACTION_TITLE" xml:space="preserve"><value>Подтверждение действия</value></data>
 	<data name="BTN_CANCEL" xml:space="preserve"><value>Отмена</value></data>
 	<data name="BTN_CONFIRM" xml:space="preserve"><value>Подтвердить</value></data>
 
 	<!-- ========================================== -->
-	<!-- 4: Закупки и Поставки                      -->
+	<!-- 3: Закупки и Поставки                      -->
 	<!-- ========================================== -->
 	<data name="TITLE_PROCUREMENT" xml:space="preserve"><value>Закупки и Поставки</value></data>
 	<data name="TAB_STOCK_RECEIPT" xml:space="preserve"><value>Приход и Остатки сырья</value></data>

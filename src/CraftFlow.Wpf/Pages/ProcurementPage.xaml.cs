@@ -28,6 +28,7 @@ public partial class ProcurementPage : Page
 
     public ObservableCollection<LookupItem> RawMaterials { get; } = [];
     public ObservableCollection<StockLotGridDto> StockLots { get; } = [];
+    public ObservableCollection<SupplierGridDto> SuppliersList { get; } = [];
 
     public ObservableCollection<StorageLocationDto> AvailableLocations { get; } = [];
     public ObservableCollection<StorageLocationDto> SelectedLocations { get; } = [];
@@ -47,6 +48,7 @@ public partial class ProcurementPage : Page
         StockRawMaterialComboBox.ItemsSource = RawMaterials;
         StockLotsDataGrid.ItemsSource = StockLots;
         WriteOffDataGrid.ItemsSource = StockLots;
+        SuppliersDataGrid.ItemsSource = SuppliersList;
 
         AvailableLocationsListBox.ItemsSource = AvailableLocations;
         SelectedLocationsListBox.ItemsSource = SelectedLocations;
@@ -60,15 +62,19 @@ public partial class ProcurementPage : Page
         {
             _isDataLoaded = false;
 
-            var suppliers = await ApiService.Instance.GetAsync<List<LookupDto>>(ProcurementConstants.SUPPLIERS) ?? [];
+            var suppliers = await ApiService.Instance.GetAsync<List<SupplierGridDto>>(ProcurementConstants.SUPPLIERS) ?? [];
             FormSuppliers.Clear();
             FilterSuppliers.Clear();
+            SuppliersList.Clear();
+
             FilterSuppliers.Add(new LookupItem(Guid.Empty, LocalizationService.Get(UiConstants.Filters.ALL_SUPPLIERS)));
+
             suppliers.ForEach(s =>
             {
                 var item = new LookupItem(s.Id, s.Name);
                 FormSuppliers.Add(item);
                 FilterSuppliers.Add(item);
+                SuppliersList.Add(s);
             });
             FilterSupplierComboBox.SelectedIndex = 0;
 
@@ -292,8 +298,12 @@ public partial class ProcurementPage : Page
     private async void CreateSupplier_Click(object sender, RoutedEventArgs e)
     {
         var name = NameTextBox.Text.Trim();
+        var legalName = string.IsNullOrWhiteSpace(LegalNameTextBox.Text) ? null : LegalNameTextBox.Text.Trim();
+        var taxId = string.IsNullOrWhiteSpace(TaxIdTextBox.Text) ? null : TaxIdTextBox.Text.Trim();
         var phone = string.IsNullOrWhiteSpace(PhoneTextBox.Text) ? null : PhoneTextBox.Text.Trim();
         var email = string.IsNullOrWhiteSpace(EmailTextBox.Text) ? null : EmailTextBox.Text.Trim();
+        var address = string.IsNullOrWhiteSpace(AddressTextBox.Text) ? null : AddressTextBox.Text.Trim();
+        var notes = string.IsNullOrWhiteSpace(NotesTextBox.Text) ? null : NotesTextBox.Text.Trim();
 
         if (string.IsNullOrWhiteSpace(name))
         {
@@ -302,16 +312,22 @@ public partial class ProcurementPage : Page
             return;
         }
 
-        var request = new CreateSupplierRequest(name, phone, email);
-        var (isSuccess, responseStr) = await ApiService.Instance.CreateSupplierAsync(request);
+        var request = new CreateSupplierRequest(name, legalName, taxId, phone, email, address, notes);
+        var (isSuccess, responseStr) = await ApiService.Instance.PostAndReadAsync(ProcurementConstants.SUPPLIERS, request);
 
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.SUPPLIER_CREATED_SUCCESS, Brushes.Green);
             AlertWindow.ShowSuccess(Window.GetWindow(this), UiConstants.Messages.SUPPLIER_CREATED_SUCCESS);
+
             NameTextBox.Clear();
+            LegalNameTextBox.Clear();
+            TaxIdTextBox.Clear();
             PhoneTextBox.Clear();
             EmailTextBox.Clear();
+            AddressTextBox.Clear();
+            NotesTextBox.Clear();
+
             await LoadDataAsync();
         }
         else

@@ -76,8 +76,7 @@
 	<!-- 1. Навігація Сайдбару                      -->
 	<!-- ========================================== -->
 	<data name="NAV_RECIPES" xml:space="preserve"><value>Сировина та Рецепти</value></data>
-	<data name="NAV_STORAGE" xml:space="preserve"><value>Склади та Обладнання</value></data>
-	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>Закупівлі та Поставки</value></data>
+	<data name="NAV_PRODUCTION_SETTINGS" xml:space="preserve"><value>Налаштування виробництва</value></data>
 	<data name="NAV_PRODUCTION" xml:space="preserve"><value>Варильний цех</value></data>
 	<data name="NAV_SALES" xml:space="preserve"><value>Продажі та Замовлення</value></data>
 	<data name="NAV_TRACEABILITY" xml:space="preserve"><value>Історія партій</value></data>
@@ -101,7 +100,15 @@
 	<data name="LANG_EN_DISPLAY" xml:space="preserve"><value>English</value></data>
 
 	<!-- ========================================== -->
-	<!-- 2: Сировина та Рецепти                     -->
+	<!-- 2: НАЛАШТУВАННЯ ВИРОБНИЦТВА (ЗАГАЛЬНЕ)     -->
+	<!-- ========================================== -->
+	<data name="NAV_PRODUCTION_SETTINGS" xml:space="preserve"><value>Налаштування виробництва</value></data>
+	<data name="TITLE_PRODUCTION_SETTINGS" xml:space="preserve"><value>Налаштування виробництва</value></data>
+	<data name="HEADER_TECHNOLOGY_AND_RECIPES" xml:space="preserve"><value>Технологія та Рецептури</value></data>
+	<data name="HEADER_INFRASTRUCTURE_AND_EQUIPMENT" xml:space="preserve"><value>Інфраструктура та Обладнання</value></data>
+
+	<!-- ========================================== -->
+	<!-- 2.1: СИРОВИНА ТА РЕЦЕПТИ                   -->
 	<!-- ========================================== -->
 	<data name="TITLE_RECIPES" xml:space="preserve"><value>Сировина та Технологічні Рецепти</value></data>
 	<data name="HEADER_RAW_MATERIALS" xml:space="preserve"><value>Сировина та Інгредієнти</value></data>
@@ -116,9 +123,17 @@
 	<data name="INGREDIENT_SECTION" xml:space="preserve"><value>СКЛАД РЕЦЕПТА</value></data>
 	<data name="CREATE_RECIPE" xml:space="preserve"><value>Зберегти рецепт</value></data>
 	<data name="BTN_ADD" xml:space="preserve"><value>Додати</value></data>
+	<data name="CHECKBOX_SHOW_ARCHIVED" xml:space="preserve"><value>Показати приховані</value></data>
+
+	<!-- Попередження та помилки сировини/рецептів -->
+	<data name="CATALOG.RAW_MATERIAL_HAS_STOCK" xml:space="preserve"><value>Неможливо приховати сировину: на складі є позитивні залишки.</value></data>
+	<data name="CATALOG.RAW_MATERIAL_IN_ACTIVE_RECIPE" xml:space="preserve"><value>Неможливо приховати сировину: вона використовується в активних рецептурах.</value></data>
+	<data name="CATALOG.RECIPE_HAS_ACTIVE_BATCHES" xml:space="preserve"><value>Неможливо приховати рецепт: за ним прямо зараз є активні або заплановані варіння.</value></data>
+	<data name="CONFIRM_ARCHIVE_RAW_MATERIAL" xml:space="preserve"><value>Ви впевнені, що хочете приховати цю сировину?</value></data>
+	<data name="CONFIRM_ARCHIVE_RECIPE" xml:space="preserve"><value>Ви впевнені, що хочете приховати цей рецепт?</value></data>
 
 	<!-- ========================================== -->
-	<!-- 3: Склади та Обладнання                    -->
+	<!-- 2.2: ІНФРАСТРУКТУРА ТА ОБЛАДНАННЯ          -->
 	<!-- ========================================== -->
 	<data name="TITLE_STORAGE" xml:space="preserve"><value>Приміщення та Обладнання</value></data>
 	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>Приміщення</value></data>
@@ -153,18 +168,20 @@
 	<data name="MENU_SANITATION_DETAILS" xml:space="preserve"><value>Мийка та Історія</value></data>
 	<data name="MENU_DELETE" xml:space="preserve"><value>Видалити</value></data>
 
-	<!-- ========================================== -->
-	<!-- 3.1: Модалка видаленя	                    -->
-	<!-- ========================================== -->
-	<data name="CONFIRM_ACTION_TITLE" xml:space="preserve"><value>Підтвердження дії</value></data>
+	<!-- Видалення об'єктів інфраструктури -->
 	<data name="CONFIRM_DELETE_WAREHOUSE" xml:space="preserve"><value>Ви впевнені, що хочете видалити цей склад?</value></data>
 	<data name="CONFIRM_DELETE_CHAMBER" xml:space="preserve"><value>Ви впевнені, що хочете видалити цю камеру?</value></data>
 	<data name="CONFIRM_DELETE_LOCATION" xml:space="preserve"><value>Ви впевнені, що хочете видалити це обладнання?</value></data>
+
+	<!-- ========================================== -->
+	<!-- ЗАГАЛЬНІ ЕЛЕМЕНТИ ДІАЛОГІВ ТА МОДАЛОК      -->
+	<!-- ========================================== -->
+	<data name="CONFIRM_ACTION_TITLE" xml:space="preserve"><value>Підтвердження дії</value></data>
 	<data name="BTN_CANCEL" xml:space="preserve"><value>Скасувати</value></data>
 	<data name="BTN_CONFIRM" xml:space="preserve"><value>Підтвердити</value></data>
 
 	<!-- ========================================== -->
-	<!-- 4: Покупки та Поставки                     -->
+	<!-- 3: Покупки та Поставки                     -->
 	<!-- ========================================== -->
 	<data name="TITLE_PROCUREMENT" xml:space="preserve"><value>Покупки та Поставки</value></data>
 	<data name="TAB_STOCK_RECEIPT" xml:space="preserve"><value>Прихід та Залишки сировини</value></data>

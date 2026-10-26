@@ -749,6 +749,10 @@ namespace CraftFlow.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
@@ -756,14 +760,26 @@ namespace CraftFlow.Api.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("LegalName")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("Notes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
+
                     b.Property<string>("Phone")
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<string>("TaxId")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
 
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
@@ -773,6 +789,10 @@ namespace CraftFlow.Api.Migrations
                     b.HasIndex("TenantId", "Name")
                         .IsUnique()
                         .HasDatabaseName("IX_SUPPLIERS_TENANT_NAME");
+
+                    b.HasIndex("TenantId", "TaxId")
+                        .HasDatabaseName("IX_SUPPLIERS_TENANT_TAX_ID")
+                        .HasFilter("\"TaxId\" IS NOT NULL");
 
                     b.ToTable("suppliers", "procurement");
                 });

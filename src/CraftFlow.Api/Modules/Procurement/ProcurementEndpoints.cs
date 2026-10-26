@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Procurement.PurchaseOrders;
 using CraftFlow.Api.Modules.Procurement.Suppliers;
+using CraftFlow.SharedKernel.Dtos.Supplier;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,7 +26,16 @@ public static class ProcurementEndpoints
         {
             var suppliers = await dbContext.Suppliers
                 .AsNoTracking()
-                .Select(s => new { s.Id, Name = s.Name })
+                .Select(s => new SupplierDto(
+                    s.Id,
+                    s.Name,
+                    s.LegalName,
+                    s.TaxId,
+                    s.Phone,
+                    s.Email,
+                    s.Address,
+                    s.Notes))
+                .OrderBy(s => s.Name)
                 .ToListAsync(cancellationToken);
 
             return Results.Ok(suppliers);

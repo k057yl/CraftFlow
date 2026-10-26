@@ -14,16 +14,18 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
 
-namespace CraftFlow.Wpf.Pages;
+namespace CraftFlow.Wpf.Pages.ProductionSettings.Controls;
 
-public partial class RecipesPage : Page
+public partial class RecipesControl : UserControl
 {
+    public event Action<string, Brush>? StatusUpdated;
+
     public ObservableCollection<LookupItem> UnitsOfMeasure { get; } = [];
     public ObservableCollection<LookupItem> RawMaterials { get; } = [];
     public ObservableCollection<RecipeDto> Recipes { get; } = [];
     private readonly ObservableCollection<IngredientItemDto> _selectedIngredients = [];
 
-    public RecipesPage()
+    public RecipesControl()
     {
         InitializeComponent();
 
@@ -262,20 +264,17 @@ public partial class RecipesPage : Page
 
     private void SetStatus(string resourceKey, Brush color)
     {
-        StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = LocalizationService.Get(resourceKey);
+        StatusUpdated?.Invoke(LocalizationService.Get(resourceKey), color);
     }
 
     private void SetStatusFormatted(string resourceKey, Brush color, params object[] args)
     {
-        StatusTextBlock.Foreground = color;
         var format = LocalizationService.Get(resourceKey);
-        StatusTextBlock.Text = string.Format(format, args);
+        StatusUpdated?.Invoke(string.Format(format, args), color);
     }
 
     private void SetStatusRaw(string rawText, Brush color)
     {
-        StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = rawText;
+        StatusUpdated?.Invoke(rawText, color);
     }
 }

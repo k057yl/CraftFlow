@@ -25,7 +25,15 @@ public sealed class CreateSupplierHandler : IRequestHandler<CreateSupplierComman
             return Result.Failure<Guid>(ErrorCodes.General.INVALID_TENANT);
         }
 
-        var supplier = Supplier.Create(_tenantContext.TenantId, request.Name, request.Phone, request.Email);
+        var supplier = Supplier.Create(
+            _tenantContext.TenantId,
+            request.Name,
+            request.LegalName,
+            request.TaxId,
+            request.Phone,
+            request.Email,
+            request.Address,
+            request.Notes);
 
         await _dbContext.Set<Supplier>().AddAsync(supplier, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);

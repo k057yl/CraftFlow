@@ -3,6 +3,7 @@ using CraftFlow.SharedKernel.Dtos.Dashboard;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Pages;
 using CraftFlow.Wpf.Pages.Production;
+using CraftFlow.Wpf.Pages.ProductionSettings;
 using CraftFlow.Wpf.Services;
 using System.Windows;
 using System.Windows.Controls;
@@ -159,8 +160,9 @@ public partial class MainWindow : Window
     }
 
     private void NavDashboard_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new DashboardPage());
-    private void NavRecipes_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new RecipesPage());
-    private void NavStorage_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new StoragePage());
+
+    private void NavProductionSettings_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionSettingsPage());
+
     private void NavProcurement_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProcurementPage());
     private void NavProduction_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
     private void NavSales_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new SalesPage());
