@@ -14,4 +14,7 @@ public class PermissionService
 
         return currentUser.Role.HasPermission(permission);
     }
+
+    public bool IsSuperAdmin => ApiService.Instance.CurrentUser?.Role == TenantRole.SUPER_ADMIN;
+    public bool IsOwner => ApiService.Instance.CurrentUser?.Role == TenantRole.OWNER;
 }

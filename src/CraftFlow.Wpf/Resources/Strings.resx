@@ -100,6 +100,17 @@
 	<data name="LANG_EN_DISPLAY" xml:space="preserve"><value>English</value></data>
 
 	<!-- ========================================== -->
+	<!-- 1.2: Admin & SaaS Management               -->
+	<!-- ========================================== -->
+	<data name="ADMIN_TITLE_SAAS" xml:space="preserve"><value>SaaS Client Management</value></data>
+	<data name="ADMIN_HINT_DOUBLE_CLICK" xml:space="preserve"><value>* Double-click a brewery row to manage subscription or block access</value></data>
+	<data name="ADMIN_COL_CHEESEMAKER" xml:space="preserve"><value>Brewery / Dairy</value></data>
+	<data name="ADMIN_COL_REG_DATE" xml:space="preserve"><value>Registration Date</value></data>
+	<data name="ADMIN_COL_TARIFF_PLAN" xml:space="preserve"><value>Subscription Plan</value></data>
+	<data name="ADMIN_COL_PAID_TIL" xml:space="preserve"><value>Valid Until</value></data>
+	<data name="ADMIN_COL_ACCESS" xml:space="preserve"><value>Access Status</value></data>
+
+	<!-- ========================================== -->
 	<!-- 2: PRODUCTION SETTINGS (GENERAL)           -->
 	<!-- ========================================== -->
 	<data name="NAV_PRODUCTION_SETTINGS" xml:space="preserve"><value>Production Settings</value></data>
@@ -259,6 +270,59 @@
 	<data name="PRODUCTION_INSUFFICIENT_RAW_MATERIAL" xml:space="preserve"><value>Insufficient raw materials!</value></data>
 	<data name="PRODUCTION_BATCH_NOT_FOUND" xml:space="preserve"><value>Production batch not found</value></data>
 	<data name="GENERAL_NOT_FOUND" xml:space="preserve"><value>Requested resource not found</value></data>
+
+	<!-- ========================================== -->
+	<!-- 4: Audit                          -->
+	<!-- ========================================== -->
+	<data name="SYSTEM_AUDIT_LOGS" xml:space="preserve"><value>System Audit Logs</value></data>
+	<data name="AUDIT_SEARCH_LABEL" xml:space="preserve"><value>Search (User / Details):</value></data>
+	<data name="AUDIT_ACTION_LABEL" xml:space="preserve"><value>Action:</value></data>
+	<data name="AUDIT_DATE_FROM" xml:space="preserve"><value>From Date:</value></data>
+	<data name="AUDIT_DATE_TO" xml:space="preserve"><value>To Date:</value></data>
+	<data name="AUDIT_ACTION_ALL" xml:space="preserve"><value>All</value></data>
+	<data name="AUDIT_ACTION_ADDED" xml:space="preserve"><value>Created</value></data>
+	<data name="AUDIT_ACTION_MODIFIED" xml:space="preserve"><value>Modified</value></data>
+	<data name="AUDIT_ACTION_DELETED" xml:space="preserve"><value>Deleted</value></data>
+	<data name="REFRESH_LOGS" xml:space="preserve"><value>Refresh</value></data>
+	<data name="BTN_RESET" xml:space="preserve"><value>Reset</value></data>
+	<data name="EXPORT_CSV" xml:space="preserve"><value>Export CSV</value></data>
+	<data name="AUDIT_COL_DATETIME" xml:space="preserve"><value>Date &amp; Time (UTC)</value></data>
+	<data name="AUDIT_COL_EMPLOYEE" xml:space="preserve"><value>Employee</value></data>
+	<data name="AUDIT_COL_ACTION" xml:space="preserve"><value>Action</value></data>
+	<data name="AUDIT_COL_DETAILS" xml:space="preserve"><value>Details</value></data>
+	<data name="AUDIT_DENIED_ERROR" xml:space="preserve"><value>Access denied. You do not have permission to view audit logs.</value></data>
+
+	<!-- ========================================== -->
+	<!-- Authentication & Onboarding (en-US)        -->
+	<!-- ========================================== -->
+	<data name="TITLE_AUTH" xml:space="preserve"><value>Authentication</value></data>
+	<data name="LABEL_REMEMBER_ME" xml:space="preserve"><value>Remember me</value></data>
+	<data name="BTN_LOGIN" xml:space="preserve"><value>Sign In</value></data>
+	<data name="LINK_NO_ACCOUNT" xml:space="preserve"><value>Don't have an account? Register brewery</value></data>
+	<data name="LABEL_COMPANY_NAME" xml:space="preserve"><value>Company / Brewery Name</value></data>
+	<data name="BTN_REGISTER_COMPANY" xml:space="preserve"><value>Register Company</value></data>
+	<data name="LINK_HAS_ACCOUNT" xml:space="preserve"><value>Already have an account? Sign In</value></data>
+	<data name="OTP_HINT_SENT" xml:space="preserve"><value>An activation code has been sent to your Email</value></data>
+	<data name="LABEL_OTP_CODE" xml:space="preserve"><value>Email Verification Code (OTP)</value></data>
+	<data name="BTN_CONFIRM" xml:space="preserve"><value>Verify Code</value></data>
+	<data name="LINK_RESEND_CODE" xml:space="preserve"><value>Resend Code</value></data>
+	<data name="LINK_GOTO_LOGIN" xml:space="preserve"><value>Back to Sign In</value></data>
+
+	<!-- ========================================== -->
+	<!-- Dashboard Page                              -->
+	<!-- ========================================== -->
+	<data name="SYSTEM_DASHBOARD_OVERVIEW" xml:space="preserve"><value>Dashboard Overview</value></data>
+	<data name="PRODUCTS_RECIPES" xml:space="preserve"><value>Products / Recipes</value></data>
+	<data name="ACTIVE_BATCHES" xml:space="preserve"><value>Active Batches</value></data>
+	<data name="CUSTOMERS" xml:space="preserve"><value>Total Customers</value></data>
+	<data name="TOTAL_STOCK_QTY" xml:space="preserve"><value>Total Stock Quantity</value></data>
+	<data name="TOTAL_REVENUE" xml:space="preserve"><value>Total Sales Revenue</value></data>
+	<data name="DASH_RAW_STOCK" xml:space="preserve"><value>Raw Material Stock</value></data>
+	<data name="DASH_FINISHED_STOCK" xml:space="preserve"><value>Finished Product Stock</value></data>
+	<data name="DASH_EXPIRING_LOTS" xml:space="preserve"><value>Expiring Stock (&lt; 7 days)</value></data>
+	<data name="DASH_OVERDUE_SANITATION" xml:space="preserve"><value>Overdue Equipment Wash</value></data>
+	<data name="DASH_PENDING_PROCUREMENTS" xml:space="preserve"><value>Pending Procurements</value></data>
+	<data name="DASH_PERIOD_REVENUE" xml:space="preserve"><value>Period Revenue</value></data>
 
 	<!-- ========================================== -->
 	<!-- 5: Production & Brewhouse                  -->

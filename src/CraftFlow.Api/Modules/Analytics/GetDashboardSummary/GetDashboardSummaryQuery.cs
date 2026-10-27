@@ -5,7 +5,10 @@ using MediatR;
 
 namespace CraftFlow.Api.Modules.Analytics.GetDashboardSummary;
 
-public record GetDashboardSummaryQuery : IRequest<Result<DashboardSummaryDto>>, IRequirePermission
+public record GetDashboardSummaryQuery(
+    DateTime? FromDate = null,
+    DateTime? ToDate = null
+) : IRequest<Result<DashboardSummaryDto>>, IRequirePermission
 {
     public AppPermission RequiredPermission => AppPermission.DASHBOARD_VIEW;
 }

@@ -13,20 +13,28 @@ public static class TraceabilityEndpoints
             .WithTags("Traceability")
             .RequireAuthorization();
 
-        group.MapGet($"{TraceabilityConstants.TRACEABILITY_FORWARD}/{{stockLotId:guid}}", async (Guid stockLotId, ISender sender) =>
+        group.MapGet($"{TraceabilityConstants.TRACEABILITY_FORWARD}/{{stockLotId:guid}}", async (Guid stockLotId, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new GetForwardTraceabilityQuery(stockLotId));
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        });
-
-        group.MapGet($"{TraceabilityConstants.TRACEABILITY_BACKWARD}/{{productStockLotId:guid}}", async (Guid productStockLotId, ISender sender) =>
-        {
-            var result = await sender.Send(new GetBackwardTraceabilityQuery(productStockLotId));
+            var result = await sender.Send(new GetForwardTraceabilityQuery(stockLotId), ct);
             return result.IsSuccess
                 ? Results.Ok(result.Value)
-                : (result.Error.Code == ErrorCodes.Inventory.ITEM_NOT_FOUND
-                    ? Results.NotFound(result.Error)
-                    : Results.BadRequest(result.Error));
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : (result.Error.Code == ErrorCodes.Inventory.ITEM_NOT_FOUND
+                        ? Results.NotFound(result.Error)
+                        : Results.BadRequest(result.Error)));
+        });
+
+        group.MapGet($"{TraceabilityConstants.TRACEABILITY_BACKWARD}/{{productStockLotId:guid}}", async (Guid productStockLotId, ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new GetBackwardTraceabilityQuery(productStockLotId), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : (result.Error.Code == ErrorCodes.Inventory.ITEM_NOT_FOUND
+                        ? Results.NotFound(result.Error)
+                        : Results.BadRequest(result.Error)));
         });
     }
 }

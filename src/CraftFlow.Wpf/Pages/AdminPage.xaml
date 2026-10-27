@@ -1,8 +1,10 @@
 ﻿<Page x:Class="CraftFlow.Wpf.Pages.AdminPage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:auth="clr-namespace:CraftFlow.Wpf.MarkupExtensions"
       Title="AdminPage">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{auth:HasPermission Permission=SYSTEM_ADMIN}">
         <Border Padding="25">
             <StackPanel MaxWidth="1000" HorizontalAlignment="Left">
                 <TextBlock Text="Управление клиентами SaaS" 

@@ -69,8 +69,7 @@ public partial class MainWindow : Window
         MainMenuPanel.Visibility = Visibility.Visible;
 
         var currentUser = ApiService.Instance.CurrentUser;
-        bool isSuperAdmin = currentUser?.Role == TenantRole.SUPER_ADMIN;
-        bool isOwner = currentUser?.Role == TenantRole.OWNER;
+        var ps = PermissionService.Instance;
 
         GuestPanel.Visibility = Visibility.Collapsed;
         UserProfilePanel.Visibility = Visibility.Visible;
@@ -87,12 +86,25 @@ public partial class MainWindow : Window
         };
 
         NavAuthButton.Visibility = Visibility.Collapsed;
-        NavAdminKeysButton.Visibility = isSuperAdmin ? Visibility.Visible : Visibility.Collapsed;
-        NavProfileButton.Visibility = (isOwner || isSuperAdmin) ? Visibility.Visible : Visibility.Collapsed;
 
-        if (NavAuditButton != null)
+        SetButtonVisibility(NavDashboardButton, ps.HasPermission(AppPermission.DASHBOARD_VIEW));
+        SetButtonVisibility(NavProductionSettingsButton, ps.HasPermission(AppPermission.RECIPES_MANAGE) || ps.HasPermission(AppPermission.RAW_MATERIALS_MANAGE));
+        SetButtonVisibility(NavProcurementButton, ps.HasPermission(AppPermission.PROCUREMENT_VIEW) || ps.HasPermission(AppPermission.SUPPLIERS_MANAGE));
+        SetButtonVisibility(NavProductionButton, ps.HasPermission(AppPermission.PRODUCTION_VIEW) || ps.HasPermission(AppPermission.PRODUCTION_EXECUTE));
+        SetButtonVisibility(NavSalesButton, ps.HasPermission(AppPermission.SALES_VIEW) || ps.HasPermission(AppPermission.SALES_MANAGE));
+        SetButtonVisibility(NavTraceabilityButton, ps.HasPermission(AppPermission.PRODUCTION_VIEW) || ps.HasPermission(AppPermission.PROCUREMENT_VIEW));
+        SetButtonVisibility(NavMrpButton, ps.HasPermission(AppPermission.PROCUREMENT_VIEW) || ps.HasPermission(AppPermission.PRODUCTION_VIEW));
+
+        SetButtonVisibility(NavAuditButton, ps.HasPermission(AppPermission.SETTINGS_MANAGE));
+        SetButtonVisibility(NavAdminKeysButton, ps.IsSuperAdmin);
+        SetButtonVisibility(NavProfileButton, ps.IsOwner || ps.IsSuperAdmin);
+    }
+
+    private static void SetButtonVisibility(Button? button, bool isVisible)
+    {
+        if (button != null)
         {
-            NavAuditButton.Visibility = (isOwner || isSuperAdmin) ? Visibility.Visible : Visibility.Collapsed;
+            button.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 
@@ -155,14 +167,26 @@ public partial class MainWindow : Window
         if (MainFrame.Content is object currentContent)
         {
             var contentType = currentContent.GetType();
-            MainFrame.Navigate(Activator.CreateInstance(contentType));
+
+            var defaultConstructor = contentType.GetConstructor(Type.EmptyTypes);
+            if (defaultConstructor != null)
+            {
+                MainFrame.Navigate(Activator.CreateInstance(contentType));
+            }
+            else
+            {
+                var firstConstructor = contentType.GetConstructors().FirstOrDefault();
+                if (firstConstructor != null)
+                {
+                    var args = new object?[firstConstructor.GetParameters().Length];
+                    MainFrame.Navigate(Activator.CreateInstance(contentType, args));
+                }
+            }
         }
     }
 
     private void NavDashboard_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new DashboardPage());
-
     private void NavProductionSettings_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionSettingsPage());
-
     private void NavProcurement_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProcurementPage());
     private void NavProduction_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
     private void NavSales_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new SalesPage());

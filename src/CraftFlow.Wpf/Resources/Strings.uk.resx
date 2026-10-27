@@ -100,6 +100,17 @@
 	<data name="LANG_EN_DISPLAY" xml:space="preserve"><value>English</value></data>
 
 	<!-- ========================================== -->
+	<!-- 1.2: Admin & SaaS Management               -->
+	<!-- ========================================== -->
+	<data name="ADMIN_TITLE_SAAS" xml:space="preserve"><value>Управління клієнтами SaaS</value></data>
+	<data name="ADMIN_HINT_DOUBLE_CLICK" xml:space="preserve"><value>* Натисніть двічі на рядок сироварні для зміни передплати або блокування</value></data>
+	<data name="ADMIN_COL_CHEESEMAKER" xml:space="preserve"><value>Сироварня</value></data>
+	<data name="ADMIN_COL_REG_DATE" xml:space="preserve"><value>Дата реєстрації</value></data>
+	<data name="ADMIN_COL_TARIFF_PLAN" xml:space="preserve"><value>Тарифний план</value></data>
+	<data name="ADMIN_COL_PAID_TIL" xml:space="preserve"><value>Оплачено до</value></data>
+	<data name="ADMIN_COL_ACCESS" xml:space="preserve"><value>Доступ</value></data>
+
+	<!-- ========================================== -->
 	<!-- 2: НАЛАШТУВАННЯ ВИРОБНИЦТВА (ЗАГАЛЬНЕ)     -->
 	<!-- ========================================== -->
 	<data name="NAV_PRODUCTION_SETTINGS" xml:space="preserve"><value>Налаштування виробництва</value></data>
@@ -259,6 +270,59 @@
 	<data name="PRODUCTION_INSUFFICIENT_RAW_MATERIAL" xml:space="preserve"><value>Недостатньо сировини для варки!</value></data>
 	<data name="PRODUCTION_BATCH_NOT_FOUND" xml:space="preserve"><value>Партію виробництва не знайдено</value></data>
 	<data name="GENERAL_NOT_FOUND" xml:space="preserve"><value>Запитуваний ресурс не знайдено</value></data>
+
+	<!-- ========================================== -->
+	<!-- 4: Аудит                          -->
+	<!-- ========================================== -->
+	<data name="SYSTEM_AUDIT_LOGS" xml:space="preserve"><value>Аудит-лог системи</value></data>
+	<data name="AUDIT_SEARCH_LABEL" xml:space="preserve"><value>Пошук (Співробітник / Деталі):</value></data>
+	<data name="AUDIT_ACTION_LABEL" xml:space="preserve"><value>Дія:</value></data>
+	<data name="AUDIT_DATE_FROM" xml:space="preserve"><value>Дата З:</value></data>
+	<data name="AUDIT_DATE_TO" xml:space="preserve"><value>Дата ПО:</value></data>
+	<data name="AUDIT_ACTION_ALL" xml:space="preserve"><value>Усі</value></data>
+	<data name="AUDIT_ACTION_ADDED" xml:space="preserve"><value>Створено</value></data>
+	<data name="AUDIT_ACTION_MODIFIED" xml:space="preserve"><value>Змінено</value></data>
+	<data name="AUDIT_ACTION_DELETED" xml:space="preserve"><value>Видалено</value></data>
+	<data name="REFRESH_LOGS" xml:space="preserve"><value>Оновити</value></data>
+	<data name="BTN_RESET" xml:space="preserve"><value>Скинути</value></data>
+	<data name="EXPORT_CSV" xml:space="preserve"><value>Експорт CSV</value></data>
+	<data name="AUDIT_COL_DATETIME" xml:space="preserve"><value>Дата та час (UTC)</value></data>
+	<data name="AUDIT_COL_EMPLOYEE" xml:space="preserve"><value>Співробітник</value></data>
+	<data name="AUDIT_COL_ACTION" xml:space="preserve"><value>Дія</value></data>
+	<data name="AUDIT_COL_DETAILS" xml:space="preserve"><value>Деталі</value></data>
+	<data name="AUDIT_DENIED_ERROR" xml:space="preserve"><value>Доступ заборонено. У вас немає прав для перегляду аудит-логів.</value></data>
+
+	<!-- ========================================== -->
+	<!-- Authentication & Onboarding (uk-UA)        -->
+	<!-- ========================================== -->
+	<data name="TITLE_AUTH" xml:space="preserve"><value>Авторизація</value></data>
+	<data name="LABEL_REMEMBER_ME" xml:space="preserve"><value>Запом'ятати мене</value></data>
+	<data name="BTN_LOGIN" xml:space="preserve"><value>Увійти</value></data>
+	<data name="LINK_NO_ACCOUNT" xml:space="preserve"><value>Немає акаунту? Зареєструвати броварню</value></data>
+	<data name="LABEL_COMPANY_NAME" xml:space="preserve"><value>Назва підприємства / броварні</value></data>
+	<data name="BTN_REGISTER_COMPANY" xml:space="preserve"><value>Зареєструвати підприємство</value></data>
+	<data name="LINK_HAS_ACCOUNT" xml:space="preserve"><value>Вже є акаунт? Увійти</value></data>
+	<data name="OTP_HINT_SENT" xml:space="preserve"><value>На ваш Email відправлено код активації підприємства</value></data>
+	<data name="LABEL_OTP_CODE" xml:space="preserve"><value>Код із листа (OTP)</value></data>
+	<data name="BTN_CONFIRM" xml:space="preserve"><value>Підтвердити</value></data>
+	<data name="LINK_RESEND_CODE" xml:space="preserve"><value>Надіслати повторно</value></data>
+	<data name="LINK_GOTO_LOGIN" xml:space="preserve"><value>На головну входу</value></data>
+
+	<!-- ========================================== -->
+	<!-- Dashboard Page                             -->
+	<!-- ========================================== -->
+	<data name="SYSTEM_DASHBOARD_OVERVIEW" xml:space="preserve"><value>Огляд ключових показників</value></data>
+	<data name="PRODUCTS_RECIPES" xml:space="preserve"><value>Продукти / Рецепти</value></data>
+	<data name="ACTIVE_BATCHES" xml:space="preserve"><value>Активні варіння</value></data>
+	<data name="CUSTOMERS" xml:space="preserve"><value>Клієнтська база</value></data>
+	<data name="TOTAL_STOCK_QTY" xml:space="preserve"><value>Загальний залишок на складах</value></data>
+	<data name="TOTAL_REVENUE" xml:space="preserve"><value>Загальний виторг від продажів</value></data>
+	<data name="DASH_RAW_STOCK" xml:space="preserve"><value>Запас сировини</value></data>
+	<data name="DASH_FINISHED_STOCK" xml:space="preserve"><value>Готова продукція</value></data>
+	<data name="DASH_EXPIRING_LOTS" xml:space="preserve"><value>Псується сировина (&lt; 7 днів)</value></data>
+	<data name="DASH_OVERDUE_SANITATION" xml:space="preserve"><value>Прострочено миття ємностей</value></data>
+	<data name="DASH_PENDING_PROCUREMENTS" xml:space="preserve"><value>Очікувані закупівлі</value></data>
+	<data name="DASH_PERIOD_REVENUE" xml:space="preserve"><value>Виторг за період</value></data>
 
 	<!-- ========================================== -->
 	<!-- 5: Варильний цех                           -->

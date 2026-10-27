@@ -14,6 +14,13 @@ public partial class AdminPage : Page
     public AdminPage()
     {
         InitializeComponent();
+
+        if (!PermissionService.Instance.IsSuperAdmin)
+        {
+            MessageBox.Show("Доступ запрещен. Раздел только для администратора системы.", "Ошибка доступа", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
         _ = LoadOrganizationsAsync();
     }
 
@@ -28,6 +35,8 @@ public partial class AdminPage : Page
 
     private async void OrganizationsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
+        if (!PermissionService.Instance.IsSuperAdmin) return;
+
         if (OrganizationsDataGrid.SelectedItem is OrganizationAdminDto selectedOrg)
         {
             var modal = new EditOrganizationWindow(selectedOrg)

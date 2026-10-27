@@ -97,7 +97,7 @@
 	<data name="NAV_PROFILE" xml:space="preserve"><value>Мой профиль</value></data>
 
 	<!-- ========================================== -->
-	<!-- 1.1: Настройки и Профиль                    -->
+	<!-- 1.1: Настройки и Профиль                   -->
 	<!-- ========================================== -->
 	<data name="LABEL_LANGUAGE" xml:space="preserve"><value>Язык</value></data>
 	<data name="LABEL_THEME" xml:space="preserve"><value>Тема оформления</value></data>
@@ -108,6 +108,17 @@
 	<data name="LANG_RU_DISPLAY" xml:space="preserve"><value>Русский</value></data>
 	<data name="LANG_UA_DISPLAY" xml:space="preserve"><value>Українська</value></data>
 	<data name="LANG_EN_DISPLAY" xml:space="preserve"><value>English</value></data>
+
+	<!-- ========================================== -->
+	<!-- 1.2: Admin & SaaS Management               -->
+	<!-- ========================================== -->
+	<data name="ADMIN_TITLE_SAAS" xml:space="preserve"><value>Управление клиентами SaaS</value></data>
+	<data name="ADMIN_HINT_DOUBLE_CLICK" xml:space="preserve"><value>* Нажмите дважды на строку сыроварни для изменения подписки или блокировки</value></data>
+	<data name="ADMIN_COL_CHEESEMAKER" xml:space="preserve"><value>Сыроварня</value></data>
+	<data name="ADMIN_COL_REG_DATE" xml:space="preserve"><value>Дата регистрации</value></data>
+	<data name="ADMIN_COL_TARIFF_PLAN" xml:space="preserve"><value>Тарифный план</value></data>
+	<data name="ADMIN_COL_PAID_TIL" xml:space="preserve"><value>Оплачено до</value></data>
+	<data name="ADMIN_COL_ACCESS" xml:space="preserve"><value>Доступ</value></data>
 
 	<!-- ========================================== -->
 	<!-- 2: НАСТРОЙКИ ПРОИЗВОДСТВА (ОБЩЕЕ)          -->
@@ -240,6 +251,59 @@
 	<data name="ALL_WAREHOUSES" xml:space="preserve"><value>— Все склады —</value></data>
 	<data name="CAPACITY_WARNING_INSUFFICIENT" xml:space="preserve"><value>⚠️ Недостаточно места! Нужно: {0:N0} л/кг, доступно: {1:N0} л/кг</value></data>
 	<data name="CAPACITY_WARNING_SUFFICIENT" xml:space="preserve"><value>Вместимость подходит (выбрано на {0:N0} л/кг под партию в {1:N0} л/кг)</value></data>
+
+	<!-- ========================================== -->
+	<!-- 4: Аудит		                            -->
+	<!-- ========================================== -->
+	<data name="SYSTEM_AUDIT_LOGS" xml:space="preserve"><value>Аудит-лог системы</value></data>
+	<data name="AUDIT_SEARCH_LABEL" xml:space="preserve"><value>Поиск (Сотрудник / Детали):</value></data>
+	<data name="AUDIT_ACTION_LABEL" xml:space="preserve"><value>Действие:</value></data>
+	<data name="AUDIT_DATE_FROM" xml:space="preserve"><value>Дата С:</value></data>
+	<data name="AUDIT_DATE_TO" xml:space="preserve"><value>Дата ПО:</value></data>
+	<data name="AUDIT_ACTION_ALL" xml:space="preserve"><value>Все</value></data>
+	<data name="AUDIT_ACTION_ADDED" xml:space="preserve"><value>Создано</value></data>
+	<data name="AUDIT_ACTION_MODIFIED" xml:space="preserve"><value>Изменено</value></data>
+	<data name="AUDIT_ACTION_DELETED" xml:space="preserve"><value>Удалено</value></data>
+	<data name="REFRESH_LOGS" xml:space="preserve"><value>Обновить</value></data>
+	<data name="BTN_RESET" xml:space="preserve"><value>Сбросить</value></data>
+	<data name="EXPORT_CSV" xml:space="preserve"><value>Экспорт CSV</value></data>
+	<data name="AUDIT_COL_DATETIME" xml:space="preserve"><value>Дата и время (UTC)</value></data>
+	<data name="AUDIT_COL_EMPLOYEE" xml:space="preserve"><value>Сотрудник</value></data>
+	<data name="AUDIT_COL_ACTION" xml:space="preserve"><value>Действие</value></data>
+	<data name="AUDIT_COL_DETAILS" xml:space="preserve"><value>Детали</value></data>
+	<data name="AUDIT_DENIED_ERROR" xml:space="preserve"><value>Доступ запрещен. У вас нет прав для просмотра аудит-логов.</value></data>
+
+	<!-- ========================================== -->
+	<!-- Authentication & Onboarding (ru-RU)        -->
+	<!-- ========================================== -->
+	<data name="TITLE_AUTH" xml:space="preserve"><value>Авторизация</value></data>
+	<data name="LABEL_REMEMBER_ME" xml:space="preserve"><value>Запомнить меня</value></data>
+	<data name="BTN_LOGIN" xml:space="preserve"><value>Войти</value></data>
+	<data name="LINK_NO_ACCOUNT" xml:space="preserve"><value>Нет аккаунта? Зарегистрировать пивоварню</value></data>
+	<data name="LABEL_COMPANY_NAME" xml:space="preserve"><value>Название предприятия / пивоварни</value></data>
+	<data name="BTN_REGISTER_COMPANY" xml:space="preserve"><value>Зарегистрировать предприятие</value></data>
+	<data name="LINK_HAS_ACCOUNT" xml:space="preserve"><value>Уже есть аккаунт? Войти</value></data>
+	<data name="OTP_HINT_SENT" xml:space="preserve"><value>На ваш Email отправлен код активации предприятия</value></data>
+	<data name="LABEL_OTP_CODE" xml:space="preserve"><value>Код из письма (OTP)</value></data>
+	<data name="BTN_CONFIRM" xml:space="preserve"><value>Подтвердить</value></data>
+	<data name="LINK_RESEND_CODE" xml:space="preserve"><value>Отправить повторно</value></data>
+	<data name="LINK_GOTO_LOGIN" xml:space="preserve"><value>На главную входа</value></data>
+
+	<!-- ========================================== -->
+	<!-- Dashboard Page                              -->
+	<!-- ========================================== -->
+	<data name="SYSTEM_DASHBOARD_OVERVIEW" xml:space="preserve"><value>Обзор ключевых показателей</value></data>
+	<data name="PRODUCTS_RECIPES" xml:space="preserve"><value>Продукты / Рецепты</value></data>
+	<data name="ACTIVE_BATCHES" xml:space="preserve"><value>Активные варки</value></data>
+	<data name="CUSTOMERS" xml:space="preserve"><value>Клиентская база</value></data>
+	<data name="TOTAL_STOCK_QTY" xml:space="preserve"><value>Общий остаток на складах</value></data>
+	<data name="TOTAL_REVENUE" xml:space="preserve"><value>Общая выручка от продаж</value></data>
+	<data name="DASH_RAW_STOCK" xml:space="preserve"><value>Запас сырья</value></data>
+	<data name="DASH_FINISHED_STOCK" xml:space="preserve"><value>Готовая продукция</value></data>
+	<data name="DASH_EXPIRING_LOTS" xml:space="preserve"><value>Портится сырье (&lt; 7 дней)</value></data>
+	<data name="DASH_OVERDUE_SANITATION" xml:space="preserve"><value>Просрочена мойка емкостей</value></data>
+	<data name="DASH_PENDING_PROCUREMENTS" xml:space="preserve"><value>Ожидаемые закупки</value></data>
+	<data name="DASH_PERIOD_REVENUE" xml:space="preserve"><value>Выручка за период</value></data>
 
 	<!-- ========================================== -->
 	<!-- 5: Варочный цех				            -->
@@ -390,16 +454,6 @@
 	<data name="SELECT_WAREHOUSE_RAW" xml:space="preserve"><value>Склад списания сырья:</value></data>
 	<data name="SELECT_WAREHOUSE_FINISHED" xml:space="preserve"><value>Склад готовой продукции:</value></data>
 	<data name="SELECT_WAREHOUSE_DESTINATION" xml:space="preserve"><value>Склад зачисления готовой продукции:</value></data>
-
-	<!-- ========================================== -->
-	<!-- 8. Dashboard Cards                         -->
-	<!-- ========================================== -->
-	<data name="PRODUCTS_RECIPES" xml:space="preserve"><value>ПРОДУКТЫ / РЕЦЕПТЫ</value></data>
-	<data name="ACTIVE_BATCHES" xml:space="preserve"><value>АКТИВНЫЕ ВАРКИ</value></data>
-	<data name="CUSTOMERS" xml:space="preserve"><value>КЛИЕНТЫ</value></data>
-	<data name="TOTAL_STOCK_QTY" xml:space="preserve"><value>ОБЩИЙ ОСТАТОК НА СКЛАДЕ</value></data>
-	<data name="TOTAL_REVENUE" xml:space="preserve"><value>ОБЩАЯ ВЫРУЧКА</value></data>
-	<data name="AVAILABLE_STOCK" xml:space="preserve"><value>Доступный остаток на складе:</value></data>
 
 	<!-- ========================================== -->
 	<!-- 9. Buttons & Action Commands               -->
