@@ -1,4 +1,6 @@
-﻿using CraftFlow.SharedKernel.Dtos.Analytics;
+﻿using CraftFlow.Api.Common.Authorization;
+using CraftFlow.SharedKernel.Dtos.Analytics;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 
@@ -11,4 +13,7 @@ public record GetAuditLogsQuery(
     Guid? UserId,
     DateTime? FromDate,
     DateTime? ToDate
-) : IRequest<Result<List<AuditLogDto>>>;
+) : IRequest<Result<List<AuditLogDto>>>, IRequirePermission
+{
+    public AppPermission RequiredPermission => AppPermission.SETTINGS_MANAGE;
+}

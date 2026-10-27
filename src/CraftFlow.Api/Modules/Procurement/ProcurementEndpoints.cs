@@ -5,10 +5,8 @@ using CraftFlow.Api.Modules.Procurement.Suppliers.ToggleSupplierActive;
 using CraftFlow.Api.Modules.Procurement.Suppliers.UpdateSupplier;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Supplier;
-using CraftFlow.SharedKernel.Enums.Identity;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace CraftFlow.Api.Modules.Procurement;
 
@@ -21,7 +19,7 @@ public static class ProcurementEndpoints
             .RequireAuthorization();
 
         // --- SUPPLIERS ---
-        group.MapPost(ProcurementConstants.SUPPLIERS, async (CreateSupplierRequest request, ISender sender) =>
+        group.MapPost(ProcurementConstants.SUPPLIERS, async (CreateSupplierRequest request, ISender sender, CancellationToken ct) =>
         {
             var command = new CreateSupplierCommand(
                 request.Name,
@@ -32,7 +30,7 @@ public static class ProcurementEndpoints
                 request.Address,
                 request.Notes);
 
-            var result = await sender.Send(command);
+            var result = await sender.Send(command, ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
@@ -65,11 +63,9 @@ public static class ProcurementEndpoints
         group.MapPut($"{ProcurementConstants.SUPPLIERS}/{{id:guid}}", async (
             Guid id,
             UpdateSupplierRequest request,
-            ClaimsPrincipal user,
             ISender sender,
             CancellationToken ct) =>
         {
-            var userRole = GetUserRoleFromClaims(user);
             var command = new UpdateSupplierCommand(
                 id,
                 request.Name,
@@ -78,8 +74,7 @@ public static class ProcurementEndpoints
                 request.Phone,
                 request.Email,
                 request.Address,
-                request.Notes,
-                userRole);
+                request.Notes);
 
             var result = await sender.Send(command, ct);
 
@@ -95,12 +90,10 @@ public static class ProcurementEndpoints
 
         group.MapPut($"{ProcurementConstants.SUPPLIERS}/{{id:guid}}/toggle-active", async (
             Guid id,
-            ClaimsPrincipal user,
             ISender sender,
             CancellationToken ct) =>
         {
-            var userRole = GetUserRoleFromClaims(user);
-            var command = new ToggleSupplierActiveCommand(id, userRole);
+            var command = new ToggleSupplierActiveCommand(id);
 
             var result = await sender.Send(command, ct);
 
@@ -115,29 +108,10 @@ public static class ProcurementEndpoints
         });
 
         // --- RECEIVE GOODS / STOCK LOTS ---
-        group.MapPost(ProcurementConstants.PURCHASE_ORDERS_RECEIVE, async (ReceiveGoodsCommand command, ISender sender) =>
+        group.MapPost(ProcurementConstants.PURCHASE_ORDERS_RECEIVE, async (ReceiveGoodsCommand command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
+            var result = await sender.Send(command, ct);
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
         });
-    }
-
-    private static TenantRole GetUserRoleFromClaims(ClaimsPrincipal user)
-    {
-        var roleClaim = user.FindFirst(ClaimTypes.Role)?.Value
-                        ?? user.FindFirst("role")?.Value
-                        ?? user.FindFirst(AuthConstants.Claims.ROLE_SHORT)?.Value;
-
-        if (Enum.TryParse<TenantRole>(roleClaim, ignoreCase: true, out var parsedRole))
-        {
-            return parsedRole;
-        }
-
-        if (int.TryParse(roleClaim, out var roleInt))
-        {
-            return (TenantRole)roleInt;
-        }
-
-        return TenantRole.NONE;
     }
 }

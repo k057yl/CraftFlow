@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Modules.MRP.CalculateRequirements;
 using CraftFlow.Api.Modules.MRP.CreateProcurement;
+using CraftFlow.SharedKernel.Constants;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.MRP;
@@ -12,16 +13,24 @@ public static class MrpEndpoints
             .WithTags("MRP")
             .RequireAuthorization();
 
-        group.MapGet(MrpConstants.MRP_REQUIREMENTS, async (ISender sender) =>
+        group.MapGet(MrpConstants.MRP_REQUIREMENTS, async (ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new CalculateRequirementsQuery());
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+            var result = await sender.Send(new CalculateRequirementsQuery(), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
         });
 
-        group.MapPost(MrpConstants.MRP_CREATE_PURCHARE_ORDER, async (CreateProcurementFromMrpCommand command, ISender sender) =>
+        group.MapPost(MrpConstants.MRP_CREATE_PURCHARE_ORDER, async (CreateProcurementFromMrpCommand command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+            var result = await sender.Send(command, ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
         });
     }
 }

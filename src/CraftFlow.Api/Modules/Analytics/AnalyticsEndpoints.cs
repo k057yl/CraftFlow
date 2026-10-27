@@ -1,7 +1,7 @@
 ﻿using CraftFlow.Api.Modules.Analytics.GetAuditLogs;
 using CraftFlow.Api.Modules.Analytics.GetDashboardSummary;
+using CraftFlow.SharedKernel.Constants;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
 
 namespace CraftFlow.Api.Modules.Analytics;
 
@@ -13,16 +13,24 @@ public static class AnalyticsEndpoints
             .WithTags("Analytics")
             .RequireAuthorization();
 
-        group.MapGet(AnalyticConstants.DASHBOARD, async (ISender sender) =>
+        group.MapGet(AnalyticConstants.DASHBOARD, async (ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new GetDashboardSummaryQuery());
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+            var result = await sender.Send(new GetDashboardSummaryQuery(), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
         });
 
-        group.MapGet(AnalyticConstants.AUDIT_LOGS, async ([AsParameters] GetAuditLogsQuery query, ISender sender) =>
+        group.MapGet(AnalyticConstants.AUDIT_LOGS, async ([AsParameters] GetAuditLogsQuery query, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(query);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+            var result = await sender.Send(query, ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
         });
     }
 }

@@ -3,12 +3,13 @@ using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Sanitation.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Enums.Sanitation;
+using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Sanitation.CreateSanitationRule;
 
-public sealed class CreateSanitationRuleCommandHandler : IRequestHandler<CreateSanitationRuleCommand, Guid>
+public sealed class CreateSanitationRuleCommandHandler : IRequestHandler<CreateSanitationRuleCommand, Result<Guid>>
 {
     private readonly AppDbContext _context;
     private readonly ITenantContext _tenantContext;
@@ -19,7 +20,7 @@ public sealed class CreateSanitationRuleCommandHandler : IRequestHandler<CreateS
         _tenantContext = tenantContext;
     }
 
-    public async Task<Guid> Handle(CreateSanitationRuleCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> Handle(CreateSanitationRuleCommand request, CancellationToken cancellationToken)
     {
         var targetExists = request.TargetType switch
         {
@@ -30,7 +31,7 @@ public sealed class CreateSanitationRuleCommandHandler : IRequestHandler<CreateS
         };
 
         if (!targetExists)
-            throw new KeyNotFoundException(ErrorCodes.General.NOT_FOUND);
+            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
 
         var existingRule = await _context.SanitationRules
             .FirstOrDefaultAsync(r => r.TargetType == request.TargetType && r.TargetId == request.TargetId, cancellationToken);
@@ -54,6 +55,6 @@ public sealed class CreateSanitationRuleCommandHandler : IRequestHandler<CreateS
         _context.SanitationRules.Add(rule);
         await _context.SaveChangesAsync(cancellationToken);
 
-        return rule.Id;
+        return Result.Success(rule.Id);
     }
 }

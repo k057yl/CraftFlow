@@ -1,4 +1,5 @@
-﻿using CraftFlow.SharedKernel.Enums.Identity;
+﻿using CraftFlow.Api.Common.Authorization;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 
@@ -12,6 +13,8 @@ public record UpdateSupplierCommand(
     string? Phone,
     string? Email,
     string? Address,
-    string? Notes,
-    TenantRole UserRole
-) : IRequest<Result>;
+    string? Notes
+) : IRequest<Result>, IRequirePermission
+{
+    public AppPermission RequiredPermission => AppPermission.SUPPLIERS_MANAGE;
+}

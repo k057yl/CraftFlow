@@ -1,6 +1,5 @@
 ﻿using CraftFlow.Api.Common.Persistence;
 using CraftFlow.SharedKernel.Constants;
-using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +17,6 @@ public class ToggleSupplierActiveCommandHandler : IRequestHandler<ToggleSupplier
 
     public async Task<Result> Handle(ToggleSupplierActiveCommand request, CancellationToken cancellationToken)
     {
-        if (request.UserRole != TenantRole.OWNER && request.UserRole != TenantRole.ACCOUNTANT)
-        {
-            return Result.Failure(Error.Forbidden(ErrorCodes.Auth.ACCESS_DENIED));
-        }
-
         var supplier = await _dbContext.Suppliers
             .FirstOrDefaultAsync(s => s.Id == request.Id, cancellationToken);
 

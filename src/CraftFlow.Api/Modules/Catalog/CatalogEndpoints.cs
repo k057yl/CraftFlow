@@ -9,6 +9,7 @@ using CraftFlow.Api.Modules.Catalog.Recipes.DeleteRecipe;
 using CraftFlow.Api.Modules.Catalog.Recipes.GetRecipes;
 using CraftFlow.Api.Modules.Catalog.UnitsOfMeasure.GetUnitsOfMeasure;
 using CraftFlow.Api.Modules.Catalog.UnitsOfMeasure.SeedUnitsOfMeasure;
+using CraftFlow.SharedKernel.Constants;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Catalog;
@@ -21,72 +22,100 @@ public static class CatalogEndpoints
             .WithTags("Catalog")
             .RequireAuthorization();
 
-        // Commands - Create
-        group.MapPost(CatalogConstants.RAW_MATERIALS, async (CreateRawMaterialCommand command, ISender sender) =>
+        // --- COMMANDS (CREATE) ---
+        group.MapPost(CatalogConstants.RAW_MATERIALS, async (CreateRawMaterialCommand command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
+            var result = await sender.Send(command, ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        group.MapPost(CatalogConstants.PRODUCTS, async (CreateProductCommand command, ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        group.MapPost(CatalogConstants.RECIPES, async (CreateRecipeCommand command, ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        group.MapPost($"{CatalogConstants.UOM}/seed", async (SeedUnitsOfMeasureCommand command, ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        // --- COMMANDS (DELETE) ---
+        group.MapDelete($"{CatalogConstants.RAW_MATERIALS}/{{id:guid}}", async (Guid id, ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new DeleteRawMaterialCommand(id), ct);
+            return result.IsSuccess
+                ? Results.NoContent()
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        group.MapDelete($"{CatalogConstants.PRODUCTS}/{{id:guid}}", async (Guid id, ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new DeleteProductCommand(id), ct);
+            return result.IsSuccess
+                ? Results.NoContent()
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        group.MapDelete($"{CatalogConstants.RECIPES}/{{id:guid}}", async (Guid id, ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new DeleteRecipeCommand(id), ct);
+            return result.IsSuccess
+                ? Results.NoContent()
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        // --- QUERIES ---
+        group.MapGet(CatalogConstants.UOM, async (ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new GetUnitsOfMeasureQuery(), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost(CatalogConstants.PRODUCTS, async (CreateProductCommand command, ISender sender) =>
+        group.MapGet(CatalogConstants.RAW_MATERIALS, async (bool includeArchived, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
+            var result = await sender.Send(new GetRawMaterialsQuery(includeArchived), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost(CatalogConstants.RECIPES, async (CreateRecipeCommand command, ISender sender) =>
+        group.MapGet(CatalogConstants.PRODUCTS, async (ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
+            var result = await sender.Send(new GetProductsQuery(), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost($"{CatalogConstants.UOM}/seed", async (SeedUnitsOfMeasureCommand command, ISender sender) =>
+        group.MapGet(CatalogConstants.RECIPES, async (bool includeArchived, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        });
-
-        // Commands - Delete
-        group.MapDelete($"{CatalogConstants.RAW_MATERIALS}/{{id:guid}}", async (Guid id, ISender sender) =>
-        {
-            var result = await sender.Send(new DeleteRawMaterialCommand(id));
-            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result.Error);
-        });
-
-        group.MapDelete($"{CatalogConstants.PRODUCTS}/{{id:guid}}", async (Guid id, ISender sender) =>
-        {
-            var result = await sender.Send(new DeleteProductCommand(id));
-            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result.Error);
-        });
-
-        group.MapDelete($"{CatalogConstants.RECIPES}/{{id:guid}}", async (Guid id, ISender sender) =>
-        {
-            var result = await sender.Send(new DeleteRecipeCommand(id));
-            return result.IsSuccess ? Results.NoContent() : Results.BadRequest(result.Error);
-        });
-
-        // Queries
-        group.MapGet(CatalogConstants.UOM, async (ISender sender) =>
-        {
-            var result = await sender.Send(new GetUnitsOfMeasureQuery());
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        });
-
-        group.MapGet(CatalogConstants.RAW_MATERIALS, async (bool includeArchived, ISender sender) =>
-        {
-            var result = await sender.Send(new GetRawMaterialsQuery(includeArchived));
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        });
-
-        group.MapGet(CatalogConstants.PRODUCTS, async (ISender sender) =>
-        {
-            var result = await sender.Send(new GetProductsQuery());
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        });
-
-        group.MapGet(CatalogConstants.RECIPES, async (bool includeArchived, ISender sender) =>
-        {
-            var result = await sender.Send(new GetRecipesQuery(includeArchived));
+            var result = await sender.Send(new GetRecipesQuery(includeArchived), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
     }

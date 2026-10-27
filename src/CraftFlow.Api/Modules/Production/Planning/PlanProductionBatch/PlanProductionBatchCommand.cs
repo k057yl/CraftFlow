@@ -1,4 +1,6 @@
-﻿using CraftFlow.SharedKernel.Result;
+﻿using CraftFlow.Api.Common.Authorization;
+using CraftFlow.SharedKernel.Enums.Identity;
+using CraftFlow.SharedKernel.Result;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Production.Planning.PlanProductionBatch;
@@ -10,4 +12,7 @@ public sealed record PlanProductionBatchCommand(
     decimal PlannedOutputQuantity,
     string? Name = null,
     DateTime? ScheduledAt = null
-) : IRequest<Result<Guid>>;
+) : IRequest<Result<Guid>>, IRequirePermission
+{
+    public AppPermission RequiredPermission => AppPermission.PRODUCTION_EXECUTE;
+}

@@ -2,12 +2,13 @@
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Sanitation;
 using CraftFlow.SharedKernel.Enums.Sanitation;
+using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.Sanitation.Tasks.GetSanitationDetails;
 
-public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanitationDetailsQuery, SanitationDetailsDto>
+public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanitationDetailsQuery, Result<SanitationDetailsDto>>
 {
     private readonly AppDbContext _context;
 
@@ -16,7 +17,7 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
         _context = context;
     }
 
-    public async Task<SanitationDetailsDto> Handle(GetSanitationDetailsQuery request, CancellationToken cancellationToken)
+    public async Task<Result<SanitationDetailsDto>> Handle(GetSanitationDetailsQuery request, CancellationToken cancellationToken)
     {
         string targetName = "Объект";
         DateTime? lastWashedAt = null;
@@ -25,7 +26,7 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
         if (request.TargetType == SanitationTargetType.STORAGE_LOCATION)
         {
             var loc = await _context.StorageLocations.AsNoTracking().FirstOrDefaultAsync(l => l.Id == request.TargetId, cancellationToken);
-            if (loc == null) throw new KeyNotFoundException(ErrorCodes.General.NOT_FOUND);
+            if (loc == null) return Result.Failure<SanitationDetailsDto>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
             targetName = loc.Name;
             lastWashedAt = loc.LastWashedAt;
             nextWashDueDate = loc.NextWashDueDate;
@@ -33,13 +34,13 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
         else if (request.TargetType == SanitationTargetType.WAREHOUSE)
         {
             var wh = await _context.Warehouses.AsNoTracking().FirstOrDefaultAsync(w => w.Id == request.TargetId, cancellationToken);
-            if (wh == null) throw new KeyNotFoundException(ErrorCodes.General.NOT_FOUND);
+            if (wh == null) return Result.Failure<SanitationDetailsDto>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
             targetName = wh.Name;
         }
         else if (request.TargetType == SanitationTargetType.AGING_CHAMBER)
         {
             var ch = await _context.AgingChambers.AsNoTracking().FirstOrDefaultAsync(c => c.Id == request.TargetId, cancellationToken);
-            if (ch == null) throw new KeyNotFoundException(ErrorCodes.General.NOT_FOUND);
+            if (ch == null) return Result.Failure<SanitationDetailsDto>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
             targetName = ch.Name;
         }
 
@@ -119,7 +120,7 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
                 statusText = "⚠️ Скоро мойка";
         }
 
-        return new SanitationDetailsDto(
+        var dto = new SanitationDetailsDto(
             request.TargetId,
             request.TargetType,
             targetName,
@@ -135,5 +136,7 @@ public sealed class GetSanitationDetailsQueryHandler : IRequestHandler<GetSanita
             isUnderSanitation,
             logDtos
         );
+
+        return Result.Success(dto);
     }
 }

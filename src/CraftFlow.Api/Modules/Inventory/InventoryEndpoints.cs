@@ -9,6 +9,7 @@ using CraftFlow.Api.Modules.Inventory.StorageLocations.GetStorageLocations;
 using CraftFlow.Api.Modules.Inventory.Warehouses.CreateWarehouse;
 using CraftFlow.Api.Modules.Inventory.Warehouses.DeleteWarehouse;
 using CraftFlow.Api.Modules.Inventory.Warehouses.GetWarehouses;
+using CraftFlow.SharedKernel.Constants;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Inventory;
@@ -22,48 +23,68 @@ public static class InventoryEndpoints
             .RequireAuthorization();
 
         // --- WAREHOUSES ---
-        group.MapPost(InventoryConstants.WAREHOUSES, async (CreateWarehouseCommand command, ISender sender) =>
+        group.MapPost(InventoryConstants.WAREHOUSES, async (CreateWarehouseCommand command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
+            var result = await sender.Send(command, ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        group.MapGet(InventoryConstants.WAREHOUSES, async (ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new GetWarehousesQuery(), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet(InventoryConstants.WAREHOUSES, async (ISender sender) =>
+        group.MapDelete($"{InventoryConstants.WAREHOUSES}/{{id:guid}}", async (Guid id, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new GetWarehousesQuery());
+            var result = await sender.Send(new DeleteWarehouseCommand(id), ct);
+            return result.IsSuccess
+                ? Results.Ok()
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        // --- STORAGE LOCATIONS ---
+        group.MapPost($"{InventoryConstants.WAREHOUSES}/locations", async (CreateStorageLocationCommand command, ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(command, ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        group.MapGet($"{InventoryConstants.WAREHOUSES}/locations", async (Guid? warehouseId, Guid? chamberId, ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new GetStorageLocationsQuery(warehouseId, chamberId), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapDelete($"{InventoryConstants.WAREHOUSES}/{{id:guid}}", async (Guid id, ISender sender) =>
+        group.MapDelete($"{InventoryConstants.WAREHOUSES}/locations/{{id:guid}}", async (Guid id, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new DeleteWarehouseCommand(id));
-            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
-        });
-
-        // --- STORAGE LOCATIONS (ЁМКОСТИ / СТЕЛЛАЖИ / ТАНКИ) ---
-        group.MapPost($"{InventoryConstants.WAREHOUSES}/locations", async (CreateStorageLocationCommand command, ISender sender) =>
-        {
-            var result = await sender.Send(command);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        });
-
-        group.MapGet($"{InventoryConstants.WAREHOUSES}/locations", async (Guid? warehouseId, Guid? chamberId, ISender sender) =>
-        {
-            var result = await sender.Send(new GetStorageLocationsQuery(warehouseId, chamberId));
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        });
-
-        group.MapDelete($"{InventoryConstants.WAREHOUSES}/locations/{{id:guid}}", async (Guid id, ISender sender) =>
-        {
-            var result = await sender.Send(new DeleteStorageLocationCommand(id));
-            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
+            var result = await sender.Send(new DeleteStorageLocationCommand(id), ct);
+            return result.IsSuccess
+                ? Results.Ok()
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
         });
 
         // --- STOCK LOTS ---
-        group.MapPost(InventoryConstants.STOCK_LOTS, async (AddStockLotCommand command, ISender sender) =>
+        group.MapPost(InventoryConstants.STOCK_LOTS, async (AddStockLotCommand command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+            var result = await sender.Send(command, ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
         });
 
         group.MapGet(InventoryConstants.STOCK_LOTS, async (
@@ -72,31 +93,33 @@ public static class InventoryEndpoints
             bool? onlyExpiringSoon,
             bool? onlyExpired,
             string? sortBy,
-            ISender sender) =>
+            ISender sender,
+            CancellationToken ct) =>
         {
-            var result = await sender.Send(new GetStockLotsQuery(warehouseId, supplierId, onlyExpiringSoon, onlyExpired, sortBy));
+            var result = await sender.Send(new GetStockLotsQuery(warehouseId, supplierId, onlyExpiringSoon, onlyExpired, sortBy), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        // --- СЫРЬЕВЫЕ ЛОТЫ ДЛЯ ПРЯМОЙ ТРАССИРОВКИ ---
-        group.MapGet(InventoryConstants.STOCK_LOTS_RAW, async (ISender sender) =>
+        group.MapGet(InventoryConstants.STOCK_LOTS_RAW, async (ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new GetRawStockLotsQuery());
+            var result = await sender.Send(new GetRawStockLotsQuery(), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        // --- ЛОТЫ ГОТОВОЙ ПРОДУКЦИИ ДЛЯ ОБРАТНОЙ ТРАССИРОВКИ ---
-        group.MapGet(InventoryConstants.STOCK_LOTS_PRODUCTS, async (ISender sender) =>
+        group.MapGet(InventoryConstants.STOCK_LOTS_PRODUCTS, async (ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new GetProductStockLotsQuery());
+            var result = await sender.Send(new GetProductStockLotsQuery(), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        // --- СПИСАНИЕ СКЛАДСКОГО ЛОТА ---
-        group.MapPost($"{InventoryConstants.STOCK_LOTS}/write-off", async (WriteOffStockLotCommand command, ISender sender) =>
+        group.MapPost($"{InventoryConstants.STOCK_LOTS}/write-off", async (WriteOffStockLotCommand command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+            var result = await sender.Send(command, ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
         });
     }
 }

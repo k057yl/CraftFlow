@@ -3,6 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
       xmlns:converters="clr-namespace:CraftFlow.Wpf.Services.Converters"
+      xmlns:auth="clr-namespace:CraftFlow.Wpf.MarkupExtensions"
       Title="{loc:Loc Key=TITLE_PROCUREMENT}">
 
     <Page.Resources>
@@ -262,13 +263,13 @@
             </TabItem>
 
             <!-- 3. Поставщики -->
-            <TabItem x:Name="SuppliersTabItem" Header="{loc:Loc Key=TAB_SUPPLIERS}">
+            <TabItem x:Name="SuppliersTabItem" 
+                     Header="{loc:Loc Key=TAB_SUPPLIERS}"
+                     Visibility="{auth:HasPermission Permission=SUPPLIERS_MANAGE}">
                 <Grid Margin="10">
                     <Grid.ColumnDefinitions>
-                        <!-- Секция A: Форма добавления/редактирования -->
                         <ColumnDefinition Width="420"/>
                         <ColumnDefinition Width="15"/>
-                        <!-- Секция B: Реестр поставщиков -->
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
@@ -276,15 +277,12 @@
                     <GroupBox Grid.Column="0" x:Name="SupplierFormGroupBox" Header="{loc:Loc Key=HEADER_SUPPLIERS}" Padding="12">
                         <ScrollViewer VerticalScrollBarVisibility="Auto">
                             <StackPanel>
-                                <!-- Название (Обязательное) -->
                                 <TextBlock Text="{loc:Loc Key=SUPPLIER_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="NameTextBox" Height="28" Margin="0,0,0,8"/>
 
-                                <!-- Юр. Наименование -->
                                 <TextBlock Text="Юридическое наименование:" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="LegalNameTextBox" Height="28" Margin="0,0,0,8"/>
 
-                                <!-- ИНН / ЕДРПОУ и Телефон -->
                                 <Grid Margin="0,0,0,8">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="*"/>
@@ -301,19 +299,15 @@
                                     </StackPanel>
                                 </Grid>
 
-                                <!-- Email -->
                                 <TextBlock Text="{loc:Loc Key=SUPPLIER_EMAIL}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="EmailTextBox" Height="28" Margin="0,0,0,8"/>
 
-                                <!-- Юр. Адрес -->
                                 <TextBlock Text="Адрес компании:" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="AddressTextBox" Height="28" Margin="0,0,0,8"/>
 
-                                <!-- Примечания / Заметки -->
                                 <TextBlock Text="Заметки / Условия работы:" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="NotesTextBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Margin="0,0,0,12"/>
 
-                                <!-- Кнопки действия -->
                                 <StackPanel Orientation="Horizontal">
                                     <Button x:Name="SaveSupplierButton" 
                                             Content="{loc:Loc Key=CREATE_SUPPLIER}" 
@@ -345,7 +339,7 @@
 
                             <CheckBox x:Name="ShowInactiveSuppliersCheckBox" 
                                       Content="Показывать неактивных поставщиков" 
-                                      Visibility="Collapsed"
+                                      Visibility="{auth:HasPermission Permission=SUPPLIERS_MANAGE}"
                                       Margin="0,0,0,10" 
                                       Foreground="{DynamicResource AppForegroundBrush}"
                                       Click="ShowInactiveSuppliers_Click"/>
@@ -365,8 +359,7 @@
                                     <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="120"/>
                                     <DataGridTextColumn Header="Адрес" Binding="{Binding Address}" Width="*"/>
 
-                                    <!-- Действия (Управляются правами OWNER / ACCOUNTANT) -->
-                                    <DataGridTemplateColumn x:Name="SupplierActionsColumn" Header="Действие" Width="170" Visibility="Collapsed">
+                                    <DataGridTemplateColumn x:Name="SupplierActionsColumn" Header="Действие" Width="170" Visibility="{auth:HasPermission Permission=SUPPLIERS_MANAGE}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">

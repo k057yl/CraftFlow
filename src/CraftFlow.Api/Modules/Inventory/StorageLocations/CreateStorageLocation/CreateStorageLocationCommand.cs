@@ -1,4 +1,6 @@
-﻿using CraftFlow.SharedKernel.Enums.Inventory;
+﻿using CraftFlow.Api.Common.Authorization;
+using CraftFlow.SharedKernel.Enums.Identity;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 
@@ -11,4 +13,7 @@ public record CreateStorageLocationCommand(
     Guid? ChamberId,
     decimal? Capacity,
     string? UnitOfMeasure
-) : IRequest<Result<Guid>>;
+) : IRequest<Result<Guid>>, IRequirePermission
+{
+    public AppPermission RequiredPermission => AppPermission.WAREHOUSES_MANAGE;
+}

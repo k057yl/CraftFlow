@@ -1,4 +1,6 @@
-﻿using CraftFlow.SharedKernel.Result;
+﻿using CraftFlow.Api.Common.Authorization;
+using CraftFlow.SharedKernel.Enums.Identity;
+using CraftFlow.SharedKernel.Result;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Aging.AgingProcess.ReleaseFromAging;
@@ -11,4 +13,7 @@ public sealed record ReleaseFromAgingCommand(
     decimal UnitPrice,
     List<Guid>? StorageLocationIds = null,
     List<decimal>? HeadWeights = null
-) : IRequest<Result>;
+) : IRequest<Result>, IRequirePermission
+{
+    public AppPermission RequiredPermission => AppPermission.PRODUCTION_EXECUTE;
+}

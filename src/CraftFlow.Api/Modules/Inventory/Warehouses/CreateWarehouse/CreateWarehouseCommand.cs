@@ -1,4 +1,6 @@
-﻿using CraftFlow.Api.Common.Behaviors;
+﻿using CraftFlow.Api.Common.Authorization;
+using CraftFlow.Api.Common.Behaviors;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
@@ -9,7 +11,8 @@ public record CreateWarehouseCommand(
     string Name,
     WarehouseType Type,
     string? Address = null
-) : IRequest<Result<Guid>>, IRequireQuotaValidation
+) : IRequest<Result<Guid>>, IRequireQuotaValidation, IRequirePermission
 {
     public QuotaType QuotaType => QuotaType.WarehousesCount;
+    public AppPermission RequiredPermission => AppPermission.WAREHOUSES_MANAGE;
 }

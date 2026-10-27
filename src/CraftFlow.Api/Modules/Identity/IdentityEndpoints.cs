@@ -10,6 +10,7 @@ using CraftFlow.Api.Modules.Identity.Users.CreateTenantUser;
 using CraftFlow.Api.Modules.Identity.Users.DeleteAccount;
 using CraftFlow.Api.Modules.Identity.Users.GetTenantUsers;
 using CraftFlow.Api.Modules.Identity.Users.ToggleUserStatus;
+using CraftFlow.SharedKernel.Constants;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Identity;
@@ -21,82 +22,121 @@ public static class IdentityEndpoints
         var group = app.MapGroup(string.Empty)
             .WithTags("Identity");
 
-        group.MapPost(IdentityConstants.REGISTER, async (RegisterOrganizationCommand command, ISender sender) =>
+        // --- PUBLIC ENDPOINTS (No Auth) ---
+        group.MapPost(IdentityConstants.REGISTER, async (RegisterOrganizationCommand command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
+            var result = await sender.Send(command, ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost(IdentityConstants.USERS, async (CreateTenantUserCommand command, ISender sender) =>
+        group.MapPost(IdentityConstants.LOGIN, async (LoginUserCommand command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        }).RequireAuthorization();
-
-        group.MapGet(IdentityConstants.USERS, async (ISender sender) =>
-        {
-            var result = await sender.Send(new GetTenantUsersQuery());
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        }).RequireAuthorization();
-
-        group.MapPost(IdentityConstants.LOGIN, async (LoginUserCommand command, ISender sender) =>
-        {
-            var result = await sender.Send(command);
+            var result = await sender.Send(command, ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost(IdentityConstants.VERIFY_OTP, async (VerifyOtpCommand command, ISender sender) =>
+        group.MapPost(IdentityConstants.VERIFY_OTP, async (VerifyOtpCommand command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
+            var result = await sender.Send(command, ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost(IdentityConstants.RESEND_OTP, async (Auth.ResendOtp.ResendOtp command, ISender sender) =>
+        group.MapPost(IdentityConstants.RESEND_OTP, async (Auth.ResendOtp.ResendOtp command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
+            var result = await sender.Send(command, ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapPost($"{IdentityConstants.DELETE_ACCOUNT}/confirm", async (DeleteAccountCommand command, ISender sender) =>
+        // --- AUTHORIZED ENDPOINTS ---
+        var authGroup = group.MapGroup(string.Empty).RequireAuthorization();
+
+        // Account Self-Management
+        authGroup.MapPost($"{IdentityConstants.DELETE_ACCOUNT}/confirm", async (DeleteAccountCommand command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(command);
+            var result = await sender.Send(command, ct);
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
-        }).RequireAuthorization();
+        });
 
-        group.MapGet(IdentityConstants.ORGANIZATIONS, async (ISender sender) =>
+        // Tenant Users Management (USERS_MANAGE)
+        authGroup.MapPost(IdentityConstants.USERS, async (CreateTenantUserCommand command, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new GetOrganizationsQuery());
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        }).RequireAuthorization();
+            var result = await sender.Send(command, ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
 
-        group.MapPost(IdentityConstants.ORGANIZATIONS_EXTED, async (Guid id, ExtendSubscriptionRequest req, ISender sender) =>
+        authGroup.MapGet(IdentityConstants.USERS, async (ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new ExtendSubscriptionCommand(id, req.Days));
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        }).RequireAuthorization();
+            var result = await sender.Send(new GetTenantUsersQuery(), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
 
-        group.MapPost(IdentityConstants.ORGANIZATIONS_TOGGLE_STATUS, async (Guid id, ISender sender) =>
+        authGroup.MapPost($"{IdentityConstants.USERS}/{{id:guid}}/toggle-status", async (Guid id, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new ToggleOrganizationStatusCommand(id));
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        }).RequireAuthorization();
+            var result = await sender.Send(new ToggleUserStatusCommand(id), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
 
-        group.MapPost(IdentityConstants.ORGANIZATIONS_MANAGE, async (Guid id, ManageSubscriptionRequest req, ISender sender) =>
+        // Platform Administration
+        authGroup.MapGet(IdentityConstants.ORGANIZATIONS, async (ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new ManageSubscriptionCommand(id, req.PlanCode, req.AddDays, req.IsActive));
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        }).RequireAuthorization();
+            var result = await sender.Send(new GetOrganizationsQuery(), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
 
-        group.MapGet(IdentityConstants.ORGANIZATIONS_PAYMENTS, async (Guid id, ISender sender) =>
+        authGroup.MapPost(IdentityConstants.ORGANIZATIONS_EXTED, async (Guid id, ExtendSubscriptionRequest req, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new GetSubscriptionPaymentsQuery(id));
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        }).RequireAuthorization();
+            var result = await sender.Send(new ExtendSubscriptionCommand(id, req.Days), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
 
-        group.MapPost($"{IdentityConstants.USERS}/{{id:guid}}/toggle-status", async (Guid id, ISender sender) =>
+        authGroup.MapPost(IdentityConstants.ORGANIZATIONS_TOGGLE_STATUS, async (Guid id, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new ToggleUserStatusCommand(id));
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
-        }).RequireAuthorization();
+            var result = await sender.Send(new ToggleOrganizationStatusCommand(id), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        authGroup.MapPost(IdentityConstants.ORGANIZATIONS_MANAGE, async (Guid id, ManageSubscriptionRequest req, ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new ManageSubscriptionCommand(id, req.PlanCode, req.AddDays, req.IsActive), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        authGroup.MapGet(IdentityConstants.ORGANIZATIONS_PAYMENTS, async (Guid id, ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new GetSubscriptionPaymentsQuery(id), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
     }
 }

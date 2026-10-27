@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using static CraftFlow.SharedKernel.Constants.ErrorCodes;
 
 namespace CraftFlow.Api.Modules.Production.Events;
 

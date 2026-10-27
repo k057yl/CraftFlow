@@ -1,4 +1,7 @@
-﻿using CraftFlow.SharedKernel.Enums.Sanitation;
+﻿using CraftFlow.Api.Common.Authorization;
+using CraftFlow.SharedKernel.Enums.Identity;
+using CraftFlow.SharedKernel.Enums.Sanitation;
+using CraftFlow.SharedKernel.Result;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.Sanitation.CreateSanitationRule;
@@ -11,4 +14,7 @@ public sealed record CreateSanitationRuleCommand(
     int? IntervalDays = null,
     int? MaxBatchCount = null,
     DateTime? NextScheduledAt = null
-) : IRequest<Guid>;
+) : IRequest<Result<Guid>>, IRequirePermission
+{
+    public AppPermission RequiredPermission => AppPermission.SANITATION_SCHEDULE;
+}

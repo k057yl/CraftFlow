@@ -60,16 +60,9 @@ public partial class ProcurementPage : Page
 
     private void ApplyRolePermissions()
     {
-        var currentUser = ApiService.Instance.CurrentUser;
-        bool hasManagementAccess = currentUser != null &&
-            (currentUser.Role == TenantRole.OWNER || currentUser.Role == TenantRole.ACCOUNTANT);
+        bool canManageSuppliers = PermissionService.Instance.HasPermission(AppPermission.SUPPLIERS_MANAGE);
 
-        SuppliersTabItem.Visibility = hasManagementAccess ? Visibility.Visible : Visibility.Collapsed;
-
-        SupplierActionsColumn.Visibility = hasManagementAccess ? Visibility.Visible : Visibility.Collapsed;
-        ShowInactiveSuppliersCheckBox.Visibility = hasManagementAccess ? Visibility.Visible : Visibility.Collapsed;
-
-        SupplierFormGroupBox.IsEnabled = hasManagementAccess;
+        SupplierFormGroupBox.IsEnabled = canManageSuppliers;
     }
 
     private async Task LoadDataAsync()
@@ -151,8 +144,7 @@ public partial class ProcurementPage : Page
 
     private async void SaveSupplier_Click(object sender, RoutedEventArgs e)
     {
-        var currentUser = ApiService.Instance.CurrentUser;
-        if (currentUser == null || (currentUser.Role != TenantRole.OWNER && currentUser.Role != TenantRole.ACCOUNTANT))
+        if (!PermissionService.Instance.HasPermission(AppPermission.SUPPLIERS_MANAGE))
         {
             AlertWindow.ShowError(Window.GetWindow(this), "Недостаточно прав для выполнения операции.");
             return;
@@ -204,8 +196,7 @@ public partial class ProcurementPage : Page
 
     private void EditSupplierRow_Click(object sender, RoutedEventArgs e)
     {
-        var currentUser = ApiService.Instance.CurrentUser;
-        if (currentUser == null || (currentUser.Role != TenantRole.OWNER && currentUser.Role != TenantRole.ACCOUNTANT))
+        if (!PermissionService.Instance.HasPermission(AppPermission.SUPPLIERS_MANAGE))
             return;
 
         if (sender is Button btn && btn.Tag is SupplierGridDto supplier)
@@ -216,8 +207,7 @@ public partial class ProcurementPage : Page
 
     private void SuppliersDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        var currentUser = ApiService.Instance.CurrentUser;
-        if (currentUser == null || (currentUser.Role != TenantRole.OWNER && currentUser.Role != TenantRole.ACCOUNTANT))
+        if (!PermissionService.Instance.HasPermission(AppPermission.SUPPLIERS_MANAGE))
             return;
 
         if (SuppliersDataGrid.SelectedItem is SupplierGridDto supplier)
@@ -262,6 +252,9 @@ public partial class ProcurementPage : Page
 
     private async void ToggleSupplierActive_Click(object sender, RoutedEventArgs e)
     {
+        if (!PermissionService.Instance.HasPermission(AppPermission.SUPPLIERS_MANAGE))
+            return;
+
         if (sender is Button btn && btn.Tag is SupplierGridDto supplier)
         {
             var (isSuccess, responseStr) = await ApiService.Instance.PutAndReadAsync($"{ProcurementConstants.SUPPLIERS}/{supplier.Id}/toggle-active", new { });
