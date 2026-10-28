@@ -5,7 +5,11 @@ namespace CraftFlow.Wpf.Pages.ProductionSettings;
 
 public partial class ProductionSettingsPage : Page
 {
-    public ProductionSettingsPage()
+    public ProductionSettingsPage() : this(null)
+    {
+    }
+
+    public ProductionSettingsPage(object? dummy = null)
     {
         InitializeComponent();
     }

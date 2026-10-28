@@ -7,15 +7,9 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Pages.Production.Controls;
-
-public static class OLD_SCHULL_DISCARD_KEYS
-{
-    public const string ERR_INVALID_INPUT = "UI_INVALID_INPUT_FIELDS";
-    public const string ERR_API_PREFIX = "UI_API_ERROR_PREFIX";
-    public const string SUCCESS_COMPLETED = "UI_BATCH_COMPLETED_SUCCESS";
-}
 
 public partial class DiscardActsControl : UserControl
 {
@@ -57,7 +51,7 @@ public partial class DiscardActsControl : UserControl
         if (DiscardBatchComboBox.SelectedValue is not Guid batchId ||
             string.IsNullOrWhiteSpace(DiscardReasonTextBox.Text))
         {
-            SetStatus(OLD_SCHULL_DISCARD_KEYS.ERR_INVALID_INPUT, Brushes.Red);
+            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -69,7 +63,7 @@ public partial class DiscardActsControl : UserControl
 
         if (isSuccess)
         {
-            SetStatus(OLD_SCHULL_DISCARD_KEYS.SUCCESS_COMPLETED, Brushes.OrangeRed);
+            SetStatus("UI_DISCARD_MSG_BATCH_SUCCESS", Brushes.OrangeRed);
 
             DiscardBatchComboBox.SelectedValue = null;
             DiscardReasonTextBox.Clear();
@@ -133,7 +127,7 @@ public partial class DiscardActsControl : UserControl
 
                     if (isSuccess)
                     {
-                        SetStatus(OLD_SCHULL_DISCARD_KEYS.SUCCESS_COMPLETED, Brushes.OrangeRed);
+                        SetStatus("UI_DISCARD_MSG_LOT_SUCCESS", Brushes.OrangeRed);
 
                         if (ParentPage != null)
                         {
@@ -148,7 +142,7 @@ public partial class DiscardActsControl : UserControl
             }
             catch (Exception ex)
             {
-                SetStatusFormatted(OLD_SCHULL_DISCARD_KEYS.ERR_API_PREFIX, Brushes.Red, ex.Message);
+                SetStatusFormatted("UI_ERR_DATA_LOAD_FMT", Brushes.Red, ex.Message);
             }
         }
     }
@@ -157,14 +151,14 @@ public partial class DiscardActsControl : UserControl
     {
         if (StatusTextBlock == null) return;
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = LocalizationService.Get(resourceKey);
+        StatusTextBlock.Text = Get(resourceKey);
     }
 
     private void SetStatusFormatted(string resourceKey, Brush color, params object[] args)
     {
         if (StatusTextBlock == null) return;
         StatusTextBlock.Foreground = color;
-        var format = LocalizationService.Get(resourceKey);
+        var format = Get(resourceKey);
         StatusTextBlock.Text = string.Format(format, args);
     }
 

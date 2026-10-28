@@ -3,7 +3,7 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
       xmlns:controls="clr-namespace:CraftFlow.Wpf.Pages.Production.Controls"
-      Title="{loc:Loc Key=TITLE_PRODUCTION}">
+      Title="{loc:Loc Key=UI_TITLE_PRODUCTION}">
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -13,7 +13,7 @@
         </Grid.RowDefinitions>
 
         <!-- Заголовок страницы -->
-        <TextBlock Text="{loc:Loc Key=PRODUCTION_HEADER}" 
+        <TextBlock Text="{loc:Loc Key=UI_PRODUCTION_HEADER}" 
                    FontSize="22" 
                    FontWeight="Bold" 
                    Foreground="{DynamicResource AppForegroundBrush}" 
@@ -23,17 +23,17 @@
         <TabControl Grid.Row="1" x:Name="ProductionTabControl">
 
             <!-- Вкладка 1: Варочный цех -->
-            <TabItem Header="{loc:Loc Key=TAB_BREWHOUSE}">
+            <TabItem Header="{loc:Loc Key=UI_TAB_BREWHOUSE}">
                 <controls:BrewhouseControl x:Name="BrewhouseView"/>
             </TabItem>
 
             <!-- Вкладка 2: Созревание и Аффинаж -->
-            <TabItem Header="{loc:Loc Key=TAB_AGING}">
+            <TabItem Header="{loc:Loc Key=UI_TAB_AGING}">
                 <controls:AgingControl x:Name="AgingView"/>
             </TabItem>
 
             <!-- Вкладка 3: Брак и Акт списания -->
-            <TabItem Header="{loc:Loc Key=TAB_DISCARD_ACTS}">
+            <TabItem Header="{loc:Loc Key=UI_TAB_DISCARD_ACTS}">
                 <controls:DiscardActsControl x:Name="DiscardView"/>
             </TabItem>
 
@@ -42,7 +42,7 @@
         <!-- Строка статуса -->
         <TextBlock x:Name="StatusTextBlock" 
                    Grid.Row="2" 
-                   Text="{loc:Loc Key=STATUS_READY}" 
+                   Text="{loc:Loc Key=UI_STATUS_READY}" 
                    Foreground="{DynamicResource AccentBrush}" 
                    FontWeight="SemiBold" 
                    Margin="0,12,0,0"/>

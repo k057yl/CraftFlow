@@ -1,5 +1,4 @@
 ﻿using CraftFlow.Api.Modules.Catalog;
-using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Enums.Identity;
@@ -13,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Media;
+using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Pages.ProductionSettings.Controls;
 
@@ -116,11 +116,11 @@ public partial class RecipesControl : UserControl
             Recipes.Clear();
             recs?.ForEach(r => Recipes.Add(r));
 
-            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            SetStatus("UI_MSG_DATA_LOADED_SUCCESS", Brushes.Green);
         }
         catch (Exception ex)
         {
-            SetStatusFormatted(UiConstants.Messages.DATA_LOAD_ERROR, Brushes.Red, ex.Message);
+            SetStatusFormatted("UI_ERR_DATA_LOAD_FMT", Brushes.Red, ex.Message);
         }
     }
 
@@ -134,11 +134,11 @@ public partial class RecipesControl : UserControl
             RecipeIngredientQuantityTextBox.Text = "1";
 
             var formattedQty = UnitFormatter.Format(qty, uomCode);
-            SetStatusRaw($"Добавлено: {rawItem.Name} — {formattedQty}", Brushes.Green);
+            SetStatusFormatted("UI_RECIPES_MSG_INGREDIENT_ADDED_FMT", Brushes.Green, rawItem.Name, formattedQty);
         }
         else
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
         }
     }
 
@@ -158,7 +158,7 @@ public partial class RecipesControl : UserControl
     {
         if (RawUomComboBox.SelectedValue is not Guid uomId || string.IsNullOrWhiteSpace(RawMaterialNameTextBox.Text))
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -187,7 +187,7 @@ public partial class RecipesControl : UserControl
             !TryParseDecimal(RecipeOutputQuantityTextBox.Text, out var targetOutput) ||
             _selectedIngredients.Count == 0)
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -242,7 +242,7 @@ public partial class RecipesControl : UserControl
     {
         if (sender is Button btn && btn.Tag is Guid id)
         {
-            bool confirmed = ConfirmWindow.Show(Window.GetWindow(this), "CONFIRM_ARCHIVE_RAW_MATERIAL", "CONFIRM_ACTION_TITLE");
+            bool confirmed = ConfirmWindow.Show(Window.GetWindow(this), "UI_RECIPES_CONFIRM_ARCHIVE_RAW", "CONFIRM_ACTION_TITLE");
             if (!confirmed) return;
 
             await ApiService.Instance.DeleteAsync($"{CatalogConstants.RAW_MATERIALS}/{id}");
@@ -254,7 +254,7 @@ public partial class RecipesControl : UserControl
     {
         if (sender is Button btn && btn.Tag is Guid id)
         {
-            bool confirmed = ConfirmWindow.Show(Window.GetWindow(this), "CONFIRM_ARCHIVE_RECIPE", "CONFIRM_ACTION_TITLE");
+            bool confirmed = ConfirmWindow.Show(Window.GetWindow(this), "UI_RECIPES_CONFIRM_ARCHIVE_RECIPE", "CONFIRM_ACTION_TITLE");
             if (!confirmed) return;
 
             await ApiService.Instance.DeleteAsync($"{CatalogConstants.RECIPES}/{id}");
@@ -264,12 +264,12 @@ public partial class RecipesControl : UserControl
 
     private void SetStatus(string resourceKey, Brush color)
     {
-        StatusUpdated?.Invoke(LocalizationService.Get(resourceKey), color);
+        StatusUpdated?.Invoke(Get(resourceKey), color);
     }
 
     private void SetStatusFormatted(string resourceKey, Brush color, params object[] args)
     {
-        var format = LocalizationService.Get(resourceKey);
+        var format = Get(resourceKey);
         StatusUpdated?.Invoke(string.Format(format, args), color);
     }
 

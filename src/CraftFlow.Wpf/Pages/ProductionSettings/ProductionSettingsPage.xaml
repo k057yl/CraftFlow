@@ -7,7 +7,7 @@
       xmlns:ctrl="clr-namespace:CraftFlow.Wpf.Pages.ProductionSettings.Controls"
       mc:Ignorable="d" 
       d:DesignHeight="800" d:DesignWidth="1200"
-      Title="{loc:Loc Key=TITLE_PRODUCTION_SETTINGS}">
+      Title="{loc:Loc Key=UI_SETTINGS_TITLE}">
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -17,24 +17,24 @@
         </Grid.RowDefinitions>
 
         <!-- Заголовок страницы -->
-        <TextBlock Text="{loc:Loc Key=TITLE_PRODUCTION_SETTINGS}" 
+        <TextBlock Text="{loc:Loc Key=UI_SETTINGS_HEADER}" 
                    FontSize="22" FontWeight="Bold" 
                    Foreground="{DynamicResource AppForegroundBrush}" 
                    Margin="0,0,0,16"/>
 
         <!-- 2 Основные Вкладки -->
         <TabControl Grid.Row="1">
-            <TabItem Header="{loc:Loc Key=HEADER_TECHNOLOGY_AND_RECIPES}">
+            <TabItem Header="{loc:Loc Key=UI_SETTINGS_TAB_TECHNOLOGY}">
                 <ctrl:RecipesControl x:Name="RecipesView" StatusUpdated="OnStatusUpdated"/>
             </TabItem>
-            <TabItem Header="{loc:Loc Key=HEADER_INFRASTRUCTURE_AND_EQUIPMENT}">
+            <TabItem Header="{loc:Loc Key=UI_SETTINGS_TAB_INFRASTRUCTURE}">
                 <ctrl:StorageControl x:Name="StorageView" StatusUpdated="OnStatusUpdated"/>
             </TabItem>
         </TabControl>
 
         <!-- Общий StatusBlock снизу -->
         <TextBlock x:Name="StatusTextBlock" Grid.Row="2" 
-                   Text="{loc:Loc Key=STATUS_READY}" 
+                   Text="{loc:Loc Key=UI_STATUS_READY}" 
                    Foreground="{DynamicResource AccentBrush}" 
                    FontWeight="SemiBold" Margin="0,12,0,0"/>
     </Grid>

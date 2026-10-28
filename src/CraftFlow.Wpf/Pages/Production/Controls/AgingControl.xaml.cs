@@ -2,7 +2,6 @@
 using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Aging;
-using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.SharedKernel.Dtos.Production;
 using CraftFlow.Wpf.Models;
@@ -13,20 +12,9 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Pages.Production.Controls;
-
-public static class OLD_SCHULL_KEYS
-{
-    public const string ERR_INVALID_INPUT = "UI_INVALID_INPUT_FIELDS";
-    public const string ERR_API_PREFIX = "UI_API_ERROR_PREFIX";
-    public const string SUCCESS_STARTED = "UI_BATCH_STARTED_SUCCESS";
-    public const string SUCCESS_SHIPPED = "UI_ORDER_SHIPPED_SUCCESS";
-    public const string LBL_ACTIVE_LOT = "LABEL_ACTIVE_AGING_LOT";
-    public const string LBL_SELECT_WAREHOUSE = "SELECT_WAREHOUSE";
-    public const string LBL_CALC_UNIT_COST = "LABEL_CALCULATED_UNIT_COST";
-    public const string LBL_SELL_PRICE = "LABEL_SELLING_PRICE_PER_UNIT";
-}
 
 public partial class AgingControl : UserControl
 {
@@ -105,7 +93,7 @@ public partial class AgingControl : UserControl
         if (CompletedBatchesComboBox.SelectedItem is BatchReadyForAgingDto selectedBatch)
         {
             MinAgingDaysTextBox.Text = selectedBatch.DefaultAgingDays.ToString();
-            AgingLotNameTextBox.Text = string.Concat(selectedBatch.Name, " (", LocalizationService.Get("NAV_AGING"), ")");
+            AgingLotNameTextBox.Text = string.Concat(selectedBatch.Name, " (", Get("UI_TAB_AGING"), ")");
         }
         else
         {
@@ -120,7 +108,7 @@ public partial class AgingControl : UserControl
             AgingChambersComboBox.SelectedValue is not Guid chamberId ||
             !int.TryParse(MinAgingDaysTextBox.Text.Trim(), out var minDays))
         {
-            SetStatus(OLD_SCHULL_KEYS.ERR_INVALID_INPUT, Brushes.Red);
+            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -136,7 +124,7 @@ public partial class AgingControl : UserControl
 
         if (isSuccess)
         {
-            SetStatus(OLD_SCHULL_KEYS.SUCCESS_STARTED, Brushes.Green);
+            SetStatus("UI_AGING_MSG_TRANSFER_SUCCESS", Brushes.Green);
 
             CompletedBatchesComboBox.SelectedValue = null;
             AgingChambersComboBox.SelectedValue = null;
@@ -176,7 +164,7 @@ public partial class AgingControl : UserControl
 
         if (ActiveAgingLotsComboBox.SelectedItem is LookupItem selectedLot)
         {
-            ReleaseLotNameTextBox.Text = string.Concat(selectedLot.Name, " (", LocalizationService.Get("GROUP_RELEASE_AGING"), ")");
+            ReleaseLotNameTextBox.Text = string.Concat(selectedLot.Name, " (", Get("UI_AGING_GROUP_RELEASE"), ")");
 
             try
             {
@@ -186,10 +174,10 @@ public partial class AgingControl : UserControl
                     _selectedLotTotalCost = details.TotalBatchCost;
                     _selectedLotUnitName = string.IsNullOrWhiteSpace(details.UnitName) ? FormattingConstants.DEFAULT_WEIGHT_UNIT : details.UnitName;
 
-                    var costFormat = LocalizationService.Get(OLD_SCHULL_KEYS.LBL_CALC_UNIT_COST);
+                    var costFormat = Get("UI_AGING_LABEL_CALCULATED_UNIT_COST_FMT");
                     CalculatedCostLabelTextBlock.Text = string.Format(costFormat, _selectedLotUnitName);
 
-                    var priceFormat = LocalizationService.Get(OLD_SCHULL_KEYS.LBL_SELL_PRICE);
+                    var priceFormat = Get("UI_AGING_LABEL_SELLING_PRICE_PER_UNIT_FMT");
                     UnitPriceLabelTextBlock.Text = string.Format(priceFormat, _selectedLotUnitName);
 
                     ActualFinalQuantityTextBox.TextChanged -= ActualFinalQuantityTextBox_TextChanged;
@@ -252,13 +240,13 @@ public partial class AgingControl : UserControl
     {
         if (ActiveAgingLotsComboBox.SelectedValue is not Guid lotId)
         {
-            SetStatus(OLD_SCHULL_KEYS.LBL_ACTIVE_LOT, Brushes.Red);
+            SetStatus("UI_AGING_ERR_SELECT_LOT", Brushes.Red);
             return;
         }
 
         if (TargetWarehousesComboBox.SelectedValue is not Guid warehouseId)
         {
-            SetStatus(OLD_SCHULL_KEYS.LBL_SELECT_WAREHOUSE, Brushes.Red);
+            SetStatus("UI_AGING_ERR_SELECT_WAREHOUSE", Brushes.Red);
             return;
         }
 
@@ -298,7 +286,7 @@ public partial class AgingControl : UserControl
 
             if (response.IsSuccess)
             {
-                SetStatus(OLD_SCHULL_KEYS.SUCCESS_SHIPPED, Brushes.Green);
+                SetStatus("UI_AGING_MSG_RELEASE_SUCCESS", Brushes.Green);
                 ReleaseLotNameTextBox.Clear();
                 TargetStorageLocations.Clear();
 
@@ -309,7 +297,7 @@ public partial class AgingControl : UserControl
             }
             else
             {
-                SetStatusFormatted(OLD_SCHULL_KEYS.ERR_API_PREFIX, Brushes.Red, response.ContentOrError);
+                SetStatusFormatted("UI_ERR_DATA_LOAD_FMT", Brushes.Red, response.ContentOrError);
             }
         }
     }
@@ -318,14 +306,14 @@ public partial class AgingControl : UserControl
     {
         if (StatusTextBlock == null) return;
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = LocalizationService.Get(resourceKey);
+        StatusTextBlock.Text = Get(resourceKey);
     }
 
     private void SetStatusFormatted(string resourceKey, Brush color, params object[] args)
     {
         if (StatusTextBlock == null) return;
         StatusTextBlock.Foreground = color;
-        var format = LocalizationService.Get(resourceKey);
+        var format = Get(resourceKey);
         StatusTextBlock.Text = string.Format(format, args);
     }
 

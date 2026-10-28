@@ -1,6 +1,5 @@
 ﻿using CraftFlow.Api.Modules.Aging;
 using CraftFlow.Api.Modules.Production;
-using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Aging;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Production;
@@ -10,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
+using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Pages.Production;
 
@@ -30,7 +30,11 @@ public partial class ProductionPage : Page
 
     private readonly DispatcherTimer _uiTimer = new();
 
-    public ProductionPage()
+    public ProductionPage() : this(null)
+    {
+    }
+
+    public ProductionPage(object? dummy = null)
     {
         InitializeComponent();
 
@@ -102,24 +106,24 @@ public partial class ProductionPage : Page
             }
             catch { }
 
-            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            SetStatus("UI_MSG_DATA_LOADED_SUCCESS", Brushes.Green);
         }
         catch (Exception ex)
         {
-            SetStatusFormatted(UiConstants.Messages.DATA_LOAD_ERROR, Brushes.Red, ex.Message);
+            SetStatusFormatted("UI_ERR_DATA_LOAD_FMT", Brushes.Red, ex.Message);
         }
     }
 
     private void SetStatus(string resourceKey, Brush color)
     {
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = LocalizationService.Get(resourceKey);
+        StatusTextBlock.Text = Get(resourceKey);
     }
 
     private void SetStatusFormatted(string resourceKey, Brush color, params object[] args)
     {
         StatusTextBlock.Foreground = color;
-        var format = LocalizationService.Get(resourceKey);
+        var format = Get(resourceKey);
         StatusTextBlock.Text = string.Format(format, args);
     }
 }

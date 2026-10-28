@@ -1,6 +1,5 @@
 ﻿using CraftFlow.Api.Modules.Aging;
 using CraftFlow.Api.Modules.Inventory;
-using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.SharedKernel.Enums.Inventory;
@@ -13,6 +12,7 @@ using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Pages.ProductionSettings.Controls;
 
@@ -75,7 +75,7 @@ public partial class StorageControl : UserControl
                     ? $"🏠 {l.WarehouseName}"
                     : (!string.IsNullOrWhiteSpace(l.ChamberName) ? $"❄ {l.ChamberName}" : "—");
 
-                string statusText = "ОК";
+                string statusText = Get("UI_STORAGE_STATUS_OK");
                 Brush statusBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#2E7D32"));
                 Brush backgroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8F5E9"));
                 string code = "OK";
@@ -84,14 +84,14 @@ public partial class StorageControl : UserControl
                 {
                     if (l.NextWashDueDate.Value < now)
                     {
-                        statusText = "🚨 ПРОСРОЧЕНО";
+                        statusText = Get("UI_STORAGE_STATUS_OVERDUE");
                         statusBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#C62828"));
                         backgroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFEBEE"));
                         code = "OVERDUE";
                     }
                     else if ((l.NextWashDueDate.Value - now).TotalDays <= 2)
                     {
-                        statusText = "⚠️ СКОРО МОЙКА";
+                        statusText = Get("UI_STORAGE_STATUS_WARNING");
                         statusBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF6C00"));
                         backgroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF3E0"));
                         code = "WARNING";
@@ -117,15 +117,15 @@ public partial class StorageControl : UserControl
             ApplyFilters();
             UpdateSanitationCounters();
 
-            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            SetStatus("UI_MSG_DATA_LOADED_SUCCESS", Brushes.Green);
         }
         catch (Exception ex)
         {
-            SetStatusFormatted(UiConstants.Messages.DATA_LOAD_ERROR, Brushes.Red, ex.Message);
+            SetStatusFormatted("UI_ERR_DATA_LOAD_FMT", Brushes.Red, ex.Message);
         }
     }
 
-    #region Выпадающие меню (Дропдауны)
+    #region Выпадающие меню
 
     private void OpenWarehouseMenu_Click(object sender, RoutedEventArgs e)
     {
@@ -133,13 +133,13 @@ public partial class StorageControl : UserControl
         {
             var menu = new ContextMenu();
 
-            var planItem = new MenuItem { Header = LocalizationService.Get("MENU_SANITATION_PLAN") };
+            var planItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_PLAN") };
             planItem.Click += (s, args) => OpenWarehouseSanitation(item);
 
-            var detailsItem = new MenuItem { Header = LocalizationService.Get("MENU_SANITATION_DETAILS") };
+            var detailsItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_DETAILS") };
             detailsItem.Click += (s, args) => OpenWarehouseDetails(item);
 
-            var deleteItem = new MenuItem { Header = LocalizationService.Get("MENU_DELETE") };
+            var deleteItem = new MenuItem { Header = Get("UI_STORAGE_MENU_DELETE") };
             deleteItem.Click += async (s, args) => await DeleteWarehouseAsync(item.Id);
 
             menu.Items.Add(planItem);
@@ -158,13 +158,13 @@ public partial class StorageControl : UserControl
         {
             var menu = new ContextMenu();
 
-            var planItem = new MenuItem { Header = LocalizationService.Get("MENU_SANITATION_PLAN") };
+            var planItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_PLAN") };
             planItem.Click += (s, args) => OpenChamberSanitation(item);
 
-            var detailsItem = new MenuItem { Header = LocalizationService.Get("MENU_SANITATION_DETAILS") };
+            var detailsItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_DETAILS") };
             detailsItem.Click += (s, args) => OpenChamberDetails(item);
 
-            var deleteItem = new MenuItem { Header = LocalizationService.Get("MENU_DELETE") };
+            var deleteItem = new MenuItem { Header = Get("UI_STORAGE_MENU_DELETE") };
             deleteItem.Click += async (s, args) => await DeleteChamberAsync(item.Id);
 
             menu.Items.Add(planItem);
@@ -183,13 +183,13 @@ public partial class StorageControl : UserControl
         {
             var menu = new ContextMenu();
 
-            var planItem = new MenuItem { Header = LocalizationService.Get("MENU_SANITATION_PLAN") };
+            var planItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_PLAN") };
             planItem.Click += (s, args) => OpenLocationSanitation(item);
 
-            var detailsItem = new MenuItem { Header = LocalizationService.Get("MENU_SANITATION_DETAILS") };
+            var detailsItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_DETAILS") };
             detailsItem.Click += (s, args) => OpenLocationDetails(item);
 
-            var deleteItem = new MenuItem { Header = LocalizationService.Get("MENU_DELETE") };
+            var deleteItem = new MenuItem { Header = Get("UI_STORAGE_MENU_DELETE") };
             deleteItem.Click += async (s, args) => await DeleteStorageLocationAsync(item.Id);
 
             menu.Items.Add(planItem);
@@ -204,7 +204,7 @@ public partial class StorageControl : UserControl
 
     #endregion
 
-    #region Логика вызовов диалогов
+    #region Логика диалогов
 
     private async void OpenWarehouseSanitation(LookupItem item)
     {
@@ -265,17 +265,17 @@ public partial class StorageControl : UserControl
 
     #endregion
 
-    #region Удаление с подтверждением
+    #region Удаление
 
     private async Task DeleteWarehouseAsync(Guid id)
     {
         var owner = Window.GetWindow(this);
-        if (!ConfirmWindow.Show(owner, "CONFIRM_DELETE_WAREHOUSE")) return;
+        if (!ConfirmWindow.Show(owner, "UI_STORAGE_CONFIRM_DELETE_WAREHOUSE")) return;
 
         var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{InventoryConstants.WAREHOUSES}/{id}");
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            SetStatus("UI_MSG_DATA_LOADED_SUCCESS", Brushes.Green);
             await LoadDataAsync();
         }
         else
@@ -287,12 +287,12 @@ public partial class StorageControl : UserControl
     private async Task DeleteChamberAsync(Guid id)
     {
         var owner = Window.GetWindow(this);
-        if (!ConfirmWindow.Show(owner, "CONFIRM_DELETE_CHAMBER")) return;
+        if (!ConfirmWindow.Show(owner, "UI_STORAGE_CONFIRM_DELETE_CHAMBER")) return;
 
         var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{AgingConstants.AGING_CHAMBERS}/{id}");
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            SetStatus("UI_MSG_DATA_LOADED_SUCCESS", Brushes.Green);
             await LoadDataAsync();
         }
         else
@@ -304,12 +304,12 @@ public partial class StorageControl : UserControl
     private async Task DeleteStorageLocationAsync(Guid id)
     {
         var owner = Window.GetWindow(this);
-        if (!ConfirmWindow.Show(owner, "CONFIRM_DELETE_LOCATION")) return;
+        if (!ConfirmWindow.Show(owner, "UI_STORAGE_CONFIRM_DELETE_LOCATION")) return;
 
         var (isSuccess, error) = await ApiService.Instance.DeleteAndReadAsync($"{InventoryConstants.WAREHOUSES}/locations/{id}");
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            SetStatus("UI_MSG_DATA_LOADED_SUCCESS", Brushes.Green);
             await LoadDataAsync();
         }
         else
@@ -373,7 +373,7 @@ public partial class StorageControl : UserControl
 
         if (string.IsNullOrWhiteSpace(name))
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -386,7 +386,7 @@ public partial class StorageControl : UserControl
 
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.WAREHOUSE_CREATED_SUCCESS, Brushes.Green);
+            SetStatus("UI_STORAGE_MSG_WAREHOUSE_CREATED_SUCCESS", Brushes.Green);
             WarehouseNameTextBox.Clear();
             WarehouseAddressTextBox.Clear();
             WarehouseTypeComboBox.SelectedIndex = 0;
@@ -406,7 +406,7 @@ public partial class StorageControl : UserControl
             !TryParseDecimal(ChamberTempTextBox.Text, out var temp) ||
             !TryParseDecimal(ChamberHumidityTextBox.Text, out var humidity))
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -419,7 +419,7 @@ public partial class StorageControl : UserControl
 
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.AGING_CHAMBER_CREATED_SUCCESS, Brushes.Green);
+            SetStatus("UI_STORAGE_MSG_CHAMBER_CREATED_SUCCESS", Brushes.Green);
             ChamberNameTextBox.Clear();
             ChamberTempTextBox.Text = "12.0";
             ChamberHumidityTextBox.Text = "85.0";
@@ -441,18 +441,18 @@ public partial class StorageControl : UserControl
         if (dialog.ShowDialog() == true)
         {
             await LoadDataAsync();
-            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            SetStatus("UI_MSG_DATA_LOADED_SUCCESS", Brushes.Green);
         }
     }
 
     private void SetStatus(string resourceKey, Brush color)
     {
-        StatusUpdated?.Invoke(LocalizationService.Get(resourceKey), color);
+        StatusUpdated?.Invoke(Get(resourceKey), color);
     }
 
     private void SetStatusFormatted(string resourceKey, Brush color, params object[] args)
     {
-        var format = LocalizationService.Get(resourceKey);
+        var format = Get(resourceKey);
         StatusUpdated?.Invoke(string.Format(format, args), color);
     }
 

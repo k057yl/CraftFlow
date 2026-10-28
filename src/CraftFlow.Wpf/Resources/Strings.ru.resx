@@ -121,85 +121,90 @@
 	<data name="ADMIN_COL_ACCESS" xml:space="preserve"><value>Доступ</value></data>
 
 	<!-- ========================================== -->
-	<!-- 2: НАСТРОЙКИ ПРОИЗВОДСТВА (ОБЩЕЕ)          -->
+	<!-- 20. Главная страница настроек производства -->
 	<!-- ========================================== -->
-	<data name="NAV_PRODUCTION_SETTINGS" xml:space="preserve"><value>Настройки производства</value></data>
-	<data name="TITLE_PRODUCTION_SETTINGS" xml:space="preserve"><value>Настройки производства</value></data>
-	<data name="HEADER_TECHNOLOGY_AND_RECIPES" xml:space="preserve"><value>Технология и Рецептуры</value></data>
-	<data name="HEADER_INFRASTRUCTURE_AND_EQUIPMENT" xml:space="preserve"><value>Инфраструктура и Оборудование</value></data>
+	<data name="UI_SETTINGS_TITLE" xml:space="preserve"><value>Настройки производства</value></data>
+	<data name="UI_SETTINGS_HEADER" xml:space="preserve"><value>Настройки производства</value></data>
+	<data name="UI_SETTINGS_TAB_TECHNOLOGY" xml:space="preserve"><value>Технология и Рецептуры</value></data>
+	<data name="UI_SETTINGS_TAB_INFRASTRUCTURE" xml:space="preserve"><value>Инфраструктура и Оборудование</value></data>
 
 	<!-- ========================================== -->
-	<!-- 2.1: ТЕХНОЛОГИЯ И РЕЦЕПТУРЫ                -->
+	<!-- 21. Контрол: Рецепты (RecipesControl)      -->
 	<!-- ========================================== -->
-	<data name="TITLE_RECIPES" xml:space="preserve"><value>Сырьё и Технологические Рецепты</value></data>
-	<data name="HEADER_RAW_MATERIALS" xml:space="preserve"><value>Сырьё и Ингредиенты</value></data>
-	<data name="HEADER_NEW_RECIPE" xml:space="preserve"><value>Новая Рецептура</value></data>
-	<data name="HEADER_RECIPES" xml:space="preserve"><value>Технологические Рецепты</value></data>
-	<data name="RAW_MATERIAL_NAME" xml:space="preserve"><value>Название сырья:</value></data>
-	<data name="SELECT_UOM" xml:space="preserve"><value>Выберите ед. изм.:</value></data>
-	<data name="CREATE_RAW_MATERIAL" xml:space="preserve"><value>Добавить сырьё</value></data>
-	<data name="RECIPE_NAME" xml:space="preserve"><value>Название рецепта:</value></data>
-	<data name="TARGET_OUTPUT_QUANTITY" xml:space="preserve"><value>Базовый выход рецепта (кг/л):</value></data>
-	<data name="IS_AGING_REQUIRED" xml:space="preserve"><value>Требуется созревание</value></data>
-	<data name="INGREDIENT_SECTION" xml:space="preserve"><value>СОСТАВ РЕЦЕПТА</value></data>
-	<data name="CREATE_RECIPE" xml:space="preserve"><value>Сохранить рецепт</value></data>
-	<data name="BTN_ADD" xml:space="preserve"><value>Добавить</value></data>
-	<data name="CHECKBOX_SHOW_ARCHIVED" xml:space="preserve"><value>Показать скрытые</value></data>
+	<data name="UI_RECIPES_HEADER_RAW_MATERIALS" xml:space="preserve"><value>Сырьё и Ингредиенты</value></data>
+	<data name="UI_RECIPES_HEADER_NEW_RECIPE" xml:space="preserve"><value>Новая Рецептура</value></data>
+	<data name="UI_RECIPES_HEADER_RECIPES_LIST" xml:space="preserve"><value>Технологические Рецепты</value></data>
 
-	<!-- Предупреждения и ошибки сырья/рецептов -->
-	<data name="CATALOG.RAW_MATERIAL_HAS_STOCK" xml:space="preserve"><value>Невозможно скрыть сырьё: на складе есть положительные остатки.</value></data>
-	<data name="CATALOG.RAW_MATERIAL_IN_ACTIVE_RECIPE" xml:space="preserve"><value>Невозможно скрыть сырьё: оно используется в активных рецептурах.</value></data>
-	<data name="CATALOG.RECIPE_HAS_ACTIVE_BATCHES" xml:space="preserve"><value>Невозможно скрыть рецепт: по нему прямо сейчас есть активные или запланированные варки.</value></data>
-	<data name="CONFIRM_ARCHIVE_RAW_MATERIAL" xml:space="preserve"><value>Вы уверены, что хотите скрыть данное сырьё?</value></data>
-	<data name="CONFIRM_ARCHIVE_RECIPE" xml:space="preserve"><value>Вы уверены, что хотите скрыть этот рецепт?</value></data>
+	<data name="UI_RECIPES_LABEL_RAW_NAME" xml:space="preserve"><value>Название сырья:</value></data>
+	<data name="UI_RECIPES_LABEL_SELECT_UOM" xml:space="preserve"><value>Выберите ед. изм.:</value></data>
+	<data name="UI_RECIPES_LABEL_RECIPE_NAME" xml:space="preserve"><value>Название рецепта:</value></data>
+	<data name="UI_RECIPES_LABEL_TARGET_OUTPUT" xml:space="preserve"><value>Базовый выход рецепта (кг/л):</value></data>
+	<data name="UI_RECIPES_LABEL_IS_AGING_REQUIRED" xml:space="preserve"><value>Требуется созревание</value></data>
+	<data name="UI_RECIPES_LABEL_INGREDIENTS_SECTION" xml:space="preserve"><value>СОСТАВ РЕЦЕПТА</value></data>
 
-	<!-- ========================================== -->
-	<!-- 2.2: ИНФРАСТРУКТУРА И ОБОРУДОВАНИЕ        -->
-	<!-- ========================================== -->
-	<data name="TITLE_STORAGE" xml:space="preserve"><value>Помещения и Оборудование</value></data>
-	<data name="WAREHOUSES_HEADER" xml:space="preserve"><value>Помещения</value></data>
-	<data name="HEADER_AGING_CHAMBERS" xml:space="preserve"><value>Камеры созревания</value></data>
-	<data name="HEADER_EQUIPMENT" xml:space="preserve"><value>Емкости, танки и стеллажи</value></data>
-	<data name="WAREHOUSE_NAME" xml:space="preserve"><value>Название склада</value></data>
-	<data name="AGING_CHAMBER_NAME" xml:space="preserve"><value>Название камеры</value></data>
-	<data name="BTN_CREATE_EQUIPMENT" xml:space="preserve"><value>Добавить оборудование</value></data>
-	<data name="LABEL_EQUIPMENT_NAME" xml:space="preserve"><value>Название</value></data>
-	<data name="LABEL_TYPE" xml:space="preserve"><value>Тип</value></data>
-	<data name="LABEL_PARENT_LOCATION" xml:space="preserve"><value>Локация</value></data>
-	<data name="LABEL_VOLUME" xml:space="preserve"><value>Объем / Вместимость</value></data>
-	<data name="LABEL_ADDRESS" xml:space="preserve"><value>Адрес:</value></data>
-	<data name="LABEL_TEMP_SHORT" xml:space="preserve"><value>Т, °C:</value></data>
-	<data name="LABEL_HUMIDITY_SHORT" xml:space="preserve"><value>Вл, %:</value></data>
-	<data name="LABEL_ZONE_TYPE" xml:space="preserve"><value>Тип зоны:</value></data>
-	<data name="TYPE_WAREHOUSE" xml:space="preserve"><value>Склад</value></data>
-	<data name="TYPE_BREWHOUSE" xml:space="preserve"><value>Варочный цех</value></data>
-	<data name="LABEL_TOTAL_EQUIPMENT" xml:space="preserve"><value>Всего ёмкостей: </value></data>
-	<data name="LABEL_WASH_SOON" xml:space="preserve"><value>⚠️ Скоро мойка: </value></data>
-	<data name="LABEL_WASH_OVERDUE" xml:space="preserve"><value>🚨 Просрочено: </value></data>
-	<data name="TOOLTIP_SEARCH_FILTER" xml:space="preserve"><value>Поиск по названию, типу или локации</value></data>
-	<data name="FILTER_STATUS_ALL" xml:space="preserve"><value>Все статусы</value></data>
-	<data name="FILTER_STATUS_OK" xml:space="preserve"><value>🟢 В норме (ОК)</value></data>
-	<data name="FILTER_STATUS_WARNING" xml:space="preserve"><value>⚠️ Скоро мойка</value></data>
-	<data name="FILTER_STATUS_OVERDUE" xml:space="preserve"><value>🚨 Просрочено</value></data>
-	<data name="LABEL_PREV_WASH" xml:space="preserve"><value>Пред. мойка</value></data>
-	<data name="LABEL_NEXT_WASH" xml:space="preserve"><value>Срок мойки</value></data>
-	<data name="LABEL_WASH_STATUS" xml:space="preserve"><value>Статус мойки</value></data>
-	<data name="LABEL_ACTIONS" xml:space="preserve"><value>Действия</value></data>
-	<data name="MENU_SANITATION_PLAN" xml:space="preserve"><value>Планирование мойки</value></data>
-	<data name="MENU_SANITATION_DETAILS" xml:space="preserve"><value>Мойка и История</value></data>
-	<data name="MENU_DELETE" xml:space="preserve"><value>Удалить</value></data>
+	<data name="UI_RECIPES_BTN_CREATE_RAW" xml:space="preserve"><value>Добавить сырьё</value></data>
+	<data name="UI_RECIPES_BTN_ADD_INGREDIENT" xml:space="preserve"><value>Добавить</value></data>
+	<data name="UI_RECIPES_BTN_CREATE_RECIPE" xml:space="preserve"><value>Сохранить рецепт</value></data>
 
-	<!-- Удаление объектов инфраструктуры -->
-	<data name="CONFIRM_DELETE_WAREHOUSE" xml:space="preserve"><value>Вы уверены, что хотите удалить этот склад?</value></data>
-	<data name="CONFIRM_DELETE_CHAMBER" xml:space="preserve"><value>Вы уверены, что хотите удалить эту камеру?</value></data>
-	<data name="CONFIRM_DELETE_LOCATION" xml:space="preserve"><value>Вы уверены, что хотите удалить это оборудование?</value></data>
+	<data name="UI_RECIPES_CHECKBOX_SHOW_ARCHIVED" xml:space="preserve"><value>Показать скрытые</value></data>
+
+	<data name="UI_RECIPES_MSG_INGREDIENT_ADDED_FMT" xml:space="preserve"><value>Добавлено: {0} — {1}</value></data>
+	<data name="UI_RECIPES_CONFIRM_ARCHIVE_RAW" xml:space="preserve"><value>Вы уверены, что хотите скрыть данное сырьё?</value></data>
+	<data name="UI_RECIPES_CONFIRM_ARCHIVE_RECIPE" xml:space="preserve"><value>Вы уверены, что хотите скрыть этот рецепт?</value></data>
 
 	<!-- ========================================== -->
-	<!-- ОБЩИЕ ЭЛЕМЕНТЫ ДИАЛОГОВ И МОДАЛОК          -->
+	<!-- 22. Контрол: Склады и Емкости (StorageControl) -->
 	<!-- ========================================== -->
-	<data name="CONFIRM_ACTION_TITLE" xml:space="preserve"><value>Подтверждение действия</value></data>
-	<data name="BTN_CANCEL" xml:space="preserve"><value>Отмена</value></data>
-	<data name="BTN_CONFIRM" xml:space="preserve"><value>Подтвердить</value></data>
+	<data name="UI_STORAGE_HEADER_WAREHOUSES" xml:space="preserve"><value>Помещения</value></data>
+	<data name="UI_STORAGE_HEADER_CHAMBERS" xml:space="preserve"><value>Камеры созревания</value></data>
+	<data name="UI_STORAGE_HEADER_EQUIPMENT" xml:space="preserve"><value>Емкости, танки и стеллажи</value></data>
+
+	<data name="UI_STORAGE_LABEL_WAREHOUSE_NAME" xml:space="preserve"><value>Название склада</value></data>
+	<data name="UI_STORAGE_LABEL_CHAMBER_NAME" xml:space="preserve"><value>Название камеры</value></data>
+	<data name="UI_STORAGE_LABEL_ZONE_TYPE" xml:space="preserve"><value>Тип зоны:</value></data>
+	<data name="UI_STORAGE_LABEL_ADDRESS" xml:space="preserve"><value>Адрес:</value></data>
+	<data name="UI_STORAGE_LABEL_TEMP_SHORT" xml:space="preserve"><value>Т, °C:</value></data>
+	<data name="UI_STORAGE_LABEL_HUMIDITY_SHORT" xml:space="preserve"><value>Вл, %:</value></data>
+
+	<data name="UI_STORAGE_TYPE_WAREHOUSE" xml:space="preserve"><value>Склад</value></data>
+	<data name="UI_STORAGE_TYPE_BREWHOUSE" xml:space="preserve"><value>Варочный цех</value></data>
+
+	<data name="UI_STORAGE_LABEL_TOTAL_EQUIPMENT" xml:space="preserve"><value>Всего ёмкостей: </value></data>
+	<data name="UI_STORAGE_LABEL_WASH_SOON" xml:space="preserve"><value>⚠️ Скоро мойка: </value></data>
+	<data name="UI_STORAGE_LABEL_WASH_OVERDUE" xml:space="preserve"><value>🚨 Просрочено: </value></data>
+
+	<data name="UI_STORAGE_TOOLTIP_SEARCH" xml:space="preserve"><value>Поиск по названию, типу или локации</value></data>
+
+	<data name="UI_STORAGE_FILTER_STATUS_ALL" xml:space="preserve"><value>Все статусы</value></data>
+	<data name="UI_STORAGE_FILTER_STATUS_OK" xml:space="preserve"><value>🟢 В норме (ОК)</value></data>
+	<data name="UI_STORAGE_FILTER_STATUS_WARNING" xml:space="preserve"><value>⚠️ Скоро мойка</value></data>
+	<data name="UI_STORAGE_FILTER_STATUS_OVERDUE" xml:space="preserve"><value>🚨 Просрочено</value></data>
+
+	<data name="UI_STORAGE_COL_EQUIPMENT_NAME" xml:space="preserve"><value>Название</value></data>
+	<data name="UI_STORAGE_COL_TYPE" xml:space="preserve"><value>Тип</value></data>
+	<data name="UI_STORAGE_COL_PARENT_LOCATION" xml:space="preserve"><value>Локация</value></data>
+	<data name="UI_STORAGE_COL_VOLUME" xml:space="preserve"><value>Объем / Вместимость</value></data>
+	<data name="UI_STORAGE_COL_PREV_WASH" xml:space="preserve"><value>Пред. мойка</value></data>
+	<data name="UI_STORAGE_COL_NEXT_WASH" xml:space="preserve"><value>Срок мойки</value></data>
+	<data name="UI_STORAGE_COL_WASH_STATUS" xml:space="preserve"><value>Статус мойки</value></data>
+	<data name="UI_STORAGE_COL_ACTIONS" xml:space="preserve"><value>Действия</value></data>
+
+	<data name="UI_STORAGE_BTN_ADD_EQUIPMENT" xml:space="preserve"><value>Добавить оборудование</value></data>
+
+	<data name="UI_STORAGE_MENU_SANITATION_PLAN" xml:space="preserve"><value>Планирование мойки</value></data>
+	<data name="UI_STORAGE_MENU_SANITATION_DETAILS" xml:space="preserve"><value>Мойка и История</value></data>
+	<data name="UI_STORAGE_MENU_DELETE" xml:space="preserve"><value>Удалить</value></data>
+
+	<data name="UI_STORAGE_CONFIRM_DELETE_WAREHOUSE" xml:space="preserve"><value>Вы уверены, что хотите удалить этот склад?</value></data>
+	<data name="UI_STORAGE_CONFIRM_DELETE_CHAMBER" xml:space="preserve"><value>Вы уверены, что хотите удалить эту камеру?</value></data>
+	<data name="UI_STORAGE_CONFIRM_DELETE_LOCATION" xml:space="preserve"><value>Вы уверены, что хотите удалить это оборудование?</value></data>
+
+	<data name="UI_STORAGE_MSG_WAREHOUSE_CREATED_SUCCESS" xml:space="preserve"><value>Склад успешно создан!</value></data>
+	<data name="UI_STORAGE_MSG_CHAMBER_CREATED_SUCCESS" xml:space="preserve"><value>Камера выдержки успешно создана!</value></data>
+
+	<data name="UI_STORAGE_STATUS_OK" xml:space="preserve"><value>ОК</value></data>
+	<data name="UI_STORAGE_STATUS_OVERDUE" xml:space="preserve"><value>🚨 ПРОСРОЧЕНО</value></data>
+	<data name="UI_STORAGE_STATUS_WARNING" xml:space="preserve"><value>⚠️ СКОРО МОЙКА</value></data>
 
 	<!-- ========================================== -->
 	<!-- 3: Закупки и Поставки                      -->
@@ -370,65 +375,7 @@
 	<data name="MSG_DRAFT_DELETED_SUCCESS" xml:space="preserve"><value>Черновик варки удален</value></data>
 
 	<!-- ========================================== -->
-	<!-- 5: Варочный цех				            -->
-	<!-- ========================================== -->
-	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>CRAFTFLOW — Производство</value></data>
-	<data name="PRODUCTION_HEADER" xml:space="preserve"><value>Производство и Варочный цех</value></data>
-
-	<data name="TAB_BREWHOUSE" xml:space="preserve"><value>Варочный цех</value></data>
-	<data name="TAB_AGING" xml:space="preserve"><value>Созревание и Аффинаж</value></data>
-	<data name="TAB_DISCARD_ACTS" xml:space="preserve"><value>Брак и Списания</value></data>
-
-	<data name="GROUP_START_BATCH" xml:space="preserve"><value>Параметры запуска варки</value></data>
-	<data name="GROUP_RAW_REQUIREMENTS" xml:space="preserve"><value>Расчет потребности в сырье</value></data>
-	<data name="GROUP_PLANNED_BATCHES" xml:space="preserve"><value>Запланированные варки (Черновики)</value></data>
-	<data name="GROUP_ACTIVE_BATCHES" xml:space="preserve"><value>Варки в процессе</value></data>
-	<data name="GROUP_COMPLETE_BATCH" xml:space="preserve"><value>Завершение варки</value></data>
-	<data name="GROUP_BATCH_COSTING" xml:space="preserve"><value>Калькуляция себестоимости</value></data>
-
-	<data name="LABEL_BATCH_CODE" xml:space="preserve"><value>Код / Наименование партии:</value></data>
-	<data name="LABEL_SELECT_RECIPE" xml:space="preserve"><value>Выберите Рецептуру:</value></data>
-	<data name="LABEL_RAW_WAREHOUSE" xml:space="preserve"><value>Склад списания сырья:</value></data>
-	<data name="LABEL_DEST_WAREHOUSE" xml:space="preserve"><value>Склад зачисления продукции:</value></data>
-	<data name="LABEL_PLANNED_OUTPUT" xml:space="preserve"><value>Планируемый объём (кг/л):</value></data>
-	<data name="LABEL_SCHEDULED_DATE" xml:space="preserve"><value>Запланированная дата старта</value></data>
-	<data name="LABEL_SCHEDULED_TIME" xml:space="preserve"><value>Время (ЧЧ:ММ)</value></data>
-	<data name="LABEL_ESTIMATED_RAW_COST" xml:space="preserve"><value>Предварительная себестоимость сырья:</value></data>
-	<data name="LABEL_ACTIVE_BATCH" xml:space="preserve"><value>Выберите активную варку (В процессе):</value></data>
-	<data name="LABEL_COMPLETE_BATCH_NAME" xml:space="preserve"><value>Наименование готовой партии / Маркировка:</value></data>
-	<data name="LABEL_ACTUAL_OUTPUT" xml:space="preserve"><value>Фактический вес (кг/л):</value></data>
-	<data name="LABEL_UNITS_COUNT" xml:space="preserve"><value>Кол-во тар / мест (опц.):</value></data>
-	<data name="LABEL_RAW_COST" xml:space="preserve"><value>Себестоимость сырья:</value></data>
-	<data name="LABEL_OVERHEAD_COST" xml:space="preserve"><value>Накладные расходы:</value></data>
-	<data name="LABEL_TOTAL_COST" xml:space="preserve"><value>Итоговая себестоимость:</value></data>
-	<data name="LABEL_UNIT_COST" xml:space="preserve"><value>Себестоимость за 1 кг/л:</value></data>
-
-	<data name="CHECKBOX_OVERHEAD" xml:space="preserve"><value>Учесть накладные расходы</value></data>
-	<data name="BTN_CALC_MAX" xml:space="preserve"><value>Максимум по остаткам</value></data>
-	<data name="BTN_PRINT_CARD" xml:space="preserve"><value>Печать тех. карты</value></data>
-	<data name="BTN_START_BATCH" xml:space="preserve"><value>Запустить Варку</value></data>
-	<data name="BTN_PLAN_BATCH" xml:space="preserve"><value>Запланировать (в Черновик)</value></data>
-	<data name="BTN_COMPLETE_BATCH" xml:space="preserve"><value>Завершить Варку</value></data>
-
-	<data name="COLUMN_BATCH_CODE" xml:space="preserve"><value>Код партии</value></data>
-	<data name="COLUMN_BATCH_NAME" xml:space="preserve"><value>Партия</value></data>
-	<data name="COLUMN_RECIPE" xml:space="preserve"><value>Рецептура</value></data>
-	<data name="COLUMN_VOLUME" xml:space="preserve"><value>Объём</value></data>
-	<data name="COLUMN_PLANNED_QTY" xml:space="preserve"><value>План (кг)</value></data>
-	<data name="COLUMN_SCHEDULED_AT" xml:space="preserve"><value>Запланировано на</value></data>
-	<data name="COLUMN_STARTED_AT" xml:space="preserve"><value>Старт</value></data>
-	<data name="COLUMN_COUNTDOWN" xml:space="preserve"><value>До старта</value></data>
-	<data name="COLUMN_ELAPSED" xml:space="preserve"><value>Прошло времени</value></data>
-	<data name="COLUMN_TARGET_DURATION" xml:space="preserve"><value>План (мин)</value></data>
-	<data name="COLUMN_ACTIONS" xml:space="preserve"><value>Действия</value></data>
-
-	<data name="TOOLTIP_START" xml:space="preserve"><value>Запустить варку</value></data>
-	<data name="TOOLTIP_DELETE" xml:space="preserve"><value>Удалить черновик</value></data>
-	<data name="MSG_BATCH_PLANNED_SUCCESS" xml:space="preserve"><value>Партия успешно запланирована!</value></data>
-	<data name="MSG_DRAFT_DELETED_SUCCESS" xml:space="preserve"><value>Черновик успешно удален!</value></data>
-
-	<!-- ========================================== -->
-	<!-- 11. Profile						        -->
+	<!-- Profile						        -->
 	<!-- ========================================== -->
 	<data name="UI_TITLE_PROFILE_PAGE" xml:space="preserve"><value>Управление аккаунтом и организацией</value></data>
 	<data name="UI_HEADER_PROFILE_DATA" xml:space="preserve"><value>Данные профиля</value></data>
@@ -503,85 +450,132 @@
 	<data name="UI_PLAN_PRO_DISPLAY" xml:space="preserve"><value>Professional (Безлимит)</value></data>
 
 	<!-- ========================================== -->
-	<!-- 5.1: Созревание и Аффинаж                  -->
+	<!-- 16. Главная страница производства         -->
 	<!-- ========================================== -->
-	<data name="GROUP_TRANSFER_AGING" xml:space="preserve"><value>Перемещение на созревание</value></data>
-	<data name="LABEL_COMPLETED_BATCH" xml:space="preserve"><value>Выбор завершённой варки:</value></data>
-	<data name="LABEL_AGING_CHAMBER" xml:space="preserve"><value>Выбор Климатической Камеры:</value></data>
-	<data name="LABEL_AGING_LOT_NAME" xml:space="preserve"><value>Маркировка лота на созревании:</value></data>
-	<data name="LABEL_MIN_AGING_DAYS" xml:space="preserve"><value>Срок выдержки (дней):</value></data>
-	<data name="BTN_TRANSFER_AGING" xml:space="preserve"><value>Разместить в Камеру</value></data>
+	<data name="UI_TITLE_PRODUCTION" xml:space="preserve"><value>CRAFTFLOW — Производство</value></data>
+	<data name="UI_PRODUCTION_HEADER" xml:space="preserve"><value>Производство и Варочный цех</value></data>
 
-	<data name="GROUP_ACTIVE_AGING_LOTS" xml:space="preserve"><value>Текущие партии в камерах созревания</value></data>
-	<data name="COLUMN_LOT_BATCH" xml:space="preserve"><value>Партия / Лот</value></data>
-	<data name="COLUMN_CHAMBER" xml:space="preserve"><value>Камера</value></data>
-	<data name="COLUMN_CURRENT_STOCK" xml:space="preserve"><value>Масса (кг)</value></data>
-	<data name="COLUMN_UNITS_COUNT" xml:space="preserve"><value>Голов / Штук</value></data>
-	<data name="COLUMN_DAYS_IN_CHAMBER" xml:space="preserve"><value>Дней в камере</value></data>
-	<data name="COLUMN_TARGET_DAYS" xml:space="preserve"><value>План (дней)</value></data>
-	<data name="COLUMN_IS_READY" xml:space="preserve"><value>Готово</value></data>
-
-	<data name="GROUP_RELEASE_AGING" xml:space="preserve"><value>Извлечение из камеры созревания</value></data>
-	<data name="LABEL_ACTIVE_AGING_LOT" xml:space="preserve"><value>Выберите партию в камере:</value></data>
-	<data name="LABEL_TARGET_WAREHOUSE" xml:space="preserve"><value>Склад зачисления сыра:</value></data>
-	<data name="LABEL_TARGET_LOCATIONS" xml:space="preserve"><value>Ячейки хранения на складе:</value></data>
-	<data name="LABEL_RELEASE_LOT_NAME" xml:space="preserve"><value>Маркировка готовой партии / Лота:</value></data>
-	<data name="LABEL_FINAL_WEIGHT" xml:space="preserve"><value>Фактический вес после усушки (кг):</value></data>
-	<data name="LABEL_UNITS_COUNT" xml:space="preserve"><value>Кол-во тар / мест (шт.):</value></data>
-	<data name="LABEL_UNIT_COST_KG" xml:space="preserve"><value>Расчетная себестоимость за 1 кг:</value></data>
-	<data name="LABEL_SELLING_PRICE_KG" xml:space="preserve"><value>Цена продажи за 1 кг:</value></data>
-	<data name="BTN_RELEASE_AGING" xml:space="preserve"><value>Выпустить в Продажу</value></data>
-	<data name="LABEL_CALCULATED_UNIT_COST" xml:space="preserve"><value>Расчетная себестоимость за 1 {0}:</value></data>
-	<data name="LABEL_SELLING_PRICE_PER_UNIT" xml:space="preserve"><value>Цена продажи за 1 {0}:</value></data>
-	<data name="LABEL_ACTIVE_AGING_LOT" xml:space="preserve"><value>Выберите партию из камеры</value></data>
-	<data name="SELECT_WAREHOUSE" xml:space="preserve"><value>Выберите склад зачисления</value></data>
+	<data name="UI_TAB_BREWHOUSE" xml:space="preserve"><value>Варочный цех</value></data>
+	<data name="UI_TAB_AGING" xml:space="preserve"><value>Созревание и Аффинаж</value></data>
+	<data name="UI_TAB_DISCARD_ACTS" xml:space="preserve"><value>Брак и Списания</value></data>
 
 	<!-- ========================================== -->
-	<!-- 5.2: Брак и Списания                       -->
+	<!-- 17. Контрол: Варочный цех (BrewhouseControl)-->
 	<!-- ========================================== -->
-	<data name="GROUP_DISCARD_IN_KETTLE" xml:space="preserve"><value>Списание варки из котла</value></data>
-	<data name="LABEL_SELECT_ACTIVE_BATCH" xml:space="preserve"><value>Выберите активную варку:</value></data>
-	<data name="LABEL_DISCARD_REASON" xml:space="preserve"><value>Причина списания:</value></data>
-	<data name="BTN_DISCARD_BATCH_SUBMIT" xml:space="preserve"><value>Списать варку</value></data>
-	<data name="GROUP_DISCARD_AGING_LOTS" xml:space="preserve"><value>Списание с камер созревания</value></data>
-	<data name="COLUMN_LOT_BATCH" xml:space="preserve"><value>Партия / Лот</value></data>
-	<data name="COLUMN_CHAMBER" xml:space="preserve"><value>Камера</value></data>
-	<data name="COLUMN_CURRENT_STOCK" xml:space="preserve"><value>Масса (кг/л)</value></data>
-	<data name="COLUMN_UNITS_COUNT" xml:space="preserve"><value>Голов / Штук</value></data>
-	<data name="COLUMN_DAYS_IN_AGING" xml:space="preserve"><value>Дней на выдержке</value></data>
-	<data name="COLUMN_ACTION" xml:space="preserve"><value>Действие</value></data>
-	<data name="BTN_DISCARD_ROW" xml:space="preserve"><value>Списать</value></data>
+	<data name="UI_BREWHOUSE_GROUP_START_BATCH" xml:space="preserve"><value>Параметры запуска варки</value></data>
+	<data name="UI_BREWHOUSE_GROUP_ACTIVE_BATCHES" xml:space="preserve"><value>Варки в процессе</value></data>
+	<data name="UI_BREWHOUSE_GROUP_RAW_REQUIREMENTS" xml:space="preserve"><value>Расчет потребности в сырье</value></data>
+	<data name="UI_BREWHOUSE_GROUP_COMPLETE_BATCH" xml:space="preserve"><value>Завершение варки</value></data>
+
+	<data name="UI_BREWHOUSE_LABEL_BATCH_CODE" xml:space="preserve"><value>Код / Наименование партии:</value></data>
+	<data name="UI_BREWHOUSE_LABEL_SELECT_RECIPE" xml:space="preserve"><value>Выберите Рецептуру:</value></data>
+	<data name="UI_BREWHOUSE_LABEL_RAW_WAREHOUSE" xml:space="preserve"><value>Склад списания сырья:</value></data>
+	<data name="UI_BREWHOUSE_LABEL_BREWERY_ROOM" xml:space="preserve"><value>Варочное помещение / Цех:</value></data>
+	<data name="UI_BREWHOUSE_LABEL_BREWING_VESSEL" xml:space="preserve"><value>Варочная ёмкость / котел:</value></data>
+	<data name="UI_BREWHOUSE_LABEL_DEST_WAREHOUSE" xml:space="preserve"><value>Склад зачисления продукции:</value></data>
+	<data name="UI_BREWHOUSE_LABEL_PLANNED_OUTPUT" xml:space="preserve"><value>Планируемый объём (кг/л):</value></data>
+
+	<data name="UI_BREWHOUSE_LABEL_ESTIMATED_RAW_COST" xml:space="preserve"><value>Предварительная себестоимость сырья:</value></data>
+	<data name="UI_BREWHOUSE_LABEL_ACTIVE_BATCH" xml:space="preserve"><value>Выберите активную варку (В процессе):</value></data>
+	<data name="UI_BREWHOUSE_LABEL_COMPLETE_BATCH_NAME" xml:space="preserve"><value>Наименование готовой партии / Маркировка:</value></data>
+	<data name="UI_BREWHOUSE_LABEL_ACTUAL_OUTPUT" xml:space="preserve"><value>Фактический вес (кг/л):</value></data>
+	<data name="UI_BREWHOUSE_LABEL_UNITS_COUNT" xml:space="preserve"><value>Кол-во тар / мест (опц.):</value></data>
+	<data name="UI_BREWHOUSE_LABEL_RAW_COST" xml:space="preserve"><value>Себестоимость сырья:</value></data>
+	<data name="UI_BREWHOUSE_LABEL_OVERHEAD_COST" xml:space="preserve"><value>Накладные расходы:</value></data>
+	<data name="UI_BREWHOUSE_LABEL_TOTAL_COST" xml:space="preserve"><value>Итоговая себестоимость:</value></data>
+	<data name="UI_BREWHOUSE_LABEL_UNIT_COST" xml:space="preserve"><value>Себестоимость за 1 кг/л:</value></data>
+	<data name="UI_BREWHOUSE_LABEL_FINISHED_PRODUCTS" xml:space="preserve"><value>Готовая продукция</value></data>
+
+	<data name="UI_BREWHOUSE_LABEL_RECIPE_DEFAULT" xml:space="preserve"><value>Технологическая карта</value></data>
+	<data name="UI_BREWHOUSE_TITLE_RECIPE_CARD" xml:space="preserve"><value>ТЕХНОЛОГИЧЕСКАЯ КАРТА</value></data>
+	<data name="UI_BREWHOUSE_LABEL_PRINT_DATE" xml:space="preserve"><value>Дата</value></data>
+	<data name="UI_BREWHOUSE_LABEL_VOLUME" xml:space="preserve"><value>Объем</value></data>
+	<data name="UI_BREWHOUSE_LABEL_REQ_NEED" xml:space="preserve"><value>Нужно</value></data>
+	<data name="UI_BREWHOUSE_LABEL_REQ_AVAIL" xml:space="preserve"><value>Доступно</value></data>
+
+	<data name="UI_BREWHOUSE_CHECKBOX_OVERHEAD" xml:space="preserve"><value>Учесть накладные расходы</value></data>
+	<data name="UI_BREWHOUSE_BTN_CALC_MAX" xml:space="preserve"><value>Максимум по остаткам</value></data>
+	<data name="UI_BREWHOUSE_BTN_START_BATCH" xml:space="preserve"><value>Запустить Варку</value></data>
+	<data name="UI_BREWHOUSE_BTN_PRINT_CARD" xml:space="preserve"><value>Печать тех. карты</value></data>
+	<data name="UI_BREWHOUSE_BTN_COMPLETE_BATCH" xml:space="preserve"><value>Завершить Варку</value></data>
+	<data name="UI_BREWHOUSE_TOOLTIP_ADD_VESSEL" xml:space="preserve"><value>Быстро добавить емкость/котел</value></data>
+
+	<data name="UI_BREWHOUSE_COL_BATCH_NAME" xml:space="preserve"><value>Партия</value></data>
+	<data name="UI_BREWHOUSE_COL_RECIPE" xml:space="preserve"><value>Рецептура</value></data>
+	<data name="UI_BREWHOUSE_COL_PLANNED_QTY" xml:space="preserve"><value>План (кг)</value></data>
+	<data name="UI_BREWHOUSE_COL_STARTED_AT" xml:space="preserve"><value>Старт</value></data>
+	<data name="UI_BREWHOUSE_COL_ELAPSED" xml:space="preserve"><value>Прошло времени</value></data>
+	<data name="UI_BREWHOUSE_COL_TARGET_DURATION" xml:space="preserve"><value>План (мин)</value></data>
+
+	<data name="UI_BREWHOUSE_MSG_BATCH_STARTED_SUCCESS" xml:space="preserve"><value>Варка успешно запущена!</value></data>
+	<data name="UI_BREWHOUSE_MSG_BATCH_COMPLETED_SUCCESS" xml:space="preserve"><value>Варка успешно завершена!</value></data>
+	<data name="UI_BREWHOUSE_MSG_MAX_CALCULATED_FMT" xml:space="preserve"><value>Максимальный объем по остаткам сырья: {0:F2}</value></data>
+	<data name="UI_BREWHOUSE_ERR_API_ACTIVE_BATCHES_FMT" xml:space="preserve"><value>Ошибка API активных варок: {0}</value></data>
+	<data name="UI_BREWHOUSE_ERR_EQUIPMENT_LOAD_FMT" xml:space="preserve"><value>Ошибка загрузки емкостей: {0}</value></data>
+	<data name="UI_BREWHOUSE_ERR_CALC_FMT" xml:space="preserve"><value>Ошибка расчета: {0}</value></data>
+	<data name="UI_BREWHOUSE_ERR_INSUFFICIENT_RAW_MATERIAL" xml:space="preserve"><value>Недостаточно сырья на выбранном складе!</value></data>
+	<data name="UI_BREWHOUSE_ERR_RECIPE_CARD_EMPTY" xml:space="preserve"><value>Нет данных по ингредиентам для печати тех. карты!</value></data>
 
 	<!-- ========================================== -->
-	<!-- 6. Production Page & Costing Labels        -->
+	<!-- 18. Созревание и Аффинаж (AgingControl)    -->
 	<!-- ========================================== -->
-	<data name="LABEL_BATCH_CODE" xml:space="preserve"><value>Код / Наименование партии:</value></data>
-	<data name="LABEL_SELECT_RECIPE" xml:space="preserve"><value>Выберите Рецептуру:</value></data>
-	<data name="LABEL_RAW_WAREHOUSE" xml:space="preserve"><value>Склад списания сырья:</value></data>
-	<data name="LABEL_DEST_WAREHOUSE" xml:space="preserve"><value>Склад зачисления продукции:</value></data>
-	<data name="LABEL_PLANNED_OUTPUT" xml:space="preserve"><value>Планируемый объём (кг/л):</value></data>
-	<data name="LABEL_ESTIMATED_COST" xml:space="preserve"><value>Предварительная себестоимость сырья:</value></data>
-	<data name="LABEL_ACTIVE_BATCH" xml:space="preserve"><value>Выберите активную варку (В процессе):</value></data>
-	<data name="LABEL_ACTUAL_OUTPUT" xml:space="preserve"><value>Фактический вес (кг/л):</value></data>
-	<data name="LABEL_TOTAL_RAW_COST" xml:space="preserve"><value>Затраты на сырье:</value></data>
-	<data name="LABEL_OVERHEAD_COST" xml:space="preserve"><value>Накладные расходы:</value></data>
-	<data name="LABEL_TOTAL_BATCH_COST" xml:space="preserve"><value>Итого стоимость партии:</value></data>
-	<data name="LABEL_UNIT_COST" xml:space="preserve"><value>Себестоимость за 1 кг/л:</value></data>
-	<data name="LABEL_USE_OVERHEAD" xml:space="preserve"><value>Накладные расходы</value></data>
-	<data name="LABEL_COMPLETED_BATCH" xml:space="preserve"><value>Выбор завершённой варки:</value></data>
-	<data name="LABEL_AGING_LOT_NAME" xml:space="preserve"><value>Маркировка лота на созревании:</value></data>
-	<data name="LABEL_AGING_CHAMBER" xml:space="preserve"><value>Выбор Климатической Камеры:</value></data>
-	<data name="LABEL_MIN_AGING_DAYS" xml:space="preserve"><value>Срок выдержки (дней):</value></data>
-	<data name="LABEL_ACTIVE_AGING_LOT" xml:space="preserve"><value>Выберите партию в камере:</value></data>
-	<data name="LABEL_TARGET_WAREHOUSE" xml:space="preserve"><value>Склад зачисления сыра:</value></data>
-	<data name="LABEL_FINAL_WEIGHT" xml:space="preserve"><value>Фактический вес после усушки (кг):</value></data>
-	<data name="LABEL_UNIT_PRICE" xml:space="preserve"><value>Отпускная цена за ед.:</value></data>
-	<data name="LABEL_DISCARD_BATCH" xml:space="preserve"><value>Выберите бракованную партию:</value></data>
-	<data name="LABEL_DISCARD_REASON" xml:space="preserve"><value>Причина списания:</value></data>
-	<data name="LABEL_UNIT_PRICE_DYNAMIC" xml:space="preserve"><value>Отпускная цена / Себестоимость ({0}):</value></data>
-	<data name="LABEL_UNITS_COUNT" xml:space="preserve"><value>Кол-во штук / головок:</value></data>
-	<data name="LABEL_CALCULATED_UNIT_COST" xml:space="preserve"><value>Рассчитанная себестоимость 1 {0}:</value></data>
-	<data name="LABEL_SELLING_PRICE_PER_UNIT" xml:space="preserve"><value>Отпускная цена (за 1 {0}):</value></data>
+	<data name="UI_AGING_GROUP_TRANSFER" xml:space="preserve"><value>Перемещение на созревание</value></data>
+	<data name="UI_AGING_LABEL_COMPLETED_BATCH" xml:space="preserve"><value>Выбор завершённой варки:</value></data>
+	<data name="UI_AGING_LABEL_CHAMBER" xml:space="preserve"><value>Выбор Климатической Камеры:</value></data>
+	<data name="UI_AGING_LABEL_LOT_NAME" xml:space="preserve"><value>Маркировка лота на созревании:</value></data>
+	<data name="UI_AGING_LABEL_MIN_DAYS" xml:space="preserve"><value>Срок выдержки (дней):</value></data>
+	<data name="UI_AGING_BTN_TRANSFER" xml:space="preserve"><value>Разместить в Камеру</value></data>
+
+	<data name="UI_AGING_GROUP_ACTIVE_LOTS" xml:space="preserve"><value>Текущие партии в камерах созревания</value></data>
+	<data name="UI_AGING_COL_LOT_BATCH" xml:space="preserve"><value>Партия / Лот</value></data>
+	<data name="UI_AGING_COL_CHAMBER" xml:space="preserve"><value>Камера</value></data>
+	<data name="UI_AGING_COL_CURRENT_STOCK" xml:space="preserve"><value>Масса (кг)</value></data>
+	<data name="UI_AGING_COL_UNITS_COUNT" xml:space="preserve"><value>Голов / Штук</value></data>
+	<data name="UI_AGING_COL_DAYS_IN_CHAMBER" xml:space="preserve"><value>Дней в камере</value></data>
+	<data name="UI_AGING_COL_TARGET_DAYS" xml:space="preserve"><value>План (дней)</value></data>
+	<data name="UI_AGING_COL_IS_READY" xml:space="preserve"><value>Готово</value></data>
+
+	<data name="UI_AGING_GROUP_RELEASE" xml:space="preserve"><value>Извлечение из камеры созревания</value></data>
+	<data name="UI_AGING_LABEL_ACTIVE_LOT" xml:space="preserve"><value>Выберите партию в камере:</value></data>
+	<data name="UI_AGING_LABEL_TARGET_WAREHOUSE" xml:space="preserve"><value>Склад зачисления сыра:</value></data>
+	<data name="UI_AGING_LABEL_TARGET_LOCATIONS" xml:space="preserve"><value>Ячейки хранения на складе:</value></data>
+	<data name="UI_AGING_LABEL_RELEASE_LOT_NAME" xml:space="preserve"><value>Маркировка готовой партии / Лота:</value></data>
+	<data name="UI_AGING_LABEL_FINAL_WEIGHT" xml:space="preserve"><value>Фактический вес после усушки (кг):</value></data>
+	<data name="UI_AGING_LABEL_UNITS_COUNT" xml:space="preserve"><value>Кол-во тар / мест (шт.):</value></data>
+	<data name="UI_AGING_LABEL_UNIT_COST_KG" xml:space="preserve"><value>Расчетная себестоимость за 1 кг:</value></data>
+	<data name="UI_AGING_LABEL_SELLING_PRICE_KG" xml:space="preserve"><value>Цена продажи за 1 кг:</value></data>
+	<data name="UI_AGING_BTN_RELEASE" xml:space="preserve"><value>Выпустить в Продажу</value></data>
+
+	<data name="UI_AGING_LABEL_FREE_CAPACITY_PREFIX" xml:space="preserve"><value>(Свободно: </value></data>
+	<data name="UI_AGING_LABEL_FREE_CAPACITY_SUFFIX" xml:space="preserve"><value>)</value></data>
+
+	<data name="UI_AGING_LABEL_CALCULATED_UNIT_COST_FMT" xml:space="preserve"><value>Расчетная себестоимость за 1 {0}:</value></data>
+	<data name="UI_AGING_LABEL_SELLING_PRICE_PER_UNIT_FMT" xml:space="preserve"><value>Цена продажи за 1 {0}:</value></data>
+
+	<data name="UI_AGING_ERR_SELECT_LOT" xml:space="preserve"><value>Выберите партию из камеры!</value></data>
+	<data name="UI_AGING_ERR_SELECT_WAREHOUSE" xml:space="preserve"><value>Выберите склад зачисления!</value></data>
+	<data name="UI_AGING_MSG_TRANSFER_SUCCESS" xml:space="preserve"><value>Партия успешно размещена на созревание!</value></data>
+	<data name="UI_AGING_MSG_RELEASE_SUCCESS" xml:space="preserve"><value>Партия успешно выпущена в продажу!</value></data>
+
+	<!-- ========================================== -->
+	<!-- 19. Брак и Списания (DiscardActsControl)   -->
+	<!-- ========================================== -->
+	<data name="UI_DISCARD_GROUP_KETTLE" xml:space="preserve"><value>Списание варки из котла</value></data>
+	<data name="UI_DISCARD_LABEL_SELECT_BATCH" xml:space="preserve"><value>Выберите активную варку:</value></data>
+	<data name="UI_DISCARD_LABEL_REASON" xml:space="preserve"><value>Причина списания:</value></data>
+	<data name="UI_DISCARD_BTN_SUBMIT_BATCH" xml:space="preserve"><value>Списать варку</value></data>
+
+	<data name="UI_DISCARD_GROUP_AGING_LOTS" xml:space="preserve"><value>Списание с камер созревания</value></data>
+	<data name="UI_DISCARD_COL_LOT_BATCH" xml:space="preserve"><value>Партия / Лот</value></data>
+	<data name="UI_DISCARD_COL_CHAMBER" xml:space="preserve"><value>Камера</value></data>
+	<data name="UI_DISCARD_COL_CURRENT_STOCK" xml:space="preserve"><value>Масса (кг/л)</value></data>
+	<data name="UI_DISCARD_COL_UNITS_COUNT" xml:space="preserve"><value>Голов / Штук</value></data>
+	<data name="UI_DISCARD_COL_DAYS_IN_AGING" xml:space="preserve"><value>Дней на выдержке</value></data>
+	<data name="UI_DISCARD_COL_ACTION" xml:space="preserve"><value>Действие</value></data>
+	<data name="UI_DISCARD_BTN_ROW" xml:space="preserve"><value>Списать</value></data>
+
+	<data name="UI_DISCARD_MSG_BATCH_SUCCESS" xml:space="preserve"><value>Акт списания варки успешно оформлен!</value></data>
+	<data name="UI_DISCARD_MSG_LOT_SUCCESS" xml:space="preserve"><value>Списание партии с камеры созревания прошло успешно!</value></data>
 
 	<!-- ========================================== -->
 	<!-- 7. Select ComboBox Options                 -->
@@ -630,14 +624,6 @@
 	<data name="COL_ACTION" xml:space="preserve"><value>Действие</value></data>
 	<data name="COL_DETAILS" xml:space="preserve"><value>Детали</value></data>
 	<data name="COL_CREATED_AT" xml:space="preserve"><value>Дата / Время (UTC)</value></data>
-
-	<!-- ========================================== -->
-	<!-- 11. Traceability Template Formats          -->
-	<!-- ========================================== -->
-	<data name="TRACE_BATCH_TITLE" xml:space="preserve"><value>Варка #{0}</value></data>
-	<data name="TRACE_BATCH_DETAILS" xml:space="preserve"><value>Статус: {0} | Запущена: {1:dd.MM.yyyy}</value></data>
-	<data name="TRACE_AGING_TITLE" xml:space="preserve"><value>Камера: {0}</value></data>
-	<data name="TRACE_AGING_DETAILS" xml:space="preserve"><value>Партия: {0} ({1})</value></data>
 
 	<!-- ========================================== -->
 	<!-- 12. UI & Status Messages                   -->
