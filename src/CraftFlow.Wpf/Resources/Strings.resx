@@ -325,6 +325,42 @@
 	<data name="DASH_PERIOD_REVENUE" xml:space="preserve"><value>Period Revenue</value></data>
 
 	<!-- ========================================== -->
+	<!-- MRP & Batch Planning                       -->
+	<!-- ========================================== -->
+	<data name="TITLE_MRP" xml:space="preserve"><value>Material Requirements Planning (MRP)</value></data>
+	<data name="TAB_MRP_CALC" xml:space="preserve"><value>MRP Calculation</value></data>
+	<data name="TAB_BATCH_PLANNING" xml:space="preserve"><value>Batch Scheduling</value></data>
+	<data name="CALCULATE_MRP" xml:space="preserve"><value>Calculate MRP</value></data>
+	<data name="LABEL_SUPPLIER" xml:space="preserve"><value>Supplier:</value></data>
+	<data name="LABEL_RECEIVING_WAREHOUSE" xml:space="preserve"><value>Raw Receiving Warehouse:</value></data>
+	<data name="BTN_CREATE_PURCHASE_ORDER" xml:space="preserve"><value>Create Purchase Order</value></data>
+	<data name="RAW_MATERIAL_NAME" xml:space="preserve"><value>Raw Material / Ingredient</value></data>
+	<data name="QUANTITY" xml:space="preserve"><value>Required Quantity</value></data>
+	<data name="AVAILABLE_STOCK" xml:space="preserve"><value>Available Stock</value></data>
+	<data name="CALCULATED_REQUIREMENTS" xml:space="preserve"><value>Shortage (To Order)</value></data>
+	<data name="GROUP_PLAN_BATCH" xml:space="preserve"><value>Schedule New Batch</value></data>
+	<data name="GROUP_PLANNED_BATCHES" xml:space="preserve"><value>Scheduled Batches (Drafts)</value></data>
+	<data name="LABEL_BATCH_CODE" xml:space="preserve"><value>Batch Code / Name:</value></data>
+	<data name="LABEL_SELECT_RECIPE" xml:space="preserve"><value>Select Recipe:</value></data>
+	<data name="LABEL_RAW_WAREHOUSE" xml:space="preserve"><value>Raw Material Warehouse:</value></data>
+	<data name="LABEL_DEST_WAREHOUSE" xml:space="preserve"><value>Destination Warehouse:</value></data>
+	<data name="LABEL_PLANNED_OUTPUT" xml:space="preserve"><value>Planned Output Volume:</value></data>
+	<data name="LABEL_SCHEDULED_DATE" xml:space="preserve"><value>Schedule Date:</value></data>
+	<data name="LABEL_SCHEDULED_TIME" xml:space="preserve"><value>Schedule Time:</value></data>
+	<data name="BTN_PLAN_BATCH" xml:space="preserve"><value>Schedule Batch</value></data>
+	<data name="COLUMN_BATCH_CODE" xml:space="preserve"><value>Batch Code</value></data>
+	<data name="COLUMN_RECIPE" xml:space="preserve"><value>Recipe</value></data>
+	<data name="COLUMN_VOLUME" xml:space="preserve"><value>Volume</value></data>
+	<data name="COLUMN_SCHEDULED_AT" xml:space="preserve"><value>Scheduled For</value></data>
+	<data name="COLUMN_COUNTDOWN" xml:space="preserve"><value>Countdown</value></data>
+	<data name="COLUMN_ACTIONS" xml:space="preserve"><value>Actions</value></data>
+	<data name="TOOLTIP_START" xml:space="preserve"><value>Start batch now</value></data>
+	<data name="TOOLTIP_DELETE" xml:space="preserve"><value>Delete draft</value></data>
+	<data name="MSG_BATCH_PLANNED_SUCCESS" xml:space="preserve"><value>Batch successfully scheduled</value></data>
+	<data name="UI_BATCH_STARTED_SUCCESS" xml:space="preserve"><value>Batch successfully started</value></data>
+	<data name="MSG_DRAFT_DELETED_SUCCESS" xml:space="preserve"><value>Draft batch deleted</value></data>
+
+	<!-- ========================================== -->
 	<!-- 5: Production & Brewhouse                  -->
 	<!-- ========================================== -->
 	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>CRAFTFLOW — Production</value></data>

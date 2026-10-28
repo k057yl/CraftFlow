@@ -32,7 +32,7 @@
                     <!-- Форма оприходования -->
                     <GroupBox Grid.Row="0" Header="{loc:Loc Key=GROUP_RECEIVE_STOCK_LOT}" Padding="10" Margin="0,0,0,15">
                         <StackPanel>
-                            <!-- 1. ВЕРХНИЙ БЛОК (ЛЕВАЯ И ПРАВАЯ КОЛОНКИ) -->
+                            <!-- 1. ВЕРХНИЙ БЛОК -->
                             <Grid Margin="0,0,0,10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -140,7 +140,7 @@
                                 </StackPanel>
                             </Grid>
 
-                            <!-- 4. НИЖНИЙ БЛОК: ОБЪЕМ, ВЫБОР ЕИ И ПРИНЯТЬ ПАРТИЮ -->
+                            <!-- 4. НИЖНИЙ БЛОК -->
                             <Grid Margin="0,5,0,0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="180"/>
@@ -157,13 +157,13 @@
 
                                 <!-- Дропдаун с выбором ЕИ -->
                                 <StackPanel Grid.Column="1" Margin="0,0,15,0">
-                                    <TextBlock Text="Ед. изм." FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                    <TextBlock Text="{loc:Loc Key=UI_LABEL_UNIT_OF_MEASURE}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
                                     <ComboBox x:Name="UnitOfMeasureComboBox" Height="28" SelectedIndex="0" SelectionChanged="UnitOfMeasureComboBox_SelectionChanged">
-                                        <ComboBoxItem Content="{loc:Loc Key=UOM_L}" Tag="l"/>
-                                        <ComboBoxItem Content="{loc:Loc Key=UOM_ML}" Tag="ml"/>
-                                        <ComboBoxItem Content="{loc:Loc Key=UOM_KG}" Tag="kg"/>
-                                        <ComboBoxItem Content="{loc:Loc Key=UOM_G}" Tag="g"/>
-                                        <ComboBoxItem Content="{loc:Loc Key=UOM_PCS}" Tag="pcs"/>
+                                        <ComboBoxItem Content="{loc:Loc Key=UI_UOM_L}" Tag="l"/>
+                                        <ComboBoxItem Content="{loc:Loc Key=UI_UOM_ML}" Tag="ml"/>
+                                        <ComboBoxItem Content="{loc:Loc Key=UI_UOM_KG}" Tag="kg"/>
+                                        <ComboBoxItem Content="{loc:Loc Key=UI_UOM_G}" Tag="g"/>
+                                        <ComboBoxItem Content="{loc:Loc Key=UI_UOM_PCS}" Tag="pcs"/>
                                     </ComboBox>
                                 </StackPanel>
 
@@ -216,9 +216,9 @@
                                       HeadersVisibility="Column">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="{loc:Loc Key=LABEL_RAW_MATERIAL}" Binding="{Binding ItemName}" Width="150"/>
-                                    <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding WarehouseName}" Width="110"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=UI_COL_WAREHOUSE_NAME}" Binding="{Binding WarehouseName}" Width="110"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=LABEL_STORAGE_CONTAINERS}" Binding="{Binding StorageLocationsInfo}" Width="*"/>
-                                    <DataGridTextColumn Header="{loc:Loc Key=LABEL_SELECT_SUPPLIER}" Binding="{Binding SupplierName}" Width="120"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=LABEL_SUPPLIER_FILTER}" Binding="{Binding SupplierName}" Width="120"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=LABEL_REMAINING_STOCK}" Binding="{Binding Quantity, StringFormat={}{0:0.####}}" Width="100"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=UNIT_PRICE}" Binding="{Binding UnitPrice, StringFormat={}{0:C2}}" Width="85"/>
                                     <DataGridTextColumn Header="{loc:Loc Key=BATCH_NUMBER}" Binding="{Binding BatchNumber}" Width="110"/>
@@ -241,7 +241,7 @@
                                   HeadersVisibility="Column">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="{loc:Loc Key=LABEL_RAW_MATERIAL}" Binding="{Binding ItemName}" Width="150"/>
-                                <DataGridTextColumn Header="{loc:Loc Key=WAREHOUSE_NAME}" Binding="{Binding WarehouseName}" Width="120"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=UI_COL_WAREHOUSE_NAME}" Binding="{Binding WarehouseName}" Width="120"/>
                                 <DataGridTextColumn Header="{loc:Loc Key=LABEL_STORAGE_CONTAINERS}" Binding="{Binding StorageLocationsInfo}" Width="*"/>
                                 <DataGridTextColumn Header="{loc:Loc Key=LABEL_REMAINING_STOCK}" Binding="{Binding Quantity, StringFormat={}{0:0.####}}" Width="100"/>
                                 <DataGridTextColumn Header="{loc:Loc Key=BATCH_NUMBER}" Binding="{Binding BatchNumber}" Width="130"/>
@@ -280,7 +280,7 @@
                                 <TextBlock Text="{loc:Loc Key=SUPPLIER_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="NameTextBox" Height="28" Margin="0,0,0,8"/>
 
-                                <TextBlock Text="Юридическое наименование:" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBlock Text="{loc:Loc Key=UI_SUPPLIER_LEGAL_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="LegalNameTextBox" Height="28" Margin="0,0,0,8"/>
 
                                 <Grid Margin="0,0,0,8">
@@ -290,7 +290,7 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="0">
-                                        <TextBlock Text="ИНН / ЕДРПОУ:" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                        <TextBlock Text="{loc:Loc Key=UI_SUPPLIER_TAX_ID}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                         <TextBox x:Name="TaxIdTextBox" Height="28"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="2">
@@ -302,10 +302,10 @@
                                 <TextBlock Text="{loc:Loc Key=SUPPLIER_EMAIL}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="EmailTextBox" Height="28" Margin="0,0,0,8"/>
 
-                                <TextBlock Text="Адрес компании:" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBlock Text="{loc:Loc Key=UI_SUPPLIER_ADDRESS}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="AddressTextBox" Height="28" Margin="0,0,0,8"/>
 
-                                <TextBlock Text="Заметки / Условия работы:" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBlock Text="{loc:Loc Key=UI_SUPPLIER_NOTES}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="NotesTextBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Margin="0,0,0,12"/>
 
                                 <StackPanel Orientation="Horizontal">
@@ -317,7 +317,7 @@
                                             Click="SaveSupplier_Click"/>
 
                                     <Button x:Name="ResetFormButton" 
-                                            Content="Сброс" 
+                                            Content="{loc:Loc Key=UI_BTN_RESET}" 
                                             Visibility="Collapsed"
                                             Style="{StaticResource SecondaryButtonStyle}"
                                             Height="32"
@@ -330,7 +330,7 @@
                     </GroupBox>
 
                     <!-- СЕКЦИЯ B: ТАБЛИЦА С ПОСТАВЩИКАМИ -->
-                    <GroupBox Grid.Column="2" Header="Реестр поставщиков" Padding="10">
+                    <GroupBox Grid.Column="2" Header="{loc:Loc Key=UI_HEADER_SUPPLIERS_REGISTRY}" Padding="10">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -338,7 +338,7 @@
                             </Grid.RowDefinitions>
 
                             <CheckBox x:Name="ShowInactiveSuppliersCheckBox" 
-                                      Content="Показывать неактивных поставщиков" 
+                                      Content="{loc:Loc Key=UI_CHECK_SHOW_INACTIVE_SUPPLIERS}" 
                                       Visibility="{auth:HasPermission Permission=SUPPLIERS_MANAGE}"
                                       Margin="0,0,0,10" 
                                       Foreground="{DynamicResource AppForegroundBrush}"
@@ -352,19 +352,19 @@
                                       HeadersVisibility="Column"
                                       MouseDoubleClick="SuppliersDataGrid_MouseDoubleClick">
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="140"/>
-                                    <DataGridTextColumn Header="Юр. Имя" Binding="{Binding LegalName}" Width="120"/>
-                                    <DataGridTextColumn Header="ИНН / ЕДРПОУ" Binding="{Binding TaxId}" Width="90"/>
-                                    <DataGridTextColumn Header="Телефон" Binding="{Binding Phone}" Width="100"/>
-                                    <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="120"/>
-                                    <DataGridTextColumn Header="Адрес" Binding="{Binding Address}" Width="*"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=UI_COL_NAME}" Binding="{Binding Name}" Width="140"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=UI_COL_LEGAL_NAME}" Binding="{Binding LegalName}" Width="120"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=UI_COL_TAX_ID}" Binding="{Binding TaxId}" Width="90"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=UI_COL_PHONE}" Binding="{Binding Phone}" Width="100"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=UI_COL_EMAIL}" Binding="{Binding Email}" Width="120"/>
+                                    <DataGridTextColumn Header="{loc:Loc Key=UI_COL_ADDRESS}" Binding="{Binding Address}" Width="*"/>
 
-                                    <DataGridTemplateColumn x:Name="SupplierActionsColumn" Header="Действие" Width="170" Visibility="{auth:HasPermission Permission=SUPPLIERS_MANAGE}">
+                                    <DataGridTemplateColumn x:Name="SupplierActionsColumn" Header="{loc:Loc Key=LABEL_ACTION}" Width="170" Visibility="{auth:HasPermission Permission=SUPPLIERS_MANAGE}">
                                         <DataGridTemplateColumn.CellTemplate>
                                             <DataTemplate>
                                                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
                                                     <Button Content="✏️" 
-                                                            ToolTip="Редактировать"
+                                                            ToolTip="{loc:Loc Key=UI_TOOLTIP_EDIT}"
                                                             Click="EditSupplierRow_Click" 
                                                             Tag="{Binding}" 
                                                             Style="{StaticResource SecondaryButtonStyle}" 
@@ -387,6 +387,6 @@
             </TabItem>
         </TabControl>
 
-        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="0,10,0,0"/>
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=UI_STATUS_READY}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="0,10,0,0"/>
     </Grid>
 </Page>

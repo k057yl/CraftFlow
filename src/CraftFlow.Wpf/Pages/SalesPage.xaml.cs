@@ -1,6 +1,5 @@
 ﻿using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.Api.Modules.Sales;
-using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Sale;
 using CraftFlow.Wpf.Models;
@@ -12,6 +11,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -99,7 +99,11 @@ public partial class SalesPage : Page
     private const decimal DEFAULT_MARKUP_MULTIPLIER = 1.40m;
     private bool _isInitializing = true;
 
-    public SalesPage()
+    public SalesPage() : this(null)
+    {
+    }
+
+    public SalesPage(object? dummy = null)
     {
         InitializeComponent();
 
@@ -138,14 +142,14 @@ public partial class SalesPage : Page
 
             _isInitializing = false;
 
-            SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
+            SetStatus("UI_MSG_DATA_LOADED_SUCCESS", Brushes.Green);
 
             await RefreshWarehouseStockLotsAsync();
         }
         catch (Exception ex)
         {
             _isInitializing = false;
-            SetStatus($"{UiConstants.Messages.DATA_LOAD_ERROR}: {ex.Message}", Brushes.Red);
+            SetStatus($"{Get("UI_ERR_DATA_LOAD")}: {ex.Message}", Brushes.Red);
         }
     }
 
@@ -218,7 +222,7 @@ public partial class SalesPage : Page
 
             if (selectedUnits.Count == 0)
             {
-                SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+                SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
                 return;
             }
 
@@ -237,7 +241,8 @@ public partial class SalesPage : Page
         }
 
         decimal basePrice = lot.UnitPrice > 0 ? lot.UnitPrice * DEFAULT_MARKUP_MULTIPLIER : 450.00m;
-        string displayUnits = unitsCount > 0 ? $" ({unitsCount} шт.)" : string.Empty;
+        string unitsSuffix = Get("UI_LABEL_PCS_SUFFIX");
+        string displayUnits = unitsCount > 0 ? $" ({unitsCount} {unitsSuffix})" : string.Empty;
 
         var row = new InvoiceItemRow
         {
@@ -266,7 +271,7 @@ public partial class SalesPage : Page
     {
         if (string.IsNullOrWhiteSpace(CustomerNameTextBox.Text))
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -278,7 +283,7 @@ public partial class SalesPage : Page
 
         if (isSuccess)
         {
-            SetStatus(UiConstants.Messages.CUSTOMER_CREATED_SUCCESS, Brushes.Green);
+            SetStatus("UI_MSG_CUSTOMER_CREATED_SUCCESS", Brushes.Green);
             CustomerNameTextBox.Clear();
             CustomerPhoneTextBox.Clear();
 
@@ -296,13 +301,13 @@ public partial class SalesPage : Page
         if (OrderCustomerComboBox.SelectedValue is not Guid customerId ||
             OrderWarehouseComboBox.SelectedValue is not Guid warehouseId)
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
         if (InvoiceItems.Count == 0)
         {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
             return;
         }
 
@@ -322,7 +327,8 @@ public partial class SalesPage : Page
 
         if (isSuccess)
         {
-            SetStatus($"{UiConstants.Messages.ORDER_SHIPPED_SUCCESS} ID: {contentOrError}", Brushes.Green);
+            var msgFormat = Get("UI_MSG_ORDER_SHIPPED_SUCCESS_FMT");
+            SetStatus(string.Format(msgFormat, contentOrError), Brushes.Green);
 
             PrintInvoiceDocument(customerId, InvoiceItems.ToList(), contentOrError);
 
@@ -339,7 +345,7 @@ public partial class SalesPage : Page
     {
         try
         {
-            var customerName = (OrderCustomerComboBox.SelectedItem as LookupItem)?.Name ?? LocalizationService.Get("LABEL_SELECT_CUSTOMER");
+            var customerName = (OrderCustomerComboBox.SelectedItem as LookupItem)?.Name ?? Get("LABEL_SELECT_CUSTOMER");
 
             FlowDocument doc = new FlowDocument
             {
@@ -347,7 +353,7 @@ public partial class SalesPage : Page
                 ColumnWidth = double.PositiveInfinity
             };
 
-            Paragraph header = new Paragraph(new Run($"{LocalizationService.Get("TITLE_SALES")} № {orderId[..Math.Min(8, orderId.Length)].ToUpper()}"))
+            Paragraph header = new Paragraph(new Run($"{Get("TITLE_SALES")} № {orderId[..Math.Min(8, orderId.Length)].ToUpper()}"))
             {
                 FontSize = 18,
                 FontWeight = FontWeights.Bold,
@@ -356,7 +362,7 @@ public partial class SalesPage : Page
             };
             doc.Blocks.Add(header);
 
-            Paragraph info = new Paragraph(new Run($"{LocalizationService.Get("LABEL_PLANTED_DATE")}: {DateTime.Now:dd.MM.yyyy HH:mm}\n{LocalizationService.Get("LABEL_SELECT_CUSTOMER")}: {customerName}"))
+            Paragraph info = new Paragraph(new Run($"{Get("LABEL_PLANTED_DATE")}: {DateTime.Now:dd.MM.yyyy HH:mm}\n{Get("LABEL_SELECT_CUSTOMER")}: {customerName}"))
             {
                 FontSize = 12,
                 Margin = new Thickness(0, 0, 0, 15)
@@ -372,10 +378,10 @@ public partial class SalesPage : Page
             TableRowGroup group = new TableRowGroup();
 
             TableRow headerRow = new TableRow { Background = Brushes.LightGray };
-            headerRow.Cells.Add(new TableCell(new Paragraph(new Run(LocalizationService.Get("LABEL_SELECT_PRODUCT"))) { FontWeight = FontWeights.Bold }));
-            headerRow.Cells.Add(new TableCell(new Paragraph(new Run(LocalizationService.Get("LABEL_QTY_KG"))) { FontWeight = FontWeights.Bold }));
-            headerRow.Cells.Add(new TableCell(new Paragraph(new Run(LocalizationService.Get("LABEL_PRICE_PER_KG"))) { FontWeight = FontWeights.Bold }));
-            headerRow.Cells.Add(new TableCell(new Paragraph(new Run(LocalizationService.Get("LABEL_TOTAL_ORDER_SUM"))) { FontWeight = FontWeights.Bold }));
+            headerRow.Cells.Add(new TableCell(new Paragraph(new Run(Get("LABEL_SELECT_PRODUCT"))) { FontWeight = FontWeights.Bold }));
+            headerRow.Cells.Add(new TableCell(new Paragraph(new Run(Get("LABEL_QTY_KG"))) { FontWeight = FontWeights.Bold }));
+            headerRow.Cells.Add(new TableCell(new Paragraph(new Run(Get("LABEL_PRICE_PER_KG"))) { FontWeight = FontWeights.Bold }));
+            headerRow.Cells.Add(new TableCell(new Paragraph(new Run(Get("LABEL_TOTAL_ORDER_SUM"))) { FontWeight = FontWeights.Bold }));
             group.Rows.Add(headerRow);
 
             foreach (var item in items)
@@ -392,7 +398,7 @@ public partial class SalesPage : Page
             doc.Blocks.Add(table);
 
             decimal totalSum = items.Sum(i => i.TotalSum);
-            Paragraph total = new Paragraph(new Run($"\n{LocalizationService.Get("LABEL_TOTAL_ORDER_SUM")}: $ {totalSum:F2}"))
+            Paragraph total = new Paragraph(new Run($"\n{Get("LABEL_TOTAL_ORDER_SUM")}: $ {totalSum:F2}"))
             {
                 FontSize = 14,
                 FontWeight = FontWeights.Bold,
@@ -410,9 +416,9 @@ public partial class SalesPage : Page
         catch { }
     }
 
-    private void SetStatus(string msg, Brush color)
+    private void SetStatus(string msgKeyOrText, Brush color)
     {
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = LocalizationService.Get(msg);
+        StatusTextBlock.Text = Get(msgKeyOrText);
     }
 }

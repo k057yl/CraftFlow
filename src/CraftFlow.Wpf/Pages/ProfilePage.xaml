@@ -2,23 +2,24 @@
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
-      Title="ProfilePage">
+      xmlns:auth="clr-namespace:CraftFlow.Wpf.MarkupExtensions"
+      Title="{loc:Loc Key=UI_TITLE_PROFILE_PAGE}">
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <Border Padding="30">
             <StackPanel MaxWidth="800" HorizontalAlignment="Left">
-                <TextBlock Text="Управление аккаунтом и организацией" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,20"/>
+                <TextBlock Text="{loc:Loc Key=UI_TITLE_PROFILE_PAGE}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,20"/>
 
                 <!-- Данные профиля -->
                 <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
                     <StackPanel>
-                        <TextBlock Text="Данные профиля" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
+                        <TextBlock Text="{loc:Loc Key=UI_HEADER_PROFILE_DATA}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
 
                         <Grid Margin="0,0,0,10">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="160"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Имя:" Foreground="{DynamicResource AppForegroundBrush}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{loc:Loc Key=UI_LABEL_NAME}" Foreground="{DynamicResource AppForegroundBrush}" FontWeight="SemiBold"/>
                             <TextBlock Grid.Column="1" x:Name="NameTextBlock" Text="-" Foreground="{DynamicResource AppForegroundBrush}"/>
                         </Grid>
 
@@ -27,7 +28,7 @@
                                 <ColumnDefinition Width="160"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Email:" Foreground="{DynamicResource AppForegroundBrush}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{loc:Loc Key=UI_LABEL_EMAIL}" Foreground="{DynamicResource AppForegroundBrush}" FontWeight="SemiBold"/>
                             <TextBlock Grid.Column="1" x:Name="EmailTextBlock" Text="-" Foreground="{DynamicResource AppForegroundBrush}"/>
                         </Grid>
 
@@ -36,59 +37,59 @@
                                 <ColumnDefinition Width="160"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="Роль в системе:" Foreground="{DynamicResource AppForegroundBrush}" FontWeight="SemiBold"/>
+                            <TextBlock Text="{loc:Loc Key=UI_LABEL_SYSTEM_ROLE}" Foreground="{DynamicResource AppForegroundBrush}" FontWeight="SemiBold"/>
                             <TextBlock Grid.Column="1" x:Name="RoleTextBlock" Text="-" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold"/>
                         </Grid>
                     </StackPanel>
                 </Border>
 
                 <!-- Управление сотрудниками организации -->
-                <Border x:Name="TeamManagementBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
+                <Border x:Name="TeamManagementBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20" Visibility="{auth:HasPermission Permission=USERS_MANAGE}">
                     <StackPanel>
-                        <TextBlock Text="Управление сотрудниками организации" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
+                        <TextBlock Text="{loc:Loc Key=UI_HEADER_TEAM_MANAGEMENT}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
 
                         <WrapPanel Margin="0,0,0,15" VerticalAlignment="Center">
                             <StackPanel Margin="0,0,10,5">
-                                <TextBlock Text="ФИО:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBlock Text="{loc:Loc Key=UI_LABEL_FULL_NAME}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="NewUserFullNameTextBox" Width="150" Height="28"/>
                             </StackPanel>
 
                             <StackPanel Margin="0,0,10,5">
-                                <TextBlock Text="Email:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBlock Text="{loc:Loc Key=UI_LABEL_EMAIL}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <TextBox x:Name="NewUserEmailTextBox" Width="150" Height="28"/>
                             </StackPanel>
 
                             <StackPanel Margin="0,0,10,5">
-                                <TextBlock Text="Пароль:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBlock Text="{loc:Loc Key=UI_LABEL_PASSWORD}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <PasswordBox x:Name="NewUserPasswordBox" Width="120" Height="28"/>
                             </StackPanel>
 
                             <StackPanel Margin="0,0,10,5">
-                                <TextBlock Text="Роль:" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBlock Text="{loc:Loc Key=UI_LABEL_ROLE}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
                                 <ComboBox x:Name="NewUserRoleComboBox" Width="140" Height="28"/>
                             </StackPanel>
 
-                            <Button Content="Добавить сотрудника" Click="CreateTeamUser_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Padding="12,0" VerticalAlignment="Bottom" Margin="0,0,0,5"/>
+                            <Button Content="{loc:Loc Key=UI_BTN_ADD_EMPLOYEE}" Click="CreateTeamUser_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Padding="12,0" VerticalAlignment="Bottom" Margin="0,0,0,5"/>
                         </WrapPanel>
 
                         <!-- Список сотрудников -->
-                        <TextBlock Text="Список сотрудников:" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,10,0,10"/>
+                        <TextBlock Text="{loc:Loc Key=UI_HEADER_EMPLOYEES_LIST}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,10,0,10"/>
                         <DataGrid x:Name="TeamUsersDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Height="220">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="ФИО" Binding="{Binding FullName}" Width="160"/>
-                                <DataGridTextColumn Header="Email" Binding="{Binding Email}" Width="180"/>
-                                <DataGridTextColumn Header="Роль" Binding="{Binding RoleDisplay}" Width="150"/>
-                                <DataGridTextColumn Header="Статус" Binding="{Binding StatusDisplay}" Width="110"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=UI_COL_FULL_NAME}" Binding="{Binding FullName}" Width="160"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=UI_COL_EMAIL}" Binding="{Binding Email}" Width="180"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=UI_COL_ROLE}" Binding="{Binding RoleDisplay}" Width="150"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=UI_COL_STATUS}" Binding="{Binding StatusDisplay}" Width="110"/>
 
                                 <!-- Колонка с кнопкой управления -->
-                                <DataGridTemplateColumn Header="Действия" Width="*">
+                                <DataGridTemplateColumn Header="{loc:Loc Key=UI_COL_ACTIONS}" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <Button Content="{Binding ActionButtonText}" 
-                                                Click="ToggleUserStatus_Click" 
-                                                Tag="{Binding Id}"
-                                                IsEnabled="{Binding CanToggle}"
-                                                Height="24" Padding="8,0" FontSize="11" VerticalAlignment="Center"/>
+                                                    Click="ToggleUserStatus_Click" 
+                                                    Tag="{Binding Id}"
+                                                    IsEnabled="{Binding CanToggle}"
+                                                    Height="24" Padding="8,0" FontSize="11" VerticalAlignment="Center"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                 </DataGridTemplateColumn>
@@ -100,32 +101,32 @@
                 <!-- Управление подпиской и API ключами -->
                 <Border x:Name="SubscriptionManagementBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
                     <StackPanel>
-                        <TextBlock Text="Управление подпиской и API ключами" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
+                        <TextBlock Text="{loc:Loc Key=UI_HEADER_SUBSCRIPTION_API}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
 
                         <!-- Тестовая смена подписки -->
-                        <TextBlock Text="Выбор тарифного плана (Тестовый режим):" FontSize="12" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,5"/>
+                        <TextBlock Text="{loc:Loc Key=UI_LABEL_SELECT_PLAN_TEST}" FontSize="12" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,5"/>
                         <WrapPanel Margin="0,0,0,15" VerticalAlignment="Center">
                             <ComboBox x:Name="PlanComboBox" Width="200" Height="28" Margin="0,0,10,5"/>
-                            <Button Content="Активировать план" Click="ActivateSelectedPlan_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Padding="12,0" Margin="0,0,10,5"/>
+                            <Button Content="{loc:Loc Key=UI_BTN_ACTIVATE_PLAN}" Click="ActivateSelectedPlan_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Padding="12,0" Margin="0,0,10,5"/>
                         </WrapPanel>
 
                         <!-- API ключи -->
-                        <TextBlock Text="API ключи доступа:" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,10,0,10"/>
+                        <TextBlock Text="{loc:Loc Key=UI_HEADER_API_KEYS}" FontSize="14" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,10,0,10"/>
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,15">
-                            <TextBox x:Name="NewAccessKeyNameTextBox" Width="200" Height="28" Margin="0,0,10,0" ToolTip="Название ключа"/>
-                            <Button Content="Создать ключ" Click="GenerateAccessKey_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Padding="12,0"/>
+                            <TextBox x:Name="NewAccessKeyNameTextBox" Width="200" Height="28" Margin="0,0,10,0" ToolTip="{loc:Loc Key=UI_TOOLTIP_KEY_NAME}"/>
+                            <Button Content="{loc:Loc Key=UI_BTN_CREATE_KEY}" Click="GenerateAccessKey_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Padding="12,0"/>
                         </StackPanel>
 
                         <DataGrid x:Name="AccessKeysDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Height="180">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Название" Binding="{Binding Name}" Width="140"/>
-                                <DataGridTextColumn Header="Ключ" Binding="{Binding KeyPreview}" Width="220"/>
-                                <DataGridTextColumn Header="Статус" Binding="{Binding StatusDisplay}" Width="100"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=UI_COL_KEY_NAME}" Binding="{Binding Name}" Width="140"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=UI_COL_KEY_PREVIEW}" Binding="{Binding KeyPreview}" Width="220"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=UI_COL_STATUS}" Binding="{Binding StatusDisplay}" Width="100"/>
 
-                                <DataGridTemplateColumn Header="Действия" Width="*">
+                                <DataGridTemplateColumn Header="{loc:Loc Key=UI_COL_ACTIONS}" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <Button Content="Отозвать" 
+                                            <Button Content="{loc:Loc Key=UI_BTN_REVOKE_KEY}" 
                                                     Click="RevokeAccessKey_Click" 
                                                     Tag="{Binding Id}"
                                                     IsEnabled="{Binding CanRevoke}"
@@ -141,20 +142,20 @@
                 <!-- Danger Zone -->
                 <Border x:Name="DangerZoneBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="#DC2626" BorderThickness="1" CornerRadius="8" Padding="20">
                     <StackPanel>
-                        <TextBlock Text="Опасная зона / Управление подпиской и аккаунтом" FontSize="16" FontWeight="Bold" Foreground="#DC2626" Margin="0,0,0,12"/>
+                        <TextBlock Text="{loc:Loc Key=UI_HEADER_DANGER_ZONE}" FontSize="16" FontWeight="Bold" Foreground="#DC2626" Margin="0,0,0,12"/>
 
-                        <TextBlock Text="Вам доступны 2 варианта прекращения работы с сервисом:" 
+                        <TextBlock Text="{loc:Loc Key=UI_LABEL_EXIT_OPTIONS_INFO}" 
                                    Foreground="{DynamicResource AppForegroundBrush}" FontWeight="SemiBold" Margin="0,0,0,8"/>
 
                         <StackPanel Margin="10,0,0,15">
-                            <TextBlock Text="• Заморозка (Деактивация): Остановка доступа к системе. Данные сохраняются. Раз в 6 месяцев приходит предупреждение, а полный снос происходит автоматически через 2 года неуведомленной неактивности." 
+                            <TextBlock Text="{loc:Loc Key=UI_INFO_DEACTIVATION_OPTION}" 
                                        Foreground="{DynamicResource AppForegroundBrush}" TextWrapping="Wrap" Margin="0,0,0,6" FontSize="12"/>
 
-                            <TextBlock Text="• Полное удаление: Моментальное физическое уничтожение всех складов, рецептов, историй партий и данных сыроварни из базы данных без возможности восстановления." 
+                            <TextBlock Text="{loc:Loc Key=UI_INFO_DELETE_OPTION}" 
                                        Foreground="#DC2626" TextWrapping="Wrap" FontSize="12"/>
                         </StackPanel>
 
-                        <Button Content="Управление выходом из системы" 
+                        <Button Content="{loc:Loc Key=UI_BTN_MANAGE_EXIT}" 
                                 Click="DeleteAccount_Click" 
                                 Background="#DC2626" 
                                 Foreground="White" 

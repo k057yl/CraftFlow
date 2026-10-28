@@ -6,6 +6,7 @@ using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.MRP;
 using CraftFlow.SharedKernel.Dtos.Production;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
@@ -62,6 +63,13 @@ public partial class MrpPage : Page
 
     private async void MrpPage_Loaded(object sender, RoutedEventArgs e)
     {
+        if (!PermissionService.Instance.HasPermission(AppPermission.PROCUREMENT_VIEW) &&
+            !PermissionService.Instance.HasPermission(AppPermission.PRODUCTION_VIEW))
+        {
+            SetStatus("UI_ERR_ACCESS_DENIED_MRP", Brushes.Red);
+            return;
+        }
+
         _uiTimer.Start();
         await LoadLookupsAsync();
         await LoadPlannedBatchesAsync();
@@ -84,9 +92,12 @@ public partial class MrpPage : Page
     {
         try
         {
-            var suppliers = await ApiService.Instance.GetAsync<List<LookupDto>>(ProcurementConstants.SUPPLIERS);
-            Suppliers.Clear();
-            suppliers?.ForEach(s => Suppliers.Add(new LookupItem(s.Id, s.Name)));
+            if (PermissionService.Instance.HasPermission(AppPermission.SUPPLIERS_MANAGE) || PermissionService.Instance.HasPermission(AppPermission.PROCUREMENT_VIEW))
+            {
+                var suppliers = await ApiService.Instance.GetAsync<List<LookupDto>>(ProcurementConstants.SUPPLIERS);
+                Suppliers.Clear();
+                suppliers?.ForEach(s => Suppliers.Add(new LookupItem(s.Id, s.Name)));
+            }
 
             var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(InventoryConstants.WAREHOUSES);
             Warehouses.Clear();
@@ -128,6 +139,8 @@ public partial class MrpPage : Page
 
     private async Task LoadPlannedBatchesAsync()
     {
+        if (!PermissionService.Instance.HasPermission(AppPermission.PRODUCTION_VIEW)) return;
+
         try
         {
             var summaryList = await ApiService.Instance.GetAsync<List<ActiveBatchSummaryDto>>(ProductionConstants.BATCHES_ACTIVE_SUMMARY);
@@ -168,6 +181,12 @@ public partial class MrpPage : Page
 
     private async void CalculateMrp_Click(object sender, RoutedEventArgs e)
     {
+        if (!PermissionService.Instance.HasPermission(AppPermission.PROCUREMENT_VIEW))
+        {
+            SetStatus("UI_ERR_ACCESS_DENIED_MRP_CALC", Brushes.Red);
+            return;
+        }
+
         try
         {
             var report = await ApiService.Instance.GetMrpRequirementsAsync();
@@ -185,12 +204,19 @@ public partial class MrpPage : Page
         }
         catch (Exception ex)
         {
-            SetStatus($"{UiConstants.Messages.DATA_LOAD_ERROR}: {ex.Message}", Brushes.Red);
+            var errorPrefix = LocalizationService.Get(UiConstants.Messages.DATA_LOAD_ERROR);
+            SetStatusRaw($"{errorPrefix}: {ex.Message}", Brushes.Red);
         }
     }
 
     private async void CreatePurchaseOrder_Click(object sender, RoutedEventArgs e)
     {
+        if (!PermissionService.Instance.HasPermission(AppPermission.PROCUREMENT_RECEIVE))
+        {
+            SetStatus("UI_ERR_ACCESS_DENIED_PURCHASE", Brushes.Red);
+            return;
+        }
+
         if (SupplierComboBox.SelectedValue is not Guid supplierId || supplierId == Guid.Empty)
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
@@ -220,17 +246,24 @@ public partial class MrpPage : Page
 
         if (isSuccess)
         {
-            SetStatus($"{UiConstants.Messages.ORDER_SHIPPED_SUCCESS} ORDER_ID: {contentOrError}", Brushes.Green);
+            var successTemplate = LocalizationService.Get("UI_ORDER_CREATED_WITH_ID");
+            SetStatusRaw(string.Format(successTemplate, contentOrError), Brushes.Green);
             await ApiService.Instance.GetMrpRequirementsAsync();
         }
         else
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatusRaw(contentOrError, Brushes.Red);
         }
     }
 
     private async void PlanBatch_Click(object sender, RoutedEventArgs e)
     {
+        if (!PermissionService.Instance.HasPermission(AppPermission.PRODUCTION_EXECUTE))
+        {
+            SetStatus("UI_ERR_ACCESS_DENIED_PLAN", Brushes.Red);
+            return;
+        }
+
         if (PlanBatchRecipeComboBox.SelectedValue is not Guid recipeId ||
             PlanRawWarehouseComboBox.SelectedValue is not Guid rawWarehouseId ||
             PlanDestWarehouseComboBox.SelectedValue is not Guid destWarehouseId ||
@@ -261,7 +294,7 @@ public partial class MrpPage : Page
 
         if (isSuccess)
         {
-            SetStatus("MSG_BATCH_PLANNED_SUCCESS", Brushes.Green);
+            SetStatus("UI_BATCH_PLANNED_SUCCESS", Brushes.Green);
             GenerateDefaultPlanBatchName();
             await LoadPlannedBatchesAsync();
         }
@@ -273,13 +306,15 @@ public partial class MrpPage : Page
 
     private async void StartDraftBatch_Click(object sender, RoutedEventArgs e)
     {
+        if (!PermissionService.Instance.HasPermission(AppPermission.PRODUCTION_EXECUTE)) return;
+
         if (sender is Button btn && btn.Tag is Guid batchId)
         {
             var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"api/production/batches/{batchId}/start", new { });
 
             if (isSuccess)
             {
-                SetStatus("UI_BATCH_STARTED_SUCCESS", Brushes.Green);
+                SetStatus(UiConstants.Messages.BATCH_STARTED_SUCCESS, Brushes.Green);
                 await LoadPlannedBatchesAsync();
             }
             else
@@ -291,13 +326,15 @@ public partial class MrpPage : Page
 
     private async void DeleteDraftBatch_Click(object sender, RoutedEventArgs e)
     {
+        if (!PermissionService.Instance.HasPermission(AppPermission.PRODUCTION_EXECUTE)) return;
+
         if (sender is Button btn && btn.Tag is Guid batchId)
         {
             var (isSuccess, contentOrError) = await ApiService.Instance.DeleteAndReadAsync($"api/production/batches/{batchId}");
 
             if (isSuccess)
             {
-                SetStatus("MSG_DRAFT_DELETED_SUCCESS", Brushes.OrangeRed);
+                SetStatus("UI_DRAFT_DELETED_SUCCESS", Brushes.OrangeRed);
                 await LoadPlannedBatchesAsync();
             }
             else

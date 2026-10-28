@@ -21,6 +21,11 @@ namespace CraftFlow.Wpf.Pages;
 
 public partial class ProcurementPage : Page
 {
+    private const string UI_SUPPLIERS_MANAGE_REQUIRED = "UI_ERR_PERMISSION_SUPPLIERS_MANAGE_REQUIRED";
+    private const string UI_SUPPLIER_UPDATED_SUCCESS = "UI_MSG_SUPPLIER_UPDATED_SUCCESS";
+    private const string UI_HEADER_SUPPLIER_EDIT = "UI_HEADER_SUPPLIER_EDIT";
+    private const string UI_BTN_SAVE_CHANGES = "UI_BTN_SAVE_CHANGES";
+
     public ObservableCollection<LookupItem> FormSuppliers { get; } = [];
     public ObservableCollection<LookupItem> FilterSuppliers { get; } = [];
 
@@ -37,7 +42,11 @@ public partial class ProcurementPage : Page
     private bool _isDataLoaded = false;
     private Guid? _editingSupplierId = null;
 
-    public ProcurementPage()
+    public ProcurementPage() : this(null)
+    {
+    }
+
+    public ProcurementPage(object? dummy = null)
     {
         InitializeComponent();
 
@@ -146,7 +155,7 @@ public partial class ProcurementPage : Page
     {
         if (!PermissionService.Instance.HasPermission(AppPermission.SUPPLIERS_MANAGE))
         {
-            AlertWindow.ShowError(Window.GetWindow(this), "Недостаточно прав для выполнения операции.");
+            AlertWindow.ShowError(Window.GetWindow(this), LocalizationService.Get(UI_SUPPLIERS_MANAGE_REQUIRED));
             return;
         }
 
@@ -161,7 +170,7 @@ public partial class ProcurementPage : Page
         if (string.IsNullOrWhiteSpace(name))
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-            AlertWindow.ShowError(Window.GetWindow(this), UiConstants.Messages.INVALID_INPUT_FIELDS);
+            AlertWindow.ShowError(Window.GetWindow(this), LocalizationService.Get(UiConstants.Messages.INVALID_INPUT_FIELDS));
             return;
         }
 
@@ -182,7 +191,7 @@ public partial class ProcurementPage : Page
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.SUPPLIER_CREATED_SUCCESS, Brushes.Green);
-            AlertWindow.ShowSuccess(Window.GetWindow(this), _editingSupplierId.HasValue ? "Данные поставщика обновлены" : UiConstants.Messages.SUPPLIER_CREATED_SUCCESS);
+            AlertWindow.ShowSuccess(Window.GetWindow(this), _editingSupplierId.HasValue ? LocalizationService.Get(UI_SUPPLIER_UPDATED_SUCCESS) : LocalizationService.Get(UiConstants.Messages.SUPPLIER_CREATED_SUCCESS));
 
             ResetSupplierForm();
             await LoadDataAsync();
@@ -227,8 +236,8 @@ public partial class ProcurementPage : Page
         AddressTextBox.Text = supplier.Address;
         NotesTextBox.Text = supplier.Notes;
 
-        SupplierFormGroupBox.Header = "Редактирование поставщика";
-        SaveSupplierButton.Content = "Сохранить изменения";
+        SupplierFormGroupBox.Header = LocalizationService.Get(UI_HEADER_SUPPLIER_EDIT);
+        SaveSupplierButton.Content = LocalizationService.Get(UI_BTN_SAVE_CHANGES);
         ResetFormButton.Visibility = Visibility.Visible;
     }
 
@@ -406,8 +415,6 @@ public partial class ProcurementPage : Page
             return;
         }
 
-        string unitDisplay = GetSelectedUnitDisplayText();
-
         decimal totalCapacity = 0;
         foreach (var loc in SelectedLocations)
         {
@@ -418,13 +425,15 @@ public partial class ProcurementPage : Page
 
         if (totalCapacity < requiredQuantity)
         {
-            CapacityWarningTextBlock.Text = $"Недостаточно емкости: выбрано на {totalCapacity} {unitDisplay} из необходимых {requiredQuantity} {unitDisplay}";
+            var format = LocalizationService.Get("CAPACITY_WARNING_INSUFFICIENT");
+            CapacityWarningTextBlock.Text = string.Format(format, requiredQuantity, totalCapacity);
             CapacityWarningTextBlock.Foreground = Brushes.Red;
             AddStockLotButton.IsEnabled = false;
         }
         else
         {
-            CapacityWarningTextBlock.Text = $"Вместимость подходит (выбрано на {totalCapacity} {unitDisplay} под партию в {requiredQuantity} {unitDisplay})";
+            var format = LocalizationService.Get("CAPACITY_WARNING_SUFFICIENT");
+            CapacityWarningTextBlock.Text = string.Format(format, totalCapacity, requiredQuantity);
             CapacityWarningTextBlock.Foreground = Brushes.Green;
             AddStockLotButton.IsEnabled = true;
         }
@@ -470,7 +479,7 @@ public partial class ProcurementPage : Page
             StockRawMaterialComboBox.SelectedItem is not LookupItem selectedRawMaterial)
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-            AlertWindow.ShowError(Window.GetWindow(this), UiConstants.Messages.INVALID_INPUT_FIELDS);
+            AlertWindow.ShowError(Window.GetWindow(this), LocalizationService.Get(UiConstants.Messages.INVALID_INPUT_FIELDS));
             return;
         }
 
@@ -481,7 +490,7 @@ public partial class ProcurementPage : Page
             !decimal.TryParse(rawPriceText, NumberStyles.Any, CultureInfo.InvariantCulture, out var unitPrice))
         {
             SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-            AlertWindow.ShowError(Window.GetWindow(this), UiConstants.Messages.INVALID_INPUT_FIELDS);
+            AlertWindow.ShowError(Window.GetWindow(this), LocalizationService.Get(UiConstants.Messages.INVALID_INPUT_FIELDS));
             return;
         }
 
@@ -507,7 +516,7 @@ public partial class ProcurementPage : Page
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS, Brushes.Green);
-            AlertWindow.ShowSuccess(Window.GetWindow(this), UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS);
+            AlertWindow.ShowSuccess(Window.GetWindow(this), LocalizationService.Get(UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS));
             ExpirationDatePicker.SelectedDate = null;
             SelectedLocations.Clear();
             await LoadStockLotsAsync();
@@ -533,7 +542,7 @@ public partial class ProcurementPage : Page
                 if (lot.Quantity <= 0m)
                 {
                     SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-                    AlertWindow.ShowError(Window.GetWindow(this), UiConstants.Messages.INVALID_INPUT_FIELDS);
+                    AlertWindow.ShowError(Window.GetWindow(this), LocalizationService.Get(UiConstants.Messages.INVALID_INPUT_FIELDS));
                     return;
                 }
 
@@ -580,7 +589,7 @@ public partial class ProcurementPage : Page
         if (isSuccess)
         {
             SetStatus(UiConstants.Messages.DATA_LOADED_SUCCESS, Brushes.Green);
-            AlertWindow.ShowSuccess(Window.GetWindow(this), UiConstants.Messages.DATA_LOADED_SUCCESS);
+            AlertWindow.ShowSuccess(Window.GetWindow(this), LocalizationService.Get(UiConstants.Messages.DATA_LOADED_SUCCESS));
             await LoadStockLotsAsync();
         }
         else

@@ -8,6 +8,7 @@ using CraftFlow.Wpf.Windows;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -17,15 +18,11 @@ public partial class ProfilePage : Page
     private const string ENDPOINT_SUBSCRIPTION_KEYS_MY = "api/subscriptions/keys/my";
     private const string ENDPOINT_ACTIVATE_PLAN = "api/subscriptions/confirm";
 
-    private const string MSG_KEY_NAME_REQUIRED = "Пожалуйста, введите название для API ключа!";
-    private const string MSG_KEY_GENERATED_SUCCESS = "Ключ успешно сгенерирован и сохранен.";
-    private const string MSG_PLAN_ACTIVATED_SUCCESS = "Тариф успешно изменён! Все лимиты пересчитаны.";
+    public ProfilePage() : this(null)
+    {
+    }
 
-    private const string MSG_CAPTION_INFO = "Информация";
-    private const string MSG_CAPTION_WARNING = "Внимание";
-    private const string MSG_CAPTION_ERROR = "Ошибка";
-
-    public ProfilePage()
+    public ProfilePage(object? dummy = null)
     {
         InitializeComponent();
         InitRoleComboBox();
@@ -37,12 +34,12 @@ public partial class ProfilePage : Page
     {
         NewUserRoleComboBox.ItemsSource = new[]
         {
-            new { Role = TenantRole.ACCOUNTANT, Display = "Бухгалтер" },
-            new { Role = TenantRole.TECHNOLOGIST, Display = "Главный технолог" },
-            new { Role = TenantRole.OPERATOR, Display = "Оператор / Сыровар" },
-            new { Role = TenantRole.STOREKEEPER, Display = "Кладовщик" },
-            new { Role = TenantRole.SALES_MANAGER, Display = "Менеджер по продажам" },
-            new { Role = TenantRole.AUDITOR, Display = "Аудитор" }
+            new { Role = TenantRole.ACCOUNTANT, Display = Get("UI_ROLE_ACCOUNTANT") },
+            new { Role = TenantRole.TECHNOLOGIST, Display = Get("UI_ROLE_TECHNOLOGIST") },
+            new { Role = TenantRole.OPERATOR, Display = Get("UI_ROLE_OPERATOR") },
+            new { Role = TenantRole.STOREKEEPER, Display = Get("UI_ROLE_STOREKEEPER") },
+            new { Role = TenantRole.SALES_MANAGER, Display = Get("UI_ROLE_SALES_MANAGER") },
+            new { Role = TenantRole.AUDITOR, Display = Get("UI_ROLE_AUDITOR") }
         };
         NewUserRoleComboBox.DisplayMemberPath = "Display";
         NewUserRoleComboBox.SelectedValuePath = "Role";
@@ -53,9 +50,9 @@ public partial class ProfilePage : Page
     {
         PlanComboBox.ItemsSource = new[]
         {
-            new { Code = "FREE", Display = "Free Trial (8 партий, 2 склада)" },
-            new { Code = "STANDARD", Display = "Standard (32 партии, 5 складов)" },
-            new { Code = "PRO", Display = "Professional (Безлимит)" }
+            new { Code = "FREE", Display = Get("UI_PLAN_FREE_DISPLAY") },
+            new { Code = "STANDARD", Display = Get("UI_PLAN_STANDARD_DISPLAY") },
+            new { Code = "PRO", Display = Get("UI_PLAN_PRO_DISPLAY") }
         };
         PlanComboBox.DisplayMemberPath = "Display";
         PlanComboBox.SelectedValuePath = "Code";
@@ -83,8 +80,8 @@ public partial class ProfilePage : Page
             }
         }
 
-        bool isOwner = user.Role == TenantRole.OWNER;
-        bool isSuperAdmin = user.Role == TenantRole.SUPER_ADMIN;
+        bool isOwner = PermissionService.Instance.IsOwner;
+        bool isSuperAdmin = PermissionService.Instance.IsSuperAdmin;
 
         TeamManagementBorder.Visibility = (isOwner || isSuperAdmin) ? Visibility.Visible : Visibility.Collapsed;
         SubscriptionManagementBorder.Visibility = isSuperAdmin ? Visibility.Visible : Visibility.Collapsed;
@@ -115,11 +112,11 @@ public partial class ProfilePage : Page
 
         if (isSuccess)
         {
-            MessageBox.Show(MSG_PLAN_ACTIVATED_SUCCESS, MSG_CAPTION_INFO, MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(Get("UI_MSG_PLAN_ACTIVATED_SUCCESS"), Get("UI_CAPTION_INFO"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
         else
         {
-            MessageBox.Show(contentOrError, MSG_CAPTION_ERROR, MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(contentOrError, Get("UI_CAPTION_ERROR"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -147,7 +144,7 @@ public partial class ProfilePage : Page
         var keyName = NewAccessKeyNameTextBox.Text.Trim();
         if (string.IsNullOrWhiteSpace(keyName))
         {
-            MessageBox.Show(MSG_KEY_NAME_REQUIRED, MSG_CAPTION_WARNING, MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(Get("UI_MSG_KEY_NAME_REQUIRED"), Get("UI_CAPTION_WARNING"), MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -158,11 +155,11 @@ public partial class ProfilePage : Page
         {
             NewAccessKeyNameTextBox.Clear();
             await LoadAccessKeysAsync();
-            MessageBox.Show(MSG_KEY_GENERATED_SUCCESS, MSG_CAPTION_INFO, MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(Get("UI_MSG_KEY_GENERATED_SUCCESS"), Get("UI_CAPTION_INFO"), MessageBoxButton.OK, MessageBoxImage.Information);
         }
         else
         {
-            MessageBox.Show(contentOrError, MSG_CAPTION_ERROR, MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(contentOrError, Get("UI_CAPTION_ERROR"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -179,7 +176,7 @@ public partial class ProfilePage : Page
             }
             else
             {
-                MessageBox.Show(contentOrError, MSG_CAPTION_ERROR, MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(contentOrError, Get("UI_CAPTION_ERROR"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
@@ -197,8 +194,8 @@ public partial class ProfilePage : Page
                 u.FullName,
                 u.Email,
                 RoleDisplay = GetRoleDisplayName(u.Role),
-                StatusDisplay = u.IsActive ? "Активен" : "Заблокирован",
-                ActionButtonText = u.IsActive ? "Деактивировать" : "Активировать",
+                StatusDisplay = u.IsActive ? Get("UI_STATUS_ACTIVE") : Get("UI_STATUS_BLOCKED"),
+                ActionButtonText = u.IsActive ? Get("UI_BTN_DEACTIVATE") : Get("UI_BTN_ACTIVATE"),
                 CanToggle = u.Role != TenantRole.OWNER && u.Email != currentUserId
             }).ToList();
 
@@ -216,7 +213,7 @@ public partial class ProfilePage : Page
             }
             else
             {
-                MessageBox.Show(contentOrError, "Ошибка смены статуса", MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(contentOrError, Get("UI_ERR_STATUS_CHANGE"), MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
     }
@@ -229,7 +226,7 @@ public partial class ProfilePage : Page
 
         if (string.IsNullOrWhiteSpace(fullName) || string.IsNullOrWhiteSpace(email) || string.IsNullOrWhiteSpace(password))
         {
-            MessageBox.Show("Заполните все поля для создания нового сотрудника!", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(Get("UI_ERR_FILL_ALL_NEW_EMPLOYEE_FIELDS"), Get("UI_CAPTION_WARNING"), MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -240,7 +237,8 @@ public partial class ProfilePage : Page
 
         if (isSuccess)
         {
-            MessageBox.Show($"Сотрудник {fullName} успешно создан!", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+            var msgFormat = Get("UI_MSG_EMPLOYEE_CREATED_FMT");
+            MessageBox.Show(string.Format(msgFormat, fullName), Get("UI_CAPTION_SUCCESS"), MessageBoxButton.OK, MessageBoxImage.Information);
             NewUserFullNameTextBox.Clear();
             NewUserEmailTextBox.Clear();
             NewUserPasswordBox.Clear();
@@ -248,7 +246,7 @@ public partial class ProfilePage : Page
         }
         else
         {
-            MessageBox.Show(contentOrError, "Ошибка при создании", MessageBoxButton.OK, MessageBoxImage.Error);
+            MessageBox.Show(contentOrError, Get("UI_ERR_CREATE_USER"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
@@ -276,10 +274,10 @@ public partial class ProfilePage : Page
         if (isSuccess)
         {
             string message = dialog.ActionType == AccountDeleteAction.Deactivate
-                ? "Ваш аккаунт деактивирован. Вы можете восстановить доступ в любое время."
-                : "Ваш аккаунт и все данные сыроварни были полностью стерты.";
+                ? Get("UI_MSG_ACCOUNT_DEACTIVATED_INFO")
+                : Get("UI_MSG_ACCOUNT_DELETED_INFO");
 
-            MessageBox.Show(message, "Уведомление", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(message, Get("UI_CAPTION_NOTIFICATION"), MessageBoxButton.OK, MessageBoxImage.Information);
 
             ApiService.Instance.ClearAuthToken();
 
@@ -297,14 +295,14 @@ public partial class ProfilePage : Page
 
     private static string GetRoleDisplayName(TenantRole role) => role switch
     {
-        TenantRole.SUPER_ADMIN => "Супер Администратор",
-        TenantRole.OWNER => "Владелец сыроварни",
-        TenantRole.ACCOUNTANT => "Бухгалтер",
-        TenantRole.TECHNOLOGIST => "Главный технолог",
-        TenantRole.OPERATOR => "Оператор / Сыровар",
-        TenantRole.STOREKEEPER => "Кладовщик",
-        TenantRole.SALES_MANAGER => "Менеджер по продажам",
-        TenantRole.AUDITOR => "Аудитор",
-        _ => "Сотрудник"
+        TenantRole.SUPER_ADMIN => Get("UI_ROLE_SUPER_ADMIN"),
+        TenantRole.OWNER => Get("UI_ROLE_OWNER"),
+        TenantRole.ACCOUNTANT => Get("UI_ROLE_ACCOUNTANT"),
+        TenantRole.TECHNOLOGIST => Get("UI_ROLE_TECHNOLOGIST"),
+        TenantRole.OPERATOR => Get("UI_ROLE_OPERATOR"),
+        TenantRole.STOREKEEPER => Get("UI_ROLE_STOREKEEPER"),
+        TenantRole.SALES_MANAGER => Get("UI_ROLE_SALES_MANAGER"),
+        TenantRole.AUDITOR => Get("UI_ROLE_AUDITOR"),
+        _ => Get("UI_ROLE_EMPLOYEE")
     };
 }

@@ -325,6 +325,42 @@
 	<data name="DASH_PERIOD_REVENUE" xml:space="preserve"><value>Виторг за період</value></data>
 
 	<!-- ========================================== -->
+	<!-- MRP & Batch Planning                       -->
+	<!-- ========================================== -->
+	<data name="TITLE_MRP" xml:space="preserve"><value>Планування (MRP)</value></data>
+	<data name="TAB_MRP_CALC" xml:space="preserve"><value>Розрахунок потреб (MRP)</value></data>
+	<data name="TAB_BATCH_PLANNING" xml:space="preserve"><value>Планування варінь</value></data>
+	<data name="CALCULATE_MRP" xml:space="preserve"><value>Розрахувати MRP</value></data>
+	<data name="LABEL_SUPPLIER" xml:space="preserve"><value>Постачальник:</value></data>
+	<data name="LABEL_RECEIVING_WAREHOUSE" xml:space="preserve"><value>Склад приймання сировини:</value></data>
+	<data name="BTN_CREATE_PURCHASE_ORDER" xml:space="preserve"><value>Сформувати Замовлення Постачальнику</value></data>
+	<data name="RAW_MATERIAL_NAME" xml:space="preserve"><value>Сировина / Інгредієнт</value></data>
+	<data name="QUANTITY" xml:space="preserve"><value>Потреба</value></data>
+	<data name="AVAILABLE_STOCK" xml:space="preserve"><value>Поточний залишок</value></data>
+	<data name="CALCULATED_REQUIREMENTS" xml:space="preserve"><value>Дефіцит (До закупівлі)</value></data>
+	<data name="GROUP_PLAN_BATCH" xml:space="preserve"><value>Запланувати варіння</value></data>
+	<data name="GROUP_PLANNED_BATCHES" xml:space="preserve"><value>Заплановані варіння (Чернетки)</value></data>
+	<data name="LABEL_BATCH_CODE" xml:space="preserve"><value>Код / Назва варіння:</value></data>
+	<data name="LABEL_SELECT_RECIPE" xml:space="preserve"><value>Оберіть рецепт:</value></data>
+	<data name="LABEL_RAW_WAREHOUSE" xml:space="preserve"><value>Склад списання сировини:</value></data>
+	<data name="LABEL_DEST_WAREHOUSE" xml:space="preserve"><value>Склад приймання продукції:</value></data>
+	<data name="LABEL_PLANNED_OUTPUT" xml:space="preserve"><value>Запланований об'єм:</value></data>
+	<data name="LABEL_SCHEDULED_DATE" xml:space="preserve"><value>Дата варіння:</value></data>
+	<data name="LABEL_SCHEDULED_TIME" xml:space="preserve"><value>Час:</value></data>
+	<data name="BTN_PLAN_BATCH" xml:space="preserve"><value>Запланувати варіння</value></data>
+	<data name="COLUMN_BATCH_CODE" xml:space="preserve"><value>Код партії</value></data>
+	<data name="COLUMN_RECIPE" xml:space="preserve"><value>Рецепт</value></data>
+	<data name="COLUMN_VOLUME" xml:space="preserve"><value>Об'єм</value></data>
+	<data name="COLUMN_SCHEDULED_AT" xml:space="preserve"><value>Заплановано на</value></data>
+	<data name="COLUMN_COUNTDOWN" xml:space="preserve"><value>До старту</value></data>
+	<data name="COLUMN_ACTIONS" xml:space="preserve"><value>Дії</value></data>
+	<data name="TOOLTIP_START" xml:space="preserve"><value>Запустити варіння зараз</value></data>
+	<data name="TOOLTIP_DELETE" xml:space="preserve"><value>Видалити чернетку</value></data>
+	<data name="MSG_BATCH_PLANNED_SUCCESS" xml:space="preserve"><value>Варіння успішно заплановано</value></data>
+	<data name="UI_BATCH_STARTED_SUCCESS" xml:space="preserve"><value>Варіння успішно запущено</value></data>
+	<data name="MSG_DRAFT_DELETED_SUCCESS" xml:space="preserve"><value>Чернетку варіння видалено</value></data>
+
+	<!-- ========================================== -->
 	<!-- 5: Варильний цех                           -->
 	<!-- ========================================== -->
 	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>CRAFTFLOW — Виробництво</value></data>

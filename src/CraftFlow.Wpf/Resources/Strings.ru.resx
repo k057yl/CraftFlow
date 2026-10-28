@@ -247,10 +247,38 @@
 	<data name="SUPPLIER_EMAIL" xml:space="preserve"><value>Email:</value></data>
 	<data name="CREATE_SUPPLIER" xml:space="preserve"><value>Добавить поставщика</value></data>
 
-	<data name="ALL_SUPPLIERS" xml:space="preserve"><value>— Все поставщики —</value></data>
-	<data name="ALL_WAREHOUSES" xml:space="preserve"><value>— Все склады —</value></data>
 	<data name="CAPACITY_WARNING_INSUFFICIENT" xml:space="preserve"><value>⚠️ Недостаточно места! Нужно: {0:N0} л/кг, доступно: {1:N0} л/кг</value></data>
 	<data name="CAPACITY_WARNING_SUFFICIENT" xml:space="preserve"><value>Вместимость подходит (выбрано на {0:N0} л/кг под партию в {1:N0} л/кг)</value></data>
+
+	<data name="UI_HEADER_SUPPLIER_EDIT" xml:space="preserve"><value>Редактирование поставщика</value></data>
+	<data name="UI_HEADER_SUPPLIERS_REGISTRY" xml:space="preserve"><value>Реестр поставщиков</value></data>
+	<data name="UI_SUPPLIER_LEGAL_NAME" xml:space="preserve"><value>Юридическое наименование:</value></data>
+	<data name="UI_SUPPLIER_TAX_ID" xml:space="preserve"><value>ИНН / ЕДРПОУ:</value></data>
+	<data name="UI_SUPPLIER_ADDRESS" xml:space="preserve"><value>Адрес компании:</value></data>
+	<data name="UI_SUPPLIER_NOTES" xml:space="preserve"><value>Заметки / Условия работы:</value></data>
+	<data name="UI_CHECK_SHOW_INACTIVE_SUPPLIERS" xml:space="preserve"><value>Показывать неактивных поставщиков</value></data>
+	<data name="UI_BTN_SAVE_CHANGES" xml:space="preserve"><value>Сохранить изменения</value></data>
+	<data name="UI_BTN_RESET" xml:space="preserve"><value>Сброс</value></data>
+	<data name="UI_TOOLTIP_EDIT" xml:space="preserve"><value>Редактировать</value></data>
+
+	<data name="UI_COL_WAREHOUSE_NAME" xml:space="preserve"><value>Склад</value></data>
+	<data name="UI_COL_NAME" xml:space="preserve"><value>Название</value></data>
+	<data name="UI_COL_LEGAL_NAME" xml:space="preserve"><value>Юр. Имя</value></data>
+	<data name="UI_COL_TAX_ID" xml:space="preserve"><value>ИНН / ЕДРПОУ</value></data>
+	<data name="UI_COL_PHONE" xml:space="preserve"><value>Телефон</value></data>
+	<data name="UI_COL_EMAIL" xml:space="preserve"><value>Email</value></data>
+	<data name="UI_COL_ADDRESS" xml:space="preserve"><value>Адрес</value></data>
+
+	<data name="UI_LABEL_UNIT_OF_MEASURE" xml:space="preserve"><value>Ед. изм.</value></data>
+	<data name="UI_UOM_L" xml:space="preserve"><value>Литры (л)</value></data>
+	<data name="UI_UOM_ML" xml:space="preserve"><value>Миллилитры (мл)</value></data>
+	<data name="UI_UOM_KG" xml:space="preserve"><value>Килограммы (кг)</value></data>
+	<data name="UI_UOM_G" xml:space="preserve"><value>Граммы (г)</value></data>
+	<data name="UI_UOM_PCS" xml:space="preserve"><value>Штуки (шт)</value></data>
+
+	<data name="UI_STATUS_READY" xml:space="preserve"><value>Готово</value></data>
+	<data name="UI_ERR_PERMISSION_SUPPLIERS_MANAGE_REQUIRED" xml:space="preserve"><value>Недостаточно прав для выполнения операции.</value></data>
+	<data name="UI_MSG_SUPPLIER_UPDATED_SUCCESS" xml:space="preserve"><value>Данные поставщика обновлены</value></data>
 
 	<!-- ========================================== -->
 	<!-- 4: Аудит		                            -->
@@ -306,22 +334,58 @@
 	<data name="DASH_PERIOD_REVENUE" xml:space="preserve"><value>Выручка за период</value></data>
 
 	<!-- ========================================== -->
+	<!-- MRP & Batch Planning                       -->
+	<!-- ========================================== -->
+	<data name="TITLE_MRP" xml:space="preserve"><value>Планирование (MRP)</value></data>
+	<data name="TAB_MRP_CALC" xml:space="preserve"><value>Расчет потребностей (MRP)</value></data>
+	<data name="TAB_BATCH_PLANNING" xml:space="preserve"><value>Планирование варок</value></data>
+	<data name="CALCULATE_MRP" xml:space="preserve"><value>Рассчитать MRP</value></data>
+	<data name="LABEL_SUPPLIER" xml:space="preserve"><value>Поставщик:</value></data>
+	<data name="LABEL_RECEIVING_WAREHOUSE" xml:space="preserve"><value>Склад приёмки сырья:</value></data>
+	<data name="BTN_CREATE_PURCHASE_ORDER" xml:space="preserve"><value>Сформировать Заказ Поставщику</value></data>
+	<data name="RAW_MATERIAL_NAME" xml:space="preserve"><value>Сырьё / Ингредиент</value></data>
+	<data name="QUANTITY" xml:space="preserve"><value>Потребность</value></data>
+	<data name="AVAILABLE_STOCK" xml:space="preserve"><value>Текущий остаток</value></data>
+	<data name="CALCULATED_REQUIREMENTS" xml:space="preserve"><value>Дефицит (К закупке)</value></data>
+	<data name="GROUP_PLAN_BATCH" xml:space="preserve"><value>Запланировать варку</value></data>
+	<data name="GROUP_PLANNED_BATCHES" xml:space="preserve"><value>Запланированные варки (Черновики)</value></data>
+	<data name="LABEL_BATCH_CODE" xml:space="preserve"><value>Код / Название варки:</value></data>
+	<data name="LABEL_SELECT_RECIPE" xml:space="preserve"><value>Выберите рецепт:</value></data>
+	<data name="LABEL_RAW_WAREHOUSE" xml:space="preserve"><value>Склад списания сырья:</value></data>
+	<data name="LABEL_DEST_WAREHOUSE" xml:space="preserve"><value>Склад приёмки продукции:</value></data>
+	<data name="LABEL_PLANNED_OUTPUT" xml:space="preserve"><value>Планируемый объём:</value></data>
+	<data name="LABEL_SCHEDULED_DATE" xml:space="preserve"><value>Дата варки:</value></data>
+	<data name="LABEL_SCHEDULED_TIME" xml:space="preserve"><value>Время:</value></data>
+	<data name="BTN_PLAN_BATCH" xml:space="preserve"><value>Запланировать варку</value></data>
+	<data name="COLUMN_BATCH_CODE" xml:space="preserve"><value>Код партии</value></data>
+	<data name="COLUMN_RECIPE" xml:space="preserve"><value>Рецепт</value></data>
+	<data name="COLUMN_VOLUME" xml:space="preserve"><value>Объём</value></data>
+	<data name="COLUMN_SCHEDULED_AT" xml:space="preserve"><value>Запланировано на</value></data>
+	<data name="COLUMN_COUNTDOWN" xml:space="preserve"><value>До старта</value></data>
+	<data name="COLUMN_ACTIONS" xml:space="preserve"><value>Действия</value></data>
+	<data name="TOOLTIP_START" xml:space="preserve"><value>Запустить варку сейчас</value></data>
+	<data name="TOOLTIP_DELETE" xml:space="preserve"><value>Удалить черновик</value></data>
+	<data name="MSG_BATCH_PLANNED_SUCCESS" xml:space="preserve"><value>Варка успешно запланирована</value></data>
+	<data name="UI_BATCH_STARTED_SUCCESS" xml:space="preserve"><value>Варка успешно запущена</value></data>
+	<data name="MSG_DRAFT_DELETED_SUCCESS" xml:space="preserve"><value>Черновик варки удален</value></data>
+
+	<!-- ========================================== -->
 	<!-- 5: Варочный цех				            -->
 	<!-- ========================================== -->
 	<data name="TITLE_PRODUCTION" xml:space="preserve"><value>CRAFTFLOW — Производство</value></data>
 	<data name="PRODUCTION_HEADER" xml:space="preserve"><value>Производство и Варочный цех</value></data>
-	<!-- Вкладки -->
+
 	<data name="TAB_BREWHOUSE" xml:space="preserve"><value>Варочный цех</value></data>
 	<data name="TAB_AGING" xml:space="preserve"><value>Созревание и Аффинаж</value></data>
 	<data name="TAB_DISCARD_ACTS" xml:space="preserve"><value>Брак и Списания</value></data>
-	<!-- Группы (GroupBox) -->
+
 	<data name="GROUP_START_BATCH" xml:space="preserve"><value>Параметры запуска варки</value></data>
 	<data name="GROUP_RAW_REQUIREMENTS" xml:space="preserve"><value>Расчет потребности в сырье</value></data>
 	<data name="GROUP_PLANNED_BATCHES" xml:space="preserve"><value>Запланированные варки (Черновики)</value></data>
 	<data name="GROUP_ACTIVE_BATCHES" xml:space="preserve"><value>Варки в процессе</value></data>
 	<data name="GROUP_COMPLETE_BATCH" xml:space="preserve"><value>Завершение варки</value></data>
 	<data name="GROUP_BATCH_COSTING" xml:space="preserve"><value>Калькуляция себестоимости</value></data>
-	<!-- Лейблы полей -->
+
 	<data name="LABEL_BATCH_CODE" xml:space="preserve"><value>Код / Наименование партии:</value></data>
 	<data name="LABEL_SELECT_RECIPE" xml:space="preserve"><value>Выберите Рецептуру:</value></data>
 	<data name="LABEL_RAW_WAREHOUSE" xml:space="preserve"><value>Склад списания сырья:</value></data>
@@ -338,14 +402,14 @@
 	<data name="LABEL_OVERHEAD_COST" xml:space="preserve"><value>Накладные расходы:</value></data>
 	<data name="LABEL_TOTAL_COST" xml:space="preserve"><value>Итоговая себестоимость:</value></data>
 	<data name="LABEL_UNIT_COST" xml:space="preserve"><value>Себестоимость за 1 кг/л:</value></data>
-	<!-- Чекбоксы и Кнопки -->
+
 	<data name="CHECKBOX_OVERHEAD" xml:space="preserve"><value>Учесть накладные расходы</value></data>
 	<data name="BTN_CALC_MAX" xml:space="preserve"><value>Максимум по остаткам</value></data>
 	<data name="BTN_PRINT_CARD" xml:space="preserve"><value>Печать тех. карты</value></data>
 	<data name="BTN_START_BATCH" xml:space="preserve"><value>Запустить Варку</value></data>
 	<data name="BTN_PLAN_BATCH" xml:space="preserve"><value>Запланировать (в Черновик)</value></data>
 	<data name="BTN_COMPLETE_BATCH" xml:space="preserve"><value>Завершить Варку</value></data>
-	<!-- Колонки таблиц -->
+
 	<data name="COLUMN_BATCH_CODE" xml:space="preserve"><value>Код партии</value></data>
 	<data name="COLUMN_BATCH_NAME" xml:space="preserve"><value>Партия</value></data>
 	<data name="COLUMN_RECIPE" xml:space="preserve"><value>Рецептура</value></data>
@@ -357,11 +421,86 @@
 	<data name="COLUMN_ELAPSED" xml:space="preserve"><value>Прошло времени</value></data>
 	<data name="COLUMN_TARGET_DURATION" xml:space="preserve"><value>План (мин)</value></data>
 	<data name="COLUMN_ACTIONS" xml:space="preserve"><value>Действия</value></data>
-	<!-- Тултипы и Сообщения -->
+
 	<data name="TOOLTIP_START" xml:space="preserve"><value>Запустить варку</value></data>
 	<data name="TOOLTIP_DELETE" xml:space="preserve"><value>Удалить черновик</value></data>
 	<data name="MSG_BATCH_PLANNED_SUCCESS" xml:space="preserve"><value>Партия успешно запланирована!</value></data>
 	<data name="MSG_DRAFT_DELETED_SUCCESS" xml:space="preserve"><value>Черновик успешно удален!</value></data>
+
+	<!-- ========================================== -->
+	<!-- 11. Profile						        -->
+	<!-- ========================================== -->
+	<data name="UI_TITLE_PROFILE_PAGE" xml:space="preserve"><value>Управление аккаунтом и организацией</value></data>
+	<data name="UI_HEADER_PROFILE_DATA" xml:space="preserve"><value>Данные профиля</value></data>
+	<data name="UI_LABEL_NAME" xml:space="preserve"><value>Имя:</value></data>
+	<data name="UI_LABEL_EMAIL" xml:space="preserve"><value>Email:</value></data>
+	<data name="UI_LABEL_SYSTEM_ROLE" xml:space="preserve"><value>Роль в системе:</value></data>
+
+	<data name="UI_HEADER_TEAM_MANAGEMENT" xml:space="preserve"><value>Управление сотрудниками организации</value></data>
+	<data name="UI_LABEL_FULL_NAME" xml:space="preserve"><value>ФИО:</value></data>
+	<data name="UI_LABEL_PASSWORD" xml:space="preserve"><value>Пароль:</value></data>
+	<data name="UI_LABEL_ROLE" xml:space="preserve"><value>Роль:</value></data>
+	<data name="UI_BTN_ADD_EMPLOYEE" xml:space="preserve"><value>Добавить сотрудника</value></data>
+	<data name="UI_HEADER_EMPLOYEES_LIST" xml:space="preserve"><value>Список сотрудников:</value></data>
+
+	<data name="UI_COL_FULL_NAME" xml:space="preserve"><value>ФИО</value></data>
+	<data name="UI_COL_EMAIL" xml:space="preserve"><value>Email</value></data>
+	<data name="UI_COL_ROLE" xml:space="preserve"><value>Роль</value></data>
+	<data name="UI_COL_STATUS" xml:space="preserve"><value>Статус</value></data>
+	<data name="UI_COL_ACTIONS" xml:space="preserve"><value>Действия</value></data>
+
+	<data name="UI_HEADER_SUBSCRIPTION_API" xml:space="preserve"><value>Управление подпиской и API ключами</value></data>
+	<data name="UI_LABEL_SELECT_PLAN_TEST" xml:space="preserve"><value>Выбор тарифного плана (Тестовый режим):</value></data>
+	<data name="UI_BTN_ACTIVATE_PLAN" xml:space="preserve"><value>Активировать план</value></data>
+	<data name="UI_HEADER_API_KEYS" xml:space="preserve"><value>API ключи доступа:</value></data>
+	<data name="UI_TOOLTIP_KEY_NAME" xml:space="preserve"><value>Название ключа</value></data>
+	<data name="UI_BTN_CREATE_KEY" xml:space="preserve"><value>Создать ключ</value></data>
+
+	<data name="UI_COL_KEY_NAME" xml:space="preserve"><value>Название</value></data>
+	<data name="UI_COL_KEY_PREVIEW" xml:space="preserve"><value>Ключ</value></data>
+	<data name="UI_BTN_REVOKE_KEY" xml:space="preserve"><value>Отозвать</value></data>
+
+	<data name="UI_HEADER_DANGER_ZONE" xml:space="preserve"><value>Опасная зона / Управление подпиской и аккаунтом</value></data>
+	<data name="UI_LABEL_EXIT_OPTIONS_INFO" xml:space="preserve"><value>Вам доступны 2 варианта прекращения работы с сервисом:</value></data>
+	<data name="UI_INFO_DEACTIVATION_OPTION" xml:space="preserve"><value>• Заморозка (Деактивация): Остановка доступа к системе. Данные сохраняются. Раз в 6 месяцев приходит предупреждение, а полный снос происходит автоматически через 2 года неуведомленной неактивности.</value></data>
+	<data name="UI_INFO_DELETE_OPTION" xml:space="preserve"><value>• Полное удаление: Моментальное физическое уничтожение всех складов, рецептов, историй партий и данных сыроварни из базы данных без возможности восстановления.</value></data>
+	<data name="UI_BTN_MANAGE_EXIT" xml:space="preserve"><value>Управление выходом из системы</value></data>
+
+	<data name="UI_CAPTION_INFO" xml:space="preserve"><value>Информация</value></data>
+	<data name="UI_CAPTION_WARNING" xml:space="preserve"><value>Внимание</value></data>
+	<data name="UI_CAPTION_ERROR" xml:space="preserve"><value>Ошибка</value></data>
+	<data name="UI_CAPTION_SUCCESS" xml:space="preserve"><value>Успех</value></data>
+	<data name="UI_CAPTION_NOTIFICATION" xml:space="preserve"><value>Уведомление</value></data>
+
+	<data name="UI_MSG_KEY_NAME_REQUIRED" xml:space="preserve"><value>Пожалуйста, введите название для API ключа!</value></data>
+	<data name="UI_MSG_KEY_GENERATED_SUCCESS" xml:space="preserve"><value>Ключ успешно сгенерирован и сохранен.</value></data>
+	<data name="UI_MSG_PLAN_ACTIVATED_SUCCESS" xml:space="preserve"><value>Тариф успешно изменён! Все лимиты пересчитаны.</value></data>
+	<data name="UI_ERR_FILL_ALL_NEW_EMPLOYEE_FIELDS" xml:space="preserve"><value>Заполните все поля для создания нового сотрудника!</value></data>
+	<data name="UI_ERR_STATUS_CHANGE" xml:space="preserve"><value>Ошибка смены статуса</value></data>
+	<data name="UI_ERR_CREATE_USER" xml:space="preserve"><value>Ошибка при создании</value></data>
+	<data name="UI_MSG_EMPLOYEE_CREATED_FMT" xml:space="preserve"><value>Сотрудник {0} успешно создан!</value></data>
+
+	<data name="UI_MSG_ACCOUNT_DEACTIVATED_INFO" xml:space="preserve"><value>Ваш аккаунт деактивирован. Вы можете восстановить доступ в любое время.</value></data>
+	<data name="UI_MSG_ACCOUNT_DELETED_INFO" xml:space="preserve"><value>Ваш аккаунт и все данные сыроварни были полностью стерты.</value></data>
+
+	<data name="UI_ROLE_SUPER_ADMIN" xml:space="preserve"><value>Супер Администратор</value></data>
+	<data name="UI_ROLE_OWNER" xml:space="preserve"><value>Владелец сыроварни</value></data>
+	<data name="UI_ROLE_ACCOUNTANT" xml:space="preserve"><value>Бухгалтер</value></data>
+	<data name="UI_ROLE_TECHNOLOGIST" xml:space="preserve"><value>Главный технолог</value></data>
+	<data name="UI_ROLE_OPERATOR" xml:space="preserve"><value>Оператор / Сыровар</value></data>
+	<data name="UI_ROLE_STOREKEEPER" xml:space="preserve"><value>Кладовщик</value></data>
+	<data name="UI_ROLE_SALES_MANAGER" xml:space="preserve"><value>Менеджер по продажам</value></data>
+	<data name="UI_ROLE_AUDITOR" xml:space="preserve"><value>Аудитор</value></data>
+	<data name="UI_ROLE_EMPLOYEE" xml:space="preserve"><value>Сотрудник</value></data>
+
+	<data name="UI_STATUS_ACTIVE" xml:space="preserve"><value>Активен</value></data>
+	<data name="UI_STATUS_BLOCKED" xml:space="preserve"><value>Заблокирован</value></data>
+	<data name="UI_BTN_DEACTIVATE" xml:space="preserve"><value>Деактивировать</value></data>
+	<data name="UI_BTN_ACTIVATE" xml:space="preserve"><value>Активировать</value></data>
+
+	<data name="UI_PLAN_FREE_DISPLAY" xml:space="preserve"><value>Free Trial (8 партий, 2 склада)</value></data>
+	<data name="UI_PLAN_STANDARD_DISPLAY" xml:space="preserve"><value>Standard (32 партии, 5 складов)</value></data>
+	<data name="UI_PLAN_PRO_DISPLAY" xml:space="preserve"><value>Professional (Безлимит)</value></data>
 
 	<!-- ========================================== -->
 	<!-- 5.1: Созревание и Аффинаж                  -->
@@ -524,6 +663,13 @@
 	<data name="UI_LOGIN_SUCCESS" xml:space="preserve"><value>Успешный вход в систему</value></data>
 	<data name="UI_BATCH_COST_CALCULATED" xml:space="preserve"><value>Себестоимость рассчитана</value></data>
 	<data name="UI_API_ERROR_PREFIX" xml:space="preserve"><value>Ошибка выполнения операции</value></data>
+	<data name="UI_ERR_ACCESS_DENIED_MRP" xml:space="preserve"><value>Доступ запрещён. Нет прав для просмотра модуля MRP.</value></data>
+	<data name="UI_ERR_ACCESS_DENIED_MRP_CALC" xml:space="preserve"><value>Недостаточно прав для расчёта MRP.</value></data>
+	<data name="UI_ERR_ACCESS_DENIED_PURCHASE" xml:space="preserve"><value>Недостаточно прав для оформления заказа поставщику.</value></data>
+	<data name="UI_ERR_ACCESS_DENIED_PLAN" xml:space="preserve"><value>Недостаточно прав для планирования варки.</value></data>
+	<data name="UI_ORDER_CREATED_WITH_ID" xml:space="preserve"><value>Заказ успешно создан. ID заказа: {0}</value></data>
+	<data name="UI_BATCH_PLANNED_SUCCESS" xml:space="preserve"><value>Варка успешно запланирована</value></data>
+	<data name="UI_DRAFT_DELETED_SUCCESS" xml:space="preserve"><value>Черновик варки удалён</value></data>
 
 	<!-- ========================================== -->
 	<!-- 13. Domain & Business Errors               -->
@@ -534,16 +680,21 @@
 	<data name="GENERAL_NOT_FOUND" xml:space="preserve"><value>Запрашиваемый ресурс не найден</value></data>
 
 	<!-- ========================================== -->
-	<!-- 14. Sales Page Keys                        -->
+	<!-- 14. Продажи и Клиенты                      -->
 	<!-- ========================================== -->
+	<data name="TITLE_SALES" xml:space="preserve"><value>Продажи и Отгрузка</value></data>
 	<data name="SALES_HEADER" xml:space="preserve"><value>Управление Продажами и Клиентами</value></data>
+
 	<data name="TAB_SALES_SHIPMENT" xml:space="preserve"><value>1. Продажи и Отгрузка</value></data>
 	<data name="TAB_CUSTOMERS" xml:space="preserve"><value>2. Клиенты и Покупатели</value></data>
+
 	<data name="GROUP_SALES_ORDER" xml:space="preserve"><value>Оформление и Отгрузка Заказа</value></data>
 	<data name="GROUP_REGISTER_CUSTOMER" xml:space="preserve"><value>Регистрация нового контрагента</value></data>
 	<data name="GROUP_ACTIVE_CUSTOMERS" xml:space="preserve"><value>Список активных клиентов</value></data>
+
 	<data name="LABEL_SELECT_CUSTOMER" xml:space="preserve"><value>Выберите Покупателя:</value></data>
 	<data name="LABEL_FINISHED_WAREHOUSE" xml:space="preserve"><value>Склад готовой продукции:</value></data>
+	<data name="LABEL_SELECT_PRODUCT" xml:space="preserve"><value>Выбор сыра / партии на складе</value></data>
 	<data name="LABEL_AVAILABLE_STOCK" xml:space="preserve"><value>Доступный остаток:</value></data>
 	<data name="LABEL_UNIT_COST_CALC" xml:space="preserve"><value>Расчётная себестоимость 1 кг:</value></data>
 	<data name="LABEL_QTY_KG" xml:space="preserve"><value>Количество (кг):</value></data>
@@ -553,27 +704,72 @@
 	<data name="LABEL_TOTAL_ORDER_SUM" xml:space="preserve"><value>ИТОГО К ОПЛАТЕ:</value></data>
 	<data name="LABEL_CUSTOMER_NAME" xml:space="preserve"><value>Наименование (Ресторан / Сетка / ФЛ):</value></data>
 	<data name="LABEL_CUSTOMER_PHONE" xml:space="preserve"><value>Контактный телефон:</value></data>
+	<data name="LABEL_PLANTED_DATE" xml:space="preserve"><value>Дата отгрузки</value></data>
 	<data name="NOTICE_MARKUP_APPLIED" xml:space="preserve"><value>* Автоматически применена базовая наценка x2 к себестоимости</value></data>
+
 	<data name="BTN_SHIP_ORDER" xml:space="preserve"><value>🚀 Отгрузить Заказ</value></data>
 	<data name="BTN_CREATE_CUSTOMER" xml:space="preserve"><value>➕ Зарегистрировать Клиента</value></data>
 
-	<!-- ========================================== -->
-	<!-- 15. Procurement Page Extra Keys            -->
-	<!-- ========================================== -->
-	<data name="TAB_GOODS_RECEIPT" xml:space="preserve"><value>1. Оприходование сырья</value></data>
-	<data name="TAB_SUPPLIERS" xml:space="preserve"><value>2. Поставщики сырья</value></data>
-	<data name="GROUP_RECEIVE_STOCK_LOT" xml:space="preserve"><value>Принять партию сырья на склад</value></data>
-	<data name="LABEL_SELECT_SUPPLIER" xml:space="preserve"><value>Выбор Поставщика:</value></data>
+	<data name="UI_COL_BATCH_NUMBER" xml:space="preserve"><value>Партия</value></data>
+	<data name="UI_COL_PRODUCT_NAME" xml:space="preserve"><value>Товар</value></data>
+	<data name="UI_COL_UNITS_COUNT" xml:space="preserve"><value>Головок</value></data>
+	<data name="UI_COL_WEIGHT_KG" xml:space="preserve"><value>Вес (кг)</value></data>
+	<data name="UI_COL_UNIT_COST" xml:space="preserve"><value>Себест./кг</value></data>
+	<data name="UI_COL_QTY_KG" xml:space="preserve"><value>Кол-во (кг)</value></data>
+	<data name="UI_COL_PRICE_PER_KG" xml:space="preserve"><value>Цена/кг ($)</value></data>
+	<data name="UI_COL_TOTAL_SUM" xml:space="preserve"><value>Сумма ($)</value></data>
+
+	<data name="UI_LABEL_LOT_ITEMS_COMPOSITION" xml:space="preserve"><value>Состав партии (головки):</value></data>
+	<data name="UI_BTN_ADD_SELECTED_HEADS" xml:space="preserve"><value>Добавить выбранные головы</value></data>
+	<data name="UI_HINT_LOT_SELECTION" xml:space="preserve"><value>* Двойной клик — добавить ВСЮ партию. Кликните по строке для выбора отдельных голов.</value></data>
+	<data name="UI_LABEL_PCS_SUFFIX" xml:space="preserve"><value>шт.</value></data>
+
+	<data name="UI_STATUS_READY" xml:space="preserve"><value>Готово</value></data>
+	<data name="UI_MSG_DATA_LOADED_SUCCESS" xml:space="preserve"><value>Данные продаж загружены успешно</value></data>
+	<data name="UI_MSG_CUSTOMER_CREATED_SUCCESS" xml:space="preserve"><value>Клиент успешно зарегистрирован!</value></data>
+	<data name="UI_MSG_ORDER_SHIPPED_SUCCESS_FMT" xml:space="preserve"><value>Заказ успешно отгружен! Номер накладной: {0}</value></data>
+	<data name="UI_ERR_DATA_LOAD" xml:space="preserve"><value>Ошибка загрузки данных</value></data>
+	<data name="UI_ERR_INVALID_INPUT_FIELDS" xml:space="preserve"><value>Заполните все обязательные поля корректно!</value></data>
 
 	<!-- ========================================== -->
-	<!-- 16. Traceability Page Keys                 -->
+	<!-- 15. Трассируемость и Генеалогия (Trace)   -->
 	<!-- ========================================== -->
-	<data name="GROUP_TRACE_CONTROLS" xml:space="preserve"><value>Параметры поиска</value></data>
-	<data name="GROUP_TRACE_RESULTS" xml:space="preserve"><value>Дерево происхождения / распределения</value></data>
-	<data name="LABEL_SELECT_LOT_TRACE" xml:space="preserve"><value>Выберите партию (Сырьё или Готовая продукция):</value></data>
-	<data name="TRACE_FORWARD" xml:space="preserve"><value>Прямая (От Сырья)</value></data>
-	<data name="TRACE_BACKWARD" xml:space="preserve"><value>Обратная (От Продукта)</value></data>
-	<data name="RUN_TRACEABILITY" xml:space="preserve"><value>🔍 Выполнить трассировку</value></data>
+	<data name="TITLE_TRACEABILITY" xml:space="preserve"><value>Трассируемость и Генеалогия</value></data>
+
+	<data name="GROUP_TRACE_CONTROLS" xml:space="preserve"><value>Параметры поиска генеалогии</value></data>
+	<data name="GROUP_TRACE_RESULTS" xml:space="preserve"><value>Дерево связей партии</value></data>
+
+	<data name="LABEL_SELECT_LOT_TRACE" xml:space="preserve"><value>Выберите партию для проверки:</value></data>
+	<data name="TRACE_FORWARD" xml:space="preserve"><value>Прямая (Сырьё ➔ Готовый продукт)</value></data>
+	<data name="TRACE_BACKWARD" xml:space="preserve"><value>Обратная (Продукт ➔ Ингредиенты)</value></data>
+	<data name="RUN_TRACEABILITY" xml:space="preserve"><value>🔍 Построить дерево</value></data>
+
+	<data name="UI_LABEL_RAW_LOT" xml:space="preserve"><value>Партия сырья</value></data>
+	<data name="UI_LABEL_BATCH_COOK" xml:space="preserve"><value>Варка</value></data>
+	<data name="UI_LABEL_STARTED_AT" xml:space="preserve"><value>Запуск</value></data>
+	<data name="UI_LABEL_LOT" xml:space="preserve"><value>Партия</value></data>
+	<data name="UI_LABEL_STOCK_REMAIN" xml:space="preserve"><value>Остаток</value></data>
+	<data name="UI_LABEL_CUSTOMER" xml:space="preserve"><value>Покупатель</value></data>
+	<data name="UI_LABEL_IN_STOCK" xml:space="preserve"><value>На складе</value></data>
+	<data name="UI_LABEL_SHRINKAGE" xml:space="preserve"><value>Усушка</value></data>
+	<data name="UI_LABEL_AGING" xml:space="preserve"><value>Выдержка</value></data>
+	<data name="UI_LABEL_DAYS_IN_CHAMBER" xml:space="preserve"><value>Дней в камере</value></data>
+	<data name="UI_LABEL_YIELD" xml:space="preserve"><value>Выход</value></data>
+	<data name="UI_LABEL_OF_PLAN" xml:space="preserve"><value>от плана</value></data>
+	<data name="UI_LABEL_CONSUMPTION" xml:space="preserve"><value>Расход</value></data>
+	<data name="UI_LABEL_SUPPLIER" xml:space="preserve"><value>Поставщик</value></data>
+	<data name="UI_UNIT_KG" xml:space="preserve"><value>кг</value></data>
+
+	<data name="UI_STATUS_READY" xml:space="preserve"><value>Готово</value></data>
+	<data name="UI_MSG_DATA_LOADED_SUCCESS" xml:space="preserve"><value>Дерево генеалогии успешно сформировано</value></data>
+	<data name="UI_MSG_TRACE_NOT_FOUND" xml:space="preserve"><value>Связи трассировки для данной партии не найдены!</value></data>
+	<data name="UI_ERR_DATA_LOAD" xml:space="preserve"><value>Ошибка загрузки связей трассировки</value></data>
+	<data name="UI_ERR_INVALID_INPUT_FIELDS" xml:space="preserve"><value>Выберите партию из списка!</value></data>
+
+	<data name="UI_ENTITY_CUSTOMER" xml:space="preserve"><value>покупателя</value></data>
+	<data name="UI_ENTITY_SUPPLIER" xml:space="preserve"><value>поставщика</value></data>
+	<data name="UI_MSG_CARD_IN_DEVELOPMENT_FMT" xml:space="preserve"><value>Карточка {0} '{1}' (ID: {2}) находится в разработке.</value></data>
+	<data name="UI_CAPTION_NAVIGATION" xml:space="preserve"><value>Навигация</value></data>
 
 	<!-- ========================================== -->
 	<!-- API Keys & Device Management               -->
