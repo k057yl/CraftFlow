@@ -17,7 +17,7 @@ using Microsoft.Extensions.Caching.Memory;
 namespace CraftFlow.Api.Common.Behaviors;
 
 public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-    where TRequest : IRequest<TResponse>, IRequireQuotaValidation
+    where TRequest : IRequest<TResponse>
     where TResponse : Result
 {
     private const int UNLIMITED_QUOTA = -1;
@@ -41,6 +41,11 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
+        if (request is not IRequireQuotaValidation quotaRequest)
+        {
+            return await next();
+        }
+
         var tenantId = _tenantContext.TenantId;
 
         if (tenantId == Guid.Empty || _tenantContext.IsSuperAdmin)
@@ -64,7 +69,7 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
             return BuildFailureResult(ErrorCodes.Saas.SUBSCRIPTION_EXPIRED);
         }
 
-        var isQuotaExceeded = request.QuotaType switch
+        var isQuotaExceeded = quotaRequest.QuotaType switch
         {
             QuotaType.MonthlyBatches => await CheckMonthlyBatchesQuotaAsync(tenantId, plan.MaxMonthlyBatches, cancellationToken),
             QuotaType.WarehousesCount => await CheckCountQuotaAsync<Warehouse>(tenantId, plan.MaxWarehouses, cancellationToken),

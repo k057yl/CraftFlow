@@ -1,7 +1,11 @@
-﻿using CraftFlow.SharedKernel.Constants.Endpoints;
+﻿using CraftFlow.Api.Modules.Identity;
+using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Constants.Endpoints;
+using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Enums.Sanitation;
 using CraftFlow.Wpf.Services;
 using System.Windows;
+using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Windows;
 
@@ -23,11 +27,52 @@ public partial class SanitationExecutionWindow : Window
         _targetType = targetType;
         _activeTaskId = activeTaskId;
 
-        TargetTitleTextBlock.Text = $"Мойка: {targetName}";
-        ChemicalsTextBox.Text = string.IsNullOrWhiteSpace(defaultChemicals) ? "Щелочной раствор CIP-30" : defaultChemicals;
-        PerformerTextBox.Text = ApiService.Instance.CurrentUser?.FullName ?? "Сотрудник";
+        var titleFmt = Get("UI_SANITATION_TITLE_FMT");
+        TargetTitleTextBlock.Text = string.Format(titleFmt, targetName);
+
+        ChemicalsTextBox.Text = string.IsNullOrWhiteSpace(defaultChemicals)
+            ? Get("UI_SANITATION_DEFAULT_CHEMICAL")
+            : defaultChemicals;
 
         SwitchMode(_activeTaskId.HasValue);
+
+        Loaded += async (s, e) => await LoadUsersAsync();
+    }
+
+    private async Task LoadUsersAsync()
+    {
+        try
+        {
+            var users = await ApiService.Instance.GetAsync<List<LookupDto>>($"{IdentityConstants.USERS}/lookup");
+            if (users != null && users.Count > 0)
+            {
+                PerformerComboBox.ItemsSource = users;
+
+                var currentUserId = ApiService.Instance.CurrentUser?.Id;
+                if (currentUserId.HasValue && users.Any(u => u.Id == currentUserId.Value))
+                {
+                    PerformerComboBox.SelectedValue = currentUserId.Value;
+                }
+                else
+                {
+                    PerformerComboBox.SelectedIndex = 0;
+                }
+                return;
+            }
+        }
+        catch
+        {
+        }
+
+        var currentUser = ApiService.Instance.CurrentUser;
+        if (currentUser != null)
+        {
+            PerformerComboBox.ItemsSource = new List<LookupDto>
+            {
+                new(currentUser.Id, currentUser.FullName)
+            };
+            PerformerComboBox.SelectedIndex = 0;
+        }
     }
 
     private void SwitchMode(bool isUnderSanitation)
@@ -38,10 +83,16 @@ public partial class SanitationExecutionWindow : Window
 
     private async void Start_Click(object sender, RoutedEventArgs e)
     {
+        var selectedPerformerId = PerformerComboBox.SelectedValue is Guid userId
+            ? userId
+            : ApiService.Instance.CurrentUser?.Id;
+
         var payload = new
         {
             TargetType = _targetType,
-            TargetId = _targetId
+            TargetId = _targetId,
+            PerformerUserId = selectedPerformerId,
+            Notes = StartNotesTextBox.Text.Trim()
         };
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{SanitationConstants.TASKS}/start-new", payload);
@@ -49,12 +100,20 @@ public partial class SanitationExecutionWindow : Window
         if (isSuccess && Guid.TryParse(contentOrError.Trim('"'), out var taskId))
         {
             _activeTaskId = taskId;
-            AlertWindow.ShowSuccess(this, "Мойка запущена! Объект переведён в статус обслуживания.");
+            AlertWindow.ShowSuccess(this, Get("UI_SANITATION_MSG_STARTED"));
             DialogResult = true;
         }
         else
         {
-            AlertWindow.ShowError(this, contentOrError);
+            if (contentOrError.Contains("LOCATION_HAS_VOLUME", StringComparison.OrdinalIgnoreCase) ||
+                contentOrError.Contains(ErrorCodes.Inventory.LOCATION_HAS_VOLUME, StringComparison.OrdinalIgnoreCase))
+            {
+                AlertWindow.ShowError(this, Get("UI_SANITATION_ERR_LOCATION_HAS_VOLUME"));
+            }
+            else
+            {
+                AlertWindow.ShowError(this, contentOrError);
+            }
         }
     }
 
@@ -65,7 +124,7 @@ public partial class SanitationExecutionWindow : Window
         var chemicals = ChemicalsTextBox.Text.Trim();
         if (string.IsNullOrWhiteSpace(chemicals))
         {
-            AlertWindow.ShowError(this, "Укажите использованные химические средства.");
+            AlertWindow.ShowError(this, Get("UI_SANITATION_ERR_CHEMICALS_REQUIRED"));
             return;
         }
 
@@ -75,7 +134,7 @@ public partial class SanitationExecutionWindow : Window
         {
             TaskId = _activeTaskId.Value,
             ChemicalsUsed = chemicals,
-            Notes = "Завершено оператором"
+            Notes = Get("UI_SANITATION_NOTE_COMPLETED_BY_OPERATOR")
         });
 
         if (!completeSuccess)
@@ -94,7 +153,7 @@ public partial class SanitationExecutionWindow : Window
 
         if (verifySuccess)
         {
-            AlertWindow.ShowSuccess(this, "Мойка принята! Объект доступен к работе.");
+            AlertWindow.ShowSuccess(this, Get("UI_SANITATION_MSG_ACCEPTED"));
             DialogResult = true;
         }
         else
@@ -114,10 +173,10 @@ public partial class SanitationExecutionWindow : Window
             TaskId = _activeTaskId.Value,
             VerifierUserId = userId,
             IsPassed = false,
-            VerificationNotes = "Забраковано. Направлено на повторную мойку."
+            VerificationNotes = Get("UI_SANITATION_NOTE_REWASH_REJECTED")
         });
 
-        AlertWindow.ShowWarning(this, "Мойка отклонена. Объект отправлен на повторную обработку.");
+        AlertWindow.ShowWarning(this, Get("UI_SANITATION_MSG_REJECTED"));
         DialogResult = true;
     }
 

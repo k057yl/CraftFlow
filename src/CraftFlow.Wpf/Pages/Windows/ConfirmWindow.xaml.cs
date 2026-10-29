@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using CraftFlow.Wpf.Services;
+using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Windows;
 
@@ -26,8 +26,8 @@ public partial class ConfirmWindow : Window
 
     public static bool Show(Window owner, string messageKeyOrRaw, string? titleKeyOrRaw = null)
     {
-        var title = titleKeyOrRaw != null ? LocalizationService.Get(titleKeyOrRaw) : LocalizationService.Get("CONFIRM_ACTION_TITLE");
-        var message = LocalizationService.Get(messageKeyOrRaw);
+        var title = titleKeyOrRaw != null ? Get(titleKeyOrRaw) : Get("UI_CONFIRM_ACTION_TITLE");
+        var message = Get(messageKeyOrRaw);
 
         var win = new ConfirmWindow(title, message) { Owner = owner };
         return win.ShowDialog() == true;

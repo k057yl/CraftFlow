@@ -9,6 +9,7 @@ using CraftFlow.Api.Modules.Identity.Subscriptions.ManageSubscription;
 using CraftFlow.Api.Modules.Identity.Users.CreateTenantUser;
 using CraftFlow.Api.Modules.Identity.Users.DeleteAccount;
 using CraftFlow.Api.Modules.Identity.Users.GetTenantUsers;
+using CraftFlow.Api.Modules.Identity.Users.GetUsersLookup;
 using CraftFlow.Api.Modules.Identity.Users.ToggleUserStatus;
 using CraftFlow.SharedKernel.Constants;
 using MediatR;
@@ -137,6 +138,14 @@ public static class IdentityEndpoints
                 : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
                     ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
                     : Results.BadRequest(result.Error));
+        });
+
+        authGroup.MapGet($"{IdentityConstants.USERS}/lookup", async (ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new GetUsersLookupQuery(), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : Results.BadRequest(result.Error);
         });
     }
 }

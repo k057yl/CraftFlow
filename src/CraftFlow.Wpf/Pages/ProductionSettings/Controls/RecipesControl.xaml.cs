@@ -1,4 +1,5 @@
 ﻿using CraftFlow.Api.Modules.Catalog;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Enums.Identity;
@@ -106,7 +107,7 @@ public partial class RecipesControl : UserControl
             raw?.ForEach(r =>
             {
                 var displayName = !string.IsNullOrWhiteSpace(r.UnitOfMeasureCode) ? $"{r.Name} ({r.UnitOfMeasureCode})" : r.Name;
-                RawMaterials.Add(new LookupItem(r.Id, displayName, r.UnitOfMeasureCode));
+                RawMaterials.Add(new LookupItem(r.Id, displayName, r.UnitOfMeasureCode) { IsArchived = r.IsArchived });
             });
 
             bool showRecipesArchived = ShowArchivedRecipesCheckBox.IsChecked ?? false;
@@ -123,6 +124,76 @@ public partial class RecipesControl : UserControl
             SetStatusFormatted("UI_ERR_DATA_LOAD_FMT", Brushes.Red, ex.Message);
         }
     }
+
+    #region Context Menus (Дропдаун при клике на •••)
+
+    private void OpenRawMaterialMenu_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is LookupItem item)
+        {
+            var menu = new ContextMenu();
+            var isArchived = item.IsArchived;
+
+            var actionHeader = isArchived ? Get("UI_RECIPES_MENU_RESTORE") : Get("UI_RECIPES_MENU_HIDE");
+            var menuItem = new MenuItem { Header = actionHeader };
+
+            menuItem.Click += async (s, args) =>
+            {
+                var confirmKey = isArchived ? "UI_RECIPES_CONFIRM_RESTORE_RAW" : "UI_RECIPES_CONFIRM_ARCHIVE_RAW";
+                bool confirmed = ConfirmWindow.Show(Window.GetWindow(this), confirmKey, "UI_CONFIRM_ACTION_TITLE");
+                if (!confirmed) return;
+
+                if (isArchived)
+                {
+                    await ApiService.Instance.PostAndReadAsync($"{CatalogConstants.RAW_MATERIALS}/{item.Id}/restore", new { });
+                }
+                else
+                {
+                    await ApiService.Instance.DeleteAsync($"{CatalogConstants.RAW_MATERIALS}/{item.Id}");
+                }
+                await LoadDataAsync();
+            };
+
+            menu.Items.Add(menuItem);
+            menu.PlacementTarget = btn;
+            menu.IsOpen = true;
+        }
+    }
+
+    private void OpenRecipeMenu_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is RecipeDto recipe)
+        {
+            var menu = new ContextMenu();
+            var isArchived = recipe.IsArchived;
+
+            var actionHeader = isArchived ? Get("UI_RECIPES_MENU_RESTORE") : Get("UI_RECIPES_MENU_HIDE");
+            var menuItem = new MenuItem { Header = actionHeader };
+
+            menuItem.Click += async (s, args) =>
+            {
+                var confirmKey = isArchived ? "UI_RECIPES_CONFIRM_RESTORE_RECIPE" : "UI_RECIPES_CONFIRM_ARCHIVE_RECIPE";
+                bool confirmed = ConfirmWindow.Show(Window.GetWindow(this), confirmKey, "UI_CONFIRM_ACTION_TITLE");
+                if (!confirmed) return;
+
+                if (isArchived)
+                {
+                    await ApiService.Instance.PostAndReadAsync($"{CatalogConstants.RECIPES}/{recipe.Id}/restore", new { });
+                }
+                else
+                {
+                    await ApiService.Instance.DeleteAsync($"{CatalogConstants.RECIPES}/{recipe.Id}");
+                }
+                await LoadDataAsync();
+            };
+
+            menu.Items.Add(menuItem);
+            menu.PlacementTarget = btn;
+            menu.IsOpen = true;
+        }
+    }
+
+    #endregion
 
     private void AddIngredient_Click(object sender, RoutedEventArgs e)
     {
@@ -235,30 +306,6 @@ public partial class RecipesControl : UserControl
         else
         {
             SetStatusRaw(recipeContentOrError, Brushes.Red);
-        }
-    }
-
-    private async void DeleteRawMaterial_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is Guid id)
-        {
-            bool confirmed = ConfirmWindow.Show(Window.GetWindow(this), "UI_RECIPES_CONFIRM_ARCHIVE_RAW", "CONFIRM_ACTION_TITLE");
-            if (!confirmed) return;
-
-            await ApiService.Instance.DeleteAsync($"{CatalogConstants.RAW_MATERIALS}/{id}");
-            await LoadDataAsync();
-        }
-    }
-
-    private async void DeleteRecipe_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is Guid id)
-        {
-            bool confirmed = ConfirmWindow.Show(Window.GetWindow(this), "UI_RECIPES_CONFIRM_ARCHIVE_RECIPE", "CONFIRM_ACTION_TITLE");
-            if (!confirmed) return;
-
-            await ApiService.Instance.DeleteAsync($"{CatalogConstants.RECIPES}/{id}");
-            await LoadDataAsync();
         }
     }
 

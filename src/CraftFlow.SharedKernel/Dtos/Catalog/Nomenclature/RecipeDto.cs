@@ -8,5 +8,6 @@ public record RecipeDto(
     decimal TargetOutputQuantity,
     bool IsAgingRequired,
     int? DefaultMinAgingDays,
-    List<RecipeIngredientDetailDto> Ingredients
+    List<RecipeIngredientDetailDto> Ingredients,
+    bool IsArchived = false
 );

@@ -71,6 +71,10 @@
 	<data name="SUPPLIER_PHONE_NUMBER_INVALID_FORMAT" xml:space="preserve"><value>Некорректный формат номера телефона (требуется от 7 до 15 цифр)</value></data>
 	<data name="GENERAL_VALUE_REQUIRED" xml:space="preserve"><value>Обязательное поле не заполнено</value></data>
 	<data name="GENERAL_INVALID_TENANT" xml:space="preserve"><value>Недействительный идентификатор организации (Tenant)</value></data>
+	
+	<data name="UI_CONFIRM_ACTION_TITLE" xml:space="preserve"><value>Подтверждение действия</value></data>
+	<data name="UI_BTN_CONFIRM" xml:space="preserve"><value>Подтвердить</value></data>
+	<data name="UI_BTN_CANCEL" xml:space="preserve"><value>Отмена</value></data>
 
 	<!-- ========================================== -->
 	<!-- 0.1: Ед. Изм								-->
@@ -151,6 +155,11 @@
 	<data name="UI_RECIPES_MSG_INGREDIENT_ADDED_FMT" xml:space="preserve"><value>Добавлено: {0} — {1}</value></data>
 	<data name="UI_RECIPES_CONFIRM_ARCHIVE_RAW" xml:space="preserve"><value>Вы уверены, что хотите скрыть данное сырьё?</value></data>
 	<data name="UI_RECIPES_CONFIRM_ARCHIVE_RECIPE" xml:space="preserve"><value>Вы уверены, что хотите скрыть этот рецепт?</value></data>
+	
+	<data name="UI_RECIPES_MENU_HIDE" xml:space="preserve"><value>Скрыть</value></data>
+	<data name="UI_RECIPES_MENU_RESTORE" xml:space="preserve"><value>Отобразить</value></data>
+	<data name="UI_RECIPES_CONFIRM_RESTORE_RAW" xml:space="preserve"><value>Вы уверены, что хотите восстановить отображение данного сырья?</value></data>
+	<data name="UI_RECIPES_CONFIRM_RESTORE_RECIPE" xml:space="preserve"><value>Вы уверены, что хотите восстановить отображение этого рецепта?</value></data>
 
 	<!-- ========================================== -->
 	<!-- 22. Контрол: Склады и Емкости (StorageControl) -->
@@ -786,4 +795,30 @@
 	<data name="HEADER_ACTIONS" xml:space="preserve"><value>Действия</value></data>
 	<data name="HEADER_CREATED_AT" xml:space="preserve"><value>Дата создания</value></data>
 	<data name="BUTTON_REVOKE" xml:space="preserve"><value>Отозвать</value></data>
+
+	<!-- ========================================== -->
+	<!-- All Windows							    -->
+	<!-- ========================================== -->
+	
+	<!-- Sanitations -->
+	<data name="UI_SANITATION_LABEL_PERFORMER" xml:space="preserve"><value>Исполнитель:</value></data>
+	<data name="UI_SANITATION_LABEL_START_NOTES" xml:space="preserve"><value>Заметки перед стартом:</value></data>
+	<data name="UI_SANITATION_LABEL_CHEMICALS" xml:space="preserve"><value>Использованные химические средства:</value></data>
+	<data name="UI_SANITATION_LABEL_VERIFY_NOTES" xml:space="preserve"><value>Замечания / Чек-лист проверки:</value></data>
+	<data name="UI_SANITATION_CHECKBOX_PASSED" xml:space="preserve"><value>Смывы и качество мойки соответствуют норме</value></data>
+	<data name="UI_SANITATION_BTN_START" xml:space="preserve"><value>▶ Начать мойку</value></data>
+	<data name="UI_SANITATION_BTN_ACCEPT" xml:space="preserve"><value>✔ Принять</value></data>
+	<data name="UI_SANITATION_BTN_REWASH" xml:space="preserve"><value>🔄 Повторная мойка</value></data>
+	<data name="UI_SANITATION_TITLE_FMT" xml:space="preserve"><value>Мойка: {0}</value></data>
+
+	<data name="UI_SANITATION_MSG_STARTED" xml:space="preserve"><value>Мойка запущена! Объект переведён в статус обслуживания.</value></data>
+	<data name="UI_SANITATION_MSG_ACCEPTED" xml:space="preserve"><value>Мойка принята! Объект доступен к работе.</value></data>
+	<data name="UI_SANITATION_MSG_REJECTED" xml:space="preserve"><value>Мойка отклонена. Объект отправлен на повторную обработку.</value></data>
+	<data name="UI_SANITATION_ERR_CHEMICALS_REQUIRED" xml:space="preserve"><value>Укажите использованные химические средства.</value></data>
+	<data name="UI_SANITATION_ERR_LOCATION_HAS_VOLUME" xml:space="preserve"><value>Нельзя начать мойку: в ёмкости находится продукция. Сначала освободите ёмкость.</value></data>
+	
+	<!-- Дефолты и системные примечания мойки -->
+	<data name="UI_SANITATION_DEFAULT_CHEMICAL" xml:space="preserve"><value>Щелочной раствор CIP-30</value></data>
+	<data name="UI_SANITATION_NOTE_COMPLETED_BY_OPERATOR" xml:space="preserve"><value>Завершено оператором</value></data>
+	<data name="UI_SANITATION_NOTE_REWASH_REJECTED" xml:space="preserve"><value>Забраковано. Направлено на повторную мойку.</value></data>
 </root>

@@ -39,6 +39,11 @@ public sealed class StartNewSanitationTaskCommandHandler : IRequestHandler<Start
 
             if (location != null)
             {
+                if (location.CurrentVolume > 0)
+                {
+                    return Result.Failure<Guid>(Error.Validation(ErrorCodes.Inventory.LOCATION_HAS_VOLUME));
+                }
+
                 location.StartSanitation();
             }
         }

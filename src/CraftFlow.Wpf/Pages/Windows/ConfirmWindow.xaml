@@ -33,8 +33,8 @@
             </ScrollViewer>
 
             <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button Content="{loc:Loc Key=BTN_CANCEL}" Click="Cancel_Click" Width="90" Height="30" Margin="0,0,8,0"/>
-                <Button Content="{loc:Loc Key=BTN_CONFIRM}" Click="Confirm_Click" Style="{StaticResource DangerButtonStyle}" Width="90" Height="30"/>
+                <Button Content="{loc:Loc Key=UI_BTN_CANCEL}" Click="Cancel_Click" Width="90" Height="30" Margin="0,0,8,0" Style="{StaticResource SecondaryButtonStyle}"/>
+                <Button Content="{loc:Loc Key=UI_BTN_CONFIRM}" Click="Confirm_Click" Style="{StaticResource DangerButtonStyle}" Width="90" Height="30"/>
             </StackPanel>
         </Grid>
     </Border>

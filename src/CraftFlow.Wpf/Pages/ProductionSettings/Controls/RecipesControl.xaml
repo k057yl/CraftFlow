@@ -44,7 +44,7 @@
                         <DataGridTemplateColumn x:Name="RawMaterialDeleteColumn" Width="45">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="•••" Click="DeleteRawMaterial_Click" Tag="{Binding Id}" Style="{StaticResource ActionButtonStyle}" Width="28" Height="24" Padding="0"/>
+                                    <Button Content="•••" Click="OpenRawMaterialMenu_Click" Tag="{Binding}" Style="{StaticResource ActionButtonStyle}" Width="28" Height="24" Padding="0"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -137,7 +137,7 @@
                         <DataGridTemplateColumn x:Name="RecipeDeleteColumn" Width="45">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="•••" Click="DeleteRecipe_Click" Tag="{Binding Id}" Style="{StaticResource ActionButtonStyle}" Width="28" Height="24" Padding="0"/>
+                                    <Button Content="•••" Click="OpenRecipeMenu_Click" Tag="{Binding}" Style="{StaticResource ActionButtonStyle}" Width="28" Height="24" Padding="0"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
