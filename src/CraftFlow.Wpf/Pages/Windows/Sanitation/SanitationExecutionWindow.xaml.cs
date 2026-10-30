@@ -189,7 +189,7 @@ public partial class SanitationExecutionWindow : Window
             return;
         }
 
-        var userId = ApiService.Instance.CurrentUser?.Id ?? Guid.Empty;
+        var currentUserId = ApiService.Instance.CurrentUser?.Id ?? Guid.Empty;
 
         var (completeSuccess, completeErr) = await ApiService.Instance.PostAndReadAsync($"{SanitationConstants.TASKS}/complete", new
         {
@@ -207,7 +207,7 @@ public partial class SanitationExecutionWindow : Window
         var (verifySuccess, verifyErr) = await ApiService.Instance.PostAndReadAsync(SanitationConstants.TASKS_VERIFY, new
         {
             TaskId = _activeTaskId.Value,
-            VerifierUserId = userId,
+            VerifierUserId = currentUserId,
             IsPassed = PassedCheckBox.IsChecked ?? true,
             VerificationNotes = VerificationNotesTextBox.Text.Trim()
         });

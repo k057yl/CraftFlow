@@ -69,8 +69,8 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="Дата завершения" Binding="{Binding CompletedAt, StringFormat=\{0:dd.MM.yyyy HH:mm\}}" Width="130"/>
                             <DataGridTextColumn Header="Кто убирал" Binding="{Binding PerformedByUserName}" Width="120"/>
+                            <DataGridTextColumn Header="Кто принял" Binding="{Binding VerifiedByUserName}" Width="120"/>
                             <DataGridTextColumn Header="Моющее средство" Binding="{Binding ChemicalsUsed}" Width="130"/>
-                            <DataGridTextColumn Header="Длительность" Binding="{Binding DurationMinutes, StringFormat=\{0\} мин}" Width="90"/>
                             <DataGridTextColumn Header="Примечания" Binding="{Binding Notes}" Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>

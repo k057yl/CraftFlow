@@ -816,9 +816,53 @@
 	<data name="UI_SANITATION_MSG_REJECTED" xml:space="preserve"><value>Мойка отклонена. Объект отправлен на повторную обработку.</value></data>
 	<data name="UI_SANITATION_ERR_CHEMICALS_REQUIRED" xml:space="preserve"><value>Укажите использованные химические средства.</value></data>
 	<data name="UI_SANITATION_ERR_LOCATION_HAS_VOLUME" xml:space="preserve"><value>Нельзя начать мойку: в ёмкости находится продукция. Сначала освободите ёмкость.</value></data>
+
+	<!-- Sanitation Rule Window -->
+	<data name="UI_SANITATION_RULE_TITLE" xml:space="preserve"><value>Настройка регламента мойки</value></data>
+	<data name="UI_SANITATION_RULE_SUBTITLE" xml:space="preserve"><value>Настройка интервалов и химических средств для сантехобслуживания</value></data>
+	<data name="UI_SANITATION_RULE_GROUP_HEADER" xml:space="preserve"><value>Регламент сантехобслуживания</value></data>
+	<data name="UI_SANITATION_RULE_LABEL_TRIGGER_TYPE" xml:space="preserve"><value>Тип триггера мойки</value></data>
+	<data name="UI_SANITATION_RULE_LABEL_BATCH_INTERVAL" xml:space="preserve"><value>Интервал (батчей)</value></data>
+	<data name="UI_SANITATION_RULE_LABEL_DAYS_INTERVAL" xml:space="preserve"><value>Интервал (дней)</value></data>
+	<data name="UI_SANITATION_RULE_LABEL_SCHEDULED_DATE" xml:space="preserve"><value>Планируемая дата мойки</value></data>
+	<data name="UI_SANITATION_RULE_LABEL_CHEMICALS" xml:space="preserve"><value>Используемая химия / моющие средства</value></data>
+	<data name="UI_SANITATION_RULE_BTN_SAVE" xml:space="preserve"><value>💾 Сохранить регламент</value></data>
+	<data name="UI_SANITATION_RULE_MSG_SUCCESS" xml:space="preserve"><value>Регламент мойки успешно обновлён!</value></data>
+	<data name="UI_SANITATION_RULE_MSG_ERROR" xml:space="preserve"><value>Ошибка сохранения регламента</value></data>
+
+	<!-- Sanitation Trigger ComboBox Options -->
+	<data name="UI_SANITATION_TRIGGER_BATCHES" xml:space="preserve"><value>По количеству партий (батчей)</value></data>
+	<data name="UI_SANITATION_TRIGGER_DAYS" xml:space="preserve"><value>По интервалу дней</value></data>
+	<data name="UI_SANITATION_TRIGGER_DATE" xml:space="preserve"><value>По конкретной дате</value></data>
+	<data name="UI_SANITATION_TRIGGER_BOTH" xml:space="preserve"><value>⚡ Комбинированный (батчи ИЛИ дни — что раньше)</value></data>
+	<data name="UI_SANITATION_TRIGGER_UPON_EMPTY" xml:space="preserve"><value>🧹 После полного опустошения ёмкости</value></data>
+
+	<!-- Target Titles -->
+	<data name="UI_SANITATION_TARGET_WAREHOUSE" xml:space="preserve"><value>Склад</value></data>
+	<data name="UI_SANITATION_TARGET_CHAMBER" xml:space="preserve"><value>Камера</value></data>
+	<data name="UI_SANITATION_TARGET_LOCATION" xml:space="preserve"><value>Ёмкость</value></data>
+
+	<!-- History Window -->
+	<data name="UI_SANITATION_HISTORY_TITLE" xml:space="preserve"><value>История сантехобслуживания</value></data>
+	<data name="UI_SANITATION_HISTORY_GROUP_HEADER" xml:space="preserve"><value>Протокол проведённых моек</value></data>
+	<data name="UI_SANITATION_LABEL_STATUS" xml:space="preserve"><value>Текущий статус:</value></data>
+	<data name="UI_SANITATION_ERR_LOAD_HISTORY" xml:space="preserve"><value>Не удалось загрузить историю моек</value></data>
+
+	<!-- Columns -->
+	<data name="UI_SANITATION_COL_COMPLETED_AT" xml:space="preserve"><value>Дата завершения</value></data>
+	<data name="UI_SANITATION_COL_PERFORMER" xml:space="preserve"><value>Кто убирал</value></data>
+	<data name="UI_SANITATION_COL_VERIFIER" xml:space="preserve"><value>Кто принял</value></data>
+	<data name="UI_SANITATION_COL_CHEMICALS" xml:space="preserve"><value>Моющее средство</value></data>
+	<data name="UI_SANITATION_COL_NOTES" xml:space="preserve"><value>Примечания / Чек-лист</value></data>
 	
 	<!-- Дефолты и системные примечания мойки -->
 	<data name="UI_SANITATION_DEFAULT_CHEMICAL" xml:space="preserve"><value>Щелочной раствор CIP-30</value></data>
 	<data name="UI_SANITATION_NOTE_COMPLETED_BY_OPERATOR" xml:space="preserve"><value>Завершено оператором</value></data>
 	<data name="UI_SANITATION_NOTE_REWASH_REJECTED" xml:space="preserve"><value>Забраковано. Направлено на повторную мойку.</value></data>
+
+	<data name="UI_STORAGE_MENU_SANITATION_PLAN" xml:space="preserve"><value>📅 Планирование мойки</value></data>
+	<data name="UI_STORAGE_MENU_SANITATION_EXECUTE" xml:space="preserve"><value>🧼 Провести мойку</value></data>
+	<data name="UI_STORAGE_MENU_SANITATION_HISTORY" xml:space="preserve"><value>📜 История моек</value></data>
+	<data name="UI_STORAGE_MENU_WRITE_OFF" xml:space="preserve"><value>📉 Списание сырья</value></data>
+	<data name="UI_MSG_WRITE_OFF_SUCCESS" xml:space="preserve"><value>Списание успешно выполнено!</value></data>
 </root>

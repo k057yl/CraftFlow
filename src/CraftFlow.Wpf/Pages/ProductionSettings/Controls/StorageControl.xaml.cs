@@ -2,6 +2,7 @@
 using CraftFlow.Api.Modules.Inventory;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Inventory;
+using CraftFlow.SharedKernel.Dtos.Sanitation;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Enums.Sanitation;
 using CraftFlow.Wpf.Models;
@@ -103,6 +104,7 @@ public partial class StorageControl : UserControl
                     Id = l.Id,
                     Name = l.Name,
                     LocationType = l.LocationType,
+                    CurrentVolume = l.CurrentVolume,
                     VolumeInfo = l.VolumeInfo,
                     ParentName = parentName,
                     LastWashedText = l.LastWashedAt?.ToString("dd.MM.yyyy HH:mm") ?? "—",
@@ -186,19 +188,100 @@ public partial class StorageControl : UserControl
             var planItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_PLAN") };
             planItem.Click += (s, args) => OpenLocationSanitation(item);
 
-            var detailsItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_DETAILS") };
-            detailsItem.Click += (s, args) => OpenLocationDetails(item);
+            var executeItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_EXECUTE") };
+            executeItem.Click += (s, args) => OpenLocationExecution(item);
+
+            var historyItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_HISTORY") };
+            historyItem.Click += (s, args) => OpenLocationHistory(item);
+
+            var writeOffItem = new MenuItem { Header = Get("UI_STORAGE_MENU_WRITE_OFF") };
+            writeOffItem.Click += (s, args) => OpenLocationWriteOff(item);
 
             var deleteItem = new MenuItem { Header = Get("UI_STORAGE_MENU_DELETE") };
             deleteItem.Click += async (s, args) => await DeleteStorageLocationAsync(item.Id);
 
             menu.Items.Add(planItem);
-            menu.Items.Add(detailsItem);
+            menu.Items.Add(executeItem);
+            menu.Items.Add(historyItem);
+
+            if (item.CurrentVolume > 0)
+            {
+                menu.Items.Add(new Separator());
+                menu.Items.Add(writeOffItem);
+            }
+
             menu.Items.Add(new Separator());
             menu.Items.Add(deleteItem);
 
             menu.PlacementTarget = btn;
             menu.IsOpen = true;
+        }
+    }
+
+    private async void OpenLocationExecution(StorageLocationViewItem item)
+    {
+        var details = await ApiService.Instance.GetAsync<SanitationDetailsDto>($"api/sanitation/details/{SanitationTargetType.STORAGE_LOCATION}/{item.Id}");
+
+        var executionWindow = new SanitationExecutionWindow(
+            item.Id,
+            item.Name,
+            SanitationTargetType.STORAGE_LOCATION,
+            details?.ActiveTaskId,
+            details?.RequiredChemicals ?? "Щелочной раствор CIP-30"
+        )
+        {
+            Owner = Window.GetWindow(this)
+        };
+
+        if (executionWindow.ShowDialog() == true)
+        {
+            await LoadDataAsync();
+        }
+    }
+
+    private async void OpenLocationHistory(StorageLocationViewItem item)
+    {
+        var historyWindow = new SanitationHistoryWindow(item.Id, item.Name, SanitationTargetType.STORAGE_LOCATION)
+        {
+            Owner = Window.GetWindow(this)
+        };
+        historyWindow.ShowDialog();
+        await LoadDataAsync();
+    }
+
+    private async void OpenLocationWriteOff(StorageLocationViewItem item)
+    {
+        var dialog = new WriteOffDialog(
+            batchNumber: item.Name,
+            chamberName: item.ParentName,
+            currentQuantity: item.CurrentVolume,
+            items: null
+        )
+        {
+            Owner = Window.GetWindow(this)
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            var payload = new
+            {
+                StorageLocationId = item.Id,
+                Quantity = dialog.QuantityToWriteOff,
+                Reason = dialog.Reason,
+                ItemIds = dialog.SelectedItemIds
+            };
+
+            var (isSuccess, error) = await ApiService.Instance.PostAndReadAsync("api/inventory/write-off", payload);
+
+            if (isSuccess)
+            {
+                AlertWindow.ShowSuccess(Window.GetWindow(this), Get("UI_MSG_WRITE_OFF_SUCCESS"));
+                await LoadDataAsync();
+            }
+            else
+            {
+                AlertWindow.ShowError(Window.GetWindow(this), error);
+            }
         }
     }
 
@@ -217,11 +300,11 @@ public partial class StorageControl : UserControl
 
     private async void OpenWarehouseDetails(LookupItem item)
     {
-        var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.WAREHOUSE)
+        var historyWindow = new SanitationHistoryWindow(item.Id, item.Name, SanitationTargetType.WAREHOUSE)
         {
             Owner = Window.GetWindow(this)
         };
-        detailsWindow.ShowDialog();
+        historyWindow.ShowDialog();
         await LoadDataAsync();
     }
 
@@ -236,11 +319,11 @@ public partial class StorageControl : UserControl
 
     private async void OpenChamberDetails(LookupItem item)
     {
-        var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.AGING_CHAMBER)
+        var historyWindow = new SanitationHistoryWindow(item.Id, item.Name, SanitationTargetType.AGING_CHAMBER)
         {
             Owner = Window.GetWindow(this)
         };
-        detailsWindow.ShowDialog();
+        historyWindow.ShowDialog();
         await LoadDataAsync();
     }
 
@@ -255,11 +338,11 @@ public partial class StorageControl : UserControl
 
     private async void OpenLocationDetails(StorageLocationViewItem item)
     {
-        var detailsWindow = new SanitationDetailsWindow(item.Id, item.Name, SanitationTargetType.STORAGE_LOCATION)
+        var historyWindow = new SanitationHistoryWindow(item.Id, item.Name, SanitationTargetType.STORAGE_LOCATION)
         {
             Owner = Window.GetWindow(this)
         };
-        detailsWindow.ShowDialog();
+        historyWindow.ShowDialog();
         await LoadDataAsync();
     }
 

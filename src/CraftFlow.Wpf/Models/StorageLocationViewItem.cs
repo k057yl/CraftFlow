@@ -9,6 +9,7 @@ public class StorageLocationViewItem
     public string Name { get; set; } = string.Empty;
     public StorageLocationType LocationType { get; set; }
     public string ParentName { get; set; } = string.Empty;
+    public decimal CurrentVolume { get; set; }
     public string VolumeInfo { get; set; } = string.Empty;
     public string LastWashedText { get; set; } = string.Empty;
     public string NextWashText { get; set; } = string.Empty;

@@ -80,6 +80,9 @@ public sealed class SanitationRule : AggregateRoot, ITenantEntity
                     throw new ArgumentException(ErrorCodes.Sanitation.INVALID_TRIGGER_CONFIG);
                 break;
 
+            case SanitationTriggerType.UPON_EMPTY:
+                break;
+
             default:
                 throw new ArgumentOutOfRangeException(nameof(triggerType));
         }

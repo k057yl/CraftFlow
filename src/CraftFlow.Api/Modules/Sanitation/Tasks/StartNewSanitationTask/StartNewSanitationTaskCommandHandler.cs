@@ -2,6 +2,7 @@
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Sanitation.Domain;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Enums.Sanitation;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
@@ -25,10 +26,14 @@ public sealed class StartNewSanitationTaskCommandHandler : IRequestHandler<Start
         if (!_tenantContext.IsResolved || _tenantContext.TenantId == Guid.Empty)
             return Result.Failure<Guid>(ErrorCodes.Auth.UNAUTHORIZED);
 
-        var userId = _tenantContext.UserId;
+        var performerId = request.PerformerUserId.HasValue && request.PerformerUserId.Value != Guid.Empty
+            ? request.PerformerUserId.Value
+            : _tenantContext.UserId;
+
         var now = DateTime.UtcNow;
         var task = SanitationTask.Create(_tenantContext.TenantId, request.TargetType, request.TargetId, now);
-        task.Start(userId, now);
+
+        task.Start(performerId, now);
 
         _context.SanitationTasks.Add(task);
 
@@ -39,7 +44,9 @@ public sealed class StartNewSanitationTaskCommandHandler : IRequestHandler<Start
 
             if (location != null)
             {
-                if (location.CurrentVolume > 0)
+                bool isShelfOrRack = location.LocationType == StorageLocationType.RACK_SHELF;
+
+                if (!isShelfOrRack && location.CurrentVolume > 0)
                 {
                     return Result.Failure<Guid>(Error.Validation(ErrorCodes.Inventory.LOCATION_HAS_VOLUME));
                 }

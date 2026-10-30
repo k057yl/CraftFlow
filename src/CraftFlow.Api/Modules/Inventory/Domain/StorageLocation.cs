@@ -133,10 +133,12 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
 
     public void StartSanitation()
     {
-        if (CurrentVolume > 0 || CurrentProductionBatchId.HasValue)
+        bool isShelfOrRack = LocationType == StorageLocationType.RACK_SHELF;
+
+        if (!isShelfOrRack && (CurrentVolume > 0 || CurrentProductionBatchId.HasValue))
             throw new InvalidOperationException(ErrorCodes.Inventory.LOCATION_HAS_VOLUME);
 
-        if (Status != StorageLocationStatus.SANITATION_REQUIRED && Status != StorageLocationStatus.AVAILABLE)
+        if (Status != StorageLocationStatus.SANITATION_REQUIRED && Status != StorageLocationStatus.AVAILABLE && Status != StorageLocationStatus.OCCUPIED)
             throw new InvalidOperationException(ErrorCodes.Inventory.LOCATION_NOT_EMPTY_FOR_SANITATION);
 
         Status = StorageLocationStatus.UNDER_SANITATION;
@@ -146,7 +148,7 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
     {
         if (isPassed)
         {
-            Status = StorageLocationStatus.AVAILABLE;
+            Status = CurrentVolume > 0 ? StorageLocationStatus.OCCUPIED : StorageLocationStatus.AVAILABLE;
             BatchesProcessedCount = 0;
             LastWashedAt = DateTime.UtcNow;
         }

@@ -8,7 +8,8 @@ namespace CraftFlow.Api.Modules.Sanitation.Tasks.StartNewSanitationTask;
 
 public record StartNewSanitationTaskCommand(
     SanitationTargetType TargetType,
-    Guid TargetId
+    Guid TargetId,
+    Guid? PerformerUserId = null
 ) : IRequest<Result<Guid>>, IRequirePermission
 {
     public AppPermission RequiredPermission => AppPermission.SANITATION_EXECUTE;
