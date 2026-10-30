@@ -4,6 +4,7 @@ using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Enums.Sanitation;
 using CraftFlow.Wpf.Services;
+using System.Text.Json;
 using System.Windows;
 using static CraftFlow.Wpf.Services.LocalizationService;
 
@@ -97,7 +98,7 @@ public partial class SanitationExecutionWindow : Window
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{SanitationConstants.TASKS}/start-new", payload);
 
-        if (isSuccess && Guid.TryParse(contentOrError.Trim('"'), out var taskId))
+        if (isSuccess && !string.IsNullOrWhiteSpace(contentOrError) && Guid.TryParse(contentOrError.Trim('"'), out var taskId))
         {
             _activeTaskId = taskId;
             AlertWindow.ShowSuccess(this, Get("UI_SANITATION_MSG_STARTED"));
@@ -105,16 +106,76 @@ public partial class SanitationExecutionWindow : Window
         }
         else
         {
-            if (contentOrError.Contains("LOCATION_HAS_VOLUME", StringComparison.OrdinalIgnoreCase) ||
-                contentOrError.Contains(ErrorCodes.Inventory.LOCATION_HAS_VOLUME, StringComparison.OrdinalIgnoreCase))
+            string rawError = contentOrError ?? string.Empty;
+            string errorCode = ExtractErrorCode(rawError);
+
+            if (errorCode.Equals("INV_LOCATION_HAS_VOLUME", StringComparison.OrdinalIgnoreCase) ||
+                errorCode.Equals(ErrorCodes.Inventory.LOCATION_HAS_VOLUME, StringComparison.OrdinalIgnoreCase) ||
+                rawError.Contains("LOCATION_HAS_VOLUME", StringComparison.OrdinalIgnoreCase))
             {
-                AlertWindow.ShowError(this, Get("UI_SANITATION_ERR_LOCATION_HAS_VOLUME"));
+                var volumeMsg = Get("UI_SANITATION_ERR_LOCATION_HAS_VOLUME");
+                AlertWindow.ShowError(this, !string.IsNullOrWhiteSpace(volumeMsg)
+                    ? volumeMsg
+                    : "Нельзя начать мойку: в ёмкости находится продукция.");
             }
             else
             {
-                AlertWindow.ShowError(this, contentOrError);
+                var localized = Get($"ERR_{errorCode}");
+                if (!string.IsNullOrEmpty(localized) && !localized.StartsWith("ERR_"))
+                {
+                    AlertWindow.ShowError(this, localized);
+                }
+                else
+                {
+                    AlertWindow.ShowError(this, !string.IsNullOrWhiteSpace(errorCode) && errorCode != "UNKNOWN_ERROR"
+                        ? errorCode
+                        : "Нельзя начать мойку: проверьте состояние ёмкости.");
+                }
             }
         }
+    }
+
+    private static string ExtractErrorCode(string rawResponse)
+    {
+        if (string.IsNullOrWhiteSpace(rawResponse))
+            return "UNKNOWN_ERROR";
+
+        try
+        {
+            using var doc = JsonDocument.Parse(rawResponse);
+            var root = doc.RootElement;
+
+            if (root.ValueKind == JsonValueKind.Object)
+            {
+                if (root.TryGetProperty("code", out var codeProp) || root.TryGetProperty("Code", out codeProp))
+                {
+                    var val = codeProp.GetString();
+                    if (!string.IsNullOrWhiteSpace(val)) return val;
+                }
+
+                if (root.TryGetProperty("error", out var errProp) || root.TryGetProperty("Error", out errProp))
+                {
+                    if (errProp.ValueKind == JsonValueKind.Object)
+                    {
+                        if (errProp.TryGetProperty("code", out var innerCode) || errProp.TryGetProperty("Code", out innerCode))
+                        {
+                            var val = innerCode.GetString();
+                            if (!string.IsNullOrWhiteSpace(val)) return val;
+                        }
+                    }
+                    else if (errProp.ValueKind == JsonValueKind.String)
+                    {
+                        var val = errProp.GetString();
+                        if (!string.IsNullOrWhiteSpace(val)) return val;
+                    }
+                }
+            }
+        }
+        catch
+        {
+        }
+
+        return rawResponse;
     }
 
     private async void CompleteAndVerify_Click(object sender, RoutedEventArgs e)

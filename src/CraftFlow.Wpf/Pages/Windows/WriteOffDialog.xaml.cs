@@ -88,6 +88,19 @@ public partial class WriteOffDialog : Window
         UpdateSelectedSummary();
     }
 
+    private void WriteOffAll_Click(object sender, RoutedEventArgs e)
+    {
+        if (LotItems != null && LotItems.Count > 0)
+        {
+            foreach (var item in LotItems)
+            {
+                item.IsSelected = true;
+            }
+        }
+
+        QuantityTextBox.Text = _maxQuantity.ToString("F2", CultureInfo.InvariantCulture);
+    }
+
     private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SelectableLotItem.IsSelected))

@@ -328,14 +328,13 @@ public class ApiService
             }
 
             var content = await response.Content.ReadAsStringAsync();
-            var cleanContent = content.Trim('"').Trim();
 
             if (response.IsSuccessStatusCode)
             {
-                return (true, cleanContent);
+                return (true, content.Trim('"').Trim());
             }
 
-            return (false, string.IsNullOrWhiteSpace(cleanContent) ? response.StatusCode.ToString() : cleanContent);
+            return (false, string.IsNullOrWhiteSpace(content) ? response.StatusCode.ToString() : content.Trim());
         }
         catch (Exception ex)
         {

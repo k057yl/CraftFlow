@@ -34,6 +34,17 @@ public class DiscardBatchHandler : IRequestHandler<DiscardBatchCommand, Result>
 
         batch.Discard(request.Reason);
 
+        if (batch.EquipmentLocationId != Guid.Empty)
+        {
+            var equipmentLocation = await _dbContext.StorageLocations
+                .FirstOrDefaultAsync(l => l.Id == batch.EquipmentLocationId, cancellationToken);
+
+            if (equipmentLocation != null)
+            {
+                equipmentLocation.ReleaseFromProduction();
+            }
+        }
+
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

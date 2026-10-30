@@ -53,7 +53,17 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Margin="0,0,8,0">
-                    <TextBlock Text="Списываемая масса / Усушка (кг):" FontSize="11" Foreground="#475569" Margin="0,0,0,3"/>
+                    <Grid Margin="0,0,0,3">
+                        <TextBlock Text="Списываемая масса / Усушка (кг):" FontSize="11" Foreground="#475569" HorizontalAlignment="Left"/>
+                        <Button Content="Списать под 0" 
+                                Click="WriteOffAll_Click" 
+                                HorizontalAlignment="Right" 
+                                FontSize="10" 
+                                Padding="4,0" 
+                                Background="#E2E8F0" 
+                                BorderThickness="0" 
+                                Cursor="Hand"/>
+                    </Grid>
                     <TextBox x:Name="QuantityTextBox" Padding="6,4" FontSize="12"/>
                 </StackPanel>
 
@@ -64,7 +74,7 @@
             </Grid>
 
             <TextBlock Text="* Если это усушка/чистка сыра без брака головок — укажите только вес." 
-                       FontSize="10" Foreground="#64748B" FontStyle="Italic" Margin="0,0,0,8" TextWrapping="Wrap"/>
+               FontSize="10" Foreground="#64748B" FontStyle="Italic" Margin="0,0,0,8" TextWrapping="Wrap"/>
 
             <TextBlock Text="Причина списания / комментарий:" FontSize="11" Foreground="#475569" Margin="0,0,0,3"/>
             <TextBox x:Name="ReasonTextBox" Padding="6,4" FontSize="12" Text="Промывка / Технические потери"/>

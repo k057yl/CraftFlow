@@ -57,6 +57,11 @@ public class WriteOffStockLotHandler : IRequestHandler<WriteOffStockLotCommand, 
                 if (location != null)
                 {
                     location.AddVolume(-amountToFree);
+
+                    if (location.CurrentVolume <= 0.001m)
+                    {
+                        location.ClearVolume();
+                    }
                 }
 
                 remainingToWriteOff -= amountToFree;

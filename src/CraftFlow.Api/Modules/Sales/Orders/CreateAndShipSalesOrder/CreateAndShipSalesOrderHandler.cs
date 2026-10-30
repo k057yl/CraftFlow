@@ -37,8 +37,19 @@ public class CreateAndShipSalesOrderHandler : IRequestHandler<CreateAndShipSales
         var lotIds = request.Items.Select(i => i.StockLotId).ToList();
 
         var stockLots = await _dbContext.StockLots
+            .Include(s => s.StorageLocations)
             .Where(s => lotIds.Contains(s.Id) && s.IsActive)
             .ToDictionaryAsync(s => s.Id, cancellationToken);
+
+        var allStorageLocationIds = stockLots.Values
+            .SelectMany(l => l.StorageLocations)
+            .Select(sl => sl.StorageLocationId)
+            .Distinct()
+            .ToList();
+
+        var storageLocations = await _dbContext.StorageLocations
+            .Where(sl => allStorageLocationIds.Contains(sl.Id))
+            .ToDictionaryAsync(sl => sl.Id, cancellationToken);
 
         foreach (var item in request.Items)
         {
@@ -54,6 +65,30 @@ public class CreateAndShipSalesOrderHandler : IRequestHandler<CreateAndShipSales
 
             lot.AdjustQuantity(-item.Quantity);
             order.AddItem(lot.Id, item.Quantity, item.UnitPrice);
+
+            if (lot.StorageLocations.Count > 0)
+            {
+                decimal remainingToFree = item.Quantity;
+
+                foreach (var stockLocation in lot.StorageLocations.ToList())
+                {
+                    if (remainingToFree <= 0) break;
+
+                    if (storageLocations.TryGetValue(stockLocation.StorageLocationId, out var location))
+                    {
+                        decimal amountToFree = Math.Min(stockLocation.AllocatedQuantity, remainingToFree);
+
+                        location.AddVolume(-amountToFree);
+
+                        if (location.CurrentVolume <= 0.001m)
+                        {
+                            location.ClearVolume();
+                        }
+
+                        remainingToFree -= amountToFree;
+                    }
+                }
+            }
         }
 
         order.Ship();

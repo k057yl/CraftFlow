@@ -93,17 +93,21 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
 
     public void AddVolume(decimal volume)
     {
-        if (volume <= 0)
+        if (volume == 0)
             return;
 
-        if (Status != StorageLocationStatus.AVAILABLE && Status != StorageLocationStatus.OCCUPIED)
-            throw new InvalidOperationException(ErrorCodes.Inventory.LOCATION_NOT_AVAILABLE);
-
-        if (Capacity.HasValue && (CurrentVolume + volume) > Capacity.Value)
-            throw new InvalidOperationException(ErrorCodes.Inventory.CAPACITY_EXCEEDED);
-
         CurrentVolume += volume;
-        Status = StorageLocationStatus.OCCUPIED;
+
+        if (CurrentVolume <= 0)
+        {
+            CurrentVolume = 0;
+            CurrentProductionBatchId = null;
+            Status = StorageLocationStatus.SANITATION_REQUIRED;
+        }
+        else
+        {
+            Status = StorageLocationStatus.OCCUPIED;
+        }
     }
 
     public void ClearVolume()
