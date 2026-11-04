@@ -23,6 +23,8 @@ builder.Services.AddInfrastructureAndServices(builder.Configuration);
 
 var app = builder.Build();
 
+app.UseExceptionHandler();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -30,13 +32,17 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseMiddleware<TenantAccessKeyMiddleware>();
-
 app.UseAuthentication();
 app.UseAuthorization();
 
-await DatabaseInitializer.SeedSaasPlansAsync(app.Services, app.Configuration);
-await SystemAdminSeeder.SeedBigBossAsync(app.Services);
+app.UseMiddleware<TenantAccessKeyMiddleware>();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await DatabaseInitializer.SeedSaasPlansAsync(services, app.Configuration);
+    await SystemAdminSeeder.SeedBigBossAsync(services);
+}
 
 // Эндпоинты модулей
 app.MapIdentityEndpoints();

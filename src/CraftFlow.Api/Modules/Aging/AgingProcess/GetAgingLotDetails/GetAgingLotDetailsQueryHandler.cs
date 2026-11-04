@@ -1,12 +1,15 @@
 ﻿using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Common.MultiTenancy;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Aging;
+using CraftFlow.SharedKernel.Result;
 using Dapper;
+using MediatR;
 using System.Data;
 
 namespace CraftFlow.Api.Modules.Aging.AgingProcess.GetAgingLotDetails;
 
-public class GetAgingLotDetailsQueryHandler
+public class GetAgingLotDetailsQueryHandler : IRequestHandler<GetAgingLotDetailsQuery, Result<GetAgingLotDetailsDto>>
 {
     private readonly IDbConnection _dbConnection;
     private readonly ITenantContext _tenantContext;
@@ -17,7 +20,7 @@ public class GetAgingLotDetailsQueryHandler
         _tenantContext = tenantContext;
     }
 
-    public async Task<GetAgingLotDetailsDto?> HandleAsync(Guid lotId)
+    public async Task<Result<GetAgingLotDetailsDto>> Handle(GetAgingLotDetailsQuery request, CancellationToken cancellationToken)
     {
         const string sql = $"""
             SELECT 
@@ -43,9 +46,16 @@ public class GetAgingLotDetailsQueryHandler
             GROUP BY al."Id", p."Name", uom."Code";
             """;
 
-        return await _dbConnection.QueryFirstOrDefaultAsync<GetAgingLotDetailsDto>(
+        var dto = await _dbConnection.QueryFirstOrDefaultAsync<GetAgingLotDetailsDto>(
             sql,
-            new { LotId = lotId, TenantId = _tenantContext.TenantId }
+            new { LotId = request.LotId, TenantId = _tenantContext.TenantId }
         );
+
+        if (dto is null)
+        {
+            return Result.Failure<GetAgingLotDetailsDto>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
+        }
+
+        return Result.Success(dto);
     }
 }

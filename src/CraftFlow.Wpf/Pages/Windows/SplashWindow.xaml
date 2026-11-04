@@ -1,6 +1,7 @@
 ﻿<Window x:Class="CraftFlow.Wpf.Pages.SplashWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
         Title="CraftFlow Loading" 
         Height="300" Width="500"
         WindowStyle="None" 
@@ -25,7 +26,7 @@
             <StackPanel Grid.Row="1">
                 <Grid Margin="0,0,0,8">
                     <TextBlock x:Name="StatusTextBlock" 
-                               Text="Инициализация системы..." 
+                               Text="{loc:Loc LBL_STARTUP_INIT}" 
                                Foreground="#94A3B8" 
                                FontSize="11" 
                                HorizontalAlignment="Left"/>

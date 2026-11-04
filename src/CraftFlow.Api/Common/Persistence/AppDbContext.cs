@@ -12,6 +12,8 @@ using CraftFlow.Api.Modules.Subscriptions.Domain;
 using CraftFlow.SharedKernel.Domain;
 using CraftFlow.SharedKernel.Enums.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using System.Linq.Expressions;
 using System.Reflection;
 using System.Text.Json;
 
@@ -69,7 +71,6 @@ public class AppDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.HasDefaultSchema("public");
-
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         modelBuilder.Entity<AuditLog>().HasQueryFilter(e =>
@@ -83,38 +84,28 @@ public class AppDbContext : DbContext
             }
 
             var clrType = entityType.ClrType;
-
             var isTenant = typeof(ITenantEntity).IsAssignableFrom(clrType);
-            var isEntity = typeof(Entity).IsAssignableFrom(clrType);
 
-            if (isTenant && isEntity)
+            if (isTenant)
             {
-                var method = typeof(AppDbContext)
-                    .GetMethod(nameof(SetTenantAndActiveFilter), BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?.MakeGenericMethod(clrType);
+                var parameter = Expression.Parameter(clrType, "e");
 
-                method?.Invoke(this, new object[] { modelBuilder });
-            }
-            else if (isTenant)
-            {
-                var method = typeof(AppDbContext)
-                    .GetMethod(nameof(SetTenantFilter), BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?.MakeGenericMethod(clrType);
+                var roleProperty = Expression.Property(Expression.Constant(_tenantContext), nameof(ITenantContext.Role));
+                var isSuperAdmin = Expression.Equal(roleProperty, Expression.Constant(TenantRole.SUPER_ADMIN));
 
-                method?.Invoke(this, new object[] { modelBuilder });
-            }
-            else if (isEntity)
-            {
-                var method = typeof(AppDbContext)
-                    .GetMethod(nameof(SetActiveFilter), BindingFlags.NonPublic | BindingFlags.Instance)
-                    ?.MakeGenericMethod(clrType);
+                var tenantIdProperty = Expression.Property(parameter, nameof(ITenantEntity.TenantId));
+                var contextTenantId = Expression.Property(Expression.Constant(_tenantContext), nameof(ITenantContext.TenantId));
+                var isSameTenant = Expression.Equal(tenantIdProperty, contextTenantId);
 
-                method?.Invoke(this, new object[] { modelBuilder });
+                var filterBody = Expression.OrElse(isSuperAdmin, isSameTenant);
+                var lambda = Expression.Lambda(filterBody, parameter);
+
+                modelBuilder.Entity(clrType).HasQueryFilter(lambda);
             }
         }
     }
 
-    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         foreach (var entry in ChangeTracker.Entries<ITenantEntity>())
         {
@@ -132,7 +123,8 @@ public class AppDbContext : DbContext
             }
         }
 
-        var auditEntries = new List<AuditLog>();
+        var auditEntries = new List<(EntityEntry Entry, string EntityName, string Action, Dictionary<string, object?> Changes)>();
+
         var entriesToAudit = ChangeTracker.Entries()
             .Where(e => e.Entity is not AuditLog &&
                        (e.State == EntityState.Added || e.State == EntityState.Modified || e.State == EntityState.Deleted))
@@ -170,26 +162,35 @@ public class AppDbContext : DbContext
                 }
             }
 
-            var changesJson = JsonSerializer.Serialize(changes);
-            var details = $"{action} {entityName}";
-
-            auditEntries.Add(AuditLog.Create(
-                _tenantContext.TenantId,
-                _tenantContext.UserId,
-                _tenantContext.UserEmail ?? string.Empty,
-                entityName,
-                action,
-                details,
-                changesJson
-            ));
+            auditEntries.Add((entry, entityName, action, changes));
         }
+
+        var result = await base.SaveChangesAsync(cancellationToken);
 
         if (auditEntries.Count > 0)
         {
-            AuditLogs.AddRange(auditEntries);
+            var logs = new List<AuditLog>();
+            foreach (var item in auditEntries)
+            {
+                var changesJson = JsonSerializer.Serialize(item.Changes);
+                var details = $"{item.Action} {item.EntityName}";
+
+                logs.Add(AuditLog.Create(
+                    _tenantContext.TenantId,
+                    _tenantContext.UserId,
+                    _tenantContext.UserEmail ?? string.Empty,
+                    item.EntityName,
+                    item.Action,
+                    details,
+                    changesJson
+                ));
+            }
+
+            AuditLogs.AddRange(logs);
+            await base.SaveChangesAsync(cancellationToken);
         }
 
-        return base.SaveChangesAsync(cancellationToken);
+        return result;
     }
 
     private void SetTenantAndActiveFilter<TEntity>(ModelBuilder modelBuilder)

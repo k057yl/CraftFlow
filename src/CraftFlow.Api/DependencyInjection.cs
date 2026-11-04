@@ -2,6 +2,7 @@
 using CraftFlow.Api.Common.BackgroundWorkers;
 using CraftFlow.Api.Common.Behaviors;
 using CraftFlow.Api.Common.Infrastructure.Converters;
+using CraftFlow.Api.Common.Infrastructure.GlobalException;
 using CraftFlow.Api.Common.Infrastructure.Identity;
 using CraftFlow.Api.Common.Infrastructure.Security;
 using CraftFlow.Api.Common.MultiTenancy;
@@ -18,7 +19,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Npgsql;
 using System.Data;
 using System.Text;
 
@@ -47,6 +47,9 @@ public static class DependencyInjection
 
         services.AddHttpClient<IEmailService, EmailService>();
 
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
+
         return services;
     }
 
@@ -72,8 +75,8 @@ public static class DependencyInjection
     }
 
     private static IServiceCollection AddDatabaseStorage(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    this IServiceCollection services,
+    IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString(AuthConstants.DB_CONNECTION_STRING_PATH);
 
@@ -83,13 +86,9 @@ public static class DependencyInjection
                 npgsqlOptions.EnableRetryOnFailure();
             }));
 
-        services.AddScoped<IDbConnection>(_ => new NpgsqlConnection(connectionString));
+        services.AddScoped<IDbConnection>(sp => sp.GetRequiredService<AppDbContext>().Database.GetDbConnection());
 
         services.AddScoped<TraceabilityReadService>();
-
-        services.AddScoped<GetActiveAgingLotsQueryHandler>();
-        services.AddScoped<GetAgingLotDetailsQueryHandler>();
-        services.AddScoped<GetActiveBatchesSummaryQueryHandler>();
 
         return services;
     }

@@ -13,8 +13,18 @@ using CraftFlow.Api.Modules.Production.Planning.CalculateRequirements;
 using CraftFlow.Api.Modules.Production.Planning.PlanProductionBatch;
 using CraftFlow.SharedKernel.Constants;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CraftFlow.Api.Modules.Production;
+
+public record CalculateRequirementsRequest(
+    [FromQuery] Guid RecipeId,
+    [FromQuery] Guid WarehouseId,
+    [FromQuery] decimal PlannedQty);
+
+public record EstimateCostRequest(
+    [FromQuery] Guid RecipeId,
+    [FromQuery] decimal PlannedQty);
 
 public static class ProductionEndpoints
 {
@@ -94,9 +104,9 @@ public static class ProductionEndpoints
                     : Results.BadRequest(result.Error));
         });
 
-        group.MapGet(ProductionConstants.CALCULATE_REQUIREMENTS, async (Guid recipeId, Guid warehouseId, decimal plannedQty, ISender sender, CancellationToken ct) =>
+        group.MapGet(ProductionConstants.CALCULATE_REQUIREMENTS, async ([AsParameters] CalculateRequirementsRequest request, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new CalculateBatchRequirementsQuery(recipeId, warehouseId, plannedQty), ct);
+            var result = await sender.Send(new CalculateBatchRequirementsQuery(request.RecipeId, request.WarehouseId, request.PlannedQty), ct);
             return result.IsSuccess
                 ? Results.Ok(result.Value)
                 : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
@@ -104,9 +114,9 @@ public static class ProductionEndpoints
                     : Results.BadRequest(result.Error));
         });
 
-        group.MapGet(ProductionConstants.ESTIMATE_COST, async (Guid recipeId, decimal plannedQty, ISender sender, CancellationToken ct) =>
+        group.MapGet(ProductionConstants.ESTIMATE_COST, async ([AsParameters] EstimateCostRequest request, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new EstimateCostQuery(recipeId, plannedQty), ct);
+            var result = await sender.Send(new EstimateCostQuery(request.RecipeId, request.PlannedQty), ct);
             return result.IsSuccess
                 ? Results.Ok(result.Value)
                 : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED

@@ -1,12 +1,14 @@
 ﻿using CraftFlow.Api.Common.Constants;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.SharedKernel.Dtos.Aging;
+using CraftFlow.SharedKernel.Result;
 using Dapper;
+using MediatR;
 using System.Data;
 
 namespace CraftFlow.Api.Modules.Aging.AgingProcess.GetActiveAgingLots;
 
-public class GetActiveAgingLotsQueryHandler
+public class GetActiveAgingLotsQueryHandler : IRequestHandler<GetActiveAgingLotsQuery, Result<List<AgingLotSummaryDto>>>
 {
     private readonly IDbConnection _dbConnection;
     private readonly ITenantContext _tenantContext;
@@ -17,7 +19,7 @@ public class GetActiveAgingLotsQueryHandler
         _tenantContext = tenantContext;
     }
 
-    public async Task<List<AgingLotSummaryDto>> HandleAsync()
+    public async Task<Result<List<AgingLotSummaryDto>>> Handle(GetActiveAgingLotsQuery request, CancellationToken cancellationToken)
     {
         const string sql = $"""
             SELECT 
@@ -40,6 +42,6 @@ public class GetActiveAgingLotsQueryHandler
             """;
 
         var result = await _dbConnection.QueryAsync<AgingLotSummaryDto>(sql, new { TenantId = _tenantContext.TenantId });
-        return result.ToList();
+        return Result.Success(result.ToList());
     }
 }

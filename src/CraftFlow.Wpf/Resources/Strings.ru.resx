@@ -60,6 +60,24 @@
 	</resheader>
 
 	<!-- ========================================== -->
+	<!-- Splash & Startup                           -->
+	<!-- ========================================== -->
+	<data name="LBL_STARTUP_INIT" xml:space="preserve"><value>Инициализация системы...</value></data>
+	<data name="LBL_STARTUP_WAIT_API" xml:space="preserve"><value>Проверка подключения к серверу...</value></data>
+	<data name="LBL_STARTUP_AUTH_CHECK" xml:space="preserve"><value>Проверка авторизации...</value></data>
+	<data name="LBL_STARTUP_AUTH_VALIDATE" xml:space="preserve"><value>Проверка сессии пользователя...</value></data>
+	<data name="LBL_STARTUP_LOAD_DICTIONARIES" xml:space="preserve"><value>Загрузка справочников...</value></data>
+	<data name="LBL_STARTUP_LOAD_DASHBOARD" xml:space="preserve"><value>Загрузка данных дашборда...</value></data>
+	<data name="LBL_STARTUP_COMPLETE" xml:space="preserve"><value>Готово!</value></data>
+
+	<data name="ERR_SESSION_NOT_FOUND" xml:space="preserve"><value>Сессия не найдена</value></data>
+	<data name="ERR_SESSION_EXPIRED" xml:space="preserve"><value>Срок действия сессии истек</value></data>
+	<data name="ERR_DASHBOARD_DATA_NULL" xml:space="preserve"><value>Не удалось получить данные дашборда</value></data>
+	<data name="ERR_API_UNAVAILABLE" xml:space="preserve"><value>Сервер недоступен. Проверьте сетевое подключение</value></data>
+	<data name="ERR_LOAD_FAILED" xml:space="preserve"><value>Ошибка загрузки</value></data>
+	<data name="ERR_UNEXPECTED" xml:space="preserve"><value>Непредвиденная ошибка</value></data>
+	
+	<!-- ========================================== -->
 	<!-- 0: Диалоги									-->
 	<!-- ========================================== -->
 	<data name="TITLE_ERROR" xml:space="preserve"><value>Ошибка</value></data>

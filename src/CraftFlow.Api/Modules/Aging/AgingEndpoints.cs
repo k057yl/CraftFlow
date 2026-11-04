@@ -21,6 +21,7 @@ public static class AgingEndpoints
             .WithTags("Aging")
             .RequireAuthorization();
 
+        // --- COMMANDS ---
         group.MapPost(AgingConstants.AGING_LOTS_TRANSFER, async (TransferToAgingCommand command, ISender sender, CancellationToken ct) =>
         {
             var result = await sender.Send(command, ct);
@@ -88,17 +89,17 @@ public static class AgingEndpoints
                     : Results.BadRequest(result.Error));
         });
 
-        // --- AGING LOTS (QUERIES) ---
-        group.MapGet(AgingConstants.AGING_LOTS_ACTIVE, async (GetActiveAgingLotsQueryHandler handler) =>
+        // --- AGING LOTS (QUERIES VIA MEDIATR) ---
+        group.MapGet(AgingConstants.AGING_LOTS_ACTIVE, async (ISender sender, CancellationToken ct) =>
         {
-            var result = await handler.HandleAsync();
-            return Results.Ok(result);
+            var result = await sender.Send(new GetActiveAgingLotsQuery(), ct);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet($"{AgingConstants.AGING_LOTS_ACTIVE}/{{id:guid}}", async (Guid id, GetAgingLotDetailsQueryHandler handler) =>
+        group.MapGet($"{AgingConstants.AGING_LOTS_ACTIVE}/{{id:guid}}", async (Guid id, ISender sender, CancellationToken ct) =>
         {
-            var result = await handler.HandleAsync(id);
-            return result is not null ? Results.Ok(result) : Results.NotFound();
+            var result = await sender.Send(new GetAgingLotDetailsQuery(id), ct);
+            return result.IsSuccess ? Results.Ok(result.Value) : Results.NotFound(result.Error);
         });
 
         group.MapGet($"{AgingConstants.AGING_LOTS_ACTIVE}/{{id:guid}}/items", async (Guid id, ISender sender, CancellationToken ct) =>
