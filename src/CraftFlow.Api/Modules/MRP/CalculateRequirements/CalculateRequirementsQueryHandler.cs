@@ -1,101 +1,145 @@
-﻿using CraftFlow.Api.Common.Constants;
-using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Modules.Production.Domain;
+﻿using System.Data;
+using CraftFlow.Api.Common.Constants;
+using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.SharedKernel.Dtos.MRP;
-using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Result;
+using Dapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.MRP.CalculateRequirements;
 
+public sealed class FlatMrpRequirementRow
+{
+    public Guid BatchId { get; set; }
+    public string BatchName { get; set; } = string.Empty;
+    public string RecipeName { get; set; } = string.Empty;
+    public decimal PlannedOutputQuantity { get; set; }
+    public DateTime? ScheduledAt { get; set; }
+    public Guid RawMaterialId { get; set; }
+    public string RawMaterialName { get; set; } = string.Empty;
+    public decimal RequiredQuantity { get; set; }
+    public decimal CurrentStockQuantity { get; set; }
+}
+
 public sealed class CalculateRequirementsQueryHandler : IRequestHandler<CalculateRequirementsQuery, Result<MrpReportDto>>
 {
-    private readonly AppDbContext _dbContext;
+    private readonly IDbConnection _dbConnection;
+    private readonly ITenantContext _tenantContext;
 
-    public CalculateRequirementsQueryHandler(AppDbContext dbContext)
+    public CalculateRequirementsQueryHandler(IDbConnection dbConnection, ITenantContext tenantContext)
     {
-        _dbContext = dbContext;
+        _dbConnection = dbConnection;
+        _tenantContext = tenantContext;
     }
 
     public async Task<Result<MrpReportDto>> Handle(CalculateRequirementsQuery request, CancellationToken cancellationToken)
     {
-        var plannedBatches = await _dbContext.ProductionBatches
-            .AsNoTracking()
-            .Where(b => b.State == BatchState.DRAFT)
-            .ToListAsync(cancellationToken);
-
-        if (plannedBatches.Count == 0)
+        if (request.BatchIds != null && request.BatchIds.Count == 0)
         {
-            return Result.Success(new MrpReportDto(DateTime.UtcNow, []));
+            return Result.Success(new MrpReportDto(DateTime.UtcNow, [], []));
         }
 
-        var recipeIds = plannedBatches.Select(b => b.RecipeId).Distinct().ToList();
+        const string sql = """
+            WITH batch_needs AS (
+                SELECT 
+                    pb."Id" AS BatchId,
+                    pb."Name" AS BatchName,
+                    r."Name" AS RecipeName,
+                    pb."PlannedOutputQuantity" AS PlannedOutputQuantity,
+                    pb."StartedAt" AS ScheduledAt,
+                    ri."RawMaterialId" AS RawMaterialId,
+                    COALESCE(rm."Name", @UnknownMaterialName) AS RawMaterialName,
+                    SUM(
+                        ri."Quantity" * (
+                            CASE 
+                                WHEN r."TargetOutputQuantity" > 0 THEN pb."PlannedOutputQuantity" / r."TargetOutputQuantity"
+                                ELSE 1.0
+                            END
+                        )
+                    ) AS RequiredQuantity
+                FROM production.production_batches pb
+                JOIN catalog.recipes r ON r."Id" = pb."RecipeId"
+                JOIN catalog.recipe_ingredients ri ON ri."RecipeId" = r."Id"
+                LEFT JOIN catalog.raw_materials rm ON rm."Id" = ri."RawMaterialId"
+                WHERE pb."TenantId" = @TenantId
+                  AND pb."State" IN (0, 1) -- БЕРЕМ И 0 (Draft), И 1 (Planned)
+                  AND (@FilterByBatches = FALSE OR pb."Id" = ANY(@BatchIds))
+                GROUP BY pb."Id", pb."Name", r."Name", pb."PlannedOutputQuantity", pb."StartedAt", ri."RawMaterialId", rm."Name"
+            ),
+            stock_summary AS (
+                SELECT 
+                    sl."ItemId" AS RawMaterialId,
+                    SUM(sl."Quantity") AS CurrentStockQuantity
+                FROM inventory.stock_lots sl
+                WHERE sl."Quantity" > 0 
+                  AND sl."TenantId" = @TenantId
+                GROUP BY sl."ItemId"
+            )
+            SELECT 
+                bn.BatchId AS BatchId,
+                bn.BatchName AS BatchName,
+                bn.RecipeName AS RecipeName,
+                bn.PlannedOutputQuantity AS PlannedOutputQuantity,
+                bn.ScheduledAt AS ScheduledAt,
+                bn.RawMaterialId AS RawMaterialId,
+                bn.RawMaterialName AS RawMaterialName,
+                bn.RequiredQuantity AS RequiredQuantity,
+                COALESCE(ss.CurrentStockQuantity, 0.0) AS CurrentStockQuantity
+            FROM batch_needs bn
+            LEFT JOIN stock_summary ss ON ss.RawMaterialId = bn.RawMaterialId;
+            """;
 
-        var recipes = await _dbContext.Recipes
-            .AsNoTracking()
-            .Include(r => r.Ingredients)
-            .Where(r => recipeIds.Contains(r.Id))
-            .ToDictionaryAsync(r => r.Id, cancellationToken);
-
-        var rawMaterialNeeds = new Dictionary<Guid, decimal>();
-
-        foreach (var batch in plannedBatches)
-        {
-            if (!recipes.TryGetValue(batch.RecipeId, out var recipe))
-                continue;
-
-            var multiplier = recipe.TargetOutputQuantity > 0
-                ? batch.PlannedOutputQuantity / recipe.TargetOutputQuantity
-                : 1m;
-
-            foreach (var ingredient in recipe.Ingredients)
+        var command = new CommandDefinition(
+            sql,
+            new
             {
-                var requiredQty = ingredient.Quantity * multiplier;
+                TenantId = _tenantContext.TenantId,
+                UnknownMaterialName = CoreConstants.Catalog.UNKNOWN_MATERIAL_NAME,
+                FilterByBatches = request.BatchIds != null && request.BatchIds.Count > 0,
+                BatchIds = request.BatchIds?.ToArray() ?? Array.Empty<Guid>()
+            },
+            cancellationToken: cancellationToken
+        );
 
-                if (rawMaterialNeeds.TryGetValue(ingredient.RawMaterialId, out var currentNeed))
-                {
-                    rawMaterialNeeds[ingredient.RawMaterialId] = currentNeed + requiredQty;
-                }
-                else
-                {
-                    rawMaterialNeeds[ingredient.RawMaterialId] = requiredQty;
-                }
-            }
-        }
+        var rows = (await _dbConnection.QueryAsync<FlatMrpRequirementRow>(command)).ToList();
 
-        var rawMaterialIds = rawMaterialNeeds.Keys.ToList();
-
-        var stockBalances = await _dbContext.StockLots
-            .AsNoTracking()
-            .Where(sl => rawMaterialIds.Contains(sl.ItemId) && sl.Quantity > 0)
-            .GroupBy(sl => sl.ItemId)
-            .Select(g => new { RawMaterialId = g.Key, TotalQuantity = g.Sum(x => x.Quantity) })
-            .ToDictionaryAsync(x => x.RawMaterialId, x => x.TotalQuantity, cancellationToken);
-
-        var rawMaterials = await _dbContext.RawMaterials
-            .AsNoTracking()
-            .Where(rm => rawMaterialIds.Contains(rm.Id))
-            .ToDictionaryAsync(rm => rm.Id, rm => rm.Name, cancellationToken);
-
-        var requirements = new List<MaterialRequirementDto>();
-
-        foreach (var (rawMaterialId, totalRequired) in rawMaterialNeeds)
+        if (rows.Count == 0)
         {
-            stockBalances.TryGetValue(rawMaterialId, out var currentStock);
-
-            var shortage = Math.Max(0m, totalRequired - currentStock);
-
-            requirements.Add(new MaterialRequirementDto(
-                rawMaterialId,
-                rawMaterials.GetValueOrDefault(rawMaterialId, CoreConstants.Catalog.UNKNOWN_MATERIAL_NAME),
-                totalRequired,
-                currentStock,
-                shortage,
-                SuggestedPurchaseQuantity: shortage
-            ));
+            return Result.Success(new MrpReportDto(DateTime.UtcNow, [], []));
         }
 
-        return Result.Success(new MrpReportDto(DateTime.UtcNow, requirements));
+        var batchGroups = rows
+            .GroupBy(r => r.BatchId)
+            .Select(g => new BatchMrpGroupDto(
+                BatchId: g.Key,
+                BatchName: g.First().BatchName,
+                RecipeName: g.First().RecipeName,
+                PlannedOutputQuantity: g.First().PlannedOutputQuantity,
+                ScheduledAt: g.First().ScheduledAt,
+                Ingredients: g.Select(i => new BatchMaterialRequirementDto(
+                    RawMaterialId: i.RawMaterialId,
+                    RawMaterialName: i.RawMaterialName,
+                    TotalRequiredQuantity: i.RequiredQuantity,
+                    CurrentStockQuantity: i.CurrentStockQuantity,
+                    ShortageQuantity: Math.Max(0m, i.RequiredQuantity - i.CurrentStockQuantity)
+                )).ToList()
+            )).ToList();
+
+        var summary = rows
+            .GroupBy(r => r.RawMaterialId)
+            .Select(g =>
+            {
+                var totalReq = g.Sum(x => x.RequiredQuantity);
+                var stock = g.First().CurrentStockQuantity;
+                return new SummaryRequirementDto(
+                    RawMaterialId: g.Key,
+                    RawMaterialName: g.First().RawMaterialName,
+                    TotalRequiredQuantity: totalReq,
+                    CurrentStockQuantity: stock,
+                    ShortageQuantity: Math.Max(0m, totalReq - stock)
+                );
+            }).ToList();
+
+        return Result.Success(new MrpReportDto(DateTime.UtcNow, batchGroups, summary));
     }
 }

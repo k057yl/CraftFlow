@@ -6,7 +6,7 @@ using MediatR;
 
 namespace CraftFlow.Api.Modules.MRP.CalculateRequirements;
 
-public sealed record CalculateRequirementsQuery : IRequest<Result<MrpReportDto>>, IRequirePermission
+public sealed record CalculateRequirementsQuery(List<Guid>? BatchIds = null) : IRequest<Result<MrpReportDto>>, IRequirePermission
 {
     public AppPermission RequiredPermission => AppPermission.PROCUREMENT_VIEW;
 }

@@ -13,9 +13,9 @@ public static class MrpEndpoints
             .WithTags("MRP")
             .RequireAuthorization();
 
-        group.MapGet(MrpConstants.MRP_REQUIREMENTS, async (ISender sender, CancellationToken ct) =>
+        group.MapPost(MrpConstants.MRP_REQUIREMENTS, async (CalculateRequirementsQuery query, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new CalculateRequirementsQuery(), ct);
+            var result = await sender.Send(query, ct);
             return result.IsSuccess
                 ? Results.Ok(result.Value)
                 : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED

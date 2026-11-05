@@ -468,13 +468,32 @@ public class ApiService
         PostAndReadAsync(AgingConstants.AGING_LOTS_RELEASE, request);
 
     // --- MRP ---
-    public async Task<Result<MrpReportDto>> GetMrpRequirementsAsync()
+    public async Task<Result<MrpReportDto>> GetMrpRequirementsAsync(List<Guid>? batchIds = null)
     {
-        var report = await GetAsync<MrpReportDto>(MrpConstants.MRP_REQUIREMENTS);
-        if (report != null)
+        try
         {
-            return Result.Success(report);
+            var (isSuccess, jsonOrError) = await PostAndReadAsync(MrpConstants.MRP_REQUIREMENTS, new { BatchIds = batchIds });
+
+            if (isSuccess && !string.IsNullOrWhiteSpace(jsonOrError))
+            {
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var report = JsonSerializer.Deserialize<MrpReportDto>(jsonOrError, options);
+
+                if (report != null)
+                {
+                    return Result.Success(report);
+                }
+            }
+
+            return Result.Failure<MrpReportDto>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
         }
-        return Result.Failure<MrpReportDto>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
+        catch
+        {
+            return Result.Failure<MrpReportDto>(Error.Failure(ErrorCodes.General.VALUE_REQUIRED));
+        }
     }
 }

@@ -5,58 +5,165 @@
       xmlns:auth="clr-namespace:CraftFlow.Wpf.MarkupExtensions"
       Title="{loc:Loc Key=TITLE_MRP}">
 
-    <Grid Margin="20">
+    <Grid Margin="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="{loc:Loc Key=TITLE_MRP}" FontSize="20" FontWeight="Bold" Margin="0,0,0,15" Foreground="{DynamicResource AppForegroundBrush}"/>
+        <TextBlock Text="{loc:Loc Key=TITLE_MRP}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" Foreground="{DynamicResource AppForegroundBrush}"/>
 
-        <TabControl Grid.Row="1">
-            <!-- Вкладка 1: Расчет потребностей -->
-            <TabItem Header="{loc:Loc Key=TAB_MRP_CALC}" Visibility="{auth:HasPermission Permission=PROCUREMENT_VIEW}">
-                <Grid Margin="10">
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="380"/>
+                <ColumnDefinition Width="15"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ЛЕВАЯ КОЛОНКА (Зона А и планирование) -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Блок создания планируемой варки -->
+                <GroupBox Grid.Row="0" Header="{loc:Loc Key=GROUP_PLAN_BATCH}" Padding="10" Margin="0,0,0,10" Foreground="{DynamicResource AppForegroundBrush}">
+                    <StackPanel>
+                        <TextBlock Text="{loc:Loc Key=LABEL_BATCH_CODE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                        <TextBox x:Name="PlanBatchNameTextBox" Height="26" Margin="0,0,0,6" Padding="4,2"/>
+
+                        <TextBlock Text="{loc:Loc Key=LABEL_SELECT_RECIPE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                        <ComboBox x:Name="PlanBatchRecipeComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,6"/>
+
+                        <TextBlock Text="{loc:Loc Key=LABEL_RAW_WAREHOUSE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                        <ComboBox x:Name="PlanRawWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,6"/>
+
+                        <TextBlock Text="{loc:Loc Key=LABEL_DEST_WAREHOUSE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                        <ComboBox x:Name="PlanDestWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,6"/>
+
+                        <TextBlock Text="{loc:Loc Key=LABEL_PLANNED_OUTPUT}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                        <TextBox x:Name="PlanBatchQuantityTextBox" Text="10" Height="26" Margin="0,0,0,6" Padding="4,2"/>
+
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*"/>
+                                <ColumnDefinition Width="8"/>
+                                <ColumnDefinition Width="1*"/>
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Column="0">
+                                <TextBlock Text="{loc:Loc Key=LABEL_SCHEDULED_DATE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <DatePicker x:Name="PlanScheduledDatePicker" Height="26"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2">
+                                <TextBlock Text="{loc:Loc Key=LABEL_SCHEDULED_TIME}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                <TextBox x:Name="PlanScheduledTimeTextBox" Text="12:00" Height="26" Padding="4,2"/>
+                            </StackPanel>
+                        </Grid>
+
+                        <Button Content="{loc:Loc Key=BTN_PLAN_BATCH}" 
+                                Click="PlanBatch_Click" Height="28" 
+                                Visibility="{auth:HasPermission Permission=PRODUCTION_EXECUTE}"
+                                Style="{StaticResource SuccessButtonStyle}"/>
+                    </StackPanel>
+                </GroupBox>
+
+                <!-- ЗОНА А: Черновики варок -->
+                <GroupBox Grid.Row="1" Header="{loc:Loc Key=GROUP_PLANNED_BATCHES}" Padding="8" Foreground="{DynamicResource AppForegroundBrush}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Фильтр с кнопкой Применить -->
+                        <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                            <TextBlock Text="Фильтр варок по дате:" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,2"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="6"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <DatePicker x:Name="FilterFromDatePicker" Grid.Column="0" Height="24" FontSize="10"/>
+                                <DatePicker x:Name="FilterToDatePicker" Grid.Column="2" Height="24" FontSize="10"/>
+                                <Button Grid.Column="3" Content="Применить" Click="ApplyFilter_Click" Height="24" FontSize="10" Margin="6,0,0,0" Padding="10,0" Style="{StaticResource SuccessButtonStyle}"/>
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- Список черновиков варок -->
+                        <DataGrid Grid.Row="1" x:Name="PlannedBatchesDataGrid" 
+                                  ItemsSource="{Binding PlannedBatchesSummary, RelativeSource={RelativeSource AncestorType=Page}}"
+                                  AutoGenerateColumns="False" 
+                                  CanUserAddRows="False"
+                                  IsReadOnly="False" 
+                                  GridLinesVisibility="Horizontal"
+                                  Background="Transparent">
+                            <DataGrid.Columns>
+                                <!-- Кнопка переброса варки в Зону Б -->
+                                <DataGridTemplateColumn IsReadOnly="True" Width="35">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="➔" Click="MoveToMrp_Click" Tag="{Binding Id}" ToolTip="Перекинуть в расчет MRP" Style="{StaticResource SuccessButtonStyle}" FontWeight="Bold" Padding="4,1"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+
+                                <DataGridTextColumn Header="{loc:Loc Key=COLUMN_BATCH_CODE}" Binding="{Binding BatchName}" IsReadOnly="True" Width="85"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=COLUMN_RECIPE}" Binding="{Binding RecipeName}" IsReadOnly="True" Width="*"/>
+                                <DataGridTextColumn Header="{loc:Loc Key=COLUMN_VOLUME}" Binding="{Binding PlannedOutputQuantity, StringFormat={}{0:F1}}" IsReadOnly="True" Width="45"/>
+
+                                <DataGridTemplateColumn Header="{loc:Loc Key=COLUMN_ACTIONS}" IsReadOnly="True" Width="60">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                                <Button Content="▶" Click="StartDraftBatch_Click" Tag="{Binding Id}" ToolTip="{loc:Loc Key=TOOLTIP_START}" Margin="0,0,2,0" Padding="4,1" Style="{StaticResource SuccessButtonStyle}" FontWeight="Bold"/>
+                                                <Button Content="✕" Click="DeleteDraftBatch_Click" Tag="{Binding Id}" ToolTip="{loc:Loc Key=TOOLTIP_DELETE}" Padding="4,1" Style="{StaticResource DangerButtonStyle}" FontWeight="Bold"/>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+
+            <!-- ПРАВАЯ КОЛОНКА (Зоны Б и С) -->
+            <GroupBox Grid.Column="2" Header="Детализация потребностей и заказов (MRP)" Padding="10" Foreground="{DynamicResource AppForegroundBrush}">
+                <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <!-- Панель управления и параметров закупки -->
-                    <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="12" Margin="0,0,0,15">
+                    <!-- Шапка заказа поставщику -->
+                    <Border Grid.Row="0" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,0,10">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <Button Content="{loc:Loc Key=CALCULATE_MRP}" 
-                                    Click="CalculateMrp_Click" 
-                                    Grid.Column="0" 
-                                    Width="180" 
-                                    Height="32" 
-                                    Margin="0,0,15,0" 
-                                    FontWeight="Bold" 
-                                    Style="{StaticResource PrimaryButtonStyle}"/>
-
-                            <StackPanel Grid.Column="1" Margin="0,0,10,0">
+                            <StackPanel Grid.Column="0" Margin="0,0,10,0">
                                 <TextBlock Text="{loc:Loc Key=LABEL_SUPPLIER}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,2"/>
                                 <ComboBox x:Name="SupplierComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28"/>
                             </StackPanel>
 
-                            <StackPanel Grid.Column="2" Margin="0,0,15,0">
+                            <StackPanel Grid.Column="1" Margin="0,0,10,0">
                                 <TextBlock Text="{loc:Loc Key=LABEL_RECEIVING_WAREHOUSE}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,2"/>
                                 <ComboBox x:Name="WarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28"/>
                             </StackPanel>
 
                             <Button Content="{loc:Loc Key=BTN_CREATE_PURCHASE_ORDER}" 
                                     Click="CreatePurchaseOrder_Click" 
-                                    Grid.Column="3" 
-                                    Height="32" 
-                                    HorizontalAlignment="Right" 
+                                    Grid.Column="2" 
+                                    Height="28" 
+                                    VerticalAlignment="Bottom"
                                     Padding="15,0" 
                                     FontWeight="Bold" 
                                     Visibility="{auth:HasPermission Permission=PROCUREMENT_RECEIVE}"
@@ -64,108 +171,54 @@
                         </Grid>
                     </Border>
 
-                    <!-- Таблица потребностей -->
-                    <DataGrid Grid.Row="1" x:Name="MrpDataGrid" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="{loc:Loc Key=RAW_MATERIAL_NAME}" Binding="{Binding RawMaterialName}" Width="*"/>
-                            <DataGridTextColumn Header="{loc:Loc Key=QUANTITY}" Binding="{Binding TotalRequiredQuantity, StringFormat={}{0:N2}}" Width="140"/>
-                            <DataGridTextColumn Header="{loc:Loc Key=AVAILABLE_STOCK}" Binding="{Binding CurrentStockQuantity, StringFormat={}{0:N2}}" Width="140"/>
-                            <DataGridTextColumn Header="{loc:Loc Key=CALCULATED_REQUIREMENTS}" Binding="{Binding ShortageQuantity, StringFormat={}{0:N2}}" Width="160"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </Grid>
-            </TabItem>
+                    <!-- ЗОНА Б: Дерево перенесённых варок и их ингредиентов -->
+                    <ItemsControl Grid.Row="1" x:Name="MrpTreeViewer">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Margin="0,0,0,8" Padding="6" Background="{DynamicResource CardBackgroundBrush}">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                            <!-- Кнопка возврата варки обратно в Зону А -->
+                                            <Button Content="🡄" Click="RemoveFromMrp_Click" Tag="{Binding BatchId}" ToolTip="Убрать из расчета" Style="{StaticResource DangerButtonStyle}" FontWeight="Bold" Margin="0,0,6,0" Padding="6,0"/>
 
-            <!-- Вкладка 2: Планирование варок (Черновики) -->
-            <TabItem Header="{loc:Loc Key=TAB_BATCH_PLANNING}" Visibility="{auth:HasPermission Permission=PRODUCTION_VIEW}">
-                <Grid Margin="10">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="320"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                                            <TextBlock Text="📦 " FontSize="14"/>
+                                            <TextBlock Text="{Binding BatchName}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" Margin="0,0,6,0"/>
+                                            <TextBlock Text="(" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                            <TextBlock Text="{Binding RecipeName}" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                            <TextBlock Text=", Объем: " Foreground="{DynamicResource AppForegroundBrush}"/>
+                                            <TextBlock Text="{Binding PlannedOutputQuantity, StringFormat={}{0:N1}}" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                            <TextBlock Text=")" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                        </StackPanel>
 
-                    <!-- Форма планирования новой варки -->
-                    <GroupBox Grid.Column="0" Header="{loc:Loc Key=GROUP_PLAN_BATCH}" Padding="10" Margin="0,0,10,0" Foreground="{DynamicResource AppForegroundBrush}">
-                        <StackPanel>
-                            <TextBlock Text="{loc:Loc Key=LABEL_BATCH_CODE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                            <TextBox x:Name="PlanBatchNameTextBox" Padding="4,2" Height="28" Margin="0,0,0,8"/>
+                                        <DataGrid ItemsSource="{Binding Ingredients}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal" HeadersVisibility="Column">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Сырье" Binding="{Binding RawMaterialName}" Width="*"/>
+                                                <DataGridTextColumn Header="Потребность" Binding="{Binding TotalRequiredQuantity, StringFormat={}{0:N2}}" Width="100"/>
+                                                <DataGridTextColumn Header="Остаток" Binding="{Binding CurrentStockQuantity, StringFormat={}{0:N2}}" Width="100"/>
+                                                <DataGridTextColumn Header="Дефицит" Binding="{Binding ShortageQuantity, StringFormat={}{0:N2}}" FontWeight="Bold" Foreground="OrangeRed" Width="100"/>
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
 
-                            <TextBlock Text="{loc:Loc Key=LABEL_SELECT_RECIPE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                            <ComboBox x:Name="PlanBatchRecipeComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Margin="0,0,0,8"/>
-
-                            <TextBlock Text="{loc:Loc Key=LABEL_RAW_WAREHOUSE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                            <ComboBox x:Name="PlanRawWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Margin="0,0,0,8"/>
-
-                            <TextBlock Text="{loc:Loc Key=LABEL_DEST_WAREHOUSE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                            <ComboBox x:Name="PlanDestWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Margin="0,0,0,8"/>
-
-                            <TextBlock Text="{loc:Loc Key=LABEL_PLANNED_OUTPUT}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                            <TextBox x:Name="PlanBatchQuantityTextBox" Text="10" Padding="4,2" Height="28" Margin="0,0,0,8"/>
-
-                            <Grid Margin="0,0,0,12">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="2*"/>
-                                    <ColumnDefinition Width="1*"/>
-                                </Grid.ColumnDefinitions>
-
-                                <StackPanel Grid.Column="0" Margin="0,0,6,0">
-                                    <TextBlock Text="{loc:Loc Key=LABEL_SCHEDULED_DATE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    <DatePicker x:Name="PlanScheduledDatePicker" Height="28"/>
-                                </StackPanel>
-
-                                <StackPanel Grid.Column="1">
-                                    <TextBlock Text="{loc:Loc Key=LABEL_SCHEDULED_TIME}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    <TextBox x:Name="PlanScheduledTimeTextBox" Text="12:00" Padding="4,2" Height="28"/>
-                                </StackPanel>
-                            </Grid>
-
-                            <Button Content="{loc:Loc Key=BTN_PLAN_BATCH}" 
-                                    Click="PlanBatch_Click" 
-                                    Height="32" 
-                                    Visibility="{auth:HasPermission Permission=PRODUCTION_EXECUTE}"
-                                    Style="{StaticResource SuccessButtonStyle}"/>
-                        </StackPanel>
-                    </GroupBox>
-
-                    <!-- Таблица запланированных варок -->
-                    <GroupBox Grid.Column="1" Header="{loc:Loc Key=GROUP_PLANNED_BATCHES}" Padding="8" Foreground="{DynamicResource AppForegroundBrush}">
-                        <DataGrid x:Name="PlannedBatchesDataGrid" 
-                                  ItemsSource="{Binding PlannedBatchesSummary, RelativeSource={RelativeSource AncestorType=Page}}"
-                                  AutoGenerateColumns="False" 
-                                  IsReadOnly="True" 
-                                  GridLinesVisibility="Horizontal"
-                                  Background="Transparent"
-                                  SelectionMode="Single">
+                    <!-- ЗОНА С: Сводный дефицит по всем выбранным варкам -->
+                    <GroupBox Grid.Row="2" Header="Сводный дефицит к закупке" Margin="0,10,0,0" Padding="6" Foreground="{DynamicResource AppForegroundBrush}">
+                        <DataGrid x:Name="MrpSummaryDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Height="130" GridLinesVisibility="Horizontal">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="{loc:Loc Key=COLUMN_BATCH_CODE}" Binding="{Binding BatchName}" Width="1.2*"/>
-                                <DataGridTextColumn Header="{loc:Loc Key=COLUMN_RECIPE}" Binding="{Binding RecipeName}" Width="1.5*"/>
-                                <DataGridTextColumn Header="{loc:Loc Key=COLUMN_VOLUME}" Binding="{Binding PlannedOutputQuantity, StringFormat={}{0:F2}}" Width="0.8*"/>
-                                <DataGridTextColumn Header="{loc:Loc Key=COLUMN_SCHEDULED_AT}" Binding="{Binding ScheduledAt, StringFormat={}{0:dd.MM.yyyy HH:mm}}" Width="1.2*"/>
-                                <DataGridTemplateColumn Header="{loc:Loc Key=COLUMN_COUNTDOWN}" Width="1.2*">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding FormattedCountdown}" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Center"/>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridTemplateColumn Header="{loc:Loc Key=COLUMN_ACTIONS}" Width="90">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                                <Button Content="▶" Click="StartDraftBatch_Click" Tag="{Binding Id}" ToolTip="{loc:Loc Key=TOOLTIP_START}" Margin="0,0,4,0" Padding="6,2" Style="{StaticResource SuccessButtonStyle}" FontWeight="Bold"/>
-                                                <Button Content="✕" Click="DeleteDraftBatch_Click" Tag="{Binding Id}" ToolTip="{loc:Loc Key=TOOLTIP_DELETE}" Padding="6,2" Style="{StaticResource DangerButtonStyle}" FontWeight="Bold"/>
-                                            </StackPanel>
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                </DataGridTemplateColumn>
+                                <DataGridTextColumn Header="Сырье" Binding="{Binding RawMaterialName}" Width="*"/>
+                                <DataGridTextColumn Header="Всего нужно" Binding="{Binding TotalRequiredQuantity, StringFormat={}{0:N2}}" Width="120"/>
+                                <DataGridTextColumn Header="Остаток на складе" Binding="{Binding CurrentStockQuantity, StringFormat={}{0:N2}}" Width="140"/>
+                                <DataGridTextColumn Header="Дефицит к закупке" Binding="{Binding ShortageQuantity, StringFormat={}{0:N2}}" FontWeight="Bold" Width="140"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </GroupBox>
                 </Grid>
-            </TabItem>
-        </TabControl>
+            </GroupBox>
+        </Grid>
 
-        <!-- Строка статуса -->
-        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="0,10,0,0"/>
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=STATUS_READY}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="0,8,0,0"/>
     </Grid>
 </Page>

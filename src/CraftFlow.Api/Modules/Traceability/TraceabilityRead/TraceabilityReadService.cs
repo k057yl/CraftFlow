@@ -31,23 +31,41 @@ public sealed class TraceabilityReadService
             TraceabilityConstants.SQL_GET_FORWARD_BATCHES,
             new { StockLotId = stockLotId, TenantId = tenantId }))?.ToList() ?? [];
 
-        var batches = batchRows
-            .Where(r => r.ProductionBatchId != Guid.Empty)
-            .GroupBy(r => r.ProductionBatchId)
-            .Select(g =>
-            {
-                var first = g.First();
-                return new TraceabilityProductionBatchDto(
-                    g.Key,
-                    first.BatchStatusInt,
-                    first.StartedAt ?? DateTime.MinValue,
-                    first.CompletedAt,
-                    first.PlannedQuantity,
-                    first.ActualQuantity,
-                    first.PlannedQuantity > 0 ? Math.Round((first.ActualQuantity / first.PlannedQuantity) * 100m, 2) : 0m,
-                    new List<TraceabilityIngredientDto>()
-                );
-            }).ToList();
+        var batches = new List<TraceabilityProductionBatchDto>();
+
+        foreach (var row in batchRows)
+        {
+            if (row.ProductionBatchId == Guid.Empty) continue;
+
+            var rawIngredients = await _dbConnection.QueryAsync<BackwardIngredientRow>(
+                TraceabilityConstants.SQL_GET_BACKWARD_CONSUMED,
+                new { BatchId = row.ProductionBatchId, TenantId = tenantId });
+
+            var ingredients = rawIngredients?.Select(i => new TraceabilityIngredientDto(
+                i.RawMaterialStockLotId ?? Guid.Empty,
+                i.RawMaterialName ?? string.Empty,
+                i.BatchNumber ?? string.Empty,
+                i.QuantityUsed,
+                i.UnitOfMeasure ?? string.Empty,
+                i.SupplierId,
+                i.SupplierName ?? string.Empty
+            )).ToList() ?? [];
+
+            decimal plannedQty = row.PlannedQuantity;
+            decimal actualQty = row.ActualQuantity;
+            decimal yield = plannedQty > 0 ? Math.Round((actualQty / plannedQty) * 100m, 2) : 0m;
+
+            batches.Add(new TraceabilityProductionBatchDto(
+                row.ProductionBatchId,
+                row.BatchStatusInt,
+                row.StartedAt ?? DateTime.MinValue,
+                row.CompletedAt,
+                plannedQty,
+                actualQty,
+                yield,
+                ingredients
+            ));
+        }
 
         return new ForwardTraceabilityDto(
             header.RawMaterialStockLotId,
@@ -140,7 +158,6 @@ public sealed class TraceabilityReadService
         );
     }
 
-    // Жесткие DTO для Dapper
     private sealed class ForwardTraceabilityHeader
     {
         public Guid RawMaterialStockLotId { get; set; }

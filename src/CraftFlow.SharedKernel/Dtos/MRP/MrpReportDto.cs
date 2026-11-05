@@ -2,5 +2,6 @@
 
 public sealed record MrpReportDto(
     DateTime GeneratedAt,
-    List<MaterialRequirementDto> Requirements
+    List<BatchMrpGroupDto> Batches,
+    List<SummaryRequirementDto> SummaryRequirements
 );
