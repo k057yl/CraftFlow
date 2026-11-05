@@ -4,14 +4,12 @@ using CraftFlow.Api.Common.Behaviors;
 using CraftFlow.Api.Common.Infrastructure.Converters;
 using CraftFlow.Api.Common.Infrastructure.GlobalException;
 using CraftFlow.Api.Common.Infrastructure.Identity;
+using CraftFlow.Api.Common.Infrastructure.Notifications;
 using CraftFlow.Api.Common.Infrastructure.Security;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Infrastructure.BackgroundServices.Cleanup;
 using CraftFlow.Api.Infrastructure.Services;
-using CraftFlow.Api.Modules.Aging.AgingProcess.GetActiveAgingLots;
-using CraftFlow.Api.Modules.Aging.AgingProcess.GetAgingLotDetails;
-using CraftFlow.Api.Modules.Production.Batches.GetActiveBatchesSummary;
 using CraftFlow.Api.Modules.Traceability.TraceabilityRead;
 using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
@@ -145,6 +143,9 @@ public static class DependencyInjection
 
     private static IServiceCollection AddBackgroundWorkers(this IServiceCollection services)
     {
+        services.AddSingleton<INotificationQueue, InMemoryNotificationQueue>();
+        services.AddHostedService<NotificationBackgroundWorker>();
+
         services.AddHostedService<LowStockMonitorWorker>();
         services.AddHostedService<ProductionTimerWorker>();
         services.AddHostedService<SubscriptionExpirationWorker>();

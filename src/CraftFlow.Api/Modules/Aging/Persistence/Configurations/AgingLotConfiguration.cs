@@ -34,7 +34,13 @@ public sealed class AgingLotConfiguration : IEntityTypeConfiguration<AgingLot>
         builder.Navigation(l => l.Items)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
-        builder.HasIndex(l => l.AgingChamberId).HasDatabaseName(DbIndexes.Aging.IX_AGING_LOTS_CHAMBER);
-        builder.HasIndex(l => l.ProductionBatchId).HasDatabaseName(DbIndexes.Aging.IX_AGING_LOTS_BATCH);
+        builder.HasIndex(l => l.AgingChamberId)
+            .HasDatabaseName(DbIndexes.Aging.IX_AGING_LOTS_CHAMBER);
+
+        builder.HasIndex(l => l.ProductionBatchId)
+            .HasDatabaseName(DbIndexes.Aging.IX_AGING_LOTS_BATCH);
+
+        builder.HasIndex(l => new { l.TenantId, l.State })
+            .HasDatabaseName(DbIndexes.Aging.IX_AGING_LOTS_TENANT_STATE);
     }
 }

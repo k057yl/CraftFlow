@@ -21,7 +21,10 @@ public class SalesOrderConfiguration : IEntityTypeConfiguration<SalesOrder>
             .HasForeignKey(i => i.SalesOrderId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(o => o.CustomerId).HasDatabaseName(DbIndexes.Sales.IX_SALES_ORDERS_CUSTOMER);
-        builder.HasIndex(o => o.Status).HasDatabaseName(DbIndexes.Sales.IX_SALES_ORDERS_STATUS);
+        builder.HasIndex(o => o.CustomerId)
+            .HasDatabaseName(DbIndexes.Sales.IX_SALES_ORDERS_CUSTOMER);
+
+        builder.HasIndex(o => new { o.TenantId, o.Status })
+            .HasDatabaseName(DbIndexes.Sales.IX_SALES_ORDERS_TENANT_STATUS);
     }
 }

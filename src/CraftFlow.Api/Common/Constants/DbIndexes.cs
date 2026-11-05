@@ -18,6 +18,7 @@ public static class DbIndexes
         public const string IX_MEMBERS_TENANT_USER = "IX_MEMBERS_TENANT_USER";
         public const string IX_MEMBERS_TENANT_ROLE_ACTIVE = "IX_MEMBERS_TENANT_ROLE_ACTIVE";
         public const string IX_SYSTEM_ADMINS_USER_ID = "IX_SYSTEM_ADMINS_USER_ID";
+        public const string IX_AUDIT_LOGS_TENANT_CREATED_AT = "IX_AUDIT_LOGS_TENANT_CREATED_AT";
     }
 
     public static class Inventory
@@ -25,13 +26,14 @@ public static class DbIndexes
         public const string IX_STOCK_LOTS_LOOKUP = "IX_STOCK_LOTS_LOOKUP";
         public const string IX_STORAGE_LOCATIONS_TENANT_WAREHOUSE = "IX_STORAGE_LOCATIONS_TENANT_WAREHOUSE";
     }
-    
+
     public static class Aging
     {
         public const string IX_AGING_CHAMBERS_TENANT_NAME = "IX_AGING_CHAMBERS_TENANT_NAME";
         public const string IX_AGING_LOTS_CHAMBER = "IX_AGING_LOTS_CHAMBER";
         public const string IX_AGING_LOTS_BATCH = "IX_AGING_LOTS_BATCH";
         public const string IX_AGING_LOT_ITEMS_LOT = "IX_AGING_LOT_ITEMS_LOT";
+        public const string IX_AGING_LOTS_TENANT_STATE = "IX_AGING_LOTS_TENANT_STATE";
     }
 
     public static class Procurement
@@ -39,7 +41,7 @@ public static class DbIndexes
         public const string IX_SUPPLIERS_TENANT_NAME = "IX_SUPPLIERS_TENANT_NAME";
         public const string IX_SUPPLIERS_TENANT_TAX_ID = "IX_SUPPLIERS_TENANT_TAX_ID";
         public const string IX_PURCHASE_ORDERS_SUPPLIER = "IX_PURCHASE_ORDERS_SUPPLIER";
-        public const string IX_PURCHASE_ORDERS_STATUS = "IX_PURCHASE_ORDERS_STATUS";
+        public const string IX_PURCHASE_ORDERS_TENANT_STATUS = "IX_PURCHASE_ORDERS_TENANT_STATUS";
         public const string IX_PURCHASE_ORDER_ITEMS_ORDER = "IX_PURCHASE_ORDER_ITEMS_ORDER";
     }
 
@@ -47,7 +49,7 @@ public static class DbIndexes
     {
         public const string IX_CUSTOMERS_TENANT_NAME = "IX_CUSTOMERS_TENANT_NAME";
         public const string IX_SALES_ORDERS_CUSTOMER = "IX_SALES_ORDERS_CUSTOMER";
-        public const string IX_SALES_ORDERS_STATUS = "IX_SALES_ORDERS_STATUS";
+        public const string IX_SALES_ORDERS_TENANT_STATUS = "IX_SALES_ORDERS_TENANT_STATUS";
         public const string IX_SALES_ORDER_ITEMS_ORDER = "IX_SALES_ORDER_ITEMS_ORDER";
     }
 

@@ -66,6 +66,9 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TenantId", "CreatedAtUtc")
+                        .HasDatabaseName("IX_AUDIT_LOGS_TENANT_CREATED_AT");
+
                     b.ToTable("audit_logs", "identity");
                 });
 
@@ -155,6 +158,9 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasIndex("ProductionBatchId")
                         .HasDatabaseName("IX_AGING_LOTS_BATCH");
+
+                    b.HasIndex("TenantId", "State")
+                        .HasDatabaseName("IX_AGING_LOTS_TENANT_STATE");
 
                     b.ToTable("aging_lots", "aging");
                 });
@@ -703,11 +709,11 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Status")
-                        .HasDatabaseName("IX_PURCHASE_ORDERS_STATUS");
-
                     b.HasIndex("SupplierId")
                         .HasDatabaseName("IX_PURCHASE_ORDERS_SUPPLIER");
+
+                    b.HasIndex("TenantId", "Status")
+                        .HasDatabaseName("IX_PURCHASE_ORDERS_TENANT_STATUS");
 
                     b.ToTable("purchase_orders", "procurement");
                 });
@@ -901,7 +907,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("State", "IsTelegramNotified", "StartedAt")
+                    b.HasIndex("TenantId", "State", "IsTelegramNotified", "StartedAt")
                         .HasDatabaseName("IX_PRODUCTION_BATCHES_TIMER_MONITORING");
 
                     b.ToTable("production_batches", "production");
@@ -972,8 +978,8 @@ namespace CraftFlow.Api.Migrations
                     b.HasIndex("CustomerId")
                         .HasDatabaseName("IX_SALES_ORDERS_CUSTOMER");
 
-                    b.HasIndex("Status")
-                        .HasDatabaseName("IX_SALES_ORDERS_STATUS");
+                    b.HasIndex("TenantId", "Status")
+                        .HasDatabaseName("IX_SALES_ORDERS_TENANT_STATUS");
 
                     b.ToTable("sales_orders", "sales");
                 });

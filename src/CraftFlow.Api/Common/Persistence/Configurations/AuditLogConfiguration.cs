@@ -16,5 +16,8 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
         builder.Property(a => a.UserEmail).HasMaxLength(256);
         builder.Property(a => a.Details).IsRequired();
         builder.Property(a => a.ChangesJson).HasColumnType("jsonb");
+
+        builder.HasIndex(a => new { a.TenantId, a.CreatedAtUtc })
+            .HasDatabaseName(DbIndexes.Identity.IX_AUDIT_LOGS_TENANT_CREATED_AT);
     }
 }

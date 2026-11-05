@@ -30,7 +30,7 @@ public class ProductionBatchConfiguration : IEntityTypeConfiguration<ProductionB
 
         builder.HasQueryFilter(p => p.TenantId == EF.Property<Guid>(p, "TenantId"));
 
-        builder.HasIndex(b => new { b.State, b.IsTelegramNotified, b.StartedAt })
+        builder.HasIndex(b => new { b.TenantId, b.State, b.IsTelegramNotified, b.StartedAt })
             .HasDatabaseName(DbIndexes.Production.IX_PRODUCTION_BATCHES_TIMER_MONITORING);
     }
 }

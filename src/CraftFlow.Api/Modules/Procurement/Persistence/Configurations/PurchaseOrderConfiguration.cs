@@ -21,7 +21,10 @@ public sealed class PurchaseOrderConfiguration : IEntityTypeConfiguration<Purcha
             .HasForeignKey(poi => poi.PurchaseOrderId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        builder.HasIndex(po => po.SupplierId).HasDatabaseName(DbIndexes.Procurement.IX_PURCHASE_ORDERS_SUPPLIER);
-        builder.HasIndex(po => po.Status).HasDatabaseName(DbIndexes.Procurement.IX_PURCHASE_ORDERS_STATUS);
+        builder.HasIndex(po => po.SupplierId)
+            .HasDatabaseName(DbIndexes.Procurement.IX_PURCHASE_ORDERS_SUPPLIER);
+
+        builder.HasIndex(po => new { po.TenantId, po.Status })
+            .HasDatabaseName(DbIndexes.Procurement.IX_PURCHASE_ORDERS_TENANT_STATUS);
     }
 }
