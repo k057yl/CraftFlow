@@ -13,6 +13,6 @@ public record CreateWarehouseCommand(
     string? Address = null
 ) : IRequest<Result<Guid>>, IRequireQuotaValidation, IRequirePermission
 {
-    public QuotaType QuotaType => QuotaType.WarehousesCount;
+    public QuotaType QuotaType => QuotaType.WAREHOUSES_COUNT;
     public AppPermission RequiredPermission => AppPermission.WAREHOUSES_MANAGE;
 }

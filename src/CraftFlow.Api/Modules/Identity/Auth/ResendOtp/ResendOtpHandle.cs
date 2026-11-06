@@ -1,5 +1,5 @@
-﻿using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Infrastructure.Services;
+﻿using CraftFlow.Api.Common.Infrastructure.Services;
+using CraftFlow.Api.Common.Persistence;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;

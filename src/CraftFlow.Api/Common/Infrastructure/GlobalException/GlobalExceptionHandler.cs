@@ -6,10 +6,12 @@ namespace CraftFlow.Api.Common.Infrastructure.GlobalException;
 public class GlobalExceptionHandler : IExceptionHandler
 {
     private readonly ILogger<GlobalExceptionHandler> _logger;
+    private readonly IHostEnvironment _environment;
 
-    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
+    public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHostEnvironment environment)
     {
         _logger = logger;
+        _environment = environment;
     }
 
     public async ValueTask<bool> TryHandleAsync(
@@ -17,18 +19,20 @@ public class GlobalExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "Unhandled exception occurred: {Message}", exception.Message);
+        _logger.LogError(exception, "Необработанное исключение: {Message}", exception.Message);
 
-        var problemDetails = new ProblemDetails
+        var details = new ProblemDetails
         {
             Status = StatusCodes.Status500InternalServerError,
-            Title = "Server Error",
-            Detail = exception.Message
+            Title = "Произошла внутренняя ошибка сервера.",
+            Type = "https://tools.ietf.org/html/rfc7231#section-6.6.1",
+            Detail = _environment.IsDevelopment()
+                ? exception.Message
+                : "Произошла непредвиденная ошибка. Обратитесь в поддержку."
         };
 
-        httpContext.Response.StatusCode = problemDetails.Status.Value;
-
-        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+        httpContext.Response.StatusCode = details.Status.Value;
+        await httpContext.Response.WriteAsJsonAsync(details, cancellationToken);
 
         return true;
     }

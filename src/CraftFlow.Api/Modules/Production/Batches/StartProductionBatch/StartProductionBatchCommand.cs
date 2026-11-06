@@ -15,6 +15,6 @@ public record StartProductionBatchCommand(
     string? Name = null
 ) : IRequest<Result<Guid>>, IRequireQuotaValidation, IRequirePermission
 {
-    public QuotaType QuotaType => QuotaType.MonthlyBatches;
+    public QuotaType QuotaType => QuotaType.MONTHLY_BATCHES;
     public AppPermission RequiredPermission => AppPermission.PRODUCTION_EXECUTE;
 }

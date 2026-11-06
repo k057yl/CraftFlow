@@ -12,6 +12,6 @@ public record CreateChamberCommand(
     decimal TargetHumidity
 ) : IRequest<Result<Guid>>, IRequireQuotaValidation, IRequirePermission
 {
-    public QuotaType QuotaType => QuotaType.ChamberCount;
+    public QuotaType QuotaType => QuotaType.CHAMBER_COUNT;
     public AppPermission RequiredPermission => AppPermission.WAREHOUSES_MANAGE;
 }

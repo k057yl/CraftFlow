@@ -7,7 +7,6 @@ namespace CraftFlow.Api.Common.MultiTenancy;
 
 public class TenantContext : ITenantContext
 {
-    private static readonly Guid DefaultTenantGuid = Guid.Parse(CoreConstants.MultiTenancy.DEFAULT_TENANT_ID_STRING);
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public TenantContext(IHttpContextAccessor httpContextAccessor)
@@ -104,12 +103,6 @@ public class TenantContext : ITenantContext
                           ?? httpContext.User.FindFirst("tenant_id")?.Value;
 
         if (Guid.TryParse(tenantClaim, out tenantId) && tenantId != Guid.Empty)
-        {
-            return true;
-        }
-
-        if (httpContext.Request.Headers.TryGetValue(CoreConstants.MultiTenancy.HEADER_TENANT_ID, out var headerValue) &&
-            Guid.TryParse(headerValue, out tenantId) && tenantId != Guid.Empty)
         {
             return true;
         }

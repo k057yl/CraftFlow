@@ -107,18 +107,51 @@ public class AppDbContext : DbContext
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
+        var currentTenantId = _tenantContext.TenantId;
+        var isSuperAdmin = _tenantContext.Role == TenantRole.SUPER_ADMIN;
+
         foreach (var entry in ChangeTracker.Entries<ITenantEntity>())
         {
             if (entry.State == EntityState.Added)
             {
-                var currentTenantId = entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue as Guid?;
+                var entityTenantId = entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue as Guid?;
 
-                if (!currentTenantId.HasValue || currentTenantId.Value == Guid.Empty)
+                if (!isSuperAdmin)
                 {
-                    if (_tenantContext.TenantId != Guid.Empty)
+                    if (currentTenantId == Guid.Empty)
                     {
-                        entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue = _tenantContext.TenantId;
+                        throw new UnauthorizedAccessException("Операция отклонена: отсутствует контекст организации.");
                     }
+
+                    if (entityTenantId.HasValue && entityTenantId.Value != Guid.Empty && entityTenantId.Value != currentTenantId)
+                    {
+                        throw new UnauthorizedAccessException("Операция отклонена: попытка создания записи для чужой организации.");
+                    }
+
+                    entry.Property(nameof(ITenantEntity.TenantId)).CurrentValue = currentTenantId;
+                }
+                else if (!entityTenantId.HasValue || entityTenantId.Value == Guid.Empty)
+                {
+                    throw new InvalidOperationException("Системный администратор должен явно указывать TenantId.");
+                }
+            }
+            else if (entry.State == EntityState.Modified)
+            {
+                if (entry.Property(nameof(ITenantEntity.TenantId)).IsModified)
+                {
+                    throw new UnauthorizedAccessException("Операция отклонена: изменение TenantId существующих записей запрещено.");
+                }
+
+                if (!isSuperAdmin && entry.Entity.TenantId != currentTenantId)
+                {
+                    throw new UnauthorizedAccessException("Операция отклонена: попытка изменения данных чужой организации.");
+                }
+            }
+            else if (entry.State == EntityState.Deleted)
+            {
+                if (!isSuperAdmin && entry.Entity.TenantId != currentTenantId)
+                {
+                    throw new UnauthorizedAccessException("Операция отклонена: попытка удаления данных чужой организации.");
                 }
             }
         }
@@ -191,25 +224,6 @@ public class AppDbContext : DbContext
         }
 
         return result;
-    }
-
-    private void SetTenantAndActiveFilter<TEntity>(ModelBuilder modelBuilder)
-        where TEntity : Entity, ITenantEntity
-    {
-        modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
-            (_tenantContext.Role == TenantRole.SUPER_ADMIN || e.TenantId == _tenantContext.TenantId));
-    }
-
-    private void SetTenantFilter<TEntity>(ModelBuilder modelBuilder)
-        where TEntity : class, ITenantEntity
-    {
-        modelBuilder.Entity<TEntity>().HasQueryFilter(e =>
-            _tenantContext.Role == TenantRole.SUPER_ADMIN || e.TenantId == _tenantContext.TenantId);
-    }
-
-    private void SetActiveFilter<TEntity>(ModelBuilder modelBuilder)
-        where TEntity : Entity
-    {
     }
 
     private sealed class DesignTimeTenantContext : ITenantContext

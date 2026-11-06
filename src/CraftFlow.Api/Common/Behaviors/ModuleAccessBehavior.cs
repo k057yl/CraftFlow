@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Reflection;
-using CraftFlow.Api.Common.MultiTenancy;
+﻿using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Modules.Subscriptions.Domain;
 using CraftFlow.SharedKernel.Constants;
@@ -17,7 +15,6 @@ public sealed class ModuleAccessBehavior<TRequest, TResponse> : IPipelineBehavio
     where TResponse : Result
 {
     private const int CACHE_EXPIRATION_MINUTES = 15;
-    private static readonly ConcurrentDictionary<Type, MethodInfo> FailureMethodCache = new();
 
     private readonly AppDbContext _dbContext;
     private readonly ITenantContext _tenantContext;
@@ -51,7 +48,7 @@ public sealed class ModuleAccessBehavior<TRequest, TResponse> : IPipelineBehavio
 
         if (!hasAccess)
         {
-            return BuildFailureResult(ErrorCodes.Saas.QUOTA_EXCEEDED);
+            return ResultFactory.CreateFailure<TResponse>(Error.Forbidden(ErrorCodes.Saas.MODULE_NOT_PURCHASED));
         }
 
         return await next();
@@ -73,46 +70,5 @@ public sealed class ModuleAccessBehavior<TRequest, TResponse> : IPipelineBehavio
         });
 
         return (enabledModules & requiredModule) == requiredModule;
-    }
-
-    private static TResponse BuildFailureResult(string errorCode)
-    {
-        var error = Error.Validation(errorCode);
-
-        if (typeof(TResponse) == typeof(Result))
-        {
-            return (TResponse)(object)Result.Failure(error);
-        }
-
-        var genericArgs = typeof(TResponse).GetGenericArguments();
-        if (genericArgs.Length == 0)
-        {
-            return (TResponse)(object)Result.Failure(error);
-        }
-
-        var valueType = genericArgs[0];
-
-        var failureMethod = FailureMethodCache.GetOrAdd(valueType, type =>
-        {
-            var genericMethod = typeof(Result)
-                .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .FirstOrDefault(m => m.Name == nameof(Result.Failure)
-                                     && m.IsGenericMethodDefinition
-                                     && m.GetParameters().Length == 1
-                                     && m.GetParameters()[0].ParameterType == typeof(Error));
-
-            if (genericMethod != null)
-            {
-                return genericMethod.MakeGenericMethod(type);
-            }
-
-            var genericResultType = typeof(Result<>).MakeGenericType(type);
-            return genericResultType
-                .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .First(m => m.Name == nameof(Result.Failure)
-                            && m.GetParameters()[0].ParameterType == typeof(Error));
-        });
-
-        return (TResponse)failureMethod.Invoke(null, new object[] { error })!;
     }
 }

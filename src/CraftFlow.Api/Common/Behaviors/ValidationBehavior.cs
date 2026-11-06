@@ -20,51 +20,20 @@ public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
         _logger = logger;
     }
 
-    public async Task<TResponse> Handle(
-        TRequest request,
-        RequestHandlerDelegate<TResponse> next,
-        CancellationToken cancellationToken)
+    public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         if (!_validators.Any())
-        {
             return await next();
-        }
 
         var context = new ValidationContext<TRequest>(request);
-        var validationResults = await Task.WhenAll(
-            _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+        var validationResults = await Task.WhenAll(_validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+        var failures = validationResults.SelectMany(r => r.Errors).Where(f => f != null).ToList();
 
-        var validationFailures = validationResults
-            .SelectMany(result => result.Errors)
-            .Where(failure => failure != null)
-            .ToList();
-
-        if (validationFailures.Count != 0)
+        if (failures.Count != 0)
         {
-            var firstFailure = validationFailures.First();
+            var error = Error.Validation(failures.First().ErrorMessage);
 
-            var errorsSummary = string.Join("; ", validationFailures
-                .Select(f => $"{f.PropertyName}: {f.ErrorMessage} (Code: {f.ErrorCode})"));
-
-            _logger.LogWarning("Validation failed for {RequestName}: {Errors}",
-                typeof(TRequest).Name, errorsSummary);
-
-            var errorCode = firstFailure.ErrorCode ?? ErrorCodes.General.VALUE_REQUIRED;
-
-            var genericArgument = typeof(TResponse).IsGenericType
-                ? typeof(TResponse).GetGenericArguments()[0]
-                : typeof(object);
-
-            var failureMethod = typeof(Result)
-                .GetMethod(
-                    nameof(Result.Failure),
-                    genericParameterCount: 1,
-                    types: new[] { typeof(Error) })!
-                .MakeGenericMethod(genericArgument);
-
-            var error = Error.Validation(errorCode);
-
-            return (TResponse)failureMethod.Invoke(null, new object[] { error })!;
+            return ResultFactory.CreateFailure<TResponse>(error);
         }
 
         return await next();

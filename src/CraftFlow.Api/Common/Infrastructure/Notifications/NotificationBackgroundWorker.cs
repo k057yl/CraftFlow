@@ -1,5 +1,5 @@
 ﻿using CraftFlow.Api.Common.BackgroundWorkers;
-using CraftFlow.Api.Infrastructure.Services;
+using CraftFlow.Api.Common.Infrastructure.Services;
 
 namespace CraftFlow.Api.Common.Infrastructure.Notifications;
 

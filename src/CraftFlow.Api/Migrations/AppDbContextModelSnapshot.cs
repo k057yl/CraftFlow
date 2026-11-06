@@ -1337,6 +1337,9 @@ namespace CraftFlow.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("EnabledModules")
+                        .HasColumnType("integer");
+
                     b.Property<DateTime?>("ExpiresAtUtc")
                         .HasColumnType("timestamp with time zone");
 
@@ -1361,8 +1364,7 @@ namespace CraftFlow.Api.Migrations
 
                     b.HasIndex("PlanId");
 
-                    b.HasIndex("TenantId")
-                        .IsUnique();
+                    b.HasIndex("TenantId");
 
                     b.HasIndex("TenantId", "ExpiresAtUtc");
 

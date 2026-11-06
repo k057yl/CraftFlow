@@ -30,6 +30,7 @@ public class SubscriptionExpirationWorker : BackgroundService
                 var nowUtc = DateTime.UtcNow;
 
                 var expiredCount = await dbContext.Set<TenantSubscription>()
+                    .IgnoreQueryFilters()
                     .Where(s => (s.State == SubscriptionState.Active || s.State == SubscriptionState.Trial)
                              && s.ExpiresAtUtc.HasValue
                              && s.ExpiresAtUtc.Value <= nowUtc)

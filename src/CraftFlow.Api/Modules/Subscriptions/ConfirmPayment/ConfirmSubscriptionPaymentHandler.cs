@@ -10,8 +10,6 @@ namespace CraftFlow.Api.Modules.Subscriptions.ConfirmPayment;
 
 public class ConfirmSubscriptionPaymentHandler : IRequestHandler<ConfirmSubscriptionPaymentCommand, Result>
 {
-    private const string MSG_PLAN_NOT_FOUND = "PLAN_NOT_FOUND";
-
     private readonly AppDbContext _dbContext;
     private readonly ITenantContext _tenantContext;
 
@@ -21,51 +19,54 @@ public class ConfirmSubscriptionPaymentHandler : IRequestHandler<ConfirmSubscrip
         _tenantContext = tenantContext;
     }
 
-    public async Task<Result> Handle(ConfirmSubscriptionPaymentCommand request, CancellationToken ct)
+    public async Task<Result> Handle(ConfirmSubscriptionPaymentCommand request, CancellationToken cancellationToken)
     {
-        if (!_tenantContext.IsSuperAdmin)
+        var targetTenantId = _tenantContext.IsSuperAdmin
+            ? request.TargetTenantId ?? _tenantContext.TenantId
+            : _tenantContext.TenantId;
+
+        if (targetTenantId == Guid.Empty)
         {
-            return Result.Failure(Error.Validation(ErrorCodes.Auth.ACCESS_DENIED));
+            return Result.Failure(Error.Validation(ErrorCodes.General.INVALID_TENANT));
         }
 
-        var tenantId = _tenantContext.TenantId;
-
         var plan = await _dbContext.Set<SubscriptionPlan>()
-            .FirstOrDefaultAsync(p => p.Code == request.PlanCode, ct);
+            .FirstOrDefaultAsync(p => p.Code == request.PlanCode, cancellationToken);
 
         if (plan == null)
         {
-            return Result.Failure(Error.NotFound(MSG_PLAN_NOT_FOUND));
+            return Result.Failure(Error.NotFound(ErrorCodes.Saas.PLAN_NOT_FOUND));
         }
 
         var subscription = await _dbContext.Set<TenantSubscription>()
-            .FirstOrDefaultAsync(s => s.TenantId == tenantId, ct);
+            .FirstOrDefaultAsync(s => s.TenantId == targetTenantId, cancellationToken);
 
-        var newExpirationUtc = DateTime.UtcNow.AddDays(request.Days);
+        var nowUtc = DateTime.UtcNow;
 
         if (subscription == null)
         {
-            subscription = TenantSubscription.CreateFree(tenantId, plan.Id);
-            subscription.Activate(newExpirationUtc);
+            subscription = TenantSubscription.CreateFree(targetTenantId, plan.Id);
             _dbContext.Set<TenantSubscription>().Add(subscription);
         }
-        else
-        {
-            subscription.ChangePlan(plan.Id);
-            subscription.Extend(newExpirationUtc);
-        }
+
+        var baseDate = subscription.ExpiresAtUtc.HasValue && subscription.ExpiresAtUtc.Value > nowUtc
+            ? subscription.ExpiresAtUtc.Value
+            : nowUtc;
+
+        var newExpirationUtc = baseDate.AddDays(request.Days);
+        subscription.Activate(newExpirationUtc);
 
         var payment = SubscriptionPayment.Create(
-            tenantId,
+            targetTenantId,
             amount: request.PlanCode == "FREE" ? 0m : 990m,
             planCode: plan.Code,
             daysAdded: request.Days,
-            description: $"Тестовая активация тарифа {plan.Name}"
+            description: $"Активация тарифа {plan.Name}"
         );
 
         _dbContext.Set<SubscriptionPayment>().Add(payment);
 
-        await _dbContext.SaveChangesAsync(ct);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
     }
