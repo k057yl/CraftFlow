@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Infrastructure.Services;
+﻿namespace CraftFlow.Api.Common.Infrastructure.Services;
 
 public interface IEmailService
 {

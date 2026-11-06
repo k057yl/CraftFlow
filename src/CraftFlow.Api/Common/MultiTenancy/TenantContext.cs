@@ -1,7 +1,7 @@
-﻿using CraftFlow.Api.Common.Constants;
+﻿using System.Security.Claims;
+using CraftFlow.Api.Common.Constants;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Enums.Identity;
-using System.Security.Claims;
 
 namespace CraftFlow.Api.Common.MultiTenancy;
 

@@ -71,10 +71,10 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
 
         var isQuotaExceeded = quotaRequest.QuotaType switch
         {
-            QuotaType.MonthlyBatches => await CheckMonthlyBatchesQuotaAsync(tenantId, plan.MaxMonthlyBatches, cancellationToken),
-            QuotaType.WarehousesCount => await CheckCountQuotaAsync<Warehouse>(tenantId, plan.MaxWarehouses, cancellationToken),
-            QuotaType.ChamberCount => await CheckCountQuotaAsync<AgingChamber>(tenantId, plan.MaxChambers, cancellationToken),
-            QuotaType.UsersCount => await CheckCountQuotaAsync<OrganizationMember>(tenantId, plan.MaxUsers, cancellationToken),
+            QuotaType.MONTHLY_BATCHES => await CheckMonthlyBatchesQuotaAsync(tenantId, plan.MaxMonthlyBatches, cancellationToken),
+            QuotaType.WAREHOUSES_COUNT => await CheckCountQuotaAsync<Warehouse>(tenantId, plan.MaxWarehouses, cancellationToken),
+            QuotaType.CHAMBER_COUNT => await CheckCountQuotaAsync<AgingChamber>(tenantId, plan.MaxChambers, cancellationToken),
+            QuotaType.USERS_COUNT => await CheckCountQuotaAsync<OrganizationMember>(tenantId, plan.MaxUsers, cancellationToken),
             _ => false
         };
 

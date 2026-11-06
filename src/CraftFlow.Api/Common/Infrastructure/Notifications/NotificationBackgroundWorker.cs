@@ -27,12 +27,12 @@ public sealed class NotificationBackgroundWorker : BackgroundService
             {
                 using var scope = _serviceProvider.CreateScope();
 
-                if (job.Type == NotificationType.Email)
+                if (job.Type == NotificationType.EMAIL)
                 {
                     var emailService = scope.ServiceProvider.GetRequiredService<IEmailService>();
                     await emailService.SendEmailAsync(job.Recipient, job.Subject, job.Body);
                 }
-                else if (job.Type == NotificationType.Telegram)
+                else if (job.Type == NotificationType.TELEGRAM)
                 {
                     var telegramService = scope.ServiceProvider.GetRequiredService<ITelegramNotificationService>();
                     await telegramService.SendAdminNotificationAsync(job.Body, stoppingToken);

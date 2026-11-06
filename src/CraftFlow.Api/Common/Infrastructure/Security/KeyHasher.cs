@@ -1,9 +1,12 @@
-﻿namespace CraftFlow.Api.Common.Infrastructure.Security;
+﻿using Microsoft.Extensions.Options;
+
+namespace CraftFlow.Api.Common.Infrastructure.Security;
+
 public class KeyHasher : IKeyHasher
 {
     private readonly ApiKeySecurityOptions _options;
 
-    public KeyHasher(Microsoft.Extensions.Options.IOptions<ApiKeySecurityOptions> options)
+    public KeyHasher(IOptions<ApiKeySecurityOptions> options)
     {
         _options = options.Value;
     }

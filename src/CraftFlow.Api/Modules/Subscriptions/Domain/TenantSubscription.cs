@@ -1,5 +1,6 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
+using CraftFlow.SharedKernel.Enums.Saas;
 using Stateless;
 
 namespace CraftFlow.Api.Modules.Subscriptions.Domain;
@@ -11,6 +12,8 @@ public class TenantSubscription : Entity, ITenantEntity
     public SubscriptionState State { get; private set; }
     public DateTime StartedAtUtc { get; private set; }
     public DateTime? ExpiresAtUtc { get; private set; }
+
+    public AppModule EnabledModules { get; private set; }
 
     public SubscriptionPlan Plan { get; private set; } = null!;
     public ICollection<TenantAccessKey> Keys { get; private set; } = new List<TenantAccessKey>();
@@ -27,7 +30,7 @@ public class TenantSubscription : Entity, ITenantEntity
         ConfigureStateMachine();
     }
 
-    public static TenantSubscription CreateFree(Guid tenantId, Guid planId)
+    public static TenantSubscription CreateFree(Guid tenantId, Guid planId, AppModule initialModules = AppModule.CHEESE_MAKING)
     {
         return new TenantSubscription
         {
@@ -36,8 +39,29 @@ public class TenantSubscription : Entity, ITenantEntity
             PlanId = planId,
             State = SubscriptionState.Active,
             StartedAtUtc = DateTime.UtcNow,
-            ExpiresAtUtc = null
+            ExpiresAtUtc = null,
+            EnabledModules = initialModules
         };
+    }
+
+    public void EnableModule(AppModule module)
+    {
+        EnabledModules |= module;
+    }
+
+    public void DisableModule(AppModule module)
+    {
+        EnabledModules &= ~module;
+    }
+
+    public void SetModules(AppModule modules)
+    {
+        EnabledModules = modules;
+    }
+
+    public bool HasModule(AppModule module)
+    {
+        return (EnabledModules & module) == module;
     }
 
     private void ConfigureStateMachine()

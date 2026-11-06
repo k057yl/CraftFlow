@@ -1,8 +1,9 @@
 ﻿namespace CraftFlow.Api.Common.Behaviors;
+
 public enum QuotaType
 {
-    MonthlyBatches,
-    WarehousesCount,
-    ChamberCount,
-    UsersCount
+    MONTHLY_BATCHES = 1,
+    WAREHOUSES_COUNT = 2,
+    CHAMBER_COUNT = 3,
+    USERS_COUNT = 4
 }

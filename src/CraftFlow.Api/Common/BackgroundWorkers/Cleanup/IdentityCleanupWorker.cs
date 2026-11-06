@@ -1,6 +1,5 @@
 ﻿using CraftFlow.Api.Common.Infrastructure.Services;
 using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Infrastructure.Services;
 using CraftFlow.Api.Modules.Identity.Users.DeleteAccount;
 using CraftFlow.SharedKernel.Enums.Identity;
 using Microsoft.EntityFrameworkCore;

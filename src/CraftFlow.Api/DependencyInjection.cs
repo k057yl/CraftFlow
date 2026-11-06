@@ -1,4 +1,5 @@
 ﻿using CraftFlow.Api.BackgroundWorkers;
+using CraftFlow.Api.Common.Authorization;
 using CraftFlow.Api.Common.BackgroundWorkers;
 using CraftFlow.Api.Common.Behaviors;
 using CraftFlow.Api.Common.Infrastructure.Converters;
@@ -6,6 +7,7 @@ using CraftFlow.Api.Common.Infrastructure.GlobalException;
 using CraftFlow.Api.Common.Infrastructure.Identity;
 using CraftFlow.Api.Common.Infrastructure.Notifications;
 using CraftFlow.Api.Common.Infrastructure.Security;
+using CraftFlow.Api.Common.Infrastructure.Services;
 using CraftFlow.Api.Common.MultiTenancy;
 using CraftFlow.Api.Common.Persistence;
 using CraftFlow.Api.Infrastructure.BackgroundServices.Cleanup;
@@ -127,6 +129,8 @@ public static class DependencyInjection
             cfg.RegisterServicesFromAssembly(typeof(Program).Assembly);
 
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PermissionBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ModuleAccessBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(SubscriptionQuotaBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
         });

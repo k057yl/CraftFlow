@@ -1,5 +1,5 @@
-﻿using CraftFlow.Api.Modules.Identity.Domain;
-using System.Security.Claims;
+﻿using System.Security.Claims;
+using CraftFlow.Api.Modules.Identity.Domain;
 
 namespace CraftFlow.Api.Common.Infrastructure.Identity;
 

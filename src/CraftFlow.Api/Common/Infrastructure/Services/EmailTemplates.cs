@@ -1,4 +1,5 @@
 ﻿namespace CraftFlow.Api.Common.Infrastructure.Services;
+
 public static class EmailTemplates
 {
     public static (string Subject, string HtmlBody) GetOtpTemplate(string otpCode, string culture) => culture.ToLowerInvariant() switch
