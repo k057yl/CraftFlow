@@ -1,0 +1,39 @@
+﻿using CraftFlow.Api.Core.Persistence;
+using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Enums.Inventory;
+using CraftFlow.SharedKernel.Result;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
+namespace CraftFlow.Api.Modules.CoreDomainServices.Production.Batches.StartDraftBatch;
+
+public sealed class StartDraftBatchCommandHandler : IRequestHandler<StartDraftBatchCommand, Result>
+{
+    private readonly AppDbContext _dbContext;
+
+    public StartDraftBatchCommandHandler(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task<Result> Handle(StartDraftBatchCommand request, CancellationToken cancellationToken)
+    {
+        var batch = await _dbContext.ProductionBatches
+            .FirstOrDefaultAsync(b => b.Id == request.BatchId, cancellationToken);
+
+        if (batch == null)
+        {
+            return Result.Failure(Error.NotFound(ErrorCodes.Production.BATCH_NOT_FOUND));
+        }
+
+        if (batch.State != BatchState.DRAFT)
+        {
+            return Result.Failure(Error.Validation(ErrorCodes.Production.BATCH_CANNOT_BE_DELETED));
+        }
+
+        batch.Start();
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Result.Success();
+    }
+}

@@ -1,0 +1,60 @@
+﻿using CraftFlow.Api.Core.MultiTenancy;
+using CraftFlow.Api.Core.Persistence;
+using CraftFlow.Api.Modules.CoreDomainServices.Sanitation.Domain;
+using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Enums.Sanitation;
+using CraftFlow.SharedKernel.Result;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
+namespace CraftFlow.Api.Modules.CoreDomainServices.Sanitation.CreateSanitationRule;
+
+public sealed class CreateSanitationRuleCommandHandler : IRequestHandler<CreateSanitationRuleCommand, Result<Guid>>
+{
+    private readonly AppDbContext _context;
+    private readonly ITenantContext _tenantContext;
+
+    public CreateSanitationRuleCommandHandler(AppDbContext context, ITenantContext tenantContext)
+    {
+        _context = context;
+        _tenantContext = tenantContext;
+    }
+
+    public async Task<Result<Guid>> Handle(CreateSanitationRuleCommand request, CancellationToken cancellationToken)
+    {
+        var targetExists = request.TargetType switch
+        {
+            SanitationTargetType.WAREHOUSE => await _context.Warehouses.AnyAsync(w => w.Id == request.TargetId, cancellationToken),
+            SanitationTargetType.AGING_CHAMBER => await _context.AgingChambers.AnyAsync(c => c.Id == request.TargetId, cancellationToken),
+            SanitationTargetType.STORAGE_LOCATION => await _context.StorageLocations.AnyAsync(l => l.Id == request.TargetId, cancellationToken),
+            _ => false
+        };
+
+        if (!targetExists)
+            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
+
+        var existingRule = await _context.SanitationRules
+            .FirstOrDefaultAsync(r => r.TargetType == request.TargetType && r.TargetId == request.TargetId, cancellationToken);
+
+        if (existingRule != null)
+        {
+            _context.SanitationRules.Remove(existingRule);
+        }
+
+        var rule = SanitationRule.Create(
+            _tenantContext.TenantId,
+            request.TargetType,
+            request.TargetId,
+            request.TriggerType,
+            request.RequiredChemicals,
+            intervalDays: request.IntervalDays,
+            maxBatchCount: request.MaxBatchCount,
+            nextScheduledAt: request.NextScheduledAt
+        );
+
+        _context.SanitationRules.Add(rule);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return Result.Success(rule.Id);
+    }
+}

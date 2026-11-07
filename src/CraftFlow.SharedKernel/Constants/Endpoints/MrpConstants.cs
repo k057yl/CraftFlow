@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.MRP;
+﻿namespace CraftFlow.SharedKernel.Constants.Endpoints;
 public class MrpConstants
 {
     public const string MRP_REQUIREMENTS = "api/mrp/requirements";

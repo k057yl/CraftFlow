@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Subscriptions.Domain;
+﻿namespace CraftFlow.SharedKernel.Enums;
 public enum KeyStatus
 {
     Active = 1,

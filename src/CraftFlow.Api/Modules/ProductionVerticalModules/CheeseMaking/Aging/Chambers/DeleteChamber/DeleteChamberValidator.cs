@@ -1,0 +1,21 @@
+﻿using CraftFlow.Api.Core.Persistence;
+using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.Domain;
+using CraftFlow.SharedKernel.Enums.Inventory;
+using FluentValidation;
+using Microsoft.EntityFrameworkCore;
+
+namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.Chambers.DeleteChamber;
+public class DeleteChamberValidator : AbstractValidator<DeleteChamberCommand>
+{
+    public DeleteChamberValidator(AppDbContext dbContext)
+    {
+        RuleFor(x => x.Id)
+            .MustAsync(async (id, ct) =>
+            {
+                var hasActiveLots = await dbContext.AgingLots
+                    .AnyAsync(l => l.AgingChamberId == id && l.State == AgingState.IN_CHAMBER, ct);
+                return !hasActiveLots;
+            })
+            .WithErrorCode("CHAMBER_HAS_ACTIVE_LOTS");
+    }
+}

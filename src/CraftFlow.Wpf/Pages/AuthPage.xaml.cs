@@ -1,5 +1,5 @@
-﻿using CraftFlow.Api.Modules.Identity;
-using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.Wpf.Services;
 using System.Net.Http.Json;
@@ -49,12 +49,16 @@ public partial class AuthPage : Page
     {
         await ExecuteWithLockAsync(async () =>
         {
+            var selectedItem = DirectionComboBox.SelectedItem as ComboBoxItem;
+            string selectedPlanCode = selectedItem?.Tag?.ToString() ?? "CHEESE_STARTER";
+
             var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(IdentityConstants.REGISTER, new
             {
                 CompanyName = RegisterCompanyNameTextBox.Text,
                 OwnerEmail = RegisterEmailTextBox.Text,
                 OwnerPassword = RegisterPasswordBox.Password,
-                OwnerFullName = RegisterNameTextBox.Text
+                OwnerFullName = RegisterNameTextBox.Text,
+                PlanCode = selectedPlanCode
             });
 
             if (isSuccess)

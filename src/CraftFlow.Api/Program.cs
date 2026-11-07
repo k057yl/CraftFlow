@@ -1,18 +1,19 @@
 using CraftFlow.Api;
-using CraftFlow.Api.Common.MultiTenancy;
-using CraftFlow.Api.Common.Persistence;
-using CraftFlow.Api.Modules.Aging;
-using CraftFlow.Api.Modules.Analytics;
-using CraftFlow.Api.Modules.Catalog;
-using CraftFlow.Api.Modules.Identity;
-using CraftFlow.Api.Modules.Inventory;
-using CraftFlow.Api.Modules.MRP;
-using CraftFlow.Api.Modules.Procurement;
-using CraftFlow.Api.Modules.Production;
-using CraftFlow.Api.Modules.Sales;
-using CraftFlow.Api.Modules.Sanitation;
-using CraftFlow.Api.Modules.Subscriptions;
-using CraftFlow.Api.Modules.Traceability;
+using CraftFlow.Api.Core.MultiTenancy;
+using CraftFlow.Api.Core.Persistence;
+using CraftFlow.Api.Modules.CoreDomainServices.Analytics;
+using CraftFlow.Api.Modules.CoreDomainServices.Catalog;
+using CraftFlow.Api.Modules.CoreDomainServices.Identity;
+using CraftFlow.Api.Modules.CoreDomainServices.Inventory;
+using CraftFlow.Api.Modules.CoreDomainServices.MRP;
+using CraftFlow.Api.Modules.CoreDomainServices.Procurement;
+using CraftFlow.Api.Modules.CoreDomainServices.Production;
+using CraftFlow.Api.Modules.CoreDomainServices.Sales;
+using CraftFlow.Api.Modules.CoreDomainServices.Sanitation;
+using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions;
+using CraftFlow.Api.Modules.CoreDomainServices.Traceability;
+using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking;
+using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging;
 
 DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
@@ -32,10 +33,10 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<TenantAccessKeyMiddleware>();
+
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseMiddleware<TenantAccessKeyMiddleware>();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -49,6 +50,7 @@ app.MapIdentityEndpoints();
 app.MapCatalogEndpoints();
 app.MapInventoryEndpoints();
 app.MapProductionEndpoints();
+app.MapCheeseMakingEndpoints();
 app.MapSalesEndpoints();
 app.MapAnalyticsEndpoints();
 app.MapProcurementEndpoints();

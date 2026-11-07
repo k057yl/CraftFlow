@@ -1,21 +1,18 @@
-﻿using System.IO;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Constants.Endpoints;
+using CraftFlow.SharedKernel.Dtos.Aging;
+using CraftFlow.SharedKernel.Dtos.Catalog.Inventory;
+using CraftFlow.SharedKernel.Dtos.Identity;
+using CraftFlow.SharedKernel.Dtos.MRP;
+using CraftFlow.SharedKernel.Dtos.Supplier;
+using CraftFlow.SharedKernel.Enums;
+using CraftFlow.SharedKernel.Enums.Identity;
+using CraftFlow.SharedKernel.Result;
+using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
-using CraftFlow.Api.Common.Constants;
-using CraftFlow.Api.Modules.Aging;
-using CraftFlow.Api.Modules.Identity;
-using CraftFlow.Api.Modules.MRP;
-using CraftFlow.Api.Modules.Procurement;
-using CraftFlow.SharedKernel.Constants;
-using CraftFlow.SharedKernel.Dtos.Aging;
-using CraftFlow.SharedKernel.Dtos.Identity;
-using CraftFlow.SharedKernel.Dtos.Inventory;
-using CraftFlow.SharedKernel.Dtos.MRP;
-using CraftFlow.SharedKernel.Dtos.Supplier;
-using CraftFlow.SharedKernel.Enums.Identity;
-using CraftFlow.SharedKernel.Result;
 
 namespace CraftFlow.Wpf.Services;
 
@@ -33,6 +30,7 @@ public class ApiService
     public string? JwtToken { get; private set; }
     public UserProfileDto? CurrentUser { get; private set; }
     public Guid? CurrentTenantId { get; private set; }
+    public AppModule ActiveModules { get; set; } = AppModule.NONE;
 
     public bool IsAuthenticated => !string.IsNullOrEmpty(JwtToken);
 
@@ -119,6 +117,7 @@ public class ApiService
     {
         JwtToken = null;
         CurrentUser = null;
+        ActiveModules = AppModule.NONE;
         _client.DefaultRequestHeaders.Authorization = null;
         ClearTenantHeader();
         DeleteTokenFromDisk();
@@ -234,6 +233,18 @@ public class ApiService
                 Guid.TryParse(tenantProp.GetString(), out var tenantId))
             {
                 CurrentTenantId = tenantId;
+            }
+
+            if (root.TryGetProperty("modules", out var modulesProp))
+            {
+                if (modulesProp.ValueKind == JsonValueKind.Number && modulesProp.TryGetInt32(out int modulesInt))
+                {
+                    ActiveModules = (AppModule)modulesInt;
+                }
+                else if (modulesProp.ValueKind == JsonValueKind.String && Enum.TryParse<AppModule>(modulesProp.GetString(), out var parsedModules))
+                {
+                    ActiveModules = parsedModules;
+                }
             }
 
             user.Role = ExtractRoleFromJwt(root);

@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Common.Constants;
+﻿namespace CraftFlow.SharedKernel.Constants;
 public static class CoreConstants
 {
     public static class MultiTenancy

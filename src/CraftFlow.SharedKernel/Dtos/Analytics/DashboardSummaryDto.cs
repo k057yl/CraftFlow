@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Analytics.GetDashboardSummary;
+﻿namespace CraftFlow.SharedKernel.Dtos.Analytics;
 
 public record DashboardSummaryDto(
     int TotalProducts,

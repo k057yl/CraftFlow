@@ -1,0 +1,61 @@
+﻿using CraftFlow.Api.Core.Constants;
+using CraftFlow.Api.Core.MultiTenancy;
+using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Dtos.Aging;
+using CraftFlow.SharedKernel.Result;
+using Dapper;
+using MediatR;
+using System.Data;
+
+namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.AgingProcess.GetAgingLotDetails;
+
+public class GetAgingLotDetailsQueryHandler : IRequestHandler<GetAgingLotDetailsQuery, Result<GetAgingLotDetailsDto>>
+{
+    private readonly IDbConnection _dbConnection;
+    private readonly ITenantContext _tenantContext;
+
+    public GetAgingLotDetailsQueryHandler(IDbConnection dbConnection, ITenantContext tenantContext)
+    {
+        _dbConnection = dbConnection;
+        _tenantContext = tenantContext;
+    }
+
+    public async Task<Result<GetAgingLotDetailsDto>> Handle(GetAgingLotDetailsQuery request, CancellationToken cancellationToken)
+    {
+        const string sql = $"""
+            SELECT 
+                al."Id" AS "LotId",
+                al."ProductId" AS "ProductId",
+                p."Name" AS "ProductName",
+                uom."Code" AS "UnitName",
+                COALESCE((
+                    SELECT 
+                        (SUM(ci."Quantity" * sl."UnitPrice") * (1.00::numeric + COALESCE(MAX(pb."OverheadPercentage"), 0.00)::numeric / 100.00::numeric))::numeric(18, 4)
+                    FROM {DbSchemas.PRODUCTION}.{DbTables.CONSUMED_INGREDIENTS} ci
+                    JOIN {DbSchemas.INVENTORY}.{DbTables.STOCK_LOTS} sl ON sl."Id" = ci."StockLotId"
+                    LEFT JOIN {DbSchemas.PRODUCTION}.{DbTables.PRODUCTION_BATCHES} pb ON pb."Id" = ci."ProductionBatchId"
+                    WHERE ci."ProductionBatchId" = al."ProductionBatchId"
+                ), 0.00)::numeric(18, 4) AS "TotalBatchCost",
+                COALESCE(SUM(CASE WHEN ali."State" = 1 THEN ali."CurrentWeight" ELSE 0 END), al."InitialQuantity") AS "InitialQuantity",
+                COALESCE(SUM(CASE WHEN ali."State" = 1 THEN 1 ELSE 0 END), 0)::integer AS "UnitsCount"
+            FROM {DbSchemas.AGING}.{DbTables.AGING_LOTS} al
+            JOIN {DbSchemas.CATALOG}.{DbTables.PRODUCTS} p ON p."Id" = al."ProductId"
+            JOIN {DbSchemas.CATALOG}.{DbTables.UNITS_OF_MEASURE} uom ON uom."Id" = p."UnitOfMeasureId"
+            LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_LOT_ITEMS} ali ON ali."AgingLotId" = al."Id"
+            WHERE al."Id" = @LotId AND al."TenantId" = @TenantId
+            GROUP BY al."Id", p."Name", uom."Code";
+            """;
+
+        var dto = await _dbConnection.QueryFirstOrDefaultAsync<GetAgingLotDetailsDto>(
+            sql,
+            new { LotId = request.LotId, TenantId = _tenantContext.TenantId }
+        );
+
+        if (dto is null)
+        {
+            return Result.Failure<GetAgingLotDetailsDto>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
+        }
+
+        return Result.Success(dto);
+    }
+}

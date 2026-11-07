@@ -1,5 +1,4 @@
-﻿using CraftFlow.Api.Modules.Inventory;
-using CraftFlow.Api.Modules.Sales;
+﻿using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Sale;
 using CraftFlow.Wpf.Models;

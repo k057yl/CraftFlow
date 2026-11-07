@@ -1,4 +1,4 @@
-﻿using CraftFlow.Api.Modules.Analytics;
+﻿using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Dashboard;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Services;

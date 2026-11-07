@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Aging;
+﻿namespace CraftFlow.SharedKernel.Constants.Endpoints;
 
 public class AgingConstants
 {

@@ -1,6 +1,6 @@
 ﻿using CraftFlow.SharedKernel.Enums.Inventory;
 
-namespace CraftFlow.SharedKernel.Dtos.Inventory;
+namespace CraftFlow.SharedKernel.Dtos.Catalog.Inventory;
 
 public record StorageLocationDto(
     Guid Id,

@@ -1,8 +1,7 @@
-﻿using CraftFlow.Api.Modules.Aging;
-using CraftFlow.Api.Modules.Inventory;
-using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Aging;
-using CraftFlow.SharedKernel.Dtos.Inventory;
+using CraftFlow.SharedKernel.Dtos.Catalog.Inventory;
 using CraftFlow.SharedKernel.Dtos.Production;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Pages.Production.Windows;

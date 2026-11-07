@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Production;
+﻿namespace CraftFlow.SharedKernel.Constants.Endpoints;
 
 public class ProductionConstants
 {

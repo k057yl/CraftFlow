@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Inventory;
+﻿namespace CraftFlow.SharedKernel.Constants.Endpoints;
 
 public static class InventoryConstants
 {

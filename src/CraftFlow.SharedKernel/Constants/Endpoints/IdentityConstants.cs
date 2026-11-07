@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Identity;
+﻿namespace CraftFlow.SharedKernel.Constants.Endpoints;
 public class IdentityConstants
 {
     public const string REGISTER = "api/identity/register";

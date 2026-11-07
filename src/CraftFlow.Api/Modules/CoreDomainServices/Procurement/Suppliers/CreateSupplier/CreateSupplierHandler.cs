@@ -1,0 +1,43 @@
+﻿using CraftFlow.Api.Core.MultiTenancy;
+using CraftFlow.Api.Core.Persistence;
+using CraftFlow.Api.Modules.CoreDomainServices.Procurement.Domain;
+using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Result;
+using MediatR;
+
+namespace CraftFlow.Api.Modules.CoreDomainServices.Procurement.Suppliers.CreateSupplier;
+
+public sealed class CreateSupplierHandler : IRequestHandler<CreateSupplierCommand, Result<Guid>>
+{
+    private readonly AppDbContext _dbContext;
+    private readonly ITenantContext _tenantContext;
+
+    public CreateSupplierHandler(AppDbContext dbContext, ITenantContext tenantContext)
+    {
+        _dbContext = dbContext;
+        _tenantContext = tenantContext;
+    }
+
+    public async Task<Result<Guid>> Handle(CreateSupplierCommand request, CancellationToken cancellationToken)
+    {
+        if (_tenantContext.TenantId == Guid.Empty)
+        {
+            return Result.Failure<Guid>(ErrorCodes.General.INVALID_TENANT);
+        }
+
+        var supplier = Supplier.Create(
+            _tenantContext.TenantId,
+            request.Name,
+            request.LegalName,
+            request.TaxId,
+            request.Phone,
+            request.Email,
+            request.Address,
+            request.Notes);
+
+        await _dbContext.Set<Supplier>().AddAsync(supplier, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Result.Success(supplier.Id);
+    }
+}

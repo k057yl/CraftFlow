@@ -1,7 +1,6 @@
-﻿using CraftFlow.Api.Modules.Aging;
-using CraftFlow.Api.Modules.Inventory;
+﻿using CraftFlow.SharedKernel.Constants.Endpoints;
+using CraftFlow.SharedKernel.Dtos.Catalog.Inventory;
 using CraftFlow.SharedKernel.Dtos.Common;
-using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.SharedKernel.Dtos.Sanitation;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Enums.Sanitation;

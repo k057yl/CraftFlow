@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Catalog;
+﻿namespace CraftFlow.SharedKernel.Constants.Endpoints;
 public class CatalogConstants
 {
     public const string UOM = "api/catalog/units-of-measure";

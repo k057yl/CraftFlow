@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Traceability
+﻿namespace CraftFlow.SharedKernel.Constants.Endpoints
 {
     public class TraceabilityConstants
     {

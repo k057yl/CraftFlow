@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Procurement;
+﻿namespace CraftFlow.SharedKernel.Constants.Endpoints;
 public class ProcurementConstants
 {
     public const string SUPPLIERS = "api/procurement/suppliers";

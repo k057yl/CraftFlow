@@ -1,0 +1,26 @@
+﻿using CraftFlow.Api.Core.Constants;
+using CraftFlow.Api.Modules.CoreDomainServices.Catalog.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace CraftFlow.Api.Modules.CoreDomainServices.Catalog.Persistence.Configurations;
+
+public class ProductConfiguration : IEntityTypeConfiguration<Product>
+{
+    public void Configure(EntityTypeBuilder<Product> builder)
+    {
+        builder.ToTable(DbTables.PRODUCTS, DbSchemas.CATALOG);
+
+        builder.HasKey(p => p.Id);
+
+        builder.HasIndex(p => new { p.TenantId, p.Id }).IsUnique();
+
+        builder.Property(p => p.Name).HasMaxLength(200).IsRequired();
+        builder.Property(p => p.TenantId).IsRequired();
+
+        builder.HasOne(p => p.UnitOfMeasure)
+               .WithMany()
+               .HasForeignKey(p => p.UnitOfMeasureId)
+               .OnDelete(DeleteBehavior.Restrict);
+    }
+}

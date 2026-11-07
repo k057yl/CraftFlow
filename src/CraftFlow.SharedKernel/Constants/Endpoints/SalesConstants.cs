@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Sales;
+﻿namespace CraftFlow.SharedKernel.Constants.Endpoints;
 public class SalesConstants
 {
     public const string CUSTOMERS = "api/sales/customers";

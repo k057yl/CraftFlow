@@ -1,9 +1,5 @@
-﻿using CraftFlow.Api.Modules.Catalog;
-using CraftFlow.Api.Modules.Inventory;
-using CraftFlow.Api.Modules.MRP;
-using CraftFlow.Api.Modules.Procurement;
-using CraftFlow.Api.Modules.Production;
-using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.MRP;
 using CraftFlow.SharedKernel.Dtos.Production;

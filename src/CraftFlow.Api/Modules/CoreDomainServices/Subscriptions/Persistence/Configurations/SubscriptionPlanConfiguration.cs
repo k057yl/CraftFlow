@@ -1,0 +1,33 @@
+﻿using CraftFlow.Api.Core.Constants;
+using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Persistence.Configurations;
+
+public class SubscriptionPlanConfiguration : IEntityTypeConfiguration<SubscriptionPlan>
+{
+    public void Configure(EntityTypeBuilder<SubscriptionPlan> builder)
+    {
+        builder.ToTable(DbTables.SUBSCRIPTION_PLANS, DbSchemas.SAAS);
+
+        builder.HasKey(p => p.Id);
+
+        builder.Property(p => p.Code)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        builder.HasIndex(p => p.Code)
+            .IsUnique()
+            .HasDatabaseName(DbIndexes.Subscriptions.IX_SUBSCRIPTION_PLANS_CODE);
+
+        builder.Property(p => p.Name)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(p => p.MaxMonthlyBatches).IsRequired();
+        builder.Property(p => p.MaxWarehouses).IsRequired();
+        builder.Property(p => p.MaxChambers).IsRequired();
+        builder.Property(p => p.MaxUsers).IsRequired();
+    }
+}

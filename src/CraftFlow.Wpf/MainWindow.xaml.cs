@@ -1,5 +1,6 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Dashboard;
+using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Pages;
 using CraftFlow.Wpf.Pages.Production;
@@ -70,6 +71,7 @@ public partial class MainWindow : Window
 
         var currentUser = ApiService.Instance.CurrentUser;
         var ps = PermissionService.Instance;
+        var activeModules = ApiService.Instance.ActiveModules;
 
         GuestPanel.Visibility = Visibility.Collapsed;
         UserProfilePanel.Visibility = Visibility.Visible;
@@ -87,14 +89,25 @@ public partial class MainWindow : Window
 
         NavAuthButton.Visibility = Visibility.Collapsed;
 
+        // --- 1. ОБЩИЕ КНОПКИ (Зависят от прав пользователя) ---
         SetButtonVisibility(NavDashboardButton, ps.HasPermission(AppPermission.DASHBOARD_VIEW));
         SetButtonVisibility(NavProductionSettingsButton, ps.HasPermission(AppPermission.RECIPES_MANAGE) || ps.HasPermission(AppPermission.RAW_MATERIALS_MANAGE));
         SetButtonVisibility(NavProcurementButton, ps.HasPermission(AppPermission.PROCUREMENT_VIEW) || ps.HasPermission(AppPermission.SUPPLIERS_MANAGE));
-        SetButtonVisibility(NavProductionButton, ps.HasPermission(AppPermission.PRODUCTION_VIEW) || ps.HasPermission(AppPermission.PRODUCTION_EXECUTE));
         SetButtonVisibility(NavSalesButton, ps.HasPermission(AppPermission.SALES_VIEW) || ps.HasPermission(AppPermission.SALES_MANAGE));
+        SetButtonVisibility(NavInventoryButton, ps.HasPermission(AppPermission.RAW_MATERIALS_MANAGE) || ps.HasPermission(AppPermission.PROCUREMENT_VIEW));
         SetButtonVisibility(NavTraceabilityButton, ps.HasPermission(AppPermission.PRODUCTION_VIEW) || ps.HasPermission(AppPermission.PROCUREMENT_VIEW));
         SetButtonVisibility(NavMrpButton, ps.HasPermission(AppPermission.PROCUREMENT_VIEW) || ps.HasPermission(AppPermission.PRODUCTION_VIEW));
 
+        // --- 2. ВАРНИИ / ПРОИЗВОДСТВЕННЫЕ ЦЕХА ---
+        var canViewProduction = ps.HasPermission(AppPermission.PRODUCTION_VIEW) || ps.HasPermission(AppPermission.PRODUCTION_EXECUTE);
+        var isSuperOrOwner = ps.IsSuperAdmin || ps.IsOwner;
+
+        SetButtonVisibility(NavCheeseMakingButton, canViewProduction && (isSuperOrOwner || activeModules.HasFlag(AppModule.CHEESE_MAKING)));
+        SetButtonVisibility(NavBreweryButton, canViewProduction && (isSuperOrOwner || activeModules.HasFlag(AppModule.BREWERY)));
+        SetButtonVisibility(NavMeatButton, canViewProduction && (isSuperOrOwner || activeModules.HasFlag(AppModule.MEAT_PROCESSING)));
+        SetButtonVisibility(NavFermentationButton, canViewProduction && (isSuperOrOwner || activeModules.HasFlag(AppModule.FERMENTATION)));
+
+        // --- 3. СИСТЕМНЫЕ КНОПКИ ---
         SetButtonVisibility(NavAuditButton, ps.HasPermission(AppPermission.SETTINGS_MANAGE));
         SetButtonVisibility(NavAdminKeysButton, ps.IsSuperAdmin);
         SetButtonVisibility(NavProfileButton, ps.IsOwner || ps.IsSuperAdmin);
@@ -185,10 +198,10 @@ public partial class MainWindow : Window
         }
     }
 
+    // --- ОБРАБОТЧИКИ НАВИГАЦИИ ---
     private void NavDashboard_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new DashboardPage());
     private void NavProductionSettings_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionSettingsPage());
     private void NavProcurement_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProcurementPage());
-    private void NavProduction_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
     private void NavSales_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new SalesPage());
     private void NavTraceability_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TraceabilityPage());
     private void NavMrp_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new MrpPage());
@@ -196,4 +209,11 @@ public partial class MainWindow : Window
     private void NavAuth_Click(object sender, RoutedEventArgs e) => NavigateToAuth();
     private void NavProfile_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProfilePage());
     private void NavAudit_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new AuditPage());
+
+    // --- ОБРАБОТЧИКИ ДЛЯ НОВЫХ ВЕРТИКАЛЬНЫХ ЦЕХОВ И СКЛАДА ---
+    private void NavInventory_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionSettingsPage());
+    private void NavCheeseMaking_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
+    private void NavBrewery_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
+    private void NavMeat_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
+    private void NavFermentation_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
 }

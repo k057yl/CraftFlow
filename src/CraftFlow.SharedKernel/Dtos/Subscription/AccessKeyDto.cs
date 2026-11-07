@@ -1,4 +1,4 @@
-﻿using CraftFlow.Api.Modules.Subscriptions.Domain;
+﻿using CraftFlow.SharedKernel.Enums;
 
 namespace CraftFlow.SharedKernel.Dtos.Subscription;
 

@@ -1,4 +1,4 @@
-﻿using CraftFlow.Api.Modules.Analytics;
+﻿using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Dashboard;
 
 namespace CraftFlow.Wpf.Services.Startup;

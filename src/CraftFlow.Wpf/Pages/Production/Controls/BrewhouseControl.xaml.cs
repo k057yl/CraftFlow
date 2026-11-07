@@ -1,8 +1,6 @@
-﻿using CraftFlow.Api.Modules.Catalog;
-using CraftFlow.Api.Modules.Inventory;
-using CraftFlow.Api.Modules.Production;
+﻿using CraftFlow.SharedKernel.Constants.Endpoints;
+using CraftFlow.SharedKernel.Dtos.Catalog.Inventory;
 using CraftFlow.SharedKernel.Dtos.Common;
-using CraftFlow.SharedKernel.Dtos.Inventory;
 using CraftFlow.SharedKernel.Dtos.Production;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.Wpf.Models;

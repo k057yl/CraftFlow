@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Analytics;
+﻿namespace CraftFlow.SharedKernel.Constants.Endpoints;
 public class AnalyticConstants
 {
     public const string DASHBOARD = "api/analytics/dashboard";

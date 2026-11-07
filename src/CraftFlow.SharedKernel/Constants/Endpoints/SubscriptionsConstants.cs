@@ -1,4 +1,4 @@
-﻿namespace CraftFlow.Api.Modules.Subscriptions;
+﻿namespace CraftFlow.SharedKernel.Constants.Endpoints;
 public class SubscriptionsConstants
 {
     public const string ACTIVATE_KEY_ENDPOINT = "api/subscriptions/keys/activate";

@@ -1,6 +1,5 @@
-﻿using CraftFlow.Api.Modules.Inventory;
-using CraftFlow.Api.Modules.Traceability;
-using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Traceability;
 using CraftFlow.Wpf.Models;

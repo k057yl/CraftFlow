@@ -1,6 +1,5 @@
-﻿using CraftFlow.Api.Common.Constants;
-using CraftFlow.Api.Modules.Analytics;
-using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Analytics;
 using CraftFlow.Wpf.Services;
 using System.IO;

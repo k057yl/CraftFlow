@@ -1,5 +1,5 @@
-﻿using CraftFlow.Api.Modules.Catalog;
-using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Enums.Identity;
