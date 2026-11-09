@@ -3,6 +3,7 @@ using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Enums;
+using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -37,11 +38,16 @@ public sealed class ModuleAccessBehavior<TRequest, TResponse> : IPipelineBehavio
             return await next();
         }
 
-        var tenantId = _tenantContext.TenantId;
-
-        if (tenantId == Guid.Empty || _tenantContext.IsSuperAdmin)
+        if (_tenantContext.IsSuperAdmin || _tenantContext.Role == TenantRole.SUPER_ADMIN)
         {
             return await next();
+        }
+
+        var tenantId = _tenantContext.TenantId;
+
+        if (tenantId == Guid.Empty)
+        {
+            return ResultFactory.CreateFailure<TResponse>(Error.Forbidden(ErrorCodes.Auth.ACCESS_DENIED));
         }
 
         var hasAccess = await CheckModuleAccessAsync(tenantId, moduleRequest.RequiredModule, cancellationToken);

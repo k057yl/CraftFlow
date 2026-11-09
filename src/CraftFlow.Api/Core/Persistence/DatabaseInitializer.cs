@@ -26,14 +26,14 @@ public static class DatabaseInitializer
         {
             var existingPlan = existingPlans.FirstOrDefault(p => p.Code == config.Code);
 
-            var baseModules = Enum.TryParse<AppModule>(config.BaseModules, true, out var parsedModules)
-                ? parsedModules
+            var targetModule = Enum.TryParse<AppModule>(config.TargetModule, true, out var parsedModule)
+                ? parsedModule
                 : AppModule.NONE;
 
             if (existingPlan != null)
             {
                 existingPlan.UpdateLimits(
-                    baseModules,
+                    targetModule,
                     config.MaxMonthlyBatches,
                     config.MaxWarehouses,
                     config.MaxChambers,
@@ -45,7 +45,7 @@ public static class DatabaseInitializer
                 var newPlan = SubscriptionPlan.Create(
                     config.Code,
                     config.Name,
-                    baseModules,
+                    targetModule,
                     config.MaxMonthlyBatches,
                     config.MaxWarehouses,
                     config.MaxChambers,
@@ -62,7 +62,7 @@ public static class DatabaseInitializer
     private record PlanConfigDto(
         string Code,
         string Name,
-        string BaseModules,
+        string TargetModule,
         int MaxMonthlyBatches,
         int MaxWarehouses,
         int MaxChambers,

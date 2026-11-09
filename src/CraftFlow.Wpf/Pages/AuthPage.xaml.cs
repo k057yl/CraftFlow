@@ -50,7 +50,13 @@ public partial class AuthPage : Page
         await ExecuteWithLockAsync(async () =>
         {
             var selectedItem = DirectionComboBox.SelectedItem as ComboBoxItem;
-            string selectedPlanCode = selectedItem?.Tag?.ToString() ?? "CHEESE_STARTER";
+            string? selectedPlanCode = selectedItem?.Tag?.ToString();
+
+            if (string.IsNullOrWhiteSpace(selectedPlanCode))
+            {
+                SetStatus("Выберите направление производства", Brushes.Red);
+                return;
+            }
 
             var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(IdentityConstants.REGISTER, new
             {

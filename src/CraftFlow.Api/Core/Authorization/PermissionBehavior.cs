@@ -32,6 +32,11 @@ public class PermissionBehavior<TRequest, TResponse> : IPipelineBehavior<TReques
 
         var userRole = GetUserRoleFromClaims(user);
 
+        if (userRole == TenantRole.SUPER_ADMIN)
+        {
+            return await next();
+        }
+
         if (!userRole.HasPermission(permissionRequest.RequiredPermission))
         {
             return (TResponse)Result.Failure(Error.Forbidden(ErrorCodes.Auth.ACCESS_DENIED));

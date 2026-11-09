@@ -1,21 +1,27 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using CraftFlow.Api.Core.Persistence;
+using CraftFlow.Api.Modules.CoreDomainServices.Identity.Domain;
+using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain;
+using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Enums;
+using CraftFlow.SharedKernel.Enums.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using CraftFlow.Api.Modules.CoreDomainServices.Identity.Domain;
-using CraftFlow.SharedKernel.Constants;
-using CraftFlow.SharedKernel.Enums.Identity;
-using Microsoft.IdentityModel.Tokens;
 
 namespace CraftFlow.Api.Core.Infrastructure.Identity;
 
 public class TokenService : ITokenService
 {
     private readonly IConfiguration _config;
+    private readonly AppDbContext _dbContext;
 
-    public TokenService(IConfiguration config)
+    public TokenService(IConfiguration config, AppDbContext dbContext)
     {
         _config = config;
+        _dbContext = dbContext;
     }
 
     public string GenerateJwtToken(User user, OrganizationMember? member = null, bool isSystemAdmin = false)
@@ -28,6 +34,31 @@ public class TokenService : ITokenService
             ? Guid.Empty
             : (member?.TenantId ?? Guid.Empty);
 
+        var activeModules = AppModule.NONE;
+
+        if (isSystemAdmin)
+        {
+            activeModules = AppModule.CHEESE_MAKING | AppModule.BREWERY | AppModule.MEAT_PROCESSING | AppModule.FERMENTATION;
+        }
+        else if (tenantId != Guid.Empty)
+        {
+            var activeSubscriptions = _dbContext.TenantSubscriptions
+                .Include(s => s.Plan)
+                .AsNoTracking()
+                .Where(s => s.TenantId == tenantId &&
+                            (s.State == SubscriptionState.Active || s.State == SubscriptionState.Trial) &&
+                            (!s.ExpiresAtUtc.HasValue || s.ExpiresAtUtc > DateTime.UtcNow))
+                .ToList();
+
+            foreach (var sub in activeSubscriptions)
+            {
+                if (sub.Plan != null)
+                {
+                    activeModules |= sub.Plan.TargetModule;
+                }
+            }
+        }
+
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
@@ -37,6 +68,7 @@ public class TokenService : ITokenService
             new(ClaimTypes.Role, effectiveRole.ToString()),
             new(AuthConstants.Claims.ROLE_ID, ((int)effectiveRole).ToString()),
             new(AuthConstants.Claims.ROLE_SHORT, effectiveRole.ToString()),
+            new("modules", ((int)activeModules).ToString()),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
 

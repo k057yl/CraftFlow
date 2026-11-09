@@ -108,8 +108,13 @@
 	<!-- ========================================== -->
 	<data name="NAV_DASHBOARD" xml:space="preserve"><value>Таблицы и Графики</value></data>
 	<data name="NAV_PRODUCTION_SETTINGS" xml:space="preserve"><value>Настройки производства</value></data>
+	<data name="NAV_INVENTORY" xml:space="preserve"><value>Складской учет</value></data>
 	<data name="NAV_PROCUREMENT" xml:space="preserve"><value>Закупки и Поставки</value></data>
 	<data name="NAV_PRODUCTION" xml:space="preserve"><value>Варочный цех</value></data>
+	<data name="NAV_CHEESE_MAKING" xml:space="preserve"><value>🧀 Варочный: Сыр</value></data>
+	<data name="NAV_BREWERY" xml:space="preserve"><value>🍺 Варочный: Пиво</value></data>
+	<data name="NAV_MEAT" xml:space="preserve"><value>🥩 Цех: Мясо</value></data>
+	<data name="NAV_FERMENTATION" xml:space="preserve"><value>🫙 Цех: Ферментация</value></data>
 	<data name="NAV_SALES" xml:space="preserve"><value>Продажи и Заказы</value></data>
 	<data name="NAV_TRACEABILITY" xml:space="preserve"><value>История партий</value></data>
 	<data name="NAV_MRP" xml:space="preserve"><value>Расчет сырья</value></data>

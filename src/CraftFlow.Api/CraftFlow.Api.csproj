@@ -24,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Core\Enums\" />
     <Folder Include="Migrations\" />
     <Folder Include="Modules\ProductionVerticalModules\Brewery\" />
     <Folder Include="Modules\ProductionVerticalModules\MeatProcessing\" />

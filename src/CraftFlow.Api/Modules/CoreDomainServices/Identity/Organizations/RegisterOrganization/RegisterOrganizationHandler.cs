@@ -2,6 +2,7 @@
 using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Identity.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain;
+using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
@@ -22,6 +23,11 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
 
     public async Task<Result<Guid>> Handle(RegisterOrganizationCommand request, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrWhiteSpace(request.PlanCode))
+        {
+            return Result.Failure<Guid>(Error.Validation(ErrorCodes.General.VALUE_REQUIRED));
+        }
+
         var normalizedEmail = request.OwnerEmail.Trim().ToLowerInvariant();
 
         var existingUser = await _dbContext.Users
@@ -31,6 +37,14 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
         if (existingUser != null)
         {
             return Result.Failure<Guid>(Error.Validation("EMAIL_ALREADY_EXISTS"));
+        }
+
+        var selectedPlan = await _dbContext.SubscriptionPlans
+            .FirstOrDefaultAsync(p => p.Code == request.PlanCode, cancellationToken);
+
+        if (selectedPlan == null)
+        {
+            return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Saas.PLAN_NOT_FOUND));
         }
 
         var organization = Organization.Create(request.CompanyName);
@@ -51,17 +65,8 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
 
         organization.AddMember(ownerUser.Id, TenantRole.OWNER);
 
-        var targetPlanCode = !string.IsNullOrWhiteSpace(request.PlanCode) ? request.PlanCode : "CHEESE_STARTER";
-
-        var selectedPlan = await _dbContext.SubscriptionPlans
-            .FirstOrDefaultAsync(p => p.Code == targetPlanCode, cancellationToken)
-            ?? await _dbContext.SubscriptionPlans.FirstOrDefaultAsync(cancellationToken);
-
-        if (selectedPlan != null)
-        {
-            var trialSubscription = TenantSubscription.CreateTrial(organization.Id, selectedPlan.Id, trialDays: 14);
-            _dbContext.TenantSubscriptions.Add(trialSubscription);
-        }
+        var trialSubscription = TenantSubscription.CreateTrial(organization.Id, selectedPlan.Id, trialDays: 14);
+        _dbContext.TenantSubscriptions.Add(trialSubscription);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
