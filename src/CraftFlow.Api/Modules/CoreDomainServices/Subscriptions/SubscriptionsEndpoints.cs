@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.ConfirmPayment;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.GenerateAccessKey;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.GetAccessKeys;
+using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.RequestInvoice;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.RevokeAccessKey;
 using CraftFlow.SharedKernel.Constants.Endpoints;
 using MediatR;
@@ -42,8 +43,14 @@ public static class SubscriptionsEndpoints
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
+        group.MapPost(SubscriptionsConstants.REQUEST_INVOICE, async (RequestSubscriptionInvoiceCommand command, ISender sender) =>
+        {
+            var result = await sender.Send(command);
+            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
+        });
+
         //Tests Payment
-        group.MapPost("api/subscriptions/confirm", async (ConfirmSubscriptionPaymentCommand command, ISender sender) =>
+        group.MapPost(SubscriptionsConstants.SUBSCRIPTION_TEST_CONFIRM, async (ConfirmSubscriptionPaymentCommand command, ISender sender) =>
         {
             var result = await sender.Send(command);
             return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);

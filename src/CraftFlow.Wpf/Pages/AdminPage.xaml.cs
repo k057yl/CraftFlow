@@ -1,5 +1,4 @@
-﻿using CraftFlow.SharedKernel.Constants;
-using CraftFlow.SharedKernel.Constants.Endpoints;
+﻿using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;

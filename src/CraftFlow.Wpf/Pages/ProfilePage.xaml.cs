@@ -7,7 +7,6 @@ using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Pages;
@@ -16,7 +15,6 @@ public partial class ProfilePage : Page
 {
     private const string ENDPOINT_SUBSCRIPTION_KEYS = "api/subscriptions/keys";
     private const string ENDPOINT_SUBSCRIPTION_KEYS_MY = "api/subscriptions/keys/my";
-    private const string ENDPOINT_ACTIVATE_PLAN = "api/subscriptions/confirm";
 
     public ProfilePage() : this(null)
     {
@@ -26,7 +24,6 @@ public partial class ProfilePage : Page
     {
         InitializeComponent();
         InitRoleComboBox();
-        InitPlanComboBox();
         LoadUserData();
     }
 
@@ -44,19 +41,6 @@ public partial class ProfilePage : Page
         NewUserRoleComboBox.DisplayMemberPath = "Display";
         NewUserRoleComboBox.SelectedValuePath = "Role";
         NewUserRoleComboBox.SelectedIndex = 0;
-    }
-
-    private void InitPlanComboBox()
-    {
-        PlanComboBox.ItemsSource = new[]
-        {
-            new { Code = "FREE", Display = Get("UI_PLAN_FREE_DISPLAY") },
-            new { Code = "STANDARD", Display = Get("UI_PLAN_STANDARD_DISPLAY") },
-            new { Code = "PRO", Display = Get("UI_PLAN_PRO_DISPLAY") }
-        };
-        PlanComboBox.DisplayMemberPath = "Display";
-        PlanComboBox.SelectedValuePath = "Code";
-        PlanComboBox.SelectedIndex = 0;
     }
 
     private async void LoadUserData()
@@ -97,26 +81,29 @@ public partial class ProfilePage : Page
         }
     }
 
-    private async void ActivateSelectedPlan_Click(object sender, RoutedEventArgs e)
+    private async void RequestAddonInvoice_Click(object sender, RoutedEventArgs e)
     {
-        var selectedCode = PlanComboBox.SelectedValue?.ToString();
-        if (string.IsNullOrEmpty(selectedCode)) return;
-
-        var payload = new
+        if (sender is Button button && button.Tag is string addonCode)
         {
-            PlanCode = selectedCode,
-            Days = 30
-        };
+            button.IsEnabled = false;
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(ENDPOINT_ACTIVATE_PLAN, payload);
+            var payload = new { PlanCode = addonCode, Days = 30 };
+            var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync("api/subscriptions/request-invoice", payload);
 
-        if (isSuccess)
-        {
-            MessageBox.Show(Get("UI_MSG_PLAN_ACTIVATED_SUCCESS"), Get("UI_CAPTION_INFO"), MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-        else
-        {
-            MessageBox.Show(contentOrError, Get("UI_CAPTION_ERROR"), MessageBoxButton.OK, MessageBoxImage.Error);
+            button.IsEnabled = true;
+
+            if (isSuccess)
+            {
+                MessageBox.Show(
+                    "Заявка сформирована и отправлена администратору. В ближайшее время с вами свяжутся по реквизитам оплаты.",
+                    Get("UI_CAPTION_INFO"),
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            else
+            {
+                MessageBox.Show(contentOrError, Get("UI_CAPTION_ERROR"), MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
     }
 
@@ -288,8 +275,7 @@ public partial class ProfilePage : Page
         }
         else
         {
-            StatusTextBlock.Foreground = Brushes.Red;
-            StatusTextBlock.Text = contentOrError.Trim('"');
+            MessageBox.Show(contentOrError.Trim('"'), Get("UI_CAPTION_ERROR"), MessageBoxButton.OK, MessageBoxImage.Error);
         }
     }
 
