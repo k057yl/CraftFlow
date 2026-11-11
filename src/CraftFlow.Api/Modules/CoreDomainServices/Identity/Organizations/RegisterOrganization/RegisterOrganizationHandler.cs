@@ -1,4 +1,4 @@
-﻿using CraftFlow.Api.Core.Infrastructure.Email;
+﻿using CraftFlow.Api.Core.Infrastructure.Notifications.Email;
 using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Identity.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain;
@@ -54,7 +54,8 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
         var ownerUser = User.Create(
             email: normalizedEmail,
             passwordHash: passwordHash,
-            fullName: request.OwnerFullName
+            fullName: request.OwnerFullName,
+            requireOtp: true
         );
 
         var rawOtpCode = new Random().Next(100000, 999999).ToString();
@@ -65,8 +66,8 @@ public class RegisterOrganizationHandler : IRequestHandler<RegisterOrganizationC
 
         organization.AddMember(ownerUser.Id, TenantRole.OWNER);
 
-        var trialSubscription = TenantSubscription.CreateTrial(organization.Id, selectedPlan.Id, trialDays: 14);
-        _dbContext.TenantSubscriptions.Add(trialSubscription);
+        var initialSubscription = TenantSubscription.CreateFree(organization.Id, selectedPlan.Id);
+        _dbContext.TenantSubscriptions.Add(initialSubscription);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 

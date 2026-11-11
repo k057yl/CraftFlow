@@ -1,5 +1,6 @@
-﻿using CraftFlow.Api.Core.BackgroundWorkers;
-using CraftFlow.Api.Core.Infrastructure.Email;
+﻿using CraftFlow.Api.Core.Enums;
+using CraftFlow.Api.Core.Infrastructure.Notifications.Email;
+using CraftFlow.Api.Core.Infrastructure.Notifications.TG;
 
 namespace CraftFlow.Api.Core.Infrastructure.Notifications;
 

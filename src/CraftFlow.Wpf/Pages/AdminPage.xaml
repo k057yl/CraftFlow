@@ -7,16 +7,48 @@
     <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{auth:HasPermission Permission=SYSTEM_ADMIN}">
         <Border Padding="25">
             <StackPanel MaxWidth="1000" HorizontalAlignment="Left">
-                <TextBlock Text="Управление клиентами SaaS" 
-                           FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,5"/>
+
+                <TextBlock Text="Управление клиентами и финансами SaaS" 
+                           FontSize="22" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,20"/>
+
+                <!-- БЛОК 1: Входящие заявки на оплату -->
+                <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,25">
+                    <StackPanel>
+                        <TextBlock Text="📥 Входящие заявки на подтверждение оплаты" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,12"/>
+
+                        <DataGrid x:Name="PendingInvoicesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Height="180" GridLinesVisibility="Horizontal">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Дата" Binding="{Binding CreatedAtUtc, StringFormat=\{0:dd.MM.yyyy HH:mm\}}" Width="130"/>
+                                <DataGridTextColumn Header="Организация" Binding="{Binding OrganizationName}" Width="2*"/>
+                                <DataGridTextColumn Header="Тариф/Аддон" Binding="{Binding PlanCode}" Width="140"/>
+                                <DataGridTextColumn Header="Дней" Binding="{Binding DaysRequested}" Width="60"/>
+                                <DataGridTemplateColumn Header="Действие" Width="140">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <Button Content="✅ Подтвердить" 
+                                                    Click="ApproveInvoice_Click" 
+                                                    Tag="{Binding Id}"
+                                                    Background="#16A34A" Foreground="White" FontWeight="Bold"
+                                                    Height="24" Padding="8,0" FontSize="11" VerticalAlignment="Center"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </Border>
+
+                <!-- БЛОК 2: Список организаций -->
+                <TextBlock Text="Все зарегистрированные сыроварни / организации" 
+                           FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,5"/>
                 <TextBlock Text="* Нажмите дважды на строку сыроварни для изменения подписки или блокировки" 
-                           FontSize="12" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,20"/>
+                           FontSize="11" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,10"/>
 
                 <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
                     <DataGrid x:Name="OrganizationsDataGrid" 
                               AutoGenerateColumns="False" 
                               IsReadOnly="True" 
-                              Height="450" 
+                              Height="350" 
                               MouseDoubleClick="OrganizationsDataGrid_MouseDoubleClick"
                               GridLinesVisibility="Horizontal">
                         <DataGrid.Columns>
@@ -28,6 +60,7 @@
                         </DataGrid.Columns>
                     </DataGrid>
                 </Border>
+
             </StackPanel>
         </Border>
     </ScrollViewer>

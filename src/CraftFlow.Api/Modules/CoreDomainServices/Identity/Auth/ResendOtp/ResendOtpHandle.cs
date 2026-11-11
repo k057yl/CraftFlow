@@ -1,4 +1,4 @@
-﻿using CraftFlow.Api.Core.Infrastructure.Email;
+﻿using CraftFlow.Api.Core.Infrastructure.Notifications.Email;
 using CraftFlow.Api.Core.Persistence;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;

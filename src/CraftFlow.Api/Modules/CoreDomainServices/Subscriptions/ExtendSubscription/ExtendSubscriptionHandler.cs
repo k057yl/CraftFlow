@@ -46,7 +46,7 @@ public class ExtendSubscriptionHandler : IRequestHandler<ExtendSubscriptionComma
         if (subscription == null)
         {
             var defaultPlan = await _dbContext.SubscriptionPlans
-                .FirstOrDefaultAsync(p => p.Code == "CHEESE_STARTER", cancellationToken)
+                .FirstOrDefaultAsync(p => p.Code == "CHEESE_FREE", cancellationToken)
                 ?? await _dbContext.SubscriptionPlans.FirstOrDefaultAsync(cancellationToken);
 
             if (defaultPlan == null)

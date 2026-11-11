@@ -53,7 +53,6 @@ public class DeleteAccountHandler : IRequestHandler<DeleteAccountCommand, Result
         await dbContext.AuditLogs.IgnoreQueryFilters().Where(a => a.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
         await dbContext.SubscriptionPayments.IgnoreQueryFilters().Where(p => p.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
         await dbContext.TenantSubscriptions.IgnoreQueryFilters().Where(s => s.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
-        await dbContext.TenantAccessKeys.IgnoreQueryFilters().Where(k => k.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
 
         await dbContext.StockLots.IgnoreQueryFilters().Where(s => s.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
         await dbContext.AgingLotItems.IgnoreQueryFilters()

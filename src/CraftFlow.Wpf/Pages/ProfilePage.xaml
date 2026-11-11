@@ -139,7 +139,6 @@
                         </Border>
                     </StackPanel>
 
-
                     <!-- ========================================== -->
                     <!-- ЗОНА B: Финансы, Подписки и Аддоны (Справа)-->
                     <!-- ========================================== -->
@@ -227,7 +226,7 @@
                         </Border>
 
                         <!-- 3. Таблица финансовых транзакций -->
-                        <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
+                        <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
                             <StackPanel>
                                 <TextBlock Text="📜 История платежей и операций" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,12"/>
                                 <DataGrid x:Name="PaymentsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Height="140">
@@ -236,36 +235,6 @@
                                         <DataGridTextColumn Header="Тариф/Модуль" Binding="{Binding PlanCode}" Width="130"/>
                                         <DataGridTextColumn Header="Дней" Binding="{Binding DaysAdded}" Width="60"/>
                                         <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- 4. Системное управление API-ключами (Только для SuperAdmin) -->
-                        <Border x:Name="SubscriptionManagementBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
-                            <StackPanel>
-                                <TextBlock Text="{loc:Loc Key=UI_HEADER_SUBSCRIPTION_API}" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,12"/>
-                                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                                    <TextBox x:Name="NewAccessKeyNameTextBox" Width="180" Height="26" Margin="0,0,10,0" ToolTip="{loc:Loc Key=UI_TOOLTIP_KEY_NAME}"/>
-                                    <Button Content="{loc:Loc Key=UI_BTN_CREATE_KEY}" Click="GenerateAccessKey_Click" Style="{StaticResource PrimaryButtonStyle}" Height="26" Padding="10,0"/>
-                                </StackPanel>
-
-                                <DataGrid x:Name="AccessKeysDataGrid" AutoGenerateColumns="False" IsReadOnly="True" Height="120">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="{loc:Loc Key=UI_COL_KEY_NAME}" Binding="{Binding Name}" Width="120"/>
-                                        <DataGridTextColumn Header="{loc:Loc Key=UI_COL_KEY_PREVIEW}" Binding="{Binding KeyPreview}" Width="160"/>
-                                        <DataGridTextColumn Header="{loc:Loc Key=UI_COL_STATUS}" Binding="{Binding StatusDisplay}" Width="80"/>
-                                        <DataGridTemplateColumn Header="{loc:Loc Key=UI_COL_ACTIONS}" Width="*">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <Button Content="{loc:Loc Key=UI_BTN_REVOKE_KEY}" 
-                                        Click="RevokeAccessKey_Click" 
-                                        Tag="{Binding Id}"
-                                        IsEnabled="{Binding CanRevoke}"
-                                        Height="20" Padding="6,0" FontSize="10" Background="#DC2626" Foreground="White"/>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </StackPanel>

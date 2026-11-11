@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Core.MultiTenancy;
+﻿using CraftFlow.Api.Core.Enums;
+using CraftFlow.Api.Core.MultiTenancy;
 using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Identity.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain;

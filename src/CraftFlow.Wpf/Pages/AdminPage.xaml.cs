@@ -1,5 +1,6 @@
 ﻿using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Identity;
+using CraftFlow.SharedKernel.Dtos.Subscription;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
 using System.Windows;
@@ -20,7 +21,12 @@ public partial class AdminPage : Page
             return;
         }
 
-        _ = LoadOrganizationsAsync();
+        _ = LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        await Task.WhenAll(LoadOrganizationsAsync(), LoadPendingInvoicesAsync());
     }
 
     private async Task LoadOrganizationsAsync()
@@ -29,6 +35,36 @@ public partial class AdminPage : Page
         if (orgs != null)
         {
             OrganizationsDataGrid.ItemsSource = orgs;
+        }
+    }
+
+    private async Task LoadPendingInvoicesAsync()
+    {
+        var invoices = await ApiService.Instance.GetAsync<List<PendingInvoiceDto>>("api/subscriptions/invoices/pending");
+        if (invoices != null)
+        {
+            PendingInvoicesDataGrid.ItemsSource = invoices;
+        }
+    }
+
+    private async void ApproveInvoice_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is Guid invoiceId)
+        {
+            button.IsEnabled = false;
+
+            var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"api/subscriptions/invoices/{invoiceId}/approve", new { });
+
+            if (isSuccess)
+            {
+                MessageBox.Show("Оплата подтверждена! Тариф/Модуль сыроварни успешно обновлен.", "Успех", MessageBoxButton.OK, MessageBoxImage.Information);
+                await LoadDataAsync();
+            }
+            else
+            {
+                MessageBox.Show(contentOrError, "Ошибка активации", MessageBoxButton.OK, MessageBoxImage.Error);
+                button.IsEnabled = true;
+            }
         }
     }
 

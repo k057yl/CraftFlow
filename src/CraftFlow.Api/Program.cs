@@ -1,5 +1,4 @@
 using CraftFlow.Api;
-using CraftFlow.Api.Core.MultiTenancy;
 using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Analytics;
 using CraftFlow.Api.Modules.CoreDomainServices.Catalog;
@@ -32,8 +31,6 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseMiddleware<TenantAccessKeyMiddleware>();
 
 app.UseAuthentication();
 app.UseAuthorization();

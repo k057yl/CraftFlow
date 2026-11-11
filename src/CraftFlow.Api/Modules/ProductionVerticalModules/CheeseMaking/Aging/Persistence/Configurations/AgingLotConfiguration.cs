@@ -9,7 +9,7 @@ public sealed class AgingLotConfiguration : IEntityTypeConfiguration<AgingLot>
 {
     public void Configure(EntityTypeBuilder<AgingLot> builder)
     {
-        builder.ToTable(DbTables.AGING_LOTS, DbSchemas.AGING);
+        builder.ToTable(DbTables.AGING_LOTS, DbSchemas.CHEESE_MAKING);
 
         builder.HasKey(l => l.Id);
 

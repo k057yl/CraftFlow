@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Core.Persistence;
+﻿using CraftFlow.Api.Core.Infrastructure.Notifications.TG;
+using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Production.Domain;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using Microsoft.EntityFrameworkCore;

@@ -1,13 +1,12 @@
 ﻿using CraftFlow.Api.Core.Authorization;
 using CraftFlow.Api.Core.BackgroundWorkers;
-using CraftFlow.Api.Core.BackgroundWorkers.Cleanup;
 using CraftFlow.Api.Core.Behaviors;
 using CraftFlow.Api.Core.Infrastructure.Converters;
-using CraftFlow.Api.Core.Infrastructure.Email;
 using CraftFlow.Api.Core.Infrastructure.GlobalException;
 using CraftFlow.Api.Core.Infrastructure.Identity;
 using CraftFlow.Api.Core.Infrastructure.Notifications;
-using CraftFlow.Api.Core.Infrastructure.Security;
+using CraftFlow.Api.Core.Infrastructure.Notifications.Email;
+using CraftFlow.Api.Core.Infrastructure.Notifications.TG;
 using CraftFlow.Api.Core.MultiTenancy;
 using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.BackgroundWorkers;
@@ -60,16 +59,10 @@ public static class DependencyInjection
     }
 
     private static IServiceCollection AddSecurityAndCaching(
-        this IServiceCollection services,
-        IConfiguration configuration)
+    this IServiceCollection services,
+    IConfiguration configuration)
     {
         services.AddMemoryCache();
-
-        services.Configure<ApiKeySecurityOptions>(
-            configuration.GetSection("ApiKeySecurity"));
-
-        services.AddSingleton<IKeyHasher, KeyHasher>();
-
         return services;
     }
 

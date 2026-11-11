@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Core.Authorization;
 using CraftFlow.Api.Core.Behaviors;
+using CraftFlow.Api.Core.Enums;
 using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;

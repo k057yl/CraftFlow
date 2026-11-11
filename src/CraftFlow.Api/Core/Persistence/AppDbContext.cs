@@ -1,14 +1,14 @@
-﻿using CraftFlow.Api.Core.Audit;
+﻿using CraftFlow.Api.Core.Domain;
 using CraftFlow.Api.Core.MultiTenancy;
-using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Catalog.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Identity.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Procurement.Domain;
+using CraftFlow.Api.Modules.CoreDomainServices.Production.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Sales.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Sanitation.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain;
-using CraftFlow.Api.Modules.CoreDomainServices.Production.Domain;
+using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
 using CraftFlow.SharedKernel.Enums.Identity;
@@ -16,7 +16,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System.Linq.Expressions;
 using System.Text.Json;
-
 
 namespace CraftFlow.Api.Core.Persistence;
 
@@ -61,8 +60,8 @@ public class AppDbContext : DbContext
     public DbSet<AgingLotItem> AgingLotItems => Set<AgingLotItem>();
     public DbSet<TenantSubscription> TenantSubscriptions => Set<TenantSubscription>();
     public DbSet<SubscriptionPlan> SubscriptionPlans => Set<SubscriptionPlan>();
-    public DbSet<TenantAccessKey> TenantAccessKeys => Set<TenantAccessKey>();
     public DbSet<SubscriptionPayment> SubscriptionPayments => Set<SubscriptionPayment>();
+    public DbSet<SubscriptionInvoice> SubscriptionInvoices => Set<SubscriptionInvoice>();
     public DbSet<SanitationRule> SanitationRules => Set<SanitationRule>();
     public DbSet<SanitationTask> SanitationTasks => Set<SanitationTask>();
     public DbSet<SanitationLog> SanitationLogs => Set<SanitationLog>();

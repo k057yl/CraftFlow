@@ -1,6 +1,5 @@
 ﻿using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Identity;
-using CraftFlow.SharedKernel.Dtos.Subscription;
 using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Services;
@@ -13,9 +12,6 @@ namespace CraftFlow.Wpf.Pages;
 
 public partial class ProfilePage : Page
 {
-    private const string ENDPOINT_SUBSCRIPTION_KEYS = "api/subscriptions/keys";
-    private const string ENDPOINT_SUBSCRIPTION_KEYS_MY = "api/subscriptions/keys/my";
-
     public ProfilePage() : this(null)
     {
     }
@@ -24,7 +20,7 @@ public partial class ProfilePage : Page
     {
         InitializeComponent();
         InitRoleComboBox();
-        LoadUserData();
+        _ = LoadUserDataAsync();
     }
 
     private void InitRoleComboBox()
@@ -43,7 +39,7 @@ public partial class ProfilePage : Page
         NewUserRoleComboBox.SelectedIndex = 0;
     }
 
-    private async void LoadUserData()
+    private async Task LoadUserDataAsync()
     {
         var user = ApiService.Instance.CurrentUser;
         if (user == null) return;
@@ -68,16 +64,11 @@ public partial class ProfilePage : Page
         bool isSuperAdmin = PermissionService.Instance.IsSuperAdmin;
 
         TeamManagementBorder.Visibility = (isOwner || isSuperAdmin) ? Visibility.Visible : Visibility.Collapsed;
-        SubscriptionManagementBorder.Visibility = isSuperAdmin ? Visibility.Visible : Visibility.Collapsed;
         DangerZoneBorder.Visibility = (isOwner || isSuperAdmin) ? Visibility.Visible : Visibility.Collapsed;
 
         if (isOwner || isSuperAdmin)
         {
             await LoadTeamUsersAsync();
-            if (isSuperAdmin)
-            {
-                await LoadAccessKeysAsync();
-            }
         }
     }
 
@@ -87,83 +78,28 @@ public partial class ProfilePage : Page
         {
             button.IsEnabled = false;
 
-            var payload = new { PlanCode = addonCode, Days = 30 };
-            var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync("api/subscriptions/request-invoice", payload);
-
-            button.IsEnabled = true;
-
-            if (isSuccess)
+            try
             {
-                MessageBox.Show(
-                    "Заявка сформирована и отправлена администратору. В ближайшее время с вами свяжутся по реквизитам оплаты.",
-                    Get("UI_CAPTION_INFO"),
-                    MessageBoxButton.OK,
-                    MessageBoxImage.Information);
+                var payload = new { PlanCode = addonCode, Days = 30 };
+                var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(SubscriptionsConstants.REQUEST_INVOICE, payload);
+
+                if (isSuccess)
+                {
+                    var userOrgName = ApiService.Instance.CurrentUser?.FullName ?? "Крафтовик";
+                    var requisitesWin = new PaymentRequisitesWindow(addonCode, userOrgName)
+                    {
+                        Owner = Window.GetWindow(this)
+                    };
+                    requisitesWin.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show(contentOrError, Get("UI_CAPTION_ERROR"), MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
-            else
+            finally
             {
-                MessageBox.Show(contentOrError, Get("UI_CAPTION_ERROR"), MessageBoxButton.OK, MessageBoxImage.Error);
-            }
-        }
-    }
-
-    private async Task LoadAccessKeysAsync()
-    {
-        var keys = await ApiService.Instance.GetAsync<List<AccessKeyDto>>(ENDPOINT_SUBSCRIPTION_KEYS_MY);
-
-        if (keys != null)
-        {
-            var viewModels = keys.Select(k => new
-            {
-                k.Id,
-                k.Name,
-                KeyPreview = k.MaskedKey,
-                StatusDisplay = k.Status.ToString(),
-                CanRevoke = k.Status != KeyStatus.Revoked
-            }).ToList();
-
-            AccessKeysDataGrid.ItemsSource = viewModels;
-        }
-    }
-
-    private async void GenerateAccessKey_Click(object sender, RoutedEventArgs e)
-    {
-        var keyName = NewAccessKeyNameTextBox.Text.Trim();
-        if (string.IsNullOrWhiteSpace(keyName))
-        {
-            MessageBox.Show(Get("UI_MSG_KEY_NAME_REQUIRED"), Get("UI_CAPTION_WARNING"), MessageBoxButton.OK, MessageBoxImage.Warning);
-            return;
-        }
-
-        var payload = new { KeyName = keyName };
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(ENDPOINT_SUBSCRIPTION_KEYS, payload);
-
-        if (isSuccess)
-        {
-            NewAccessKeyNameTextBox.Clear();
-            await LoadAccessKeysAsync();
-            MessageBox.Show(Get("UI_MSG_KEY_GENERATED_SUCCESS"), Get("UI_CAPTION_INFO"), MessageBoxButton.OK, MessageBoxImage.Information);
-        }
-        else
-        {
-            MessageBox.Show(contentOrError, Get("UI_CAPTION_ERROR"), MessageBoxButton.OK, MessageBoxImage.Error);
-        }
-    }
-
-    private async void RevokeAccessKey_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button button && button.Tag is Guid keyId)
-        {
-            var endpointUrl = $"{ENDPOINT_SUBSCRIPTION_KEYS}/{keyId}";
-            var (isSuccess, contentOrError) = await ApiService.Instance.DeleteAndReadAsync(endpointUrl);
-
-            if (isSuccess)
-            {
-                await LoadAccessKeysAsync();
-            }
-            else
-            {
-                MessageBox.Show(contentOrError, Get("UI_CAPTION_ERROR"), MessageBoxButton.OK, MessageBoxImage.Error);
+                button.IsEnabled = true;
             }
         }
     }

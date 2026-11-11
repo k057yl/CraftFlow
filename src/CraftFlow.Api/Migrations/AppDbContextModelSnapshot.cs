@@ -23,7 +23,7 @@ namespace CraftFlow.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("CraftFlow.Api.Core.Audit.AuditLog", b =>
+            modelBuilder.Entity("CraftFlow.Api.Core.Domain.AuditLog", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1059,6 +1059,50 @@ namespace CraftFlow.Api.Migrations
                     b.ToTable("sanitation_tasks", "sanitation");
                 });
 
+            modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain.SubscriptionInvoice", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("DaysRequested")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("PlanCode")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime?>("ProcessedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("subscription_invoices", "saas");
+                });
+
             modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain.SubscriptionPayment", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1138,69 +1182,6 @@ namespace CraftFlow.Api.Migrations
                     b.ToTable("subscription_plans", "saas");
                 });
 
-            modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain.TenantAccessKey", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("KeyHash")
-                        .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
-
-                    b.Property<string>("KeyPrefix")
-                        .IsRequired()
-                        .HasMaxLength(15)
-                        .HasColumnType("character varying(15)");
-
-                    b.Property<string>("KeySuffix")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("character varying(10)");
-
-                    b.Property<DateTime?>("LastUsedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<DateTime?>("RevokedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<Guid>("SubscriptionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("KeyHash")
-                        .IsUnique()
-                        .HasDatabaseName("IX_ACCESS_KEYS_HASH");
-
-                    b.HasIndex("SubscriptionId");
-
-                    b.HasIndex("TenantId")
-                        .HasDatabaseName("IX_ACCESS_KEYS_TENANT");
-
-                    b.ToTable("tenant_access_keys", "saas");
-                });
-
             modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain.TenantSubscription", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1269,7 +1250,7 @@ namespace CraftFlow.Api.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_AGING_CHAMBERS_TENANT_NAME");
 
-                    b.ToTable("aging_chambers", "aging");
+                    b.ToTable("aging_chambers", "cheese_making");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.Domain.AgingLot", b =>
@@ -1328,7 +1309,7 @@ namespace CraftFlow.Api.Migrations
                     b.HasIndex("TenantId", "State")
                         .HasDatabaseName("IX_AGING_LOTS_TENANT_STATE");
 
-                    b.ToTable("aging_lots", "aging");
+                    b.ToTable("aging_lots", "cheese_making");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.Domain.AgingLotItem", b =>
@@ -1368,7 +1349,7 @@ namespace CraftFlow.Api.Migrations
                     b.HasIndex("AgingLotId")
                         .HasDatabaseName("IX_AGING_LOT_ITEMS_LOT");
 
-                    b.ToTable("aging_lot_items", "aging");
+                    b.ToTable("aging_lot_items", "cheese_making");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Catalog.Domain.Product", b =>
@@ -1517,17 +1498,6 @@ namespace CraftFlow.Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain.TenantAccessKey", b =>
-                {
-                    b.HasOne("CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain.TenantSubscription", "Subscription")
-                        .WithMany("Keys")
-                        .HasForeignKey("SubscriptionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Subscription");
-                });
-
             modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain.TenantSubscription", b =>
                 {
                     b.HasOne("CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain.SubscriptionPlan", "Plan")
@@ -1566,11 +1536,6 @@ namespace CraftFlow.Api.Migrations
             modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Sales.Domain.SalesOrder", b =>
                 {
                     b.Navigation("Items");
-                });
-
-            modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain.TenantSubscription", b =>
-                {
-                    b.Navigation("Keys");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.Domain.AgingLot", b =>

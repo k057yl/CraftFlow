@@ -1,5 +1,5 @@
-﻿using CraftFlow.Api.Core.Audit;
-using CraftFlow.Api.Core.Constants;
+﻿using CraftFlow.Api.Core.Constants;
+using CraftFlow.Api.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

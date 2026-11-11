@@ -39,7 +39,8 @@ public class ConfirmSubscriptionPaymentHandler : IRequestHandler<ConfirmSubscrip
         }
 
         var subscription = await _dbContext.Set<TenantSubscription>()
-            .FirstOrDefaultAsync(s => s.TenantId == targetTenantId && s.PlanId == plan.Id, cancellationToken);
+            .Include(s => s.Plan)
+            .FirstOrDefaultAsync(s => s.TenantId == targetTenantId && s.Plan.TargetModule == plan.TargetModule, cancellationToken);
 
         var nowUtc = DateTime.UtcNow;
 
@@ -47,6 +48,10 @@ public class ConfirmSubscriptionPaymentHandler : IRequestHandler<ConfirmSubscrip
         {
             subscription = TenantSubscription.Create(targetTenantId, plan.Id);
             _dbContext.Set<TenantSubscription>().Add(subscription);
+        }
+        else
+        {
+            subscription.ChangePlan(plan.Id);
         }
 
         var baseDate = subscription.ExpiresAtUtc.HasValue && subscription.ExpiresAtUtc.Value > nowUtc

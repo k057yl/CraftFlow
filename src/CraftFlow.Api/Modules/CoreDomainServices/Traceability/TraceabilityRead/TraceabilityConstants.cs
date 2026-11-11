@@ -57,9 +57,9 @@ public static class TraceabilityConstants
         LEFT JOIN {DbSchemas.PRODUCTION}.{DbTables.PRODUCTION_BATCHES} pb 
             ON pb."Id" = tl."ProductionBatchId"
         LEFT JOIN {DbSchemas.CATALOG}.{DbTables.PRODUCTS} p ON p."Id" = tl."ItemId"
-        LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_LOTS} al 
+        LEFT JOIN {DbSchemas.CHEESE_MAKING}.{DbTables.AGING_LOTS} al 
             ON al."ProductionBatchId" = pb."Id"
-        LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_CHAMBERS} ach ON ach."Id" = al."AgingChamberId"
+        LEFT JOIN {DbSchemas.CHEESE_MAKING}.{DbTables.AGING_CHAMBERS} ach ON ach."Id" = al."AgingChamberId"
         LEFT JOIN {DbSchemas.INVENTORY}.{DbTables.STORAGE_LOCATIONS} sloc ON sloc."Id" = al."StorageLocationId"
         LEFT JOIN {DbSchemas.SALES}.{DbTables.SALES_ORDER_ITEMS} soi ON soi."StockLotId" = tl."Id"
         LEFT JOIN {DbSchemas.SALES}.{DbTables.SALES_ORDERS} so ON so."Id" = soi."SalesOrderId"

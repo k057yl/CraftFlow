@@ -48,7 +48,8 @@ public class ManageSubscriptionHandler : IRequestHandler<ManageSubscriptionComma
 
         var subscription = await _dbContext.TenantSubscriptions
             .IgnoreQueryFilters()
-            .Where(s => s.TenantId == request.OrganizationId)
+            .Include(s => s.Plan)
+            .Where(s => s.TenantId == request.OrganizationId && s.Plan.TargetModule == targetPlan.TargetModule)
             .OrderByDescending(s => s.ExpiresAtUtc)
             .FirstOrDefaultAsync(cancellationToken);
 

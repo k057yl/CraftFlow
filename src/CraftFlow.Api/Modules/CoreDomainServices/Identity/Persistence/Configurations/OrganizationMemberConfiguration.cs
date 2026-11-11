@@ -10,7 +10,7 @@ public class OrganizationMemberConfiguration : IEntityTypeConfiguration<Organiza
 {
     public void Configure(EntityTypeBuilder<OrganizationMember> builder)
     {
-        builder.ToTable(DbTables.TABLE_ORGANIZATION_MEMBERS, DbSchemas.IDENTITY);
+        builder.ToTable(DbTables.ORGANIZATION_MEMBERS, DbSchemas.IDENTITY);
 
         builder.HasKey(m => m.Id);
 

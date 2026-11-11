@@ -9,7 +9,7 @@ public sealed class AgingChamberConfiguration : IEntityTypeConfiguration<AgingCh
 {
     public void Configure(EntityTypeBuilder<AgingChamber> builder)
     {
-        builder.ToTable(DbTables.AGING_CHAMBERS, DbSchemas.AGING);
+        builder.ToTable(DbTables.AGING_CHAMBERS, DbSchemas.CHEESE_MAKING);
 
         builder.HasKey(c => c.Id);
         builder.Property(c => c.Name).HasMaxLength(200).IsRequired();

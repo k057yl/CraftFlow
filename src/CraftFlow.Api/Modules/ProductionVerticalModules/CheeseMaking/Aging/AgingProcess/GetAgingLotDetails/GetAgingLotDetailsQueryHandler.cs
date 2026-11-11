@@ -38,10 +38,10 @@ public class GetAgingLotDetailsQueryHandler : IRequestHandler<GetAgingLotDetails
                 ), 0.00)::numeric(18, 4) AS "TotalBatchCost",
                 COALESCE(SUM(CASE WHEN ali."State" = 1 THEN ali."CurrentWeight" ELSE 0 END), al."InitialQuantity") AS "InitialQuantity",
                 COALESCE(SUM(CASE WHEN ali."State" = 1 THEN 1 ELSE 0 END), 0)::integer AS "UnitsCount"
-            FROM {DbSchemas.AGING}.{DbTables.AGING_LOTS} al
+            FROM {DbSchemas.CHEESE_MAKING}.{DbTables.AGING_LOTS} al
             JOIN {DbSchemas.CATALOG}.{DbTables.PRODUCTS} p ON p."Id" = al."ProductId"
             JOIN {DbSchemas.CATALOG}.{DbTables.UNITS_OF_MEASURE} uom ON uom."Id" = p."UnitOfMeasureId"
-            LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_LOT_ITEMS} ali ON ali."AgingLotId" = al."Id"
+            LEFT JOIN {DbSchemas.CHEESE_MAKING}.{DbTables.AGING_LOT_ITEMS} ali ON ali."AgingLotId" = al."Id"
             WHERE al."Id" = @LotId AND al."TenantId" = @TenantId
             GROUP BY al."Id", p."Name", uom."Code";
             """;

@@ -33,9 +33,9 @@ public class GetActiveAgingLotsQueryHandler : IRequestHandler<GetActiveAgingLots
                 EXTRACT(DAY FROM (NOW() - al."PlacedAt"))::integer AS "DaysInChamber",
                 EXTRACT(DAY FROM (al."TargetReleaseDate" - al."PlacedAt"))::integer AS "TargetDays",
                 (NOW() >= al."TargetReleaseDate") AS "IsReadyForRelease"
-            FROM {DbSchemas.AGING}.{DbTables.AGING_LOTS} al
-            JOIN {DbSchemas.AGING}.{DbTables.AGING_CHAMBERS} ach ON ach."Id" = al."AgingChamberId"
-            LEFT JOIN {DbSchemas.AGING}.{DbTables.AGING_LOT_ITEMS} ali ON ali."AgingLotId" = al."Id"
+            FROM {DbSchemas.CHEESE_MAKING}.{DbTables.AGING_LOTS} al
+            JOIN {DbSchemas.CHEESE_MAKING}.{DbTables.AGING_CHAMBERS} ach ON ach."Id" = al."AgingChamberId"
+            LEFT JOIN {DbSchemas.CHEESE_MAKING}.{DbTables.AGING_LOT_ITEMS} ali ON ali."AgingLotId" = al."Id"
             WHERE al."TenantId" = @TenantId AND al."State"::text IN ('1', '2', 'InChamber', 'ReadyForRelease')
             GROUP BY al."Id", ach."Name"
             ORDER BY al."PlacedAt" ASC;

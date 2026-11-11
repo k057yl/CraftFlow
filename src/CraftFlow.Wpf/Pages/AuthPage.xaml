@@ -39,18 +39,18 @@
                             </TextBlock>
                         </StackPanel>
 
-                        <!-- Панель 2: Регистрация Организации (Онбординг с выбором цеха) -->
+                        <!-- Панель 2: Регистрация Организации (FREE Стартовый тариф) -->
                         <StackPanel x:Name="RegisterPanel" Visibility="Collapsed">
                             <TextBlock Text="{loc:Loc Key=LABEL_COMPANY_NAME}" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4" FontWeight="SemiBold"/>
                             <TextBox x:Name="RegisterCompanyNameTextBox" Text="Крафтовое Производство" Height="32" Margin="0,0,0,10"/>
 
-                            <!-- Выбор Направления (Локомотива) -->
+                            <!-- Выбор Направления (Регистрируется сразу на FREE тариф) -->
                             <TextBlock Text="Основное направление" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4" FontWeight="SemiBold"/>
                             <ComboBox x:Name="DirectionComboBox" SelectedIndex="0" Height="32" Margin="0,0,0,10">
-                                <ComboBoxItem Content="Сыроварня" Tag="CHEESE_STARTER"/>
-                                <ComboBoxItem Content="Пивоварня" Tag="BEER_STARTER"/>
-                                <ComboBoxItem Content="Мясной цех" Tag="MEAT_STARTER"/>
-                                <ComboBoxItem Content="Ферментация и овощи" Tag="FERMENTATION_STARTER"/>
+                                <ComboBoxItem Content="Сыроварня (Бесплатно)" Tag="CHEESE_FREE"/>
+                                <ComboBoxItem Content="Пивоварня (Бесплатно)" Tag="BEER_FREE"/>
+                                <ComboBoxItem Content="Мясной цех (Бесплатно)" Tag="MEAT_FREE"/>
+                                <ComboBoxItem Content="Ферментация и овощи (Бесплатно)" Tag="FERMENTATION_FREE"/>
                             </ComboBox>
 
                             <TextBlock Text="{loc:Loc Key=FULL_NAME}" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4" FontWeight="SemiBold"/>

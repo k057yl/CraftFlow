@@ -13,7 +13,6 @@ public class TenantSubscription : Entity, ITenantEntity
     public DateTime? ExpiresAtUtc { get; private set; }
 
     public SubscriptionPlan Plan { get; private set; } = null!;
-    public ICollection<TenantAccessKey> Keys { get; private set; } = new List<TenantAccessKey>();
 
     private readonly StateMachine<SubscriptionState, SubscriptionTrigger> _machine;
 
