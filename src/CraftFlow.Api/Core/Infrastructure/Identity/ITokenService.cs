@@ -1,7 +1,6 @@
 ﻿using CraftFlow.Api.Modules.CoreDomainServices.Identity.Domain;
 using System.Security.Claims;
 
-
 namespace CraftFlow.Api.Core.Infrastructure.Identity;
 
 public interface ITokenService

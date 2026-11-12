@@ -43,6 +43,7 @@ public class TokenService : ITokenService
         else if (tenantId != Guid.Empty)
         {
             var activeSubscriptions = _dbContext.TenantSubscriptions
+                .IgnoreQueryFilters()
                 .Include(s => s.Plan)
                 .AsNoTracking()
                 .Where(s => s.TenantId == tenantId &&

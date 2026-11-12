@@ -1,7 +1,8 @@
-﻿using CraftFlow.SharedKernel.Dtos.Identity;
+﻿using CraftFlow.SharedKernel.Constants.Endpoints;
+using CraftFlow.SharedKernel.Dtos.Identity;
+using CraftFlow.SharedKernel.Dtos.Subscription;
 using CraftFlow.Wpf.Services;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace CraftFlow.Wpf.Windows;
 
@@ -19,18 +20,28 @@ public partial class EditOrganizationWindow : Window
         OrgNameTextBlock.Text = $"Управление: {org.Name}";
         IsActiveCheckBox.IsChecked = org.IsActive;
 
-        foreach (ComboBoxItem item in PlanComboBox.Items)
-        {
-            if (item.Tag?.ToString() == org.SubscriptionStatus.ToUpperInvariant())
-            {
-                PlanComboBox.SelectedItem = item;
-                break;
-            }
-        }
+        _ = LoadInitialDataAsync();
+    }
 
-        if (PlanComboBox.SelectedItem == null) PlanComboBox.SelectedIndex = 0;
+    private async Task LoadInitialDataAsync()
+    {
+        await Task.WhenAll(LoadPlansAsync(), LoadPaymentsAsync());
+    }
 
-        _ = LoadPaymentsAsync();
+    private async Task LoadPlansAsync()
+    {
+        var plans = await ApiService.Instance.GetAsync<List<SubscriptionPlanDto>>(
+            $"{SubscriptionsConstants.PLANS}?organizationId={_org.Id}");
+
+        if (plans == null || plans.Count == 0) return;
+
+        PlanComboBox.ItemsSource = plans;
+
+        var currentCode = _org.SubscriptionStatus.ToUpperInvariant();
+        var matched = plans.FirstOrDefault(p => p.Code.Equals(currentCode, StringComparison.OrdinalIgnoreCase))
+                      ?? plans.FirstOrDefault(p => currentCode.Contains(p.Code, StringComparison.OrdinalIgnoreCase));
+
+        PlanComboBox.SelectedItem = matched ?? plans[0];
     }
 
     private async Task LoadPaymentsAsync()
@@ -44,13 +55,16 @@ public partial class EditOrganizationWindow : Window
 
     private async void Save_Click(object sender, RoutedEventArgs e)
     {
-        if (!int.TryParse(AddDaysTextBox.Text, out int addDays)) addDays = 0;
+        if (PlanComboBox.SelectedValue is not string planCode || string.IsNullOrWhiteSpace(planCode))
+        {
+            MessageBox.Show("Выберите тарифный план.", "Внимание", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
 
-        var selectedItem = (ComboBoxItem)PlanComboBox.SelectedItem;
-        string planCode = selectedItem.Tag.ToString()!;
+        if (!int.TryParse(AddDaysTextBox.Text, out int addDays)) addDays = 0;
         bool isActive = IsActiveCheckBox.IsChecked ?? true;
 
-        (bool isSuccess, string contentOrError) = await ApiService.Instance.PostAndReadAsync($"/api/identity/organizations/{_org.Id}/manage", new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"/api/identity/organizations/{_org.Id}/manage", new
         {
             PlanCode = planCode,
             AddDays = addDays,

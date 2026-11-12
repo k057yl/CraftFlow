@@ -1,6 +1,6 @@
 ﻿using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Identity;
-using CraftFlow.SharedKernel.Enums;
+using CraftFlow.SharedKernel.Dtos.Subscription;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
@@ -66,9 +66,36 @@ public partial class ProfilePage : Page
         TeamManagementBorder.Visibility = (isOwner || isSuperAdmin) ? Visibility.Visible : Visibility.Collapsed;
         DangerZoneBorder.Visibility = (isOwner || isSuperAdmin) ? Visibility.Visible : Visibility.Collapsed;
 
+        var tasks = new List<Task> { LoadSubscriptionOverviewAsync() };
         if (isOwner || isSuperAdmin)
         {
-            await LoadTeamUsersAsync();
+            tasks.Add(LoadTeamUsersAsync());
+        }
+
+        await Task.WhenAll(tasks);
+    }
+
+    private async Task LoadSubscriptionOverviewAsync()
+    {
+        var overview = await ApiService.Instance.GetAsync<MySubscriptionOverviewDto>(SubscriptionsConstants.MY_SUBSCRIPTIONS);
+        if (overview == null)
+        {
+            CurrentPlanTitleText.Text = "Не удалось загрузить";
+            return;
+        }
+
+        SubscriptionStatusBadge.Text = overview.StatusBadge;
+        CurrentPlanTitleText.Text = overview.ActivePlansSummary;
+        SubscriptionExpiresText.Text = overview.NearestExpirationUtc.HasValue
+            ? overview.NearestExpirationUtc.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
+            : "Бессрочно";
+
+        PaymentsDataGrid.ItemsSource = overview.Payments;
+
+        ApiService.Instance.ActiveModules = overview.ActiveModules;
+        if (Application.Current.MainWindow is MainWindow mainWindow)
+        {
+            mainWindow.UpdateNavigationPermissions();
         }
     }
 

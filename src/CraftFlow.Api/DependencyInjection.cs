@@ -10,6 +10,7 @@ using CraftFlow.Api.Core.Infrastructure.Notifications.TG;
 using CraftFlow.Api.Core.MultiTenancy;
 using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.BackgroundWorkers;
+using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Services;
 using CraftFlow.Api.Modules.CoreDomainServices.Traceability.TraceabilityRead;
 using CraftFlow.SharedKernel.Constants;
 using FluentValidation;
@@ -81,6 +82,7 @@ public static class DependencyInjection
         services.AddScoped<IDbConnection>(sp => sp.GetRequiredService<AppDbContext>().Database.GetDbConnection());
 
         services.AddScoped<TraceabilityReadService>();
+        services.AddScoped<SubscriptionLifecycleService>();
 
         return services;
     }

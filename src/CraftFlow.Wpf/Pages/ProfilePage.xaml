@@ -12,24 +12,18 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Заголовок страницы -->
                 <TextBlock Grid.Row="0" Text="{loc:Loc Key=UI_TITLE_PROFILE_PAGE}" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,20"/>
 
-                <!-- Главная двухколоночная сетка (ЗОНА A и ЗОНА B) -->
                 <Grid Grid.Row="1">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*"/>
                         <ColumnDefinition Width="20"/>
-                        <!-- Разделитель -->
                         <ColumnDefinition Width="1.2*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- ========================================== -->
-                    <!-- ЗОНА A: Профиль, Команда и Удаление (Слева) -->
-                    <!-- ========================================== -->
+                    <!-- ЗОНА A: Профиль, Команда и Удаление -->
                     <StackPanel Grid.Column="0">
 
-                        <!-- 1. Данные профиля -->
                         <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
                             <StackPanel>
                                 <TextBlock Text="{loc:Loc Key=UI_HEADER_PROFILE_DATA}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
@@ -63,7 +57,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- 2. Управление сотрудниками организации -->
                         <Border x:Name="TeamManagementBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20" Visibility="{auth:HasPermission Permission=USERS_MANAGE}">
                             <StackPanel>
                                 <TextBlock Text="{loc:Loc Key=UI_HEADER_TEAM_MANAGEMENT}" FontSize="16" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15"/>
@@ -116,7 +109,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- 3. Опасная зона -->
                         <Border x:Name="DangerZoneBorder" Background="{DynamicResource CardBackgroundBrush}" BorderBrush="#DC2626" BorderThickness="1" CornerRadius="8" Padding="20">
                             <StackPanel>
                                 <TextBlock Text="{loc:Loc Key=UI_HEADER_DANGER_ZONE}" FontSize="16" FontWeight="Bold" Foreground="#DC2626" Margin="0,0,0,10"/>
@@ -139,12 +131,9 @@
                         </Border>
                     </StackPanel>
 
-                    <!-- ========================================== -->
-                    <!-- ЗОНА B: Финансы, Подписки и Аддоны (Справа)-->
-                    <!-- ========================================== -->
+                    <!-- ЗОНА B: Финансы, Подписки и Аддоны -->
                     <StackPanel Grid.Column="2">
 
-                        <!-- 1. Состояние текущей подписки -->
                         <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
                             <StackPanel>
                                 <Grid Margin="0,0,0,15">
@@ -160,7 +149,7 @@
                                         <ColumnDefinition Width="*"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Text="Активный план:" Foreground="{DynamicResource AppForegroundBrush}" FontWeight="SemiBold"/>
-                                    <TextBlock Grid.Column="1" x:Name="CurrentPlanTitleText" Text="Загрузка..." Foreground="{DynamicResource AppForegroundBrush}" FontWeight="Bold"/>
+                                    <TextBlock Grid.Column="1" x:Name="CurrentPlanTitleText" Text="Загрузка..." Foreground="{DynamicResource AppForegroundBrush}" FontWeight="Bold" TextWrapping="Wrap"/>
                                 </Grid>
 
                                 <Grid Margin="0,0,0,10">
@@ -174,7 +163,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- 2. Подключение Аддонов (Запрос на оплату) -->
                         <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
                             <StackPanel>
                                 <TextBlock Text="🧩 Дополнительные цеха (Аддоны)" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,8"/>
@@ -225,7 +213,6 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- 3. Таблица финансовых транзакций -->
                         <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20">
                             <StackPanel>
                                 <TextBlock Text="📜 История платежей и операций" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,12"/>

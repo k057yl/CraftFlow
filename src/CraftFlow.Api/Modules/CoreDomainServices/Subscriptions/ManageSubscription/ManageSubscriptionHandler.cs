@@ -46,12 +46,19 @@ public class ManageSubscriptionHandler : IRequestHandler<ManageSubscriptionComma
             return Result.Failure<bool>(Error.NotFound("PLAN_NOT_FOUND"));
         }
 
-        var subscription = await _dbContext.TenantSubscriptions
+        var moduleSubscriptions = await _dbContext.TenantSubscriptions
             .IgnoreQueryFilters()
             .Include(s => s.Plan)
             .Where(s => s.TenantId == request.OrganizationId && s.Plan.TargetModule == targetPlan.TargetModule)
             .OrderByDescending(s => s.ExpiresAtUtc)
-            .FirstOrDefaultAsync(cancellationToken);
+            .ToListAsync(cancellationToken);
+
+        var subscription = moduleSubscriptions.FirstOrDefault();
+
+        if (moduleSubscriptions.Count > 1)
+        {
+            _dbContext.TenantSubscriptions.RemoveRange(moduleSubscriptions.Skip(1));
+        }
 
         var now = DateTime.UtcNow;
 
@@ -66,12 +73,23 @@ public class ManageSubscriptionHandler : IRequestHandler<ManageSubscriptionComma
         }
         else
         {
-            var baseDate = subscription.ExpiresAtUtc.HasValue ? subscription.ExpiresAtUtc.Value : now;
+            var baseDate = subscription.ExpiresAtUtc.HasValue && subscription.ExpiresAtUtc.Value > now
+                ? subscription.ExpiresAtUtc.Value
+                : now;
+
             var newExpires = baseDate.AddDays(request.AddDays);
             if (newExpires < now) newExpires = now;
 
-            subscription.Extend(newExpires);
             subscription.ChangePlan(targetPlan.Id);
+
+            if (subscription.State == SubscriptionState.Trial || subscription.State == SubscriptionState.Suspended)
+            {
+                subscription.Activate(newExpires);
+            }
+            else
+            {
+                subscription.Extend(newExpires);
+            }
         }
 
         if (request.AddDays != 0)

@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Core.Infrastructure.Identity;
 using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Identity.Domain;
+using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Services;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.SharedKernel.Enums.Identity;
@@ -14,11 +15,16 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginRe
 {
     private readonly AppDbContext _dbContext;
     private readonly ITokenService _tokenService;
+    private readonly SubscriptionLifecycleService _lifecycleService;
 
-    public LoginUserHandler(AppDbContext dbContext, ITokenService tokenService)
+    public LoginUserHandler(
+        AppDbContext dbContext,
+        ITokenService tokenService,
+        SubscriptionLifecycleService lifecycleService)
     {
         _dbContext = dbContext;
         _tokenService = tokenService;
+        _lifecycleService = lifecycleService;
     }
 
     public async Task<Result<LoginResponseDto>> Handle(LoginUserCommand request, CancellationToken cancellationToken)
@@ -60,6 +66,8 @@ public class LoginUserHandler : IRequestHandler<LoginUserCommand, Result<LoginRe
             {
                 return Result.Failure<LoginResponseDto>(Error.Validation(ErrorCodes.Auth.ACCOUNT_NOT_ACTIVATED));
             }
+
+            await _lifecycleService.DowngradeExpiredModulesAsync(activeMember.TenantId, cancellationToken);
         }
 
         var tokenString = _tokenService.GenerateJwtToken(user, activeMember, isSystemAdmin);

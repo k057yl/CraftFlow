@@ -116,6 +116,21 @@ public class TenantSubscription : Entity, ITenantEntity
         _machine.Fire(SubscriptionTrigger.Cancel);
     }
 
+    public void DowngradeToFree(Guid freePlanId)
+    {
+        PlanId = freePlanId;
+        ExpiresAtUtc = null;
+
+        if (State == SubscriptionState.Trial && _machine.CanFire(SubscriptionTrigger.Activate))
+        {
+            _machine.Fire(SubscriptionTrigger.Activate);
+        }
+        else if (State == SubscriptionState.Expired && _machine.CanFire(SubscriptionTrigger.Renew))
+        {
+            _machine.Fire(SubscriptionTrigger.Renew);
+        }
+    }
+
     private void EnsureCanFire(SubscriptionTrigger trigger)
     {
         if (!_machine.CanFire(trigger))
