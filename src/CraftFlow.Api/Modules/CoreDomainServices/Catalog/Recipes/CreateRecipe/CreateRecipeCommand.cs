@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Core.Authorization;
 using CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature;
+using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
@@ -11,6 +12,7 @@ public record CreateRecipeCommand(
     string Name,
     decimal TargetOutputQuantity,
     List<RecipeIngredientDto> Ingredients,
+    AppModule TargetModule = AppModule.CHEESE_MAKING,
     bool IsAgingRequired = false,
     int? DefaultMinAgingDays = null
 ) : IRequest<Result<Guid>>, IRequirePermission

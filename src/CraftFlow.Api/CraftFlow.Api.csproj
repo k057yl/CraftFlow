@@ -27,7 +27,6 @@
     <Folder Include="Migrations\" />
     <Folder Include="Modules\ProductionVerticalModules\Brewery\" />
     <Folder Include="Modules\ProductionVerticalModules\MeatProcessing\" />
-    <Folder Include="Modules\ProductionVerticalModules\Fermentation\" />
   </ItemGroup>
 
   <ItemGroup>

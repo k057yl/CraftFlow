@@ -1,7 +1,7 @@
-﻿using CraftFlow.SharedKernel.Constants;
-using CraftFlow.SharedKernel.Constants.Endpoints;
+﻿using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Catalog.Nomenclature;
 using CraftFlow.SharedKernel.Dtos.Common;
+using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
@@ -24,6 +24,7 @@ public partial class RecipesControl : UserControl
     public ObservableCollection<LookupItem> UnitsOfMeasure { get; } = [];
     public ObservableCollection<LookupItem> RawMaterials { get; } = [];
     public ObservableCollection<RecipeDto> Recipes { get; } = [];
+    public ObservableCollection<LookupItem> AvailableModules { get; } = [];
     private readonly ObservableCollection<IngredientItemDto> _selectedIngredients = [];
 
     public RecipesControl()
@@ -33,16 +34,41 @@ public partial class RecipesControl : UserControl
         RawUomComboBox.ItemsSource = UnitsOfMeasure;
         ProductUomComboBox.ItemsSource = UnitsOfMeasure;
         RecipeRawMaterialComboBox.ItemsSource = RawMaterials;
+        RecipeModuleComboBox.ItemsSource = AvailableModules;
         AddedIngredientsListBox.ItemsSource = _selectedIngredients;
 
         RawMaterialsDataGrid.ItemsSource = RawMaterials;
         RecipesDataGrid.ItemsSource = Recipes;
+
+        InitializeModules();
 
         Loaded += async (s, e) =>
         {
             ApplyRolePermissions();
             await LoadDataAsync();
         };
+    }
+
+    private void InitializeModules()
+    {
+        AvailableModules.Clear();
+        var activeModules = ApiService.Instance.ActiveModules;
+        var isSuperAdmin = PermissionService.Instance.IsSuperAdmin;
+
+        if (isSuperAdmin || activeModules.HasFlag(AppModule.CHEESE_MAKING))
+            AvailableModules.Add(new LookupItem(Guid.Empty, Get("UI_MODULE_CHEESE_MAKING"), nameof(AppModule.CHEESE_MAKING)));
+
+        if (isSuperAdmin || activeModules.HasFlag(AppModule.FERMENTATION))
+            AvailableModules.Add(new LookupItem(Guid.Empty, Get("UI_MODULE_FERMENTATION"), nameof(AppModule.FERMENTATION)));
+
+        if (isSuperAdmin || activeModules.HasFlag(AppModule.BREWERY))
+            AvailableModules.Add(new LookupItem(Guid.Empty, Get("UI_MODULE_BREWERY"), nameof(AppModule.BREWERY)));
+
+        if (isSuperAdmin || activeModules.HasFlag(AppModule.MEAT_PROCESSING))
+            AvailableModules.Add(new LookupItem(Guid.Empty, Get("UI_MODULE_MEAT_PROCESSING"), nameof(AppModule.MEAT_PROCESSING)));
+
+        if (AvailableModules.Count > 0)
+            RecipeModuleComboBox.SelectedIndex = 0;
     }
 
     private void ApplyRolePermissions()
@@ -125,7 +151,7 @@ public partial class RecipesControl : UserControl
         }
     }
 
-    #region Context Menus (Дропдаун при клике на •••)
+    #region Context Menus
 
     private void OpenRawMaterialMenu_Click(object sender, RoutedEventArgs e)
     {
@@ -255,6 +281,8 @@ public partial class RecipesControl : UserControl
         var productName = ProductNameTextBox.Text?.Trim();
         if (string.IsNullOrWhiteSpace(productName) ||
             ProductUomComboBox.SelectedValue is not Guid productUomId ||
+            RecipeModuleComboBox.SelectedValue is not string moduleCode ||
+            !Enum.TryParse<AppModule>(moduleCode, out var targetModule) ||
             !TryParseDecimal(RecipeOutputQuantityTextBox.Text, out var targetOutput) ||
             _selectedIngredients.Count == 0)
         {
@@ -291,6 +319,7 @@ public partial class RecipesControl : UserControl
         {
             ProductId = productId,
             Name = productName,
+            TargetModule = targetModule,
             TargetOutputQuantity = targetOutput,
             IsAgingRequired = isAgingRequired,
             DefaultMinAgingDays = defaultMinAgingDays,

@@ -159,4 +159,12 @@ public static class ErrorCodes
         public const string INVALID_TRIGGER_CONFIG = "SANITATION.INVALID_TRIGGER_CONFIG";
         public const string TASK_NOT_COMPLETED = "SANITATION.TASK_NOT_COMPLETED";
     }
+
+    public static class Fermentation
+    {
+        public const string BATCH_NOT_FOUND = "FERMENTATION_BATCH_NOT_FOUND";
+        public const string BATCH_ALREADY_COMPLETED = "FERMENTATION_BATCH_ALREADY_COMPLETED";
+        public const string INVALID_STAGE_FOR_COLD = "FERMENTATION_INVALID_STAGE_FOR_COLD";
+        public const string CANNOT_COMPLETE_DISCARDED = "FERMENTATION_CANNOT_COMPLETE_DISCARDED";
+    }
 }

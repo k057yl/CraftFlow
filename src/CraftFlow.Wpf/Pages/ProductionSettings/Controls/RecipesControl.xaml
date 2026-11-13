@@ -60,6 +60,9 @@
                     <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_RECIPE_NAME}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
                     <TextBox x:Name="ProductNameTextBox" Height="28" Margin="0,0,0,8"/>
 
+                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_MODULE}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
+                    <ComboBox x:Name="RecipeModuleComboBox" DisplayMemberPath="Name" SelectedValuePath="Code" Height="28" Margin="0,0,0,8"/>
+
                     <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_SELECT_UOM}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
                     <ComboBox x:Name="ProductUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Margin="0,0,0,8"/>
 
@@ -133,6 +136,8 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
+
+                        <DataGridTextColumn Header="{loc:Loc Key=UI_RECIPES_COL_MODULE}" Binding="{Binding TargetModule}" Width="130"/>
 
                         <DataGridTemplateColumn x:Name="RecipeDeleteColumn" Width="45">
                             <DataGridTemplateColumn.CellTemplate>

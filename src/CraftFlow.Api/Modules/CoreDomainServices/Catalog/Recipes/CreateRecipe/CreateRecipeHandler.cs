@@ -20,6 +20,7 @@ public class CreateRecipeHandler : IRequestHandler<CreateRecipeCommand, Result<G
             request.ProductId,
             request.Name,
             request.TargetOutputQuantity,
+            request.TargetModule,
             request.IsAgingRequired,
             request.DefaultMinAgingDays
         );

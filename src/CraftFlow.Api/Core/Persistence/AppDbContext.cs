@@ -9,6 +9,7 @@ using CraftFlow.Api.Modules.CoreDomainServices.Sales.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Sanitation.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.Domain;
+using CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
 using CraftFlow.SharedKernel.Enums.Identity;
@@ -65,6 +66,8 @@ public class AppDbContext : DbContext
     public DbSet<SanitationRule> SanitationRules => Set<SanitationRule>();
     public DbSet<SanitationTask> SanitationTasks => Set<SanitationTask>();
     public DbSet<SanitationLog> SanitationLogs => Set<SanitationLog>();
+    public DbSet<FermentationBatch> FermentationBatches => Set<FermentationBatch>();
+    public DbSet<FermentationReading> FermentationReadings => Set<FermentationReading>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

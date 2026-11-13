@@ -155,6 +155,13 @@ namespace CraftFlow.Api.Migrations
                     b.Property<int>("TargetDurationMinutes")
                         .HasColumnType("integer");
 
+                    b.Property<string>("TargetModule")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)")
+                        .HasDefaultValue("CHEESE_MAKING");
+
                     b.Property<decimal>("TargetOutputQuantity")
                         .HasPrecision(18, 4)
                         .HasColumnType("numeric(18,4)");
@@ -1352,6 +1359,122 @@ namespace CraftFlow.Api.Migrations
                     b.ToTable("aging_lot_items", "cheese_making");
                 });
 
+            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationBatch", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("BatchNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal?>("CurrentPh")
+                        .HasPrecision(4, 2)
+                        .HasColumnType("numeric(4,2)");
+
+                    b.Property<decimal?>("InitialPh")
+                        .HasPrecision(4, 2)
+                        .HasColumnType("numeric(4,2)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("MovedToColdAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ProductionBatchId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("RecipeName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<decimal>("SaltPercentage")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("numeric(6,2)");
+
+                    b.Property<string>("Stage")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<decimal>("SubstrateWeightKg")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<decimal>("TargetTemperature")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("VesselInfo")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductionBatchId")
+                        .HasDatabaseName("IX_FERMENTATION_BATCHES_PRODUCTION_BATCH");
+
+                    b.HasIndex("TenantId", "Stage")
+                        .HasDatabaseName("IX_FERMENTATION_BATCHES_TENANT_STAGE");
+
+                    b.ToTable("fermentation_batches", "fermentation");
+                });
+
+            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationReading", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("BrineToppedUp")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("DegassedOrBurped")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("FermentationBatchId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal?>("Ph")
+                        .HasPrecision(4, 2)
+                        .HasColumnType("numeric(4,2)");
+
+                    b.Property<DateTime>("RecordedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SensoryNotes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<decimal?>("Temperature")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("numeric(5,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FermentationBatchId", "RecordedAt")
+                        .HasDatabaseName("IX_FERMENTATION_READINGS_BATCH_RECORDED_AT");
+
+                    b.ToTable("fermentation_readings", "fermentation");
+                });
+
             modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Catalog.Domain.Product", b =>
                 {
                     b.HasOne("CraftFlow.Api.Modules.CoreDomainServices.Catalog.Domain.UnitOfMeasure", "UnitOfMeasure")
@@ -1518,6 +1641,15 @@ namespace CraftFlow.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationReading", b =>
+                {
+                    b.HasOne("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationBatch", null)
+                        .WithMany("Readings")
+                        .HasForeignKey("FermentationBatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Catalog.Domain.Recipe", b =>
                 {
                     b.Navigation("Ingredients");
@@ -1541,6 +1673,11 @@ namespace CraftFlow.Api.Migrations
             modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.Domain.AgingLot", b =>
                 {
                     b.Navigation("Items");
+                });
+
+            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationBatch", b =>
+                {
+                    b.Navigation("Readings");
                 });
 #pragma warning restore 612, 618
         }

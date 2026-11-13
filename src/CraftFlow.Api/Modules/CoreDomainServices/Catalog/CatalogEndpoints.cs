@@ -11,6 +11,7 @@ using CraftFlow.Api.Modules.CoreDomainServices.Catalog.UnitsOfMeasure;
 using CraftFlow.Api.Modules.CoreDomainServices.Catalog.UnitsOfMeasure.SeedUnitsOfMeasure;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Constants.Endpoints;
+using CraftFlow.SharedKernel.Enums;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.CoreDomainServices.Catalog;
@@ -114,9 +115,9 @@ public static class CatalogEndpoints
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
 
-        group.MapGet(CatalogConstants.RECIPES, async (bool includeArchived, ISender sender, CancellationToken ct) =>
+        group.MapGet(CatalogConstants.RECIPES, async (bool includeArchived, AppModule? module, ISender sender, CancellationToken ct) =>
         {
-            var result = await sender.Send(new GetRecipesQuery(includeArchived), ct);
+            var result = await sender.Send(new GetRecipesQuery(includeArchived, module), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
         });
     }

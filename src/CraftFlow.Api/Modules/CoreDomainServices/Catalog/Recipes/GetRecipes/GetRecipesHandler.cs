@@ -24,12 +24,18 @@ public class GetRecipesHandler : IRequestHandler<GetRecipesQuery, Result<List<Re
             query = query.Where(r => r.IsActive);
         }
 
+        if (request.Module.HasValue)
+        {
+            query = query.Where(r => r.TargetModule == request.Module.Value);
+        }
+
         var recipes = await query
             .Select(r => new RecipeDto(
                 r.Id,
                 r.ProductId,
                 r.Product.Name,
                 r.Name,
+                r.TargetModule,
                 r.TargetOutputQuantity,
                 r.IsAgingRequired,
                 r.DefaultMinAgingDays,

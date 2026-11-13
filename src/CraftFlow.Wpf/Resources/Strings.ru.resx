@@ -820,6 +820,54 @@
 	<data name="BUTTON_REVOKE" xml:space="preserve"><value>Отозвать</value></data>
 
 	<!-- ========================================== -->
+	<!-- Fermentation Module                        -->
+	<!-- ========================================== -->
+	<data name="UI_TITLE_FERMENTATION" xml:space="preserve"><value>Ферментация</value></data>
+	<data name="UI_FERMENTATION_HEADER" xml:space="preserve"><value>Цех ферментации</value></data>
+
+	<data name="UI_TAB_FERMENTATION_BATCHES" xml:space="preserve"><value>Закладка и выпуск</value></data>
+	<data name="UI_TAB_FERMENTATION_LOG" xml:space="preserve"><value>Журнал брожения и pH</value></data>
+
+	<data name="UI_FERM_GROUP_NEW_PASSPORT" xml:space="preserve"><value>Паспорт брожения</value></data>
+	<data name="UI_FERM_LABEL_ACTIVE_BATCH" xml:space="preserve"><value>Активная партия</value></data>
+	<data name="UI_FERM_LABEL_SUBSTRATE_KG" xml:space="preserve"><value>Вес сырья (кг)</value></data>
+	<data name="UI_FERM_LABEL_SALT_PERCENT" xml:space="preserve"><value>Соль (%)</value></data>
+	<data name="UI_FERM_LABEL_SALT_GRAMS_FMT" xml:space="preserve"><value>Расчёт соли: {0:0.#} г</value></data>
+	<data name="UI_FERM_LABEL_TARGET_TEMP" xml:space="preserve"><value>Целевая t° (°C)</value></data>
+	<data name="UI_FERM_LABEL_INITIAL_PH" xml:space="preserve"><value>Начальный pH (опц.)</value></data>
+	<data name="UI_FERM_LABEL_VESSEL_INFO" xml:space="preserve"><value>Тара / Гидрозатвор</value></data>
+	<data name="UI_FERM_BTN_CREATE_PASSPORT" xml:space="preserve"><value>Завести в журнал</value></data>
+
+	<data name="UI_FERM_GROUP_ACTIVE_LOTS" xml:space="preserve"><value>Партии на брожении</value></data>
+	<data name="UI_FERM_COL_BATCH" xml:space="preserve"><value>Партия</value></data>
+	<data name="UI_FERM_COL_PRODUCT" xml:space="preserve"><value>Продукт</value></data>
+	<data name="UI_FERM_COL_STAGE" xml:space="preserve"><value>Этап</value></data>
+	<data name="UI_FERM_COL_DAYS" xml:space="preserve"><value>Дней</value></data>
+	<data name="UI_FERM_COL_SALT" xml:space="preserve"><value>Соль</value></data>
+	<data name="UI_FERM_COL_PH" xml:space="preserve"><value>Текущий pH</value></data>
+	<data name="UI_FERM_COL_VESSEL" xml:space="preserve"><value>Тара</value></data>
+	<data name="UI_FERM_BTN_MOVE_COLD" xml:space="preserve"><value>В холод</value></data>
+	<data name="UI_FERM_BTN_COMPLETE" xml:space="preserve"><value>Завершить брожение</value></data>
+
+	<data name="UI_FERM_GROUP_ADD_READING" xml:space="preserve"><value>Замер и обслуживание</value></data>
+	<data name="UI_FERM_LABEL_PH" xml:space="preserve"><value>pH</value></data>
+	<data name="UI_FERM_LABEL_TEMP" xml:space="preserve"><value>Температура (°C)</value></data>
+	<data name="UI_FERM_CHECK_DEGASSED" xml:space="preserve"><value>Стравил газ / утопил шапку</value></data>
+	<data name="UI_FERM_CHECK_BRINE" xml:space="preserve"><value>Долил рассол</value></data>
+	<data name="UI_FERM_LABEL_NOTES" xml:space="preserve"><value>Органолептика / заметки</value></data>
+	<data name="UI_FERM_BTN_ADD_READING" xml:space="preserve"><value>Записать замер</value></data>
+
+	<data name="UI_FERM_GROUP_HISTORY" xml:space="preserve"><value>История замеров партии</value></data>
+	<data name="UI_FERM_STAGE_WARM" xml:space="preserve"><value>Активное (тепло)</value></data>
+	<data name="UI_FERM_STAGE_COLD" xml:space="preserve"><value>Холод</value></data>
+	<data name="UI_FERM_STAGE_DONE" xml:space="preserve"><value>Готово</value></data>
+
+	<data name="UI_FERM_MSG_PASSPORT_CREATED" xml:space="preserve"><value>Партия добавлена в журнал ферментации</value></data>
+	<data name="UI_FERM_MSG_READING_ADDED" xml:space="preserve"><value>Замер сохранён</value></data>
+	<data name="UI_FERM_MSG_MOVED_COLD" xml:space="preserve"><value>Партия переведена в холод</value></data>
+	<data name="UI_FERM_MSG_COMPLETED" xml:space="preserve"><value>Ферментация завершена</value></data>
+	
+	<!-- ========================================== -->
 	<!-- All Windows							    -->
 	<!-- ========================================== -->
 	

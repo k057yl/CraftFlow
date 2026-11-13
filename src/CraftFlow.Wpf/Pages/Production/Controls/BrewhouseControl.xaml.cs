@@ -2,6 +2,7 @@
 using CraftFlow.SharedKernel.Dtos.Catalog.Inventory;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Production;
+using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
@@ -46,6 +47,7 @@ public partial class BrewhouseControl : UserControl
     private decimal _currentRawCost = 0m;
     private bool _isInitializing = true;
 
+    public AppModule TargetModule { get; set; } = AppModule.CHEESE_MAKING;
     public TextBlock? StatusTextBlock { get; set; }
     public ProductionPage? ParentPage { get; set; }
 
@@ -123,7 +125,7 @@ public partial class BrewhouseControl : UserControl
                 warehouses.ForEach(w => RawMaterialWarehouses.Add(new LookupItem(w.Id, w.Name)));
             }
 
-            var recipes = await ApiService.Instance.GetAsync<List<LookupDto>>($"{CatalogConstants.RECIPES}?includeArchived=false");
+            var recipes = await ApiService.Instance.GetAsync<List<LookupDto>>($"{CatalogConstants.RECIPES}?includeArchived=false&module={TargetModule}");
             Recipes.Clear();
             recipes?.ForEach(r => Recipes.Add(new LookupItem(r.Id, r.Name)));
 

@@ -13,6 +13,7 @@ using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions;
 using CraftFlow.Api.Modules.CoreDomainServices.Traceability;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging;
+using CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation;
 
 DotNetEnv.Env.Load();
 var builder = WebApplication.CreateBuilder(args);
@@ -56,5 +57,6 @@ app.MapTraceabilityEndpoints();
 app.MapMrpEndpoints();
 app.MapSubscriptionsEndpoints();
 app.MapSanitationEndpoints();
+app.MapFermentationEndpoints();
 
 app.Run();

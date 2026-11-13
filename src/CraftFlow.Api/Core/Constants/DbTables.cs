@@ -52,5 +52,7 @@ public static class DbTables
     public const string AGING_LOTS = "aging_lots";
     public const string AGING_LOT_ITEMS = "aging_lot_items";
 
-    // --- VERTICAL MODULES (Future Tables for Brewery, Meat, Fermentation) ---
+    // --- VERTICAL MODULE: FERMENTATION (schema: fermentation) ---
+    public const string FERMENTATION_BATCHES = "fermentation_batches";
+    public const string FERMENTATION_READINGS = "fermentation_readings";
 }

@@ -3,6 +3,7 @@ using CraftFlow.SharedKernel.Dtos.Dashboard;
 using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Pages;
+using CraftFlow.Wpf.Pages.Fermentation;
 using CraftFlow.Wpf.Pages.Production;
 using CraftFlow.Wpf.Pages.ProductionSettings;
 using CraftFlow.Wpf.Services;
@@ -101,7 +102,7 @@ public partial class MainWindow : Window
         // --- 4. Предметная область / Локомотив (Варочные цеха) ---
         var canViewProduction = ps.HasPermission(AppPermission.PRODUCTION_VIEW) || ps.HasPermission(AppPermission.PRODUCTION_EXECUTE);
 
-        bool isCheeseActive = canViewProduction && (ps.IsSuperAdmin || ps.IsOwner || activeModules.HasFlag(AppModule.CHEESE_MAKING));
+        bool isCheeseActive = canViewProduction && (ps.IsSuperAdmin || activeModules.HasFlag(AppModule.CHEESE_MAKING));
         bool isBreweryActive = canViewProduction && (ps.IsSuperAdmin || activeModules.HasFlag(AppModule.BREWERY));
         bool isMeatActive = canViewProduction && (ps.IsSuperAdmin || activeModules.HasFlag(AppModule.MEAT_PROCESSING));
         bool isFermentationActive = canViewProduction && (ps.IsSuperAdmin || activeModules.HasFlag(AppModule.FERMENTATION));
@@ -221,7 +222,7 @@ public partial class MainWindow : Window
     private void NavCheeseMaking_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
     private void NavBrewery_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
     private void NavMeat_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
-    private void NavFermentation_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionPage());
+    private void NavFermentation_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new FermentationPage());
 
     private void NavSales_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new SalesPage());
     private void NavTraceability_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TraceabilityPage());

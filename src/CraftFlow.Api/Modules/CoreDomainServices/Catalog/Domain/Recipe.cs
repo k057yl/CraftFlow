@@ -1,5 +1,6 @@
 ﻿using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
+using CraftFlow.SharedKernel.Enums;
 
 namespace CraftFlow.Api.Modules.CoreDomainServices.Catalog.Domain;
 
@@ -11,10 +12,10 @@ public sealed class Recipe : AggregateRoot, ITenantEntity
     public Guid ProductId { get; private set; }
     public Product Product { get; private set; } = null!;
     public string Name { get; private set; } = null!;
+    public AppModule TargetModule { get; private set; }
     public decimal TargetOutputQuantity { get; private set; }
     public bool IsAgingRequired { get; private set; }
     public int? DefaultMinAgingDays { get; private set; }
-
     public int TargetDurationMinutes { get; private set; }
 
     public IReadOnlyCollection<RecipeIngredient> Ingredients => _ingredients.AsReadOnly();
@@ -25,6 +26,7 @@ public sealed class Recipe : AggregateRoot, ITenantEntity
         Guid productId,
         string name,
         decimal targetOutputQuantity,
+        AppModule targetModule = AppModule.CHEESE_MAKING,
         bool isAgingRequired = false,
         int? defaultMinAgingDays = null,
         int targetDurationMinutes = 180)
@@ -40,6 +42,7 @@ public sealed class Recipe : AggregateRoot, ITenantEntity
             Id = Guid.NewGuid(),
             ProductId = productId,
             Name = name,
+            TargetModule = targetModule,
             TargetOutputQuantity = targetOutputQuantity,
             IsAgingRequired = isAgingRequired,
             DefaultMinAgingDays = isAgingRequired ? defaultMinAgingDays : null,
