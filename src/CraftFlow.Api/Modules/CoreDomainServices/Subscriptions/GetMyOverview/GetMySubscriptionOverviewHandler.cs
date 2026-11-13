@@ -49,6 +49,30 @@ public class GetMySubscriptionOverviewHandler : IRequestHandler<GetMySubscriptio
             activeModules |= sub.Plan.TargetModule;
         }
 
+        var allModules = new[]
+        {
+            AppModule.CHEESE_MAKING,
+            AppModule.BREWERY,
+            AppModule.MEAT_PROCESSING,
+            AppModule.FERMENTATION
+        };
+
+        var moduleStatuses = allModules.Select(mod =>
+        {
+            var sub = activeSubs
+                .Where(s => s.Plan.TargetModule == mod)
+                .OrderByDescending(s => s.ExpiresAtUtc ?? DateTime.MaxValue)
+                .FirstOrDefault();
+
+            if (sub == null)
+            {
+                return new ModuleSubscriptionStatusDto(mod, false, string.Empty, "Не подключен", null);
+            }
+
+            var suffix = sub.Plan.Code.Split('_').LastOrDefault() ?? string.Empty;
+            return new ModuleSubscriptionStatusDto(mod, true, suffix, sub.Plan.Name, sub.ExpiresAtUtc);
+        }).ToList();
+
         var payments = await _dbContext.SubscriptionPayments
             .AsNoTracking()
             .Where(p => p.TenantId == tenantId)
@@ -78,6 +102,7 @@ public class GetMySubscriptionOverviewHandler : IRequestHandler<GetMySubscriptio
             plansSummary,
             maxExpiration,
             activeModules,
+            moduleStatuses,
             payments
         ));
     }

@@ -73,12 +73,13 @@ public class ManageSubscriptionHandler : IRequestHandler<ManageSubscriptionComma
         }
         else
         {
-            var baseDate = subscription.ExpiresAtUtc.HasValue && subscription.ExpiresAtUtc.Value > now
-                ? subscription.ExpiresAtUtc.Value
-                : now;
-
-            var newExpires = baseDate.AddDays(request.AddDays);
-            if (newExpires < now) newExpires = now;
+            var newExpires = PlanUpgradeCalculator.CalculateNewExpirationUtc(
+                currentPlanCode: subscription.Plan?.Code,
+                currentExpiresAtUtc: subscription.ExpiresAtUtc,
+                targetPlanCode: targetPlan.Code,
+                daysToAdd: request.AddDays,
+                nowUtc: now
+            );
 
             subscription.ChangePlan(targetPlan.Id);
 

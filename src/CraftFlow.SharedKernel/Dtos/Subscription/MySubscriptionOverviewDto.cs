@@ -7,5 +7,6 @@ public record MySubscriptionOverviewDto(
     string ActivePlansSummary,
     DateTime? NearestExpirationUtc,
     AppModule ActiveModules,
+    List<ModuleSubscriptionStatusDto> Modules,
     List<SubscriptionPaymentDto> Payments
 );

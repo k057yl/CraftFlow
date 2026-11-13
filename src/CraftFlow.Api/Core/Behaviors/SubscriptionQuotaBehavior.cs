@@ -50,28 +50,28 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
             return await next();
         }
 
-        var subscription = await _dbContext.Set<TenantSubscription>()
+        var subscriptions = await _dbContext.Set<TenantSubscription>()
             .Include(s => s.Plan)
             .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.TenantId == tenantId, cancellationToken);
+            .Where(s => s.TenantId == tenantId)
+            .ToListAsync(cancellationToken);
 
-        if (subscription == null || !IsSubscriptionValid(subscription))
-        {
-            return ResultFactory.CreateFailure<TResponse>(Error.Validation(ErrorCodes.Saas.SUBSCRIPTION_EXPIRED));
-        }
+        var activePlans = subscriptions
+            .Where(s => IsSubscriptionValid(s) && s.Plan != null)
+            .Select(s => s.Plan)
+            .ToList();
 
-        var plan = subscription.Plan;
-        if (plan == null)
+        if (activePlans.Count == 0)
         {
             return ResultFactory.CreateFailure<TResponse>(Error.Validation(ErrorCodes.Saas.SUBSCRIPTION_EXPIRED));
         }
 
         var isQuotaExceeded = quotaRequest.QuotaType switch
         {
-            QuotaType.MONTHLY_BATCHES => await CheckMonthlyBatchesQuotaAsync(tenantId, plan.MaxMonthlyBatches, cancellationToken),
-            QuotaType.WAREHOUSES_COUNT => await CheckCountQuotaAsync<Warehouse>(tenantId, plan.MaxWarehouses, cancellationToken),
-            QuotaType.CHAMBER_COUNT => await CheckCountQuotaAsync<AgingChamber>(tenantId, plan.MaxChambers, cancellationToken),
-            QuotaType.USERS_COUNT => await CheckCountQuotaAsync<OrganizationMember>(tenantId, plan.MaxUsers, cancellationToken),
+            QuotaType.MONTHLY_BATCHES => await CheckMonthlyBatchesQuotaAsync(tenantId, GetEffectiveLimit(activePlans, p => p.MaxMonthlyBatches), cancellationToken),
+            QuotaType.WAREHOUSES_COUNT => await CheckCountQuotaAsync<Warehouse>(tenantId, GetEffectiveLimit(activePlans, p => p.MaxWarehouses), cancellationToken),
+            QuotaType.CHAMBER_COUNT => await CheckCountQuotaAsync<AgingChamber>(tenantId, GetEffectiveLimit(activePlans, p => p.MaxChambers), cancellationToken),
+            QuotaType.USERS_COUNT => await CheckCountQuotaAsync<OrganizationMember>(tenantId, GetEffectiveLimit(activePlans, p => p.MaxUsers), cancellationToken),
             _ => false
         };
 
@@ -81,6 +81,12 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
         }
 
         return await next();
+    }
+
+    private static int GetEffectiveLimit(IEnumerable<SubscriptionPlan> plans, Func<SubscriptionPlan, int> selector)
+    {
+        var limits = plans.Select(selector).ToList();
+        return limits.Contains(UNLIMITED_QUOTA) ? UNLIMITED_QUOTA : limits.Max();
     }
 
     private static bool IsSubscriptionValid(TenantSubscription subscription)

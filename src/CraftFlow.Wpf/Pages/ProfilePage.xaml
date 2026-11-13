@@ -163,53 +163,75 @@
                             </StackPanel>
                         </Border>
 
+                        <!-- Управление цехами, тарифами и продлением -->
                         <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="8" Padding="20" Margin="0,0,0,20">
                             <StackPanel>
-                                <TextBlock Text="🧩 Дополнительные цеха (Аддоны)" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,8"/>
-                                <TextBlock Text="Для подключения дополнительных цехов сформируйте заявку или свяжитесь с отделом продаж." FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,15" TextWrapping="Wrap"/>
+                                <TextBlock Text="🧩 Цеха, тарифы и продление" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,6"/>
+                                <TextBlock Text="Текущий тариф отмечен зеленым. Выберите тариф для продления или повышения уровня." FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Opacity="0.8" Margin="0,0,0,15" TextWrapping="Wrap"/>
 
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
+                                <ItemsControl x:Name="ModulesItemsControl">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="0,0,0,12" Margin="0,0,0,12">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*"/>
+                                                        <ColumnDefinition Width="Auto"/>
+                                                        <ColumnDefinition Width="135"/>
+                                                    </Grid.ColumnDefinitions>
 
-                                    <StackPanel Grid.Column="0">
-                                        <TextBlock Text="🍺 Варочный цех: Пивоварение" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                        <TextBlock Text="Модуль рецептур сусла, варок и созревания пива" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    </StackPanel>
-                                    <Button Grid.Column="1" Content="Запросить счет" Click="RequestAddonInvoice_Click" Tag="BEER_STARTER" Height="26" Padding="12,0"/>
-                                </Grid>
+                                                    <!-- Название цеха и статус с датой -->
+                                                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,10,0">
+                                                        <TextBlock Text="{Binding Title}" FontWeight="Bold" FontSize="13" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                                            <Ellipse Width="8" Height="8" Fill="{Binding StatusDotBrush}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                                            <TextBlock Text="{Binding StatusText}" FontSize="11" FontWeight="SemiBold" Foreground="{Binding StatusTextBrush}"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
 
-                                <Separator Background="{DynamicResource BorderBrush}" Margin="0,5,0,10"/>
+                                                    <!-- Кнопки выбора тарифа -->
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,10,0">
+                                                        <Button Content="{Binding StarterLabel}"
+                                                                Click="SelectTier_Click"
+                                                                Tag="STARTER"
+                                                                Background="{Binding StarterBg}"
+                                                                BorderBrush="{Binding StarterBorder}"
+                                                                Foreground="{Binding StarterFg}"
+                                                                BorderThickness="1.5"
+                                                                Height="26" Padding="8,0" FontSize="11" Margin="0,0,4,0"/>
 
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
+                                                        <Button Content="{Binding StandardLabel}"
+                                                                Click="SelectTier_Click"
+                                                                Tag="STANDARD"
+                                                                Background="{Binding StandardBg}"
+                                                                BorderBrush="{Binding StandardBorder}"
+                                                                Foreground="{Binding StandardFg}"
+                                                                BorderThickness="1.5"
+                                                                Height="26" Padding="8,0" FontSize="11" Margin="0,0,4,0"/>
 
-                                    <StackPanel Grid.Column="0">
-                                        <TextBlock Text="🥩 Мясной цех: Сыровяление и Бастурма" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                        <TextBlock Text="Модуль засола, сушки, усушки и созревания мяса" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    </StackPanel>
-                                    <Button Grid.Column="1" Content="Запросить счет" Click="RequestAddonInvoice_Click" Tag="MEAT_STARTER" Height="26" Padding="12,0"/>
-                                </Grid>
+                                                        <Button Content="{Binding ProLabel}"
+                                                                Click="SelectTier_Click"
+                                                                Tag="PRO"
+                                                                Background="{Binding ProBg}"
+                                                                BorderBrush="{Binding ProBorder}"
+                                                                Foreground="{Binding ProFg}"
+                                                                BorderThickness="1.5"
+                                                                Height="26" Padding="8,0" FontSize="11"/>
+                                                    </StackPanel>
 
-                                <Separator Background="{DynamicResource BorderBrush}" Margin="0,5,0,10"/>
-
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <StackPanel Grid.Column="0">
-                                        <TextBlock Text="🫙 Цех Ферментации и Солений" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                        <TextBlock Text="Модуль квашения, кимчи, соусов и выдержки" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    </StackPanel>
-                                    <Button Grid.Column="1" Content="Запросить счет" Click="RequestAddonInvoice_Click" Tag="FERMENTATION_STARTER" Height="26" Padding="12,0"/>
-                                </Grid>
+                                                    <!-- Кнопка запроса счета / продления -->
+                                                    <Button Grid.Column="2"
+                                                            Content="{Binding ActionButtonText}"
+                                                            IsEnabled="{Binding IsActionEnabled}"
+                                                            Click="ModuleAction_Click"
+                                                            Style="{StaticResource PrimaryButtonStyle}"
+                                                            Height="28" Padding="10,0" FontSize="11"
+                                                            VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
                         </Border>
 

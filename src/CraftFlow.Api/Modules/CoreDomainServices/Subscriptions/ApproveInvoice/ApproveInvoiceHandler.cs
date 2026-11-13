@@ -44,11 +44,19 @@ public class ApproveInvoiceHandler : IRequestHandler<ApproveInvoiceCommand, Resu
             return Result.Failure<bool>(Error.NotFound("PLAN_NOT_FOUND"));
         }
 
-        var subscription = await _dbContext.TenantSubscriptions
+        var moduleSubscriptions = await _dbContext.TenantSubscriptions
             .IgnoreQueryFilters()
             .Include(s => s.Plan)
             .Where(s => s.TenantId == invoice.TenantId && s.Plan.TargetModule == targetPlan.TargetModule)
-            .FirstOrDefaultAsync(cancellationToken);
+            .OrderByDescending(s => s.ExpiresAtUtc)
+            .ToListAsync(cancellationToken);
+
+        var subscription = moduleSubscriptions.FirstOrDefault();
+
+        if (moduleSubscriptions.Count > 1)
+        {
+            _dbContext.TenantSubscriptions.RemoveRange(moduleSubscriptions.Skip(1));
+        }
 
         var now = DateTime.UtcNow;
 
@@ -63,12 +71,24 @@ public class ApproveInvoiceHandler : IRequestHandler<ApproveInvoiceCommand, Resu
         }
         else
         {
-            var baseDate = subscription.ExpiresAtUtc.HasValue && subscription.ExpiresAtUtc.Value > now
-                ? subscription.ExpiresAtUtc.Value
-                : now;
+            var newExpires = PlanUpgradeCalculator.CalculateNewExpirationUtc(
+                currentPlanCode: subscription.Plan?.Code,
+                currentExpiresAtUtc: subscription.ExpiresAtUtc,
+                targetPlanCode: targetPlan.Code,
+                daysToAdd: invoice.DaysRequested,
+                nowUtc: now
+            );
 
-            subscription.Extend(baseDate.AddDays(invoice.DaysRequested));
             subscription.ChangePlan(targetPlan.Id);
+
+            if (subscription.State == SubscriptionState.Trial || subscription.State == SubscriptionState.Suspended)
+            {
+                subscription.Activate(newExpires);
+            }
+            else
+            {
+                subscription.Extend(newExpires);
+            }
         }
 
         var payment = SubscriptionPayment.Create(

@@ -1,14 +1,143 @@
 ﻿using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Identity;
 using CraftFlow.SharedKernel.Dtos.Subscription;
+using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Pages;
+
+public class ModuleSubscriptionItemVm : INotifyPropertyChanged
+{
+    private string? _selectedTier;
+
+    public AppModule Module { get; init; }
+    public string Prefix { get; init; } = string.Empty;
+    public string Title { get; init; } = string.Empty;
+    public bool IsConnected { get; init; }
+    public string CurrentTier { get; init; } = string.Empty;
+    public DateTime? ExpiresAtUtc { get; init; }
+
+    public string? SelectedTier
+    {
+        get => _selectedTier;
+        set
+        {
+            _selectedTier = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(StarterBg));
+            OnPropertyChanged(nameof(StarterBorder));
+            OnPropertyChanged(nameof(StarterFg));
+            OnPropertyChanged(nameof(StandardBg));
+            OnPropertyChanged(nameof(StandardBorder));
+            OnPropertyChanged(nameof(StandardFg));
+            OnPropertyChanged(nameof(ProBg));
+            OnPropertyChanged(nameof(ProBorder));
+            OnPropertyChanged(nameof(ProFg));
+            OnPropertyChanged(nameof(ActionButtonText));
+            OnPropertyChanged(nameof(IsActionEnabled));
+        }
+    }
+
+    public Brush StatusDotBrush => IsConnected
+        ? new SolidColorBrush(Color.FromRgb(22, 163, 74))
+        : new SolidColorBrush(Color.FromRgb(220, 38, 38));
+
+    public Brush StatusTextBrush => IsConnected
+        ? new SolidColorBrush(Color.FromRgb(22, 163, 74))
+        : new SolidColorBrush(Color.FromRgb(156, 163, 175));
+
+    public string StatusText
+    {
+        get
+        {
+            if (!IsConnected) return "Не подключен";
+
+            string tierName = CurrentTier switch
+            {
+                "FREE" => "Базовый (Free)",
+                "STARTER" => "Старт",
+                "STANDARD" => "Стандарт",
+                "PRO" => "Профи",
+                _ => "Активен"
+            };
+
+            return ExpiresAtUtc.HasValue
+                ? $"{tierName} • до {ExpiresAtUtc.Value.ToLocalTime():dd.MM.yyyy}"
+                : $"{tierName} • бессрочно";
+        }
+    }
+
+    public string StarterLabel => CurrentTier == "STARTER" ? "✓ Старт" : "Старт";
+    public string StandardLabel => CurrentTier == "STANDARD" ? "✓ Стандарт" : "Стандарт";
+    public string ProLabel => CurrentTier == "PRO" ? "✓ Профи" : "Профи";
+
+    public Brush StarterBg => GetTierBg("STARTER");
+    public Brush StarterBorder => GetTierBorder("STARTER");
+    public Brush StarterFg => GetTierFg("STARTER");
+
+    public Brush StandardBg => GetTierBg("STANDARD");
+    public Brush StandardBorder => GetTierBorder("STANDARD");
+    public Brush StandardFg => GetTierFg("STANDARD");
+
+    public Brush ProBg => GetTierBg("PRO");
+    public Brush ProBorder => GetTierBorder("PRO");
+    public Brush ProFg => GetTierFg("PRO");
+
+    private Brush GetTierBg(string tier)
+    {
+        if (SelectedTier == tier) return new SolidColorBrush(Color.FromRgb(37, 99, 235));
+        if (CurrentTier == tier) return new SolidColorBrush(Color.FromArgb(35, 22, 163, 74));
+        return Brushes.Transparent;
+    }
+
+    private Brush GetTierBorder(string tier)
+    {
+        if (SelectedTier == tier) return new SolidColorBrush(Color.FromRgb(37, 99, 235));
+        if (CurrentTier == tier) return new SolidColorBrush(Color.FromRgb(22, 163, 74));
+        return new SolidColorBrush(Color.FromRgb(107, 114, 128));
+    }
+
+    private Brush GetTierFg(string tier)
+    {
+        if (SelectedTier == tier) return Brushes.White;
+        if (CurrentTier == tier) return new SolidColorBrush(Color.FromRgb(22, 163, 74));
+        return Application.Current.TryFindResource("AppForegroundBrush") as Brush ?? Brushes.Gray;
+    }
+
+    public bool IsActionEnabled => !string.IsNullOrEmpty(SelectedTier);
+
+    public string ActionButtonText
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(SelectedTier))
+                return IsConnected ? "Подключен" : "Выберите тариф";
+
+            if (IsConnected && SelectedTier == CurrentTier)
+                return "Продлить (+30 дн.)";
+
+            if (IsConnected && CurrentTier != "FREE")
+                return "Сменить тариф";
+
+            return "Запросить счет";
+        }
+    }
+
+    public string TargetPlanCode => $"{Prefix}_{SelectedTier}";
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    private void OnPropertyChanged([CallerMemberName] string? name = null)
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+}
 
 public partial class ProfilePage : Page
 {
@@ -97,23 +226,65 @@ public partial class ProfilePage : Page
         {
             mainWindow.UpdateNavigationPermissions();
         }
+
+        var items = new ObservableCollection<ModuleSubscriptionItemVm>();
+        foreach (var mod in overview.Modules)
+        {
+            var (prefix, title) = mod.Module switch
+            {
+                AppModule.CHEESE_MAKING => ("CHEESE", "🧀 Варочный цех: Сыроварение"),
+                AppModule.BREWERY => ("BEER", "🍺 Варочный цех: Пивоварение"),
+                AppModule.MEAT_PROCESSING => ("MEAT", "🥩 Мясной цех: Сыровяление и Бастурма"),
+                AppModule.FERMENTATION => ("FERMENTATION", "🫙 Цех Ферментации и Солений"),
+                _ => ("", mod.Module.ToString())
+            };
+
+            items.Add(new ModuleSubscriptionItemVm
+            {
+                Module = mod.Module,
+                Prefix = prefix,
+                Title = title,
+                IsConnected = mod.IsConnected,
+                CurrentTier = mod.TierSuffix,
+                ExpiresAtUtc = mod.ExpiresAtUtc,
+                SelectedTier = mod.IsConnected ? null : "STARTER"
+            });
+        }
+
+        ModulesItemsControl.ItemsSource = items;
     }
 
-    private async void RequestAddonInvoice_Click(object sender, RoutedEventArgs e)
+    private void SelectTier_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button button && button.Tag is string addonCode)
+        if (sender is Button btn && btn.DataContext is ModuleSubscriptionItemVm vm && btn.Tag is string tier)
+        {
+            if (vm.IsConnected && vm.SelectedTier == tier)
+            {
+                vm.SelectedTier = null;
+            }
+            else
+            {
+                vm.SelectedTier = tier;
+            }
+        }
+    }
+
+    private async void ModuleAction_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.DataContext is ModuleSubscriptionItemVm vm && !string.IsNullOrEmpty(vm.SelectedTier))
         {
             button.IsEnabled = false;
 
             try
             {
-                var payload = new { PlanCode = addonCode, Days = 30 };
+                var planCode = vm.TargetPlanCode;
+                var payload = new { PlanCode = planCode, Days = 30 };
                 var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(SubscriptionsConstants.REQUEST_INVOICE, payload);
 
                 if (isSuccess)
                 {
                     var userOrgName = ApiService.Instance.CurrentUser?.FullName ?? "Крафтовик";
-                    var requisitesWin = new PaymentRequisitesWindow(addonCode, userOrgName)
+                    var requisitesWin = new PaymentRequisitesWindow(planCode, userOrgName)
                     {
                         Owner = Window.GetWindow(this)
                     };
@@ -126,7 +297,7 @@ public partial class ProfilePage : Page
             }
             finally
             {
-                button.IsEnabled = true;
+                button.IsEnabled = vm.IsActionEnabled;
             }
         }
     }

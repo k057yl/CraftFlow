@@ -68,6 +68,34 @@ public partial class AdminPage : Page
         }
     }
 
+    private async void RejectInvoice_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is Guid invoiceId)
+        {
+            var confirm = MessageBox.Show(
+                "Отклонить заявку на оплату? Она будет удалена из списка входящих.",
+                "Подтверждение отклонения",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Question);
+
+            if (confirm != MessageBoxResult.Yes) return;
+
+            button.IsEnabled = false;
+
+            var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"api/subscriptions/invoices/{invoiceId}/reject", new { });
+
+            if (isSuccess)
+            {
+                await LoadDataAsync();
+            }
+            else
+            {
+                MessageBox.Show(contentOrError, "Ошибка отклонения", MessageBoxButton.OK, MessageBoxImage.Error);
+                button.IsEnabled = true;
+            }
+        }
+    }
+
     private async void OrganizationsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         if (!PermissionService.Instance.IsSuperAdmin) return;

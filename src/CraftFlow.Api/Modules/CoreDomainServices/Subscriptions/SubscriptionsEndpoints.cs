@@ -3,6 +3,7 @@ using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.ConfirmPayment;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.GetMyOverview;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.GetPendingInvoices;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.GetPlans;
+using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.RejectInvoice;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.RequestInvoice;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Constants.Endpoints;
@@ -60,6 +61,16 @@ public static class SubscriptionsEndpoints
         {
             var result = await sender.Send(new GetSubscriptionPlansQuery(organizationId), ct);
             return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+        });
+
+        group.MapPost("api/subscriptions/invoices/{id:guid}/reject", async (Guid id, ISender sender, CancellationToken ct) =>
+        {
+            var result = await sender.Send(new RejectInvoiceCommand(id), ct);
+            return result.IsSuccess
+                ? Results.Ok(result.Value)
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
         });
     }
 }
