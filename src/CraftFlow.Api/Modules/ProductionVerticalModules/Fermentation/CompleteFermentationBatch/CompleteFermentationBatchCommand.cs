@@ -4,7 +4,14 @@ using CraftFlow.SharedKernel.Result;
 using MediatR;
 
 namespace CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.CompleteFermentationBatch;
-public record CompleteFermentationBatchCommand(Guid FermentationBatchId) : IRequest<Result>, IRequirePermission
+
+public record CompleteFermentationBatchCommand(
+    Guid FermentationBatchId,
+    decimal ActualOutputQuantity,
+    int UnitsCount,
+    decimal? OverheadPercentage,
+    string? BatchNumber
+) : IRequest<Result>, IRequirePermission
 {
     public AppPermission RequiredPermission => AppPermission.PRODUCTION_EXECUTE;
 }

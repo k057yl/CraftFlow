@@ -105,7 +105,7 @@ public partial class BrewhouseControl : UserControl
             {
                 var item = new LookupItem(w.Id, w.Name);
 
-                if (w.Type == WarehouseType.BREWHOUSE)
+                if (w.Type == WarehouseType.PRODUCTION_WORKSHOP)
                 {
                     BreweryWarehouses.Add(item);
                 }

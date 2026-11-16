@@ -41,8 +41,16 @@ public class DiscardBatchHandler : IRequestHandler<DiscardBatchCommand, Result>
 
             if (equipmentLocation != null)
             {
-                equipmentLocation.ReleaseFromProduction();
+                equipmentLocation.CompleteSanitation(isPassed: true);
             }
+        }
+
+        var fermentationBatch = await _dbContext.FermentationBatches
+            .FirstOrDefaultAsync(fb => fb.ProductionBatchId == batch.Id, cancellationToken);
+
+        if (fermentationBatch != null)
+        {
+            fermentationBatch.Complete();
         }
 
         await _dbContext.SaveChangesAsync(cancellationToken);

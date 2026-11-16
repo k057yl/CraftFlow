@@ -13,6 +13,7 @@ public sealed class FermentationReadingConfiguration : IEntityTypeConfiguration<
 
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.RecordedAt).IsRequired();
         builder.Property(x => x.Ph).HasPrecision(4, 2);
         builder.Property(x => x.Temperature).HasPrecision(5, 2);

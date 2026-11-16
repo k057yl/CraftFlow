@@ -16,7 +16,7 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- Склады -->
+            <!-- Склады и цеха -->
             <GroupBox Grid.Row="0" Header="{loc:Loc Key=UI_STORAGE_HEADER_WAREHOUSES}" Margin="0,0,0,6" Padding="10">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -31,7 +31,7 @@
                         <TextBlock Text="{loc:Loc Key=UI_STORAGE_LABEL_ZONE_TYPE}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
                         <ComboBox x:Name="WarehouseTypeComboBox" Height="28" SelectedIndex="0" Margin="0,0,0,8">
                             <ComboBoxItem Content="{loc:Loc Key=UI_STORAGE_TYPE_WAREHOUSE}" Tag="WAREHOUSE"/>
-                            <ComboBoxItem Content="{loc:Loc Key=UI_STORAGE_TYPE_BREWHOUSE}" Tag="BREWHOUSE"/>
+                            <ComboBoxItem Content="{loc:Loc Key=UI_STORAGE_TYPE_PRODUCTION_WORKSHOP}" Tag="PRODUCTION_WORKSHOP"/>
                         </ComboBox>
 
                         <TextBlock Text="{loc:Loc Key=UI_STORAGE_LABEL_ADDRESS}" FontSize="10" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
@@ -165,7 +165,7 @@
                 <DataGrid Grid.Row="2" x:Name="StorageLocationsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="{loc:Loc Key=UI_STORAGE_COL_EQUIPMENT_NAME}" Binding="{Binding Name}" Width="150"/>
-                        <DataGridTextColumn Header="{loc:Loc Key=UI_STORAGE_COL_TYPE}" Binding="{Binding LocationType}" Width="110"/>
+                        <DataGridTextColumn Header="{loc:Loc Key=UI_STORAGE_COL_TYPE}" Binding="{Binding LocationTypeDisplay}" Width="130"/>
                         <DataGridTextColumn Header="{loc:Loc Key=UI_STORAGE_COL_PARENT_LOCATION}" Binding="{Binding ParentName}" Width="160"/>
                         <DataGridTextColumn Header="{loc:Loc Key=UI_STORAGE_COL_VOLUME}" Binding="{Binding VolumeInfo}" Width="180"/>
                         <DataGridTextColumn Header="{loc:Loc Key=UI_STORAGE_COL_PREV_WASH}" Binding="{Binding LastWashedText}" Width="120"/>

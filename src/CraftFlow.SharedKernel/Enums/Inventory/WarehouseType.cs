@@ -2,5 +2,5 @@
 public enum WarehouseType
 {
     WAREHOUSE = 0,
-    BREWHOUSE = 1
+    PRODUCTION_WORKSHOP = 1
 }

@@ -199,7 +199,7 @@
 	<data name="UI_STORAGE_LABEL_HUMIDITY_SHORT" xml:space="preserve"><value>Вл, %:</value></data>
 
 	<data name="UI_STORAGE_TYPE_WAREHOUSE" xml:space="preserve"><value>Склад</value></data>
-	<data name="UI_STORAGE_TYPE_BREWHOUSE" xml:space="preserve"><value>Варочный цех</value></data>
+	<data name="UI_STORAGE_TYPE_PRODUCTION_WORKSHOP" xml:space="preserve"><value>Производственный цех</value></data>
 
 	<data name="UI_STORAGE_LABEL_TOTAL_EQUIPMENT" xml:space="preserve"><value>Всего ёмкостей: </value></data>
 	<data name="UI_STORAGE_LABEL_WASH_SOON" xml:space="preserve"><value>⚠️ Скоро мойка: </value></data>
@@ -237,6 +237,12 @@
 	<data name="UI_STORAGE_STATUS_OK" xml:space="preserve"><value>ОК</value></data>
 	<data name="UI_STORAGE_STATUS_OVERDUE" xml:space="preserve"><value>🚨 ПРОСРОЧЕНО</value></data>
 	<data name="UI_STORAGE_STATUS_WARNING" xml:space="preserve"><value>⚠️ СКОРО МОЙКА</value></data>
+
+	<data name="UI_LOCATION_TYPE_VAT_TANK" xml:space="preserve"><value>Чан / Танк</value></data>
+	<data name="UI_LOCATION_TYPE_RACK_SHELF" xml:space="preserve"><value>Стеллаж / Полка</value></data>
+	<data name="UI_LOCATION_TYPE_BARREL" xml:space="preserve"><value>Бочка / Кадка</value></data>
+	<data name="UI_LOCATION_TYPE_CONTAINER" xml:space="preserve"><value>Контейнер / Тара</value></data>
+	<data name="UI_LOCATION_TYPE_BREWING_VESSEL" xml:space="preserve"><value>Варочный котёл</value></data>
 
 	<!-- ========================================== -->
 	<!-- 3: Закупки и Поставки                      -->

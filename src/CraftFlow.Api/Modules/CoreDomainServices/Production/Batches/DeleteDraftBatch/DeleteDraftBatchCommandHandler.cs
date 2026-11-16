@@ -31,6 +31,17 @@ public sealed class DeleteDraftBatchCommandHandler : IRequestHandler<DeleteDraft
             return Result.Failure(Error.Validation(ErrorCodes.Production.BATCH_CANNOT_BE_DELETED));
         }
 
+        if (batch.EquipmentLocationId != Guid.Empty)
+        {
+            var equipmentLocation = await _dbContext.StorageLocations
+                .FirstOrDefaultAsync(l => l.Id == batch.EquipmentLocationId, cancellationToken);
+
+            if (equipmentLocation != null)
+            {
+                equipmentLocation.CompleteSanitation(isPassed: true);
+            }
+        }
+
         _dbContext.ProductionBatches.Remove(batch);
         await _dbContext.SaveChangesAsync(cancellationToken);
 

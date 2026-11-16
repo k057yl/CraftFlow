@@ -36,6 +36,7 @@ public partial class DiscardActsControl : UserControl
 
     public TextBlock? StatusTextBlock { get; set; }
     public ProductionPage? ParentPage { get; set; }
+    public Func<Task>? OnDataChangedAsync { get; set; }
 
     public DiscardActsControl()
     {
@@ -71,6 +72,10 @@ public partial class DiscardActsControl : UserControl
             {
                 await ParentPage.LoadDataExternalAsync();
             }
+            else if (OnDataChangedAsync != null)
+            {
+                await OnDataChangedAsync();
+            }
         }
         else
         {
@@ -103,8 +108,7 @@ public partial class DiscardActsControl : UserControl
                         var res = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_DISCARD_ITEMS, new
                         {
                             AgingLotId = lotId,
-                            ItemIds = dialog.SelectedItemIds,
-                            Reason = dialog.Reason
+                            ItemIds = dialog.SelectedItemIds
                         });
 
                         isSuccess = res.IsSuccess;
@@ -116,8 +120,7 @@ public partial class DiscardActsControl : UserControl
                         {
                             AgingLotId = lotId,
                             Quantity = dialog.QuantityToWriteOff,
-                            UnitsToRemove = 0,
-                            Reason = dialog.Reason
+                            UnitsToRemove = 0
                         });
 
                         isSuccess = res.IsSuccess;
@@ -131,6 +134,10 @@ public partial class DiscardActsControl : UserControl
                         if (ParentPage != null)
                         {
                             await ParentPage.LoadDataExternalAsync();
+                        }
+                        else if (OnDataChangedAsync != null)
+                        {
+                            await OnDataChangedAsync();
                         }
                     }
                     else

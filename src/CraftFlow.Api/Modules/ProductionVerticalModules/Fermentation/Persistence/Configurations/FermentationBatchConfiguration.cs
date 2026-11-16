@@ -13,6 +13,7 @@ public sealed class FermentationBatchConfiguration : IEntityTypeConfiguration<Fe
 
         builder.HasKey(x => x.Id);
 
+        builder.Property(x => x.Id).ValueGeneratedNever();
         builder.Property(x => x.BatchNumber).HasMaxLength(100).IsRequired();
         builder.Property(x => x.RecipeName).HasMaxLength(200).IsRequired();
         builder.Property(x => x.SubstrateWeightKg).HasPrecision(18, 4);

@@ -22,49 +22,28 @@
         <!-- Вкладки -->
         <TabControl Grid.Row="1" x:Name="FermentationTabControl">
 
-            <!-- Вкладка 1: Закладка сырья и выпуск -->
-            <TabItem Header="{loc:Loc Key=UI_TAB_FERMENTATION_BATCHES}">
-                <controls:BrewhouseControl x:Name="FermentationBrewhouseView"/>
-            </TabItem>
-
-            <!-- Вкладка 2: Журнал брожения и контроль pH -->
+            <!-- Вкладка 1: Закладка, журнал брожения и выпуск -->
             <TabItem Header="{loc:Loc Key=UI_TAB_FERMENTATION_LOG}">
                 <Border Padding="8">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="270"/>
-                            <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="310"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="300"/>
                         </Grid.ColumnDefinitions>
 
-                        <!-- Левая колонка: Паспорт брожения + Калькулятор соли -->
+                        <!-- Левая колонка: Закладка новой партии -->
                         <GroupBox Grid.Column="0" Header="{loc:Loc Key=UI_FERM_GROUP_NEW_PASSPORT}" Margin="0,0,8,0" Padding="10">
                             <ScrollViewer VerticalScrollBarVisibility="Auto">
                                 <StackPanel>
-                                    <TextBlock Text="{loc:Loc Key=UI_FERM_LABEL_ACTIVE_BATCH}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-                                    <ComboBox x:Name="ActiveProdBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8"/>
+                                    <TextBlock Text="Наименование партии" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                    <TextBox x:Name="BatchNameTextBox" Height="26" Padding="4,2" Margin="0,0,0,8"/>
 
-                                    <Grid Margin="0,0,0,4">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="8"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Рецептура" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                    <ComboBox x:Name="RecipeComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="LaydownInputs_Changed"/>
 
-                                        <StackPanel Grid.Column="0">
-                                            <TextBlock Text="{loc:Loc Key=UI_FERM_LABEL_SUBSTRATE_KG}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-                                            <TextBox x:Name="SubstrateWeightTextBox" Text="10" Height="26" Padding="4,2" TextChanged="SaltInputs_Changed"/>
-                                        </StackPanel>
-
-                                        <StackPanel Grid.Column="2">
-                                            <TextBlock Text="{loc:Loc Key=UI_FERM_LABEL_SALT_PERCENT}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-                                            <TextBox x:Name="SaltPercentageTextBox" Text="2.0" Height="26" Padding="4,2" TextChanged="SaltInputs_Changed"/>
-                                        </StackPanel>
-                                    </Grid>
-
-                                    <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="8,5" Margin="0,0,0,8">
-                                        <TextBlock x:Name="CalculatedSaltTextBlock" FontWeight="Bold" FontSize="12" Foreground="{DynamicResource AccentBrush}"/>
-                                    </Border>
+                                    <TextBlock Text="Склад списания сырья" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                    <ComboBox x:Name="RawWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="LaydownInputs_Changed"/>
 
                                     <Grid Margin="0,0,0,8">
                                         <Grid.ColumnDefinitions>
@@ -74,89 +53,227 @@
                                         </Grid.ColumnDefinitions>
 
                                         <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Цех ферментации" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                            <ComboBox x:Name="WorkshopWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" SelectionChanged="WorkshopWarehouseComboBox_SelectionChanged"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Склад продукции" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                            <ComboBox x:Name="DestinationWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <TextBlock Text="Ёмкость / Бочка" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="6"/>
+                                            <ColumnDefinition Width="28"/>
+                                        </Grid.ColumnDefinitions>
+                                        <ComboBox Grid.Column="0" x:Name="EquipmentLocationComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26"/>
+                                        <Button Grid.Column="2" Content="+" Click="QuickCreateEquipment_Click" Height="26" Style="{StaticResource PrimaryButtonStyle}"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="8"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{loc:Loc Key=UI_FERM_LABEL_SUBSTRATE_KG}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                            <TextBox x:Name="SubstrateWeightTextBox" Text="10" Height="26" Padding="4,2" TextChanged="LaydownInputs_Changed"/>
+                                        </StackPanel>
+
+                                        <Button Grid.Column="2"
+                                                Content="Макс."
+                                                Click="CalculateMaxQuantity_Click"
+                                                Height="26"
+                                                Padding="8,0"
+                                                VerticalAlignment="Bottom"
+                                                Style="{StaticResource SecondaryButtonStyle}"/>
+                                    </Grid>
+
+                                    <Grid Margin="0,4,0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="8"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="8"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="{loc:Loc Key=UI_FERM_LABEL_SALT_PERCENT}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                            <TextBox x:Name="SaltPercentageTextBox" Text="2.0" Height="26" Padding="4,2" TextChanged="SaltInputs_Changed"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2">
                                             <TextBlock Text="{loc:Loc Key=UI_FERM_LABEL_TARGET_TEMP}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
                                             <TextBox x:Name="TargetTempTextBox" Text="20" Height="26" Padding="4,2"/>
                                         </StackPanel>
 
-                                        <StackPanel Grid.Column="2">
+                                        <StackPanel Grid.Column="4">
                                             <TextBlock Text="{loc:Loc Key=UI_FERM_LABEL_INITIAL_PH}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
                                             <TextBox x:Name="InitialPhTextBox" Height="26" Padding="4,2"/>
                                         </StackPanel>
                                     </Grid>
 
-                                    <TextBlock Text="{loc:Loc Key=UI_FERM_LABEL_VESSEL_INFO}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-                                    <TextBox x:Name="VesselInfoTextBox" Height="26" Padding="4,2" Margin="0,0,0,12"/>
+                                    <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="8,5" Margin="0,0,0,8">
+                                        <StackPanel>
+                                            <TextBlock x:Name="CalculatedSaltTextBlock" FontWeight="Bold" FontSize="11" Foreground="{DynamicResource AccentBrush}"/>
+                                            <TextBlock x:Name="EstimatedCostTextBlock" Text="Сырьё: $0.00" FontWeight="SemiBold" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </Border>
 
-                                    <Button Content="{loc:Loc Key=UI_FERM_BTN_CREATE_PASSPORT}"
-                                            Click="CreateFermentationPassport_Click"
-                                            Height="28"
+                                    <TextBlock Text="Потребность в сырье" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                    <ListBox x:Name="RequirementsListBox"
+                                             DisplayMemberPath="FormattedInfo"
+                                             Height="95"
+                                             FontSize="11"
+                                             Background="Transparent"
+                                             BorderThickness="1"
+                                             BorderBrush="{DynamicResource BorderBrush}"
+                                             Margin="0,0,0,10"/>
+
+                                    <Button Content="Заложить на ферментацию"
+                                            Click="CreateFermentationBatch_Click"
+                                            Height="30"
                                             Padding="14,0"
-                                            HorizontalAlignment="Left"
+                                            HorizontalAlignment="Stretch"
                                             Style="{StaticResource PrimaryButtonStyle}"/>
                                 </StackPanel>
                             </ScrollViewer>
                         </GroupBox>
 
-                        <!-- Центральная колонка: Активные партии брожения -->
-                        <GroupBox Grid.Column="1" Header="{loc:Loc Key=UI_FERM_GROUP_ACTIVE_LOTS}" Margin="0,0,8,0" Padding="8">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
+                        <!-- Центральная колонка: Активные партии брожения + Выпуск на склад -->
+                        <Grid Grid.Column="1" Margin="0,0,8,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
 
-                                <DataGrid Grid.Row="0"
-                                          x:Name="FermentationBatchesDataGrid"
-                                          AutoGenerateColumns="False"
-                                          IsReadOnly="True"
-                                          CanUserAddRows="False"
-                                          SelectionMode="Single"
-                                          Background="Transparent"
-                                          GridLinesVisibility="Horizontal"
-                                          SelectionChanged="FermentationBatchesDataGrid_SelectionChanged">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="{loc:Loc Key=UI_FERM_COL_BATCH}" Binding="{Binding BatchNumber}" Width="1.1*"/>
-                                        <DataGridTextColumn Header="{loc:Loc Key=UI_FERM_COL_PRODUCT}" Binding="{Binding RecipeName}" Width="1.3*"/>
-                                        <DataGridTextColumn Header="{loc:Loc Key=UI_FERM_COL_STAGE}" Binding="{Binding StageDisplay}" Width="1.1*"/>
-                                        <DataGridTextColumn Header="{loc:Loc Key=UI_FERM_COL_DAYS}" Binding="{Binding DaysElapsed}" Width="0.55*"/>
-                                        <DataGridTextColumn Header="{loc:Loc Key=UI_FERM_COL_SALT}" Binding="{Binding SaltDisplay}" Width="0.95*"/>
-                                        <DataGridTemplateColumn Header="{loc:Loc Key=UI_FERM_COL_PH}" Width="0.8*">
-                                            <DataGridTemplateColumn.CellTemplate>
-                                                <DataTemplate>
-                                                    <TextBlock Text="{Binding PhDisplay}" FontWeight="Bold" HorizontalAlignment="Center">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock">
-                                                                <Setter Property="Foreground" Value="#D97706"/>
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding IsSafeAcidity}" Value="True">
-                                                                        <Setter Property="Foreground" Value="#059669"/>
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
-                                                    </TextBlock>
-                                                </DataTemplate>
-                                            </DataGridTemplateColumn.CellTemplate>
-                                        </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="{loc:Loc Key=UI_FERM_COL_VESSEL}" Binding="{Binding VesselInfo}" Width="1*"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
+                            <GroupBox Grid.Row="0" Header="{loc:Loc Key=UI_FERM_GROUP_ACTIVE_LOTS}" Margin="0,0,0,8" Padding="8">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
 
-                                <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,0">
-                                    <Button Content="{loc:Loc Key=UI_FERM_BTN_MOVE_COLD}"
-                                            Click="MoveToCold_Click"
-                                            Height="28"
-                                            Padding="12,0"
-                                            Margin="0,0,8,0"
-                                            Style="{StaticResource SecondaryButtonStyle}"/>
+                                    <DataGrid Grid.Row="0"
+                                              x:Name="FermentationBatchesDataGrid"
+                                              AutoGenerateColumns="False"
+                                              IsReadOnly="True"
+                                              CanUserAddRows="False"
+                                              SelectionMode="Single"
+                                              Background="Transparent"
+                                              GridLinesVisibility="Horizontal"
+                                              SelectionChanged="FermentationBatchesDataGrid_SelectionChanged">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="{loc:Loc Key=UI_FERM_COL_BATCH}" Binding="{Binding BatchNumber}" Width="1.1*"/>
+                                            <DataGridTextColumn Header="{loc:Loc Key=UI_FERM_COL_PRODUCT}" Binding="{Binding RecipeName}" Width="1.3*"/>
+                                            <DataGridTextColumn Header="{loc:Loc Key=UI_FERM_COL_STAGE}" Binding="{Binding StageDisplay}" Width="1.1*"/>
+                                            <DataGridTextColumn Header="{loc:Loc Key=UI_FERM_COL_DAYS}" Binding="{Binding DaysElapsed}" Width="0.55*"/>
+                                            <DataGridTextColumn Header="{loc:Loc Key=UI_FERM_COL_SALT}" Binding="{Binding SaltDisplay}" Width="0.95*"/>
+                                            <DataGridTemplateColumn Header="{loc:Loc Key=UI_FERM_COL_PH}" Width="0.8*">
+                                                <DataGridTemplateColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <TextBlock Text="{Binding PhDisplay}" FontWeight="Bold" HorizontalAlignment="Center">
+                                                            <TextBlock.Style>
+                                                                <Style TargetType="TextBlock">
+                                                                    <Setter Property="Foreground" Value="#D97706"/>
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding IsSafeAcidity}" Value="True">
+                                                                            <Setter Property="Foreground" Value="#059669"/>
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+                                                    </DataTemplate>
+                                                </DataGridTemplateColumn.CellTemplate>
+                                            </DataGridTemplateColumn>
+                                            <DataGridTextColumn Header="{loc:Loc Key=UI_FERM_COL_VESSEL}" Binding="{Binding VesselInfo}" Width="1*"/>
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+
+                                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,8,0,0">
+                                        <Button Content="{loc:Loc Key=UI_FERM_BTN_MOVE_COLD}"
+                                                Click="MoveToCold_Click"
+                                                Height="28"
+                                                Padding="12,0"
+                                                Style="{StaticResource SecondaryButtonStyle}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </GroupBox>
+
+                            <!-- Панель завершения выбранной партии и оприходования -->
+                            <GroupBox Grid.Row="1" Header="Завершение брожения и выпуск на склад" Padding="10">
+                                <StackPanel>
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="8"/>
+                                            <ColumnDefinition Width="1*"/>
+                                            <ColumnDefinition Width="8"/>
+                                            <ColumnDefinition Width="0.8*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock Text="Маркировка готовой партии" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                            <TextBox x:Name="CompleteBatchNameTextBox" Height="26" Padding="4,2"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2">
+                                            <TextBlock Text="Факт. выход (кг/л)" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                            <TextBox x:Name="ActualOutputQuantityTextBox" Height="26" Padding="4,2" TextChanged="CostInputs_Changed"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="4">
+                                            <TextBlock Text="Тар / мест" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                            <TextBox x:Name="ActualUnitsCountTextBox" Text="1" Height="26" Padding="4,2"/>
+                                        </StackPanel>
+                                    </Grid>
+
+                                    <Grid Margin="0,0,0,8">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="8"/>
+                                            <ColumnDefinition Width="60"/>
+                                            <ColumnDefinition Width="16"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <CheckBox Grid.Column="0"
+                                                  x:Name="UseOverheadCheckBox"
+                                                  Content="Накладные (%)"
+                                                  VerticalAlignment="Center"
+                                                  Foreground="{DynamicResource AppForegroundBrush}"
+                                                  Checked="CostInputs_Changed"
+                                                  Unchecked="CostInputs_Changed"/>
+
+                                        <TextBox Grid.Column="2"
+                                                 x:Name="OverheadPercentageTextBox"
+                                                 Text="15"
+                                                 Height="26"
+                                                 Padding="4,2"
+                                                 TextChanged="CostInputs_Changed"/>
+
+                                        <StackPanel Grid.Column="4" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Right">
+                                            <TextBlock Text="Себестоимость: " FontSize="12" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                            <TextBlock x:Name="TotalBatchCostTextBlock" Text="$0.00" FontWeight="Bold" FontSize="12" Foreground="#059669" Margin="0,0,10,0"/>
+                                            <TextBlock x:Name="UnitCostTextBlock" Text="($0.00 / кг)" FontSize="12" Foreground="{DynamicResource AccentBrush}"/>
+                                        </StackPanel>
+                                    </Grid>
+
                                     <Button Content="{loc:Loc Key=UI_FERM_BTN_COMPLETE}"
                                             Click="CompleteFermentation_Click"
-                                            Height="28"
-                                            Padding="12,0"
+                                            Height="30"
                                             Style="{StaticResource PrimaryButtonStyle}"/>
                                 </StackPanel>
-                            </Grid>
-                        </GroupBox>
+                            </GroupBox>
+                        </Grid>
 
                         <!-- Правая колонка: Замер и история -->
                         <Grid Grid.Column="2">
@@ -208,7 +325,7 @@
                 </Border>
             </TabItem>
 
-            <!-- Вкладка 3: Списание -->
+            <!-- Вкладка 2: Списание -->
             <TabItem Header="{loc:Loc Key=UI_TAB_DISCARD_ACTS}">
                 <controls:DiscardActsControl x:Name="FermentationDiscardView"/>
             </TabItem>

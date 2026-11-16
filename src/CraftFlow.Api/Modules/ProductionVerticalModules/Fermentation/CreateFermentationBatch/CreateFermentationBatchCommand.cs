@@ -6,12 +6,15 @@ using MediatR;
 namespace CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.CreateFermentationBatch;
 
 public record CreateFermentationBatchCommand(
-    Guid ProductionBatchId,
+    Guid RecipeId,
+    Guid WarehouseId,
+    Guid DestinationWarehouseId,
+    Guid EquipmentLocationId,
     decimal SubstrateWeightKg,
     decimal SaltPercentage,
     decimal TargetTemperature,
-    string VesselInfo,
-    decimal? InitialPh = null
+    decimal? InitialPh = null,
+    string? BatchName = null
 ) : IRequest<Result<Guid>>, IRequirePermission
 {
     public AppPermission RequiredPermission => AppPermission.PRODUCTION_EXECUTE;

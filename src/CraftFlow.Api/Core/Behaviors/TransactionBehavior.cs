@@ -18,7 +18,7 @@ public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TReque
 
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
-        if (!typeof(TRequest).Name.EndsWith("Command"))
+        if (!typeof(TRequest).Name.EndsWith("Command") || _dbContext.Database.CurrentTransaction is not null)
         {
             return await next();
         }

@@ -52,6 +52,16 @@ public partial class StorageControl : UserControl
         return decimal.TryParse(normalized, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
     }
 
+    private static string GetLocationTypeDisplay(StorageLocationType type) => type switch
+    {
+        StorageLocationType.VAT_TANK => Get("UI_LOCATION_TYPE_VAT_TANK"),
+        StorageLocationType.RACK_SHELF => Get("UI_LOCATION_TYPE_RACK_SHELF"),
+        StorageLocationType.BARREL => Get("UI_LOCATION_TYPE_BARREL"),
+        StorageLocationType.CONTAINER => Get("UI_LOCATION_TYPE_CONTAINER"),
+        StorageLocationType.BREWING_VESSEL => Get("UI_LOCATION_TYPE_BREWING_VESSEL"),
+        _ => type.ToString()
+    };
+
     private async Task LoadDataAsync()
     {
         try
@@ -103,6 +113,7 @@ public partial class StorageControl : UserControl
                     Id = l.Id,
                     Name = l.Name,
                     LocationType = l.LocationType,
+                    LocationTypeDisplay = GetLocationTypeDisplay(l.LocationType),
                     CurrentVolume = l.CurrentVolume,
                     VolumeInfo = l.VolumeInfo,
                     ParentName = parentName,
@@ -226,7 +237,7 @@ public partial class StorageControl : UserControl
             item.Name,
             SanitationTargetType.STORAGE_LOCATION,
             details?.ActiveTaskId,
-            details?.RequiredChemicals ?? "Щелочной раствор CIP-30"
+            details?.RequiredChemicals ?? "CIP-30"
         )
         {
             Owner = Window.GetWindow(this)
@@ -266,7 +277,6 @@ public partial class StorageControl : UserControl
             {
                 StorageLocationId = item.Id,
                 Quantity = dialog.QuantityToWriteOff,
-                Reason = dialog.Reason,
                 ItemIds = dialog.SelectedItemIds
             };
 
@@ -335,16 +345,6 @@ public partial class StorageControl : UserControl
         if (dialog.ShowDialog() == true) await LoadDataAsync();
     }
 
-    private async void OpenLocationDetails(StorageLocationViewItem item)
-    {
-        var historyWindow = new SanitationHistoryWindow(item.Id, item.Name, SanitationTargetType.STORAGE_LOCATION)
-        {
-            Owner = Window.GetWindow(this)
-        };
-        historyWindow.ShowDialog();
-        await LoadDataAsync();
-    }
-
     #endregion
 
     #region Удаление
@@ -411,7 +411,7 @@ public partial class StorageControl : UserControl
         {
             var matchesSearch = string.IsNullOrEmpty(searchText) ||
                                 item.Name.ToLower().Contains(searchText) ||
-                                item.LocationType.ToString().ToLower().Contains(searchText) ||
+                                item.LocationTypeDisplay.ToLower().Contains(searchText) ||
                                 item.ParentName.ToLower().Contains(searchText);
 
             var matchesStatus = selectedStatusIndex switch

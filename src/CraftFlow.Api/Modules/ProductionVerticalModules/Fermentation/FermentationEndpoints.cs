@@ -2,6 +2,7 @@
 using CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.ChangeStage;
 using CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.CompleteFermentationBatch;
 using CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.CreateFermentationBatch;
+using CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.DiscardFermentationBatch;
 using CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.GetFermentationBatches;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Constants.Endpoints;
@@ -10,6 +11,17 @@ using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation;
+
+public sealed record CompleteFermentationBatchRequest(
+    decimal ActualOutputQuantity,
+    int UnitsCount,
+    decimal? OverheadPercentage,
+    string? BatchNumber
+);
+
+public sealed record DiscardFermentationBatchRequest(
+    string Reason
+);
 
 public static class FermentationEndpoints
 {
@@ -72,10 +84,32 @@ public static class FermentationEndpoints
 
         group.MapPost($"{FermentationConstants.BATCHES}/{{id:guid}}/{FermentationConstants.COMPLETE}", async (
             [FromRoute] Guid id,
+            [FromBody] CompleteFermentationBatchRequest body,
             ISender sender,
             CancellationToken ct) =>
         {
-            var result = await sender.Send(new CompleteFermentationBatchCommand(id), ct);
+            var command = new CompleteFermentationBatchCommand(
+                id,
+                body.ActualOutputQuantity,
+                body.UnitsCount,
+                body.OverheadPercentage,
+                body.BatchNumber);
+
+            var result = await sender.Send(command, ct);
+            return result.IsSuccess
+                ? Results.NoContent()
+                : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
+                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
+                    : Results.BadRequest(result.Error));
+        });
+
+        group.MapPost($"{FermentationConstants.BATCHES}/{{id:guid}}/discard", async (
+            [FromRoute] Guid id,
+            [FromBody] DiscardFermentationBatchRequest body,
+            ISender sender,
+            CancellationToken ct) =>
+        {
+            var result = await sender.Send(new DiscardFermentationBatchCommand(id, body.Reason), ct);
             return result.IsSuccess
                 ? Results.NoContent()
                 : (result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
