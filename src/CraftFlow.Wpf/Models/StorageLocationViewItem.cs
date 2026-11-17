@@ -8,6 +8,8 @@ public class StorageLocationViewItem
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public StorageLocationType LocationType { get; set; }
+    public StorageLocationStatus LocationStatus { get; set; }
+    public bool IsOccupied { get; set; }
     public string LocationTypeDisplay { get; set; } = string.Empty;
     public string ParentName { get; set; } = string.Empty;
     public decimal CurrentVolume { get; set; }

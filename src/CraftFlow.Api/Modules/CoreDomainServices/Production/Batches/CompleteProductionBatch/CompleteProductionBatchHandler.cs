@@ -49,7 +49,7 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
 
             if (equipmentLocation != null)
             {
-                equipmentLocation.CompleteSanitation(isPassed: true);
+                equipmentLocation.ReleaseFromProduction();
             }
         }
 
@@ -81,7 +81,7 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
         }
 
         await _publisher.Publish(
-            new ProductionBatchCompletedEvent(batch.Id, batch.RecipeId, batch.WarehouseId, batch.ActualOutputQuantity, unitsCount),
+            new ProductionBatchCompletedEvent(batch.Id, batch.RecipeId, batch.DestinationWarehouseId, batch.ActualOutputQuantity, unitsCount),
             cancellationToken
         );
 

@@ -46,7 +46,7 @@ public sealed class StartNewSanitationTaskCommandHandler : IRequestHandler<Start
             {
                 bool isShelfOrRack = location.LocationType == StorageLocationType.RACK_SHELF;
 
-                if (!isShelfOrRack && location.CurrentVolume > 0)
+                if (!isShelfOrRack && location.IsOccupied)
                 {
                     return Result.Failure<Guid>(Error.Validation(ErrorCodes.Inventory.LOCATION_HAS_VOLUME));
                 }

@@ -90,7 +90,28 @@ public partial class StorageControl : UserControl
                 Brush backgroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E8F5E9"));
                 string code = "OK";
 
-                if (l.NextWashDueDate.HasValue)
+                if (l.Status == StorageLocationStatus.UNDER_SANITATION)
+                {
+                    statusText = "🧼 Идёт мойка (ожидает приёмки)";
+                    statusBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1565C0"));
+                    backgroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E3F2FD"));
+                    code = "IN_PROGRESS";
+                }
+                else if (l.Status == StorageLocationStatus.SANITATION_REQUIRED)
+                {
+                    statusText = "⚠ Требуется мойка";
+                    statusBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF6C00"));
+                    backgroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF3E0"));
+                    code = "WARNING";
+                }
+                else if (l.IsOccupied)
+                {
+                    statusText = "🔒 Занята";
+                    statusBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#6A1B9A"));
+                    backgroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3E5F5"));
+                    code = "OCCUPIED";
+                }
+                else if (l.NextWashDueDate.HasValue)
                 {
                     if (l.NextWashDueDate.Value < now)
                     {
@@ -113,6 +134,8 @@ public partial class StorageControl : UserControl
                     Id = l.Id,
                     Name = l.Name,
                     LocationType = l.LocationType,
+                    LocationStatus = l.Status,
+                    IsOccupied = l.IsOccupied,
                     LocationTypeDisplay = GetLocationTypeDisplay(l.LocationType),
                     CurrentVolume = l.CurrentVolume,
                     VolumeInfo = l.VolumeInfo,
@@ -194,11 +217,22 @@ public partial class StorageControl : UserControl
         if (sender is Button btn && btn.Tag is StorageLocationViewItem item)
         {
             var menu = new ContextMenu();
+            bool isBlockedByOccupancy = item.IsOccupied && item.LocationType != StorageLocationType.RACK_SHELF;
 
-            var planItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_PLAN") };
+            var planItem = new MenuItem
+            {
+                Header = Get("UI_STORAGE_MENU_SANITATION_PLAN"),
+                IsEnabled = !isBlockedByOccupancy
+            };
             planItem.Click += (s, args) => OpenLocationSanitation(item);
 
-            var executeItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_EXECUTE") };
+            var executeItem = new MenuItem
+            {
+                Header = item.LocationStatus == StorageLocationStatus.UNDER_SANITATION
+                    ? "✔ Принять / Завершить мойку"
+                    : Get("UI_STORAGE_MENU_SANITATION_EXECUTE"),
+                IsEnabled = !isBlockedByOccupancy
+            };
             executeItem.Click += (s, args) => OpenLocationExecution(item);
 
             var historyItem = new MenuItem { Header = Get("UI_STORAGE_MENU_SANITATION_HISTORY") };
@@ -207,7 +241,11 @@ public partial class StorageControl : UserControl
             var writeOffItem = new MenuItem { Header = Get("UI_STORAGE_MENU_WRITE_OFF") };
             writeOffItem.Click += (s, args) => OpenLocationWriteOff(item);
 
-            var deleteItem = new MenuItem { Header = Get("UI_STORAGE_MENU_DELETE") };
+            var deleteItem = new MenuItem
+            {
+                Header = Get("UI_STORAGE_MENU_DELETE"),
+                IsEnabled = !item.IsOccupied
+            };
             deleteItem.Click += async (s, args) => await DeleteStorageLocationAsync(item.Id);
 
             menu.Items.Add(planItem);

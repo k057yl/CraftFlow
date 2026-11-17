@@ -131,14 +131,21 @@ public sealed class StorageLocation : AggregateRoot, ITenantEntity
         }
     }
 
+    public void ReleaseFromDiscard()
+    {
+        CurrentProductionBatchId = null;
+        CurrentVolume = 0;
+        Status = StorageLocationStatus.AVAILABLE;
+    }
+
     public void StartSanitation()
     {
         bool isShelfOrRack = LocationType == StorageLocationType.RACK_SHELF;
 
-        if (!isShelfOrRack && (CurrentVolume > 0 || CurrentProductionBatchId.HasValue))
+        if (!isShelfOrRack && IsOccupied)
             throw new InvalidOperationException(ErrorCodes.Inventory.LOCATION_HAS_VOLUME);
 
-        if (Status != StorageLocationStatus.SANITATION_REQUIRED && Status != StorageLocationStatus.AVAILABLE && Status != StorageLocationStatus.OCCUPIED)
+        if (Status != StorageLocationStatus.SANITATION_REQUIRED && Status != StorageLocationStatus.AVAILABLE)
             throw new InvalidOperationException(ErrorCodes.Inventory.LOCATION_NOT_EMPTY_FOR_SANITATION);
 
         Status = StorageLocationStatus.UNDER_SANITATION;

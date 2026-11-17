@@ -41,7 +41,7 @@ public class DiscardBatchHandler : IRequestHandler<DiscardBatchCommand, Result>
 
             if (equipmentLocation != null)
             {
-                equipmentLocation.CompleteSanitation(isPassed: true);
+                equipmentLocation.ReleaseFromDiscard();
             }
         }
 

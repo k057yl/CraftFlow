@@ -38,6 +38,14 @@ public record StorageLocationDto(
         get
         {
             var uom = !string.IsNullOrWhiteSpace(UnitOfMeasure) ? UnitOfMeasure : "л";
+
+            if (IsOccupied && CurrentVolume <= 0)
+            {
+                return Capacity.HasValue && Capacity.Value > 0
+                    ? $"🔒 Занята партией (Ёмкость: {Capacity.Value:N0} {uom})"
+                    : "🔒 Занята партией";
+            }
+
             return Capacity.HasValue && Capacity.Value > 0
                 ? $"{CurrentVolume:N0} / {Capacity.Value:N0} {uom} (Свободно: {FreeCapacity:N0} {uom})"
                 : $"{CurrentVolume:N0} {uom} (Без лимита)";

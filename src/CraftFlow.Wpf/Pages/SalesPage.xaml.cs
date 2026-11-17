@@ -1,10 +1,11 @@
 ﻿using CraftFlow.SharedKernel.Constants.Endpoints;
+using CraftFlow.SharedKernel.Dtos.Catalog.Inventory;
 using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Sale;
 using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Models.Sales;
 using CraftFlow.Wpf.Services;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -14,85 +15,11 @@ using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Pages;
 
-public sealed class InvoiceItemRow : INotifyPropertyChanged
-{
-    public Guid StockLotId { get; set; }
-    public string BatchNumber { get; set; } = string.Empty;
-    public string ProductName { get; set; } = string.Empty;
-    public decimal AvailableQuantity { get; set; }
-
-    private decimal _quantity;
-    public decimal Quantity
-    {
-        get => _quantity;
-        set
-        {
-            _quantity = Math.Min(value, AvailableQuantity);
-            if (_quantity < 0) _quantity = 0;
-            OnPropertyChanged(nameof(Quantity));
-            OnPropertyChanged(nameof(TotalSum));
-        }
-    }
-
-    private decimal _sellingPrice;
-    public decimal SellingPrice
-    {
-        get => _sellingPrice;
-        set
-        {
-            _sellingPrice = value < 0 ? 0 : value;
-            OnPropertyChanged(nameof(SellingPrice));
-            OnPropertyChanged(nameof(TotalSum));
-        }
-    }
-
-    public decimal TotalSum => Quantity * SellingPrice;
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    private void OnPropertyChanged(string name) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-}
-
-public sealed class SalesLotItemDto : INotifyPropertyChanged
-{
-    public Guid Id { get; set; }
-    public string ItemNumber { get; set; } = string.Empty;
-    public decimal CurrentWeight { get; set; }
-
-    private bool _isSelected;
-    public bool IsSelected
-    {
-        get => _isSelected;
-        set
-        {
-            _isSelected = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSelected)));
-        }
-    }
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-}
-
-public sealed class SalesStockLotDto : INotifyPropertyChanged
-{
-    public Guid Id { get; set; }
-    public string BatchNumber { get; set; } = string.Empty;
-    public Guid ItemId { get; set; }
-    public Guid? ProductionBatchId { get; set; }
-    public string ProductName { get; set; } = string.Empty;
-    public decimal Quantity { get; set; }
-    public decimal UnitPrice { get; set; }
-    public int UnitsCount { get; set; }
-
-    public ObservableCollection<SalesLotItemDto> Items { get; set; } = [];
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-}
-
 public partial class SalesPage : Page
 {
     public ObservableCollection<LookupItem> Customers { get; } = [];
     public ObservableCollection<LookupItem> Warehouses { get; } = [];
-    public ObservableCollection<SalesStockLotDto> AvailableLots { get; } = [];
+    public ObservableCollection<SalesStockLotViewItem> AvailableLots { get; } = [];
     public ObservableCollection<InvoiceItemRow> InvoiceItems { get; } = [];
 
     private const decimal DEFAULT_MARKUP_MULTIPLIER = 1.40m;
@@ -148,7 +75,7 @@ public partial class SalesPage : Page
         catch (Exception ex)
         {
             _isInitializing = false;
-            SetStatus($"{Get("UI_ERR_DATA_LOAD")}: {ex.Message}", Brushes.Red);
+            SetStatusRaw($"{Get("UI_ERR_DATA_LOAD")}: {ex.Message}", Brushes.Red);
         }
     }
 
@@ -167,39 +94,52 @@ public partial class SalesPage : Page
 
         try
         {
-            var stockLots = await ApiService.Instance.GetAsync<List<SalesStockLotDto>>($"{InventoryConstants.STOCK_LOTS}?warehouseId={warehouseId}");
+            var stockLots = await ApiService.Instance.GetAsync<List<StockLotDto>>($"{InventoryConstants.STOCK_LOTS}?warehouseId={warehouseId}");
 
             AvailableLots.Clear();
 
             if (stockLots != null)
             {
-                foreach (var lot in stockLots.Where(l => l.Quantity > 0))
+                foreach (var dto in stockLots.Where(l => l.Quantity > 0))
                 {
+                    var viewItem = new SalesStockLotViewItem
+                    {
+                        Id = dto.Id,
+                        BatchNumber = dto.BatchNumber ?? "—",
+                        ProductName = dto.ItemName,
+                        Quantity = dto.Quantity,
+                        UnitPrice = dto.UnitPrice,
+                        UnitsCount = 0
+                    };
+
                     try
                     {
-                        var details = await ApiService.Instance.GetAsync<StockLotDetailsDto>($"api/sales/stock-lots/{lot.Id}/details");
+                        var details = await ApiService.Instance.GetAsync<StockLotDetailsDto>($"api/sales/stock-lots/{dto.Id}/details");
                         if (details != null && details.Items.Count > 0)
                         {
-                            lot.Items = new ObservableCollection<SalesLotItemDto>(
-                                details.Items.Select(i => new SalesLotItemDto
+                            viewItem.Items = new ObservableCollection<SalesLotItemViewItem>(
+                                details.Items.Select(i => new SalesLotItemViewItem
                                 {
                                     Id = i.Id,
                                     ItemNumber = i.ItemNumber,
                                     CurrentWeight = i.CurrentWeight
                                 })
                             );
-                            lot.UnitsCount = lot.Items.Count;
+                            viewItem.UnitsCount = viewItem.Items.Count;
                         }
                     }
-                    catch { }
+                    catch
+                    {
+                    }
 
-                    AvailableLots.Add(lot);
+                    AvailableLots.Add(viewItem);
                 }
             }
         }
-        catch
+        catch (Exception ex)
         {
             AvailableLots.Clear();
+            SetStatusRaw($"{Get("UI_ERR_DATA_LOAD")}: {ex.Message}", Brushes.Red);
         }
 
         RecalculateOrderTotals();
@@ -207,7 +147,7 @@ public partial class SalesPage : Page
 
     private void AvailableLotsDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
-        if (AvailableLotsDataGrid.SelectedItem is SalesStockLotDto selectedLot)
+        if (AvailableLotsDataGrid.SelectedItem is SalesStockLotViewItem selectedLot)
         {
             AddLotToInvoice(selectedLot, selectedLot.Quantity, selectedLot.UnitsCount);
         }
@@ -215,7 +155,7 @@ public partial class SalesPage : Page
 
     private void AddSelectedUnitsToInvoice_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is Button btn && btn.Tag is SalesStockLotDto lot)
+        if (sender is Button btn && btn.Tag is SalesStockLotViewItem lot)
         {
             var selectedUnits = lot.Items.Where(i => i.IsSelected).ToList();
 
@@ -232,7 +172,7 @@ public partial class SalesPage : Page
         }
     }
 
-    private void AddLotToInvoice(SalesStockLotDto lot, decimal weight, int unitsCount)
+    private void AddLotToInvoice(SalesStockLotViewItem lot, decimal weight, int unitsCount)
     {
         if (InvoiceItems.Any(i => i.StockLotId == lot.Id))
         {
@@ -291,7 +231,7 @@ public partial class SalesPage : Page
         }
         else
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatusRaw(contentOrError, Brushes.Red);
         }
     }
 
@@ -327,7 +267,7 @@ public partial class SalesPage : Page
         if (isSuccess)
         {
             var msgFormat = Get("UI_MSG_ORDER_SHIPPED_SUCCESS_FMT");
-            SetStatus(string.Format(msgFormat, contentOrError), Brushes.Green);
+            SetStatusRaw(string.Format(msgFormat, contentOrError), Brushes.Green);
 
             PrintInvoiceDocument(customerId, InvoiceItems.ToList(), contentOrError);
 
@@ -336,7 +276,7 @@ public partial class SalesPage : Page
         }
         else
         {
-            SetStatus(contentOrError, Brushes.Red);
+            SetStatusRaw(contentOrError, Brushes.Red);
         }
     }
 
@@ -415,9 +355,15 @@ public partial class SalesPage : Page
         catch { }
     }
 
-    private void SetStatus(string msgKeyOrText, Brush color)
+    private void SetStatus(string msgKey, Brush color)
     {
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = Get(msgKeyOrText);
+        StatusTextBlock.Text = Get(msgKey);
+    }
+
+    private void SetStatusRaw(string text, Brush color)
+    {
+        StatusTextBlock.Foreground = color;
+        StatusTextBlock.Text = text;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Core.Persistence;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Enums.Sanitation;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
@@ -33,8 +34,18 @@ public sealed class StartSanitationTaskCommandHandler : IRequestHandler<StartSan
 
             if (location != null)
             {
+                bool isShelfOrRack = location.LocationType == StorageLocationType.RACK_SHELF;
+
+                if (!isShelfOrRack && location.IsOccupied)
+                    return Result.Failure<Guid>(Error.Validation(ErrorCodes.Inventory.LOCATION_HAS_VOLUME));
+
+                task.Start(request.PerformerUserId, DateTime.UtcNow);
                 location.StartSanitation();
             }
+        }
+        else
+        {
+            task.Start(request.PerformerUserId, DateTime.UtcNow);
         }
 
         await _context.SaveChangesAsync(cancellationToken);
