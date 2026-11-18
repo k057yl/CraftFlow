@@ -4,9 +4,9 @@ using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Fermentation;
 using CraftFlow.SharedKernel.Dtos.Production;
 using CraftFlow.SharedKernel.Enums;
-using CraftFlow.SharedKernel.Enums.Fermrntation;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Models.Fermentations;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
 using System.Collections.ObjectModel;
@@ -20,49 +20,6 @@ namespace CraftFlow.Wpf.Pages.Fermentation;
 
 public partial class FermentationPage : Page
 {
-    public sealed class FermentationBatchUiModel
-    {
-        public Guid Id { get; init; }
-        public Guid ProductionBatchId { get; init; }
-        public string BatchNumber { get; init; } = string.Empty;
-        public string RecipeName { get; init; } = string.Empty;
-        public decimal SubstrateWeightKg { get; init; }
-        public decimal SaltPercentage { get; init; }
-        public decimal CalculatedSaltGrams { get; init; }
-        public decimal? CurrentPh { get; init; }
-        public string VesselInfo { get; init; } = string.Empty;
-        public FermentationStage Stage { get; init; }
-        public int DaysElapsed { get; init; }
-        public List<FermentationReadingDto> Readings { get; init; } = [];
-
-        public string StageDisplay => Stage switch
-        {
-            FermentationStage.ACTIVE_WARM => Get("UI_FERM_STAGE_WARM"),
-            FermentationStage.COLD_RETARDATION => Get("UI_FERM_STAGE_COLD"),
-            _ => Get("UI_FERM_STAGE_DONE")
-        };
-
-        public string SaltDisplay => $"{SaltPercentage:0.##}% ({CalculatedSaltGrams:0.#} г)";
-        public string PhDisplay => CurrentPh.HasValue ? CurrentPh.Value.ToString("0.00", CultureInfo.InvariantCulture) : "—";
-        public bool IsSafeAcidity => CurrentPh.HasValue && CurrentPh.Value < 4.6m;
-    }
-
-    public sealed class FermentationReadingUiModel
-    {
-        public string Summary { get; init; } = string.Empty;
-    }
-
-    public sealed class RequirementItemUiModel
-    {
-        public string MaterialName { get; set; } = string.Empty;
-        public decimal RequiredQty { get; set; }
-        public decimal AvailableQty { get; set; }
-        public bool IsSufficient { get; set; }
-
-        public string FormattedInfo =>
-            $"{MaterialName}: {Get("UI_BREWHOUSE_LABEL_REQ_NEED")} {RequiredQty:0.####} | {Get("UI_BREWHOUSE_LABEL_REQ_AVAIL")} {AvailableQty:0.####} {(IsSufficient ? "✔" : "❌")}";
-    }
-
     public ObservableCollection<LookupItem> RawMaterialWarehouses { get; } = [];
     public ObservableCollection<LookupItem> WorkshopWarehouses { get; } = [];
     public ObservableCollection<LookupItem> DestinationWarehouses { get; } = [];
@@ -164,7 +121,6 @@ public partial class FermentationPage : Page
                     FermentationBatches.Add(new FermentationBatchUiModel
                     {
                         Id = b.Id,
-                        ProductionBatchId = b.ProductionBatchId,
                         BatchNumber = b.BatchNumber,
                         RecipeName = b.RecipeName,
                         SubstrateWeightKg = b.SubstrateWeightKg,
@@ -177,7 +133,7 @@ public partial class FermentationPage : Page
                         Readings = b.Readings
                     });
 
-                    ActiveProductionBatches.Add(new LookupItem(b.ProductionBatchId, $"{b.BatchNumber} — {b.RecipeName}"));
+                    ActiveProductionBatches.Add(new LookupItem(b.Id, $"{b.BatchNumber} — {b.RecipeName}"));
                 }
             }
 
@@ -482,7 +438,7 @@ public partial class FermentationPage : Page
 
         try
         {
-            var costData = await ApiService.Instance.GetAsync<BatchCostDto>($"{ProductionConstants.PRODUCTION_COSTING}/{selected.ProductionBatchId}");
+            var costData = await ApiService.Instance.GetAsync<BatchCostDto>($"{ProductionConstants.PRODUCTION_COSTING}/{selected.Id}");
             _selectedBatchRawCost = costData?.TotalRawMaterialCost ?? 0m;
         }
         catch

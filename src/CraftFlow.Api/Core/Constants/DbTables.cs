@@ -55,4 +55,5 @@ public static class DbTables
     // --- VERTICAL MODULE: FERMENTATION (schema: fermentation) ---
     public const string FERMENTATION_BATCHES = "fermentation_batches";
     public const string FERMENTATION_READINGS = "fermentation_readings";
+    public const string FERMENTATION_CONSUMED_INGREDIENTS = "fermentation_consumed_ingredients";
 }

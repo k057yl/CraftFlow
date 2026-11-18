@@ -4,11 +4,11 @@ using CraftFlow.Api.Modules.CoreDomainServices.Catalog.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Identity.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Procurement.Domain;
-using CraftFlow.Api.Modules.CoreDomainServices.Production.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Sales.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Sanitation.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.Domain;
+using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain;
 using CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
@@ -68,6 +68,7 @@ public class AppDbContext : DbContext
     public DbSet<SanitationLog> SanitationLogs => Set<SanitationLog>();
     public DbSet<FermentationBatch> FermentationBatches => Set<FermentationBatch>();
     public DbSet<FermentationReading> FermentationReadings => Set<FermentationReading>();
+    public DbSet<FermentationConsumedIngredient> FermentationConsumedIngredients => Set<FermentationConsumedIngredient>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -35,7 +35,6 @@ public sealed class GetFermentationBatchesHandler : IRequestHandler<GetFermentat
 
         var result = batches.Select(b => new FermentationBatchDto(
             b.Id,
-            b.ProductionBatchId,
             b.BatchNumber,
             b.RecipeName,
             b.SubstrateWeightKg,

@@ -6,7 +6,6 @@ using CraftFlow.Api.Modules.CoreDomainServices.Identity;
 using CraftFlow.Api.Modules.CoreDomainServices.Inventory;
 using CraftFlow.Api.Modules.CoreDomainServices.MRP;
 using CraftFlow.Api.Modules.CoreDomainServices.Procurement;
-using CraftFlow.Api.Modules.CoreDomainServices.Production;
 using CraftFlow.Api.Modules.CoreDomainServices.Sales;
 using CraftFlow.Api.Modules.CoreDomainServices.Sanitation;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions;
@@ -47,7 +46,6 @@ using (var scope = app.Services.CreateScope())
 app.MapIdentityEndpoints();
 app.MapCatalogEndpoints();
 app.MapInventoryEndpoints();
-app.MapProductionEndpoints();
 app.MapCheeseMakingEndpoints();
 app.MapSalesEndpoints();
 app.MapAnalyticsEndpoints();

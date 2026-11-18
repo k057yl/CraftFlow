@@ -1,5 +1,5 @@
 ﻿using CraftFlow.Api.Core.Persistence;
-using CraftFlow.Api.Modules.CoreDomainServices.Production.Batches.CompleteProductionBatch;
+using CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
@@ -10,38 +10,69 @@ namespace CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.CompleteF
 public sealed class CompleteFermentationBatchHandler : IRequestHandler<CompleteFermentationBatchCommand, Result>
 {
     private readonly AppDbContext _dbContext;
-    private readonly ISender _sender;
 
-    public CompleteFermentationBatchHandler(AppDbContext dbContext, ISender sender)
+    public CompleteFermentationBatchHandler(AppDbContext dbContext)
     {
         _dbContext = dbContext;
-        _sender = sender;
     }
 
     public async Task<Result> Handle(CompleteFermentationBatchCommand request, CancellationToken cancellationToken)
     {
         var batch = await _dbContext.FermentationBatches
+            .Include(b => b.ConsumedIngredients)
             .FirstOrDefaultAsync(b => b.Id == request.FermentationBatchId, cancellationToken);
 
         if (batch is null)
             return Result.Failure(new Error(ErrorCodes.Fermentation.BATCH_NOT_FOUND));
 
-        var completeProdResult = await _sender.Send(new CompleteProductionBatchCommand(
-            BatchId: batch.ProductionBatchId,
-            ActualOutputQuantity: request.ActualOutputQuantity,
-            UnitsCount: request.UnitsCount,
-            OverheadPercentage: request.OverheadPercentage,
-            BatchNumber: request.BatchNumber,
-            RequiresAging: false,
-            AgingChamberId: null,
-            MinAgingDays: null,
-            StorageLocationId: null
-        ), cancellationToken);
+        if (batch.EquipmentLocationId != Guid.Empty)
+        {
+            var equipmentLocation = await _dbContext.StorageLocations
+                .FirstOrDefaultAsync(l => l.Id == batch.EquipmentLocationId, cancellationToken);
 
-        if (completeProdResult.IsFailure)
-            return Result.Failure(completeProdResult.Error);
+            equipmentLocation?.ReleaseFromProduction();
+        }
 
-        batch.Complete();
+        batch.Complete(
+            request.ActualOutputQuantity,
+            request.UnitsCount,
+            request.OverheadPercentage,
+            request.BatchNumber
+        );
+
+        var product = await _dbContext.Products
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == batch.TargetProductId, cancellationToken);
+
+        if (product != null && request.ActualOutputQuantity > 0)
+        {
+            var lotIds = batch.ConsumedIngredients.Select(ci => ci.StockLotId).Distinct().ToList();
+            var lotPrices = await _dbContext.StockLots
+                .AsNoTracking()
+                .Where(sl => lotIds.Contains(sl.Id))
+                .ToDictionaryAsync(sl => sl.Id, sl => sl.UnitPrice, cancellationToken);
+
+            decimal totalRawCost = batch.ConsumedIngredients
+                .Sum(ci => ci.Quantity * lotPrices.GetValueOrDefault(ci.StockLotId, 0m));
+
+            decimal overheadMultiplier = 1m + ((request.OverheadPercentage ?? 0m) / 100m);
+            decimal unitCost = (totalRawCost * overheadMultiplier) / request.ActualOutputQuantity;
+
+            var finishedStockLot = StockLot.Create(
+                tenantId: batch.TenantId,
+                warehouseId: batch.DestinationWarehouseId,
+                itemId: batch.TargetProductId,
+                unitOfMeasureId: product.UnitOfMeasureId,
+                initialQuantity: request.ActualOutputQuantity,
+                unitsCount: batch.UnitsCount,
+                unitPrice: unitCost,
+                batchNumber: batch.BatchNumber,
+                productionBatchId: null
+            );
+
+            await _dbContext.StockLots.AddAsync(finishedStockLot, cancellationToken);
+        }
+
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

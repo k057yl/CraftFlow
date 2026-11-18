@@ -23,6 +23,9 @@ public sealed class FermentationBatchConfiguration : IEntityTypeConfiguration<Fe
         builder.Property(x => x.TargetTemperature).HasPrecision(5, 2);
         builder.Property(x => x.VesselInfo).HasMaxLength(200);
         builder.Property(x => x.Stage).HasConversion<string>().HasMaxLength(40).IsRequired();
+        builder.Property(x => x.ActualOutputQuantity).HasPrecision(18, 4);
+        builder.Property(x => x.OverheadPercentage).HasPrecision(6, 2);
+        builder.Property(x => x.DiscardReason).HasMaxLength(500);
 
         builder.Ignore(x => x.CalculatedSaltGrams);
 
@@ -36,7 +39,12 @@ public sealed class FermentationBatchConfiguration : IEntityTypeConfiguration<Fe
         builder.HasIndex(x => new { x.TenantId, x.Stage })
             .HasDatabaseName(DbIndexes.Fermentation.IX_FERMENTATION_BATCHES_TENANT_STAGE);
 
-        builder.HasIndex(x => x.ProductionBatchId)
-            .HasDatabaseName(DbIndexes.Fermentation.IX_FERMENTATION_BATCHES_PRODUCTION_BATCH);
+        builder.HasMany(x => x.ConsumedIngredients)
+            .WithOne()
+            .HasForeignKey(x => x.FermentationBatchId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(x => x.ConsumedIngredients)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }

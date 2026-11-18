@@ -2,7 +2,7 @@
 using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Catalog.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain;
-using CraftFlow.Api.Modules.CoreDomainServices.Production.Domain;
+using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;

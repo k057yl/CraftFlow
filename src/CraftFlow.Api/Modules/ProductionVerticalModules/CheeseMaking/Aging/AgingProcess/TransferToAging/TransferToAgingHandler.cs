@@ -5,7 +5,7 @@ using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using CraftFlow.Api.Modules.CoreDomainServices.Production.Domain;
+using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain;
 
 namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.AgingProcess.TransferToAging;
 

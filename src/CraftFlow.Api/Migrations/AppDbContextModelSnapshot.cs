@@ -677,116 +677,6 @@ namespace CraftFlow.Api.Migrations
                     b.ToTable("suppliers", "procurement");
                 });
 
-            modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Production.Domain.ConsumedIngredient", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("ProductionBatchId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric");
-
-                    b.Property<Guid>("RawMaterialId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("StockLotId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductionBatchId")
-                        .HasDatabaseName("IX_CONSUMED_INGREDIENTS_BATCH");
-
-                    b.ToTable("consumed_ingredients", "production");
-                });
-
-            modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Production.Domain.ProductionBatch", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("ActualOutputQuantity")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("numeric(18,4)");
-
-                    b.Property<DateTime?>("AgingStartedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("BrewingCompletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("DestinationWarehouseId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DiscardReason")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("EquipmentLocationId")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsTelegramNotified")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<decimal?>("OverheadPercentage")
-                        .HasColumnType("numeric");
-
-                    b.Property<decimal>("PlannedOutputQuantity")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("numeric(18,4)");
-
-                    b.Property<Guid>("RecipeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("StartedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("State")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("TargetDurationMinutes")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("TargetProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("UnitsCount")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("WarehouseId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TenantId", "State", "IsTelegramNotified", "StartedAt")
-                        .HasDatabaseName("IX_PRODUCTION_BATCHES_TIMER_MONITORING");
-
-                    b.ToTable("production_batches", "production");
-                });
-
             modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Sales.Domain.Customer", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1359,11 +1249,124 @@ namespace CraftFlow.Api.Migrations
                     b.ToTable("aging_lot_items", "cheese_making");
                 });
 
-            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationBatch", b =>
+            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain.ConsumedIngredient", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("ProductionBatchId")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("RawMaterialId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("StockLotId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductionBatchId")
+                        .HasDatabaseName("IX_CONSUMED_INGREDIENTS_BATCH");
+
+                    b.ToTable("consumed_ingredients", "production");
+                });
+
+            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain.ProductionBatch", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("ActualOutputQuantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<DateTime?>("AgingStartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("BrewingCompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("CompletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DestinationWarehouseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DiscardReason")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("EquipmentLocationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsTelegramNotified")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<decimal?>("OverheadPercentage")
+                        .HasColumnType("numeric");
+
+                    b.Property<decimal>("PlannedOutputQuantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<Guid>("RecipeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("State")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TargetDurationMinutes")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("TargetProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("UnitsCount")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId", "State", "IsTelegramNotified", "StartedAt")
+                        .HasDatabaseName("IX_PRODUCTION_BATCHES_TIMER_MONITORING");
+
+                    b.ToTable("production_batches", "production");
+                });
+
+            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationBatch", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("ActualOutputQuantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
 
                     b.Property<string>("BatchNumber")
                         .IsRequired()
@@ -1377,6 +1380,19 @@ namespace CraftFlow.Api.Migrations
                         .HasPrecision(4, 2)
                         .HasColumnType("numeric(4,2)");
 
+                    b.Property<Guid>("DestinationWarehouseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("DiscardReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("DiscardedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("EquipmentLocationId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal?>("InitialPh")
                         .HasPrecision(4, 2)
                         .HasColumnType("numeric(4,2)");
@@ -1387,7 +1403,11 @@ namespace CraftFlow.Api.Migrations
                     b.Property<DateTime?>("MovedToColdAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("ProductionBatchId")
+                    b.Property<decimal?>("OverheadPercentage")
+                        .HasPrecision(6, 2)
+                        .HasColumnType("numeric(6,2)");
+
+                    b.Property<Guid>("RecipeId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("RecipeName")
@@ -1411,6 +1431,9 @@ namespace CraftFlow.Api.Migrations
                         .HasPrecision(18, 4)
                         .HasColumnType("numeric(18,4)");
 
+                    b.Property<Guid>("TargetProductId")
+                        .HasColumnType("uuid");
+
                     b.Property<decimal>("TargetTemperature")
                         .HasPrecision(5, 2)
                         .HasColumnType("numeric(5,2)");
@@ -1418,15 +1441,18 @@ namespace CraftFlow.Api.Migrations
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("UnitsCount")
+                        .HasColumnType("integer");
+
                     b.Property<string>("VesselInfo")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.HasKey("Id");
+                    b.Property<Guid>("WarehouseId")
+                        .HasColumnType("uuid");
 
-                    b.HasIndex("ProductionBatchId")
-                        .HasDatabaseName("IX_FERMENTATION_BATCHES_PRODUCTION_BATCH");
+                    b.HasKey("Id");
 
                     b.HasIndex("TenantId", "Stage")
                         .HasDatabaseName("IX_FERMENTATION_BATCHES_TENANT_STAGE");
@@ -1434,10 +1460,44 @@ namespace CraftFlow.Api.Migrations
                     b.ToTable("fermentation_batches", "fermentation");
                 });
 
+            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationConsumedIngredient", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("FermentationBatchId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<Guid>("RawMaterialId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("StockLotId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FermentationBatchId")
+                        .HasDatabaseName("IX_FERMENTATION_CONSUMED_INGREDIENTS_BATCH_ID");
+
+                    b.HasIndex("TenantId")
+                        .HasDatabaseName("IX_FERMENTATION_CONSUMED_INGREDIENTS_TENANT_ID");
+
+                    b.ToTable("fermentation_consumed_ingredients", "fermentation");
+                });
+
             modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationReading", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<bool>("BrineToppedUp")
@@ -1641,6 +1701,15 @@ namespace CraftFlow.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationConsumedIngredient", b =>
+                {
+                    b.HasOne("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationBatch", null)
+                        .WithMany("ConsumedIngredients")
+                        .HasForeignKey("FermentationBatchId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationReading", b =>
                 {
                     b.HasOne("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationBatch", null)
@@ -1677,6 +1746,8 @@ namespace CraftFlow.Api.Migrations
 
             modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationBatch", b =>
                 {
+                    b.Navigation("ConsumedIngredients");
+
                     b.Navigation("Readings");
                 });
 #pragma warning restore 612, 618

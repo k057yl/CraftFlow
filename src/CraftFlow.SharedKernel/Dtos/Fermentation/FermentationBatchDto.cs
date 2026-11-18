@@ -4,7 +4,6 @@ namespace CraftFlow.SharedKernel.Dtos.Fermentation;
 
 public record FermentationBatchDto(
     Guid Id,
-    Guid ProductionBatchId,
     string BatchNumber,
     string RecipeName,
     decimal SubstrateWeightKg,
