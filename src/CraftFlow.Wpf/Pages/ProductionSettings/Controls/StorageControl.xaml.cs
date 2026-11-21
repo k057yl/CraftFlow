@@ -314,11 +314,11 @@ public partial class StorageControl : UserControl
             var payload = new
             {
                 StorageLocationId = item.Id,
-                Quantity = dialog.QuantityToWriteOff,
-                ItemIds = dialog.SelectedItemIds
+                QuantityToWriteOff = dialog.QuantityToWriteOff,
+                Reason = dialog.Reason
             };
 
-            var (isSuccess, error) = await ApiService.Instance.PostAndReadAsync("api/inventory/write-off", payload);
+            var (isSuccess, error) = await ApiService.Instance.PostAndReadAsync(InventoryConstants.WAREHOUSES_LOCATIONS_WRITE_OFF, payload);
 
             if (isSuccess)
             {

@@ -7,13 +7,16 @@ using CraftFlow.SharedKernel.Dtos.Supplier;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Models.Inventory;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace CraftFlow.Wpf.Pages;
 
@@ -36,6 +39,7 @@ public partial class ProcurementPage : Page
 
     public ObservableCollection<StorageLocationDto> AvailableLocations { get; } = [];
     public ObservableCollection<StorageLocationDto> SelectedLocations { get; } = [];
+    public ObservableCollection<ReceiptDraftItem> DraftItems { get; } = [];
 
     private bool _isDataLoaded = false;
     private Guid? _editingSupplierId = null;
@@ -61,6 +65,13 @@ public partial class ProcurementPage : Page
 
         AvailableLocationsListBox.ItemsSource = AvailableLocations;
         SelectedLocationsListBox.ItemsSource = SelectedLocations;
+
+        ReceiptDraftDataGrid.ItemsSource = DraftItems;
+        DraftItems.CollectionChanged += (s, e) =>
+        {
+            UpdateDraftSummary();
+            ValidateCapacity();
+        };
 
         Loaded += async (s, e) => await LoadDataAsync();
     }
@@ -212,7 +223,7 @@ public partial class ProcurementPage : Page
         }
     }
 
-    private void SuppliersDataGrid_MouseDoubleClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void SuppliersDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
     {
         if (!PermissionService.Instance.HasPermission(AppPermission.SUPPLIERS_MANAGE))
             return;
@@ -333,6 +344,8 @@ public partial class ProcurementPage : Page
     private async void StockWarehouseComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         SelectedLocations.Clear();
+        DraftItems.Clear();
+
         if (StockWarehouseComboBox.SelectedValue is Guid warehouseId && warehouseId != Guid.Empty)
         {
             await LoadLocationsForWarehouseAsync(warehouseId);
@@ -348,7 +361,7 @@ public partial class ProcurementPage : Page
     {
         try
         {
-            var locations = await ApiService.Instance.GetAsync<List<StorageLocationDto>>($"{InventoryConstants.WAREHOUSES}/locations?warehouseId={warehouseId}");
+            var locations = await ApiService.Instance.GetAsync<List<StorageLocationDto>>($"{InventoryConstants.WAREHOUSES_LOCATIONS}?warehouseId={warehouseId}");
             AvailableLocations.Clear();
 
             locations?.Where(l => l.LocationType != StorageLocationType.BREWING_VESSEL
@@ -392,8 +405,13 @@ public partial class ProcurementPage : Page
 
     private void ValidateCapacity()
     {
-        if (CapacityWarningTextBlock == null || AddStockLotButton == null || StockQuantityTextBox == null)
+        if (CapacityWarningTextBlock == null || AddDraftLineButton == null || StockQuantityTextBox == null)
+            return;
+
+        if (string.IsNullOrWhiteSpace(StockQuantityTextBox.Text))
         {
+            CapacityWarningTextBlock.Text = string.Empty;
+            AddDraftLineButton.IsEnabled = true;
             return;
         }
 
@@ -402,16 +420,22 @@ public partial class ProcurementPage : Page
         {
             CapacityWarningTextBlock.Text = LocalizationService.Get(UiConstants.Messages.INVALID_INPUT_FIELDS);
             CapacityWarningTextBlock.Foreground = Brushes.Red;
-            AddStockLotButton.IsEnabled = false;
+            AddDraftLineButton.IsEnabled = false;
             return;
         }
 
         if (SelectedLocations.Count == 0)
         {
             CapacityWarningTextBlock.Text = string.Empty;
-            AddStockLotButton.IsEnabled = true;
+            AddDraftLineButton.IsEnabled = true;
             return;
         }
+
+        // Учитываем объём, уже зарезервированный в текущем черновике накладной под выбранные ёмкости
+        var selectedIds = SelectedLocations.Select(l => l.Id).ToHashSet();
+        decimal reservedInDraft = DraftItems
+            .Where(d => d.StorageLocationIds.Any(id => selectedIds.Contains(id)))
+            .Sum(d => d.Quantity);
 
         decimal totalCapacity = 0;
         foreach (var loc in SelectedLocations)
@@ -421,19 +445,180 @@ public partial class ProcurementPage : Page
             totalCapacity += freeCap;
         }
 
-        if (totalCapacity < requiredQuantity)
+        decimal effectiveFreeCapacity = Math.Max(0, totalCapacity - reservedInDraft);
+
+        if (effectiveFreeCapacity < requiredQuantity)
         {
             var format = LocalizationService.Get("CAPACITY_WARNING_INSUFFICIENT");
-            CapacityWarningTextBlock.Text = string.Format(format, requiredQuantity, totalCapacity);
+            CapacityWarningTextBlock.Text = string.Format(format, requiredQuantity, effectiveFreeCapacity);
             CapacityWarningTextBlock.Foreground = Brushes.Red;
-            AddStockLotButton.IsEnabled = false;
+            AddDraftLineButton.IsEnabled = false;
         }
         else
         {
             var format = LocalizationService.Get("CAPACITY_WARNING_SUFFICIENT");
-            CapacityWarningTextBlock.Text = string.Format(format, totalCapacity, requiredQuantity);
+            CapacityWarningTextBlock.Text = string.Format(format, effectiveFreeCapacity, requiredQuantity);
             CapacityWarningTextBlock.Foreground = Brushes.Green;
-            AddStockLotButton.IsEnabled = true;
+            AddDraftLineButton.IsEnabled = true;
+        }
+    }
+
+    private void DraftInput_KeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            AddDraftLine_Click(sender, e);
+        }
+    }
+
+    private void AddDraftLine_Click(object sender, RoutedEventArgs e)
+    {
+        if (StockRawMaterialComboBox.SelectedItem is not LookupItem selectedRawMaterial)
+        {
+            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
+
+        var rawQuantityText = StockQuantityTextBox.Text.Replace(',', '.');
+        var rawPriceText = StockUnitPriceTextBox.Text.Replace(',', '.');
+
+        if (!decimal.TryParse(rawQuantityText, NumberStyles.Any, CultureInfo.InvariantCulture, out var quantity) || quantity <= 0 ||
+            !decimal.TryParse(rawPriceText, NumberStyles.Any, CultureInfo.InvariantCulture, out var unitPrice) || unitPrice < 0)
+        {
+            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            return;
+        }
+
+        var batchNumber = string.IsNullOrWhiteSpace(StockBatchTextBox.Text)
+            ? InvoiceNumberTextBox.Text.Trim()
+            : StockBatchTextBox.Text.Trim();
+
+        var locationIds = SelectedLocations.Select(l => l.Id).ToList();
+        var locationsDisplay = SelectedLocations.Count > 0
+            ? string.Join(", ", SelectedLocations.Select(l => l.Name))
+            : "—";
+
+        DraftItems.Add(new ReceiptDraftItem
+        {
+            ItemId = selectedRawMaterial.Id,
+            ItemName = selectedRawMaterial.Name,
+            Quantity = quantity,
+            UnitPrice = unitPrice,
+            UnitOfMeasure = GetSelectedUnitTag(),
+            UnitOfMeasureDisplay = GetSelectedUnitDisplayText(),
+            BatchNumber = batchNumber,
+            ExpirationDate = ExpirationDatePicker.SelectedDate,
+            StorageLocationIds = locationIds,
+            StorageLocationsDisplay = locationsDisplay
+        });
+
+        // Возвращаем выбранные ёмкости обратно в доступные для следующей позиции накладной
+        foreach (var loc in SelectedLocations.ToList())
+        {
+            SelectedLocations.Remove(loc);
+            AvailableLocations.Add(loc);
+        }
+
+        StockRawMaterialComboBox.SelectedItem = null;
+        StockRawMaterialComboBox.Text = string.Empty;
+        StockQuantityTextBox.Clear();
+        StockUnitPriceTextBox.Clear();
+        StockBatchTextBox.Clear();
+        ExpirationDatePicker.SelectedDate = null;
+        CapacityWarningTextBlock.Text = string.Empty;
+
+        StockRawMaterialComboBox.Focus();
+    }
+
+    private void RemoveDraftLine_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is ReceiptDraftItem item)
+        {
+            DraftItems.Remove(item);
+        }
+    }
+
+    private void ClearDraftLines_Click(object sender, RoutedEventArgs e)
+    {
+        DraftItems.Clear();
+    }
+
+    private void ReceiptDraftDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+    {
+        Dispatcher.BeginInvoke(() =>
+        {
+            UpdateDraftSummary();
+            ValidateCapacity();
+        }, DispatcherPriority.Background);
+    }
+
+    private void UpdateDraftSummary()
+    {
+        int count = DraftItems.Count;
+        decimal total = DraftItems.Sum(x => x.LineTotal);
+
+        DraftSummaryTextBlock.Text = $"Позиций в накладной: {count} | Итого: ${total:F2}";
+        SubmitReceiptBatchButton.IsEnabled = count > 0;
+    }
+
+    private void ImportInvoiceFile_Click(object sender, RoutedEventArgs e)
+    {
+        AlertWindow.ShowSuccess(Window.GetWindow(this), "Модуль автозагрузки накладных из Excel / PDF в разработке. Распознанные позиции будут загружаться в эту таблицу для проверки перед проведением.");
+    }
+
+    private async void SubmitReceiptBatch_Click(object sender, RoutedEventArgs e)
+    {
+        if (DraftItems.Count == 0) return;
+
+        if (StockSupplierComboBox.SelectedItem is not LookupItem selectedSupplier ||
+            StockWarehouseComboBox.SelectedItem is not LookupItem selectedWarehouse)
+        {
+            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
+            AlertWindow.ShowError(Window.GetWindow(this), LocalizationService.Get(UiConstants.Messages.INVALID_INPUT_FIELDS));
+            return;
+        }
+
+        var request = new ReceiveStockBatchRequest(
+            SupplierId: selectedSupplier.Id,
+            WarehouseId: selectedWarehouse.Id,
+            InvoiceNumber: string.IsNullOrWhiteSpace(InvoiceNumberTextBox.Text) ? null : InvoiceNumberTextBox.Text.Trim(),
+            Items: DraftItems.Select(x => new StockReceiptLineDto(
+                ItemId: x.ItemId,
+                Quantity: x.Quantity,
+                UnitPrice: x.UnitPrice,
+                UnitOfMeasureId: Guid.Empty,
+                BatchNumber: string.IsNullOrWhiteSpace(x.BatchNumber) ? null : x.BatchNumber,
+                ExpirationDate: x.ExpirationDate,
+                StorageLocationIds: x.StorageLocationIds.Count > 0 ? x.StorageLocationIds : null
+            )).ToList()
+        );
+
+        SubmitReceiptBatchButton.IsEnabled = false;
+        try
+        {
+            var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(InventoryConstants.STOCK_LOTS_BATCH, request);
+
+            if (isSuccess)
+            {
+                DraftItems.Clear();
+                SetStatus(UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS, Brushes.Green);
+                AlertWindow.ShowSuccess(Window.GetWindow(this), LocalizationService.Get(UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS));
+
+                await LoadStockLotsAsync();
+                if (selectedWarehouse.Id != Guid.Empty)
+                {
+                    await LoadLocationsForWarehouseAsync(selectedWarehouse.Id);
+                }
+            }
+            else
+            {
+                SetStatusRaw(contentOrError, Brushes.Red);
+                AlertWindow.ShowError(Window.GetWindow(this), contentOrError);
+            }
+        }
+        finally
+        {
+            UpdateDraftSummary();
         }
     }
 
@@ -469,66 +654,6 @@ public partial class ProcurementPage : Page
 
     private async void FilterStockLots_Changed(object sender, RoutedEventArgs e) => await LoadStockLotsAsync();
     private async void RefreshStockLots_Click(object sender, RoutedEventArgs e) => await LoadStockLotsAsync();
-
-    private async void AddStockLot_Click(object sender, RoutedEventArgs e)
-    {
-        if (StockSupplierComboBox.SelectedItem is not LookupItem selectedSupplier ||
-            StockWarehouseComboBox.SelectedItem is not LookupItem selectedWarehouse ||
-            StockRawMaterialComboBox.SelectedItem is not LookupItem selectedRawMaterial)
-        {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-            AlertWindow.ShowError(Window.GetWindow(this), LocalizationService.Get(UiConstants.Messages.INVALID_INPUT_FIELDS));
-            return;
-        }
-
-        var rawQuantityText = StockQuantityTextBox.Text.Replace(',', '.');
-        var rawPriceText = StockUnitPriceTextBox.Text.Replace(',', '.');
-
-        if (!decimal.TryParse(rawQuantityText, NumberStyles.Any, CultureInfo.InvariantCulture, out var quantity) ||
-            !decimal.TryParse(rawPriceText, NumberStyles.Any, CultureInfo.InvariantCulture, out var unitPrice))
-        {
-            SetStatus(UiConstants.Messages.INVALID_INPUT_FIELDS, Brushes.Red);
-            AlertWindow.ShowError(Window.GetWindow(this), LocalizationService.Get(UiConstants.Messages.INVALID_INPUT_FIELDS));
-            return;
-        }
-
-        int? unitsCount = null;
-        DateTime? expirationDate = ExpirationDatePicker.SelectedDate;
-        var selectedLocationIds = SelectedLocations.Select(l => l.Id).ToList();
-        var unitOfMeasureTag = GetSelectedUnitTag();
-
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(InventoryConstants.STOCK_LOTS, new
-        {
-            SupplierId = selectedSupplier.Id,
-            WarehouseId = selectedWarehouse.Id,
-            ItemId = selectedRawMaterial.Id,
-            Quantity = quantity,
-            UnitsCount = unitsCount,
-            UnitPrice = unitPrice,
-            UnitOfMeasure = unitOfMeasureTag,
-            BatchNumber = StockBatchTextBox.Text,
-            ExpirationDate = expirationDate,
-            StorageLocationIds = selectedLocationIds.Count > 0 ? selectedLocationIds : null
-        });
-
-        if (isSuccess)
-        {
-            SetStatus(UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS, Brushes.Green);
-            AlertWindow.ShowSuccess(Window.GetWindow(this), LocalizationService.Get(UiConstants.Messages.STOCK_LOT_CREATED_SUCCESS));
-            ExpirationDatePicker.SelectedDate = null;
-            SelectedLocations.Clear();
-            await LoadStockLotsAsync();
-            if (selectedWarehouse.Id != Guid.Empty)
-            {
-                await LoadLocationsForWarehouseAsync(selectedWarehouse.Id);
-            }
-        }
-        else
-        {
-            SetStatusRaw(contentOrError, Brushes.Red);
-            AlertWindow.ShowError(Window.GetWindow(this), contentOrError);
-        }
-    }
 
     private async void WriteOffRow_Click(object sender, RoutedEventArgs e)
     {
@@ -576,7 +701,7 @@ public partial class ProcurementPage : Page
 
     private async Task ExecuteWriteOffAsync(Guid stockLotId, decimal quantity, List<Guid>? itemIds = null, string? reason = null)
     {
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync($"{InventoryConstants.STOCK_LOTS}/write-off", new
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(InventoryConstants.STOCK_LOTS_WRITE_OFF, new
         {
             StockLotId = stockLotId,
             QuantityToWriteOff = quantity,

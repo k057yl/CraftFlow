@@ -1,9 +1,9 @@
-﻿using CraftFlow.Api.Core.Persistence;
+﻿using CraftFlow.Api.Core.Extensions;
+using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Procurement.PurchaseOrders;
 using CraftFlow.Api.Modules.CoreDomainServices.Procurement.Suppliers.CreateSupplier;
 using CraftFlow.Api.Modules.CoreDomainServices.Procurement.Suppliers.ToggleSupplierActive;
 using CraftFlow.Api.Modules.CoreDomainServices.Procurement.Suppliers.UpdateSupplier;
-using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Supplier;
 using MediatR;
@@ -31,8 +31,7 @@ public static class ProcurementEndpoints
                 request.Address,
                 request.Notes);
 
-            var result = await sender.Send(command, ct);
-            return result.IsSuccess ? Results.Ok(result.Value) : Results.BadRequest(result.Error);
+            return (await sender.Send(command, ct)).ToHttpResult();
         });
 
         group.MapGet(ProcurementConstants.SUPPLIERS, async (bool? includeInactive, AppDbContext dbContext, CancellationToken cancellationToken) =>
@@ -77,42 +76,17 @@ public static class ProcurementEndpoints
                 request.Address,
                 request.Notes);
 
-            var result = await sender.Send(command, ct);
-
-            if (result.IsFailure)
-            {
-                return result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
-                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
-                    : Results.BadRequest(result.Error);
-            }
-
-            return Results.Ok();
+            return (await sender.Send(command, ct)).ToHttpResult();
         });
 
         group.MapPut($"{ProcurementConstants.SUPPLIERS}/{{id:guid}}/toggle-active", async (
             Guid id,
             ISender sender,
             CancellationToken ct) =>
-        {
-            var command = new ToggleSupplierActiveCommand(id);
-
-            var result = await sender.Send(command, ct);
-
-            if (result.IsFailure)
-            {
-                return result.Error.Code == ErrorCodes.Auth.ACCESS_DENIED
-                    ? Results.Json(new { Message = result.Error.Code }, statusCode: 403)
-                    : Results.BadRequest(result.Error);
-            }
-
-            return Results.Ok();
-        });
+            (await sender.Send(new ToggleSupplierActiveCommand(id), ct)).ToHttpResult());
 
         // --- RECEIVE GOODS / STOCK LOTS ---
         group.MapPost(ProcurementConstants.PURCHASE_ORDERS_RECEIVE, async (ReceiveGoodsCommand command, ISender sender, CancellationToken ct) =>
-        {
-            var result = await sender.Send(command, ct);
-            return result.IsSuccess ? Results.Ok() : Results.BadRequest(result.Error);
-        });
+            (await sender.Send(command, ct)).ToHttpResult());
     }
 }
