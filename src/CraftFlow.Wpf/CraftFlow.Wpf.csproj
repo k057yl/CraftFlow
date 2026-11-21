@@ -9,6 +9,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="PagesOLD\**" />
+    <EmbeddedResource Remove="PagesOLD\**" />
+    <None Remove="PagesOLD\**" />
+    <Page Remove="PagesOLD\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="System.Net.Http.Json" Version="10.0.11" />
   </ItemGroup>
 
@@ -29,6 +36,13 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Pages\CheeseMaking\Controls\" />
+    <Folder Include="Pages\ProductionSettings\Controls\" />
+    <Folder Include="Pages\Fermentation\" />
+    <Folder Include="Pages\Windows\" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,39 @@
+﻿<Page x:Class="CraftFlow.Wpf.Pages.WarehouseAndSuppliers.WarehouseAndSuppliersPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
+      xmlns:auth="clr-namespace:CraftFlow.Wpf.MarkupExtensions"
+      xmlns:controls="clr-namespace:CraftFlow.Wpf.Pages.WarehouseAndSuppliers.Controls"
+      Title="{loc:Loc Key=TITLE_PROCUREMENT}">
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="{loc:Loc Key=TITLE_PROCUREMENT}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" Foreground="{DynamicResource AppForegroundBrush}"/>
+
+        <TabControl Grid.Row="1">
+            <!-- 1. Приход и Остатки Сырья -->
+            <TabItem Header="{loc:Loc Key=TAB_STOCK_RECEIPT}">
+                <controls:StockReceiptControl x:Name="ReceiptControl"/>
+            </TabItem>
+
+            <!-- 2. Списание / Акты Потерь -->
+            <TabItem Header="{loc:Loc Key=TAB_WRITE_OFF}">
+                <controls:StockWriteOffControl x:Name="WriteOffControl"/>
+            </TabItem>
+
+            <!-- 3. Поставщики -->
+            <TabItem x:Name="SuppliersTabItem"
+                     Header="{loc:Loc Key=TAB_SUPPLIERS}"
+                     Visibility="{auth:HasPermission Permission=SUPPLIERS_MANAGE}">
+                <controls:SuppliersControl x:Name="SuppliersViewControl"/>
+            </TabItem>
+        </TabControl>
+
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=UI_STATUS_READY}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="0,10,0,0"/>
+    </Grid>
+</Page>

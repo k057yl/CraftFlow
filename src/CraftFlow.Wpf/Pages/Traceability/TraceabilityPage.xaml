@@ -1,0 +1,100 @@
+﻿<Page x:Class="CraftFlow.Wpf.Pages.Traceability.TraceabilityPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:loc="clr-namespace:CraftFlow.Wpf.Localization"
+      Title="{loc:Loc Key=TITLE_TRACEABILITY}">
+
+    <Page.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisConverter"/>
+    </Page.Resources>
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock Text="{loc:Loc Key=TITLE_TRACEABILITY}" FontSize="20" FontWeight="Bold" Margin="0,0,0,15" Foreground="{DynamicResource AppForegroundBrush}"/>
+
+        <!-- Панель управления трассировкой -->
+        <StackPanel Grid.Row="1" MaxWidth="920" HorizontalAlignment="Left" Width="920">
+            <GroupBox Header="{loc:Loc Key=GROUP_TRACE_CONTROLS}" Padding="12" Margin="0,0,0,15" Foreground="{DynamicResource AppForegroundBrush}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="0,0,15,0">
+                        <TextBlock Text="{loc:Loc Key=LABEL_SELECT_LOT_TRACE}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                        <ComboBox x:Name="StockLotsComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Padding="5,4" Height="28"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,15,0" VerticalAlignment="Bottom" Height="28">
+                        <RadioButton x:Name="ForwardRadioButton" Content="{loc:Loc Key=TRACE_FORWARD}" IsChecked="True" Margin="0,0,15,0" VerticalAlignment="Center" FontWeight="SemiBold" Checked="RadioButton_Checked" Foreground="{DynamicResource AppForegroundBrush}"/>
+                        <RadioButton x:Name="BackwardRadioButton" Content="{loc:Loc Key=TRACE_BACKWARD}" VerticalAlignment="Center" FontWeight="SemiBold" Checked="RadioButton_Checked" Foreground="{DynamicResource AppForegroundBrush}"/>
+                    </StackPanel>
+
+                    <Button Grid.Column="2" 
+                            Content="{loc:Loc Key=RUN_TRACEABILITY}" 
+                            Click="RunTraceability_Click" 
+                            Padding="20,0" 
+                            Height="28" 
+                            VerticalAlignment="Bottom"
+                            FontWeight="Bold" 
+                            Background="#0284C7" 
+                            Foreground="White"/>
+                </Grid>
+            </GroupBox>
+        </StackPanel>
+
+        <!-- Дерево результатов -->
+        <StackPanel Grid.Row="2" MaxWidth="920" HorizontalAlignment="Left" Width="920">
+            <GroupBox Header="{loc:Loc Key=GROUP_TRACE_RESULTS}" Padding="10" MinHeight="300" Foreground="{DynamicResource AppForegroundBrush}">
+                <TreeView x:Name="TraceTreeView" FontSize="14" BorderThickness="0" Background="Transparent">
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Children}">
+                            <StackPanel Orientation="Horizontal" Margin="2,4">
+                                <!-- Иконка и Заголовок узла -->
+                                <TextBlock Text="{Binding Icon}" Margin="0,0,8,0" FontSize="16"/>
+                                <TextBlock Text="{Binding Title}" FontWeight="Bold" Margin="0,0,8,0" Foreground="{DynamicResource AppForegroundBrush}"/>
+
+                                <!-- Текст до ссылки (Префикс) -->
+                                <TextBlock Text="{Binding PrefixDetails}" Foreground="{DynamicResource AppForegroundBrush}" Opacity="0.8"/>
+
+                                <!-- Кликабельная ссылка (если есть HasLink) -->
+                                <TextBlock Visibility="{Binding HasLink, Converter={StaticResource BoolToVisConverter}}" Margin="0,0,4,0">
+                                    <Hyperlink Click="EntityLink_Click" Foreground="#0284C7">
+                                        <Run Text="{Binding LinkText}" FontWeight="SemiBold"/>
+                                    </Hyperlink>
+                                </TextBlock>
+
+                                <!-- Обычный текст, если ссылки нет -->
+                                <TextBlock Text="{Binding LinkText}" Foreground="{DynamicResource AppForegroundBrush}" Opacity="0.8">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding HasLink}" Value="False">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+
+                                <!-- Текст после ссылки (Суффикс) -->
+                                <TextBlock Text="{Binding SuffixDetails}" Foreground="{DynamicResource AppForegroundBrush}" Opacity="0.8"/>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </GroupBox>
+        </StackPanel>
+
+        <TextBlock x:Name="StatusTextBlock" Grid.Row="3" Text="{loc:Loc Key=UI_STATUS_READY}" Foreground="Blue" FontWeight="Bold" Margin="0,10,0,0"/>
+    </Grid>
+</Page>

@@ -24,43 +24,43 @@
                     <StackPanel>
                         <TextBlock Text="CRAFTFLOW" Foreground="{DynamicResource AppForegroundBrush}" FontSize="20" FontWeight="Bold" Margin="0,10,0,25" HorizontalAlignment="Center"/>
 
-                        <!-- ОСНОВНОЕ МЕНЮ СТРОГО ПО СПИСКУ -->
+                        <!-- ОСНОВНОЕ МЕНЮ СТРОГО ПО ЦЕПОЧКЕ ПРОЦЕССА -->
                         <StackPanel x:Name="MainMenuPanel" Visibility="Collapsed">
-                            <!-- 1. Дашборд -->
+                            <!-- 1. Обзор и Сводка (Дашборд) -->
                             <Button x:Name="NavDashboardButton" Content="{loc:Loc Key=NAV_DASHBOARD}" Click="NavDashboard_Click" Style="{StaticResource NavButtonStyle}"/>
 
-                            <!-- 2. Рецепты и оборудование -->
+                            <!-- 2. Настройки производства (Справочники и Оборудование) -->
                             <Button x:Name="NavProductionSettingsButton" Content="{loc:Loc Key=NAV_PRODUCTION_SETTINGS}" Click="NavProductionSettings_Click" Style="{StaticResource NavButtonStyle}"/>
 
-                            <!-- 3. Закупки и поставщики -->
-                            <Button x:Name="NavProcurementButton" Content="{loc:Loc Key=NAV_PROCUREMENT}" Click="NavProcurement_Click" Style="{StaticResource NavButtonStyle}"/>
+                            <!-- 3. Склад и Поставщики -->
+                            <Button x:Name="NavWarehouseAndSuppliersButton" Content="{loc:Loc Key=NAV_WAREHOUSE_AND_SUPPLIERS}" Click="NavWarehouseAndSuppliers_Click" Style="{StaticResource NavButtonStyle}"/>
 
-                            <!-- 4. Предметная область (Локомотив - Варочные цеха по подписке) -->
+                            <!-- 4. Расчёт сырья (MRP) -->
+                            <Button x:Name="NavMrpButton" Content="{loc:Loc Key=NAV_MRP}" Click="NavMrp_Click" Style="{StaticResource NavButtonStyle}"/>
+
+                            <!-- 5. Цеха по подписке -->
                             <Button x:Name="NavCheeseMakingButton" Content="{loc:Loc Key=NAV_CHEESE_MAKING}" Click="NavCheeseMaking_Click" Style="{StaticResource NavButtonStyle}"/>
                             <Button x:Name="NavBreweryButton" Content="{loc:Loc Key=NAV_BREWERY}" Click="NavBrewery_Click" Style="{StaticResource NavButtonStyle}"/>
-                            <Button x:Name="NavMeatButton" Content="{loc:Loc Key=NAV_MEAT}" Click="NavMeat_Click" Style="{StaticResource NavButtonStyle}"/>
+                            <Button x:Name="NavMeatProcessingButton" Content="{loc:Loc Key=NAV_MEAT_PROCESSING}" Click="NavMeatProcessing_Click" Style="{StaticResource NavButtonStyle}"/>
                             <Button x:Name="NavFermentationButton" Content="{loc:Loc Key=NAV_FERMENTATION}" Click="NavFermentation_Click" Style="{StaticResource NavButtonStyle}"/>
 
-                            <!-- 5. Продажи -->
+                            <!-- 6. Продажи и Клиенты -->
                             <Button x:Name="NavSalesButton" Content="{loc:Loc Key=NAV_SALES}" Click="NavSales_Click" Style="{StaticResource NavButtonStyle}"/>
 
-                            <!-- 6. История (Трассировка) -->
+                            <!-- 7. История партий (Трассировка) -->
                             <Button x:Name="NavTraceabilityButton" Content="{loc:Loc Key=NAV_TRACEABILITY}" Click="NavTraceability_Click" Style="{StaticResource NavButtonStyle}"/>
-
-                            <!-- 7. Расчёт сырья (MRP) -->
-                            <Button x:Name="NavMrpButton" Content="{loc:Loc Key=NAV_MRP}" Click="NavMrp_Click" Style="{StaticResource NavButtonStyle}"/>
 
                             <!-- 8. Журнал событий -->
                             <Button x:Name="NavAuditButton" Content="{loc:Loc Key=NAV_AUDIT}" Click="NavAudit_Click" Style="{StaticResource NavButtonStyle}"/>
                         </StackPanel>
 
-                        <!-- 10. Админка (Строго для тебя) -->
-                        <Button x:Name="NavAdminKeysButton" Content="{loc:Loc Key=NAV_ADMIN_KEYS}" Click="NavAdminKeys_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed" Margin="0,10,0,10"/>
+                        <!-- 10. Админка (Строго для суперадмина) -->
+                        <Button x:Name="NavAdminButton" Content="{loc:Loc Key=NAV_ADMIN_KEYS}" Click="NavAdmin_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed" Margin="0,10,0,10"/>
 
                         <!-- Кнопка входа -->
                         <Button x:Name="NavAuthButton" Content="{loc:Loc Key=NAV_AUTH}" Click="NavAuth_Click" Style="{StaticResource NavButtonStyle}" Visibility="Visible"/>
 
-                        <!-- 9. Профиль -->
+                        <!-- 9. Мой профиль -->
                         <Button x:Name="NavProfileButton" Content="{loc:Loc Key=NAV_PROFILE}" Click="NavProfile_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed"/>
                     </StackPanel>
                 </ScrollViewer>

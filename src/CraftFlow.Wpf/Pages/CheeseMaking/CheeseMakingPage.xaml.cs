@@ -1,0 +1,128 @@
+﻿using CraftFlow.SharedKernel.Constants.Endpoints;
+using CraftFlow.SharedKernel.Dtos.Aging;
+using CraftFlow.SharedKernel.Dtos.Common;
+using CraftFlow.SharedKernel.Dtos.Production;
+using CraftFlow.Wpf.Models;
+using CraftFlow.Wpf.Services;
+using System.Collections.ObjectModel;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Threading;
+using static CraftFlow.Wpf.Services.LocalizationService;
+
+namespace CraftFlow.Wpf.Pages.CheeseMaking;
+
+public partial class CheeseMakingPage : Page
+{
+    public ObservableCollection<LookupItem> RawMaterialWarehouses => BrewhouseView.RawMaterialWarehouses;
+    public ObservableCollection<LookupItem> BreweryWarehouses => BrewhouseView.BreweryWarehouses;
+    public ObservableCollection<LookupItem> DestinationWarehouses => BrewhouseView.DestinationWarehouses;
+
+    public ObservableCollection<LookupItem> Recipes => BrewhouseView.Recipes;
+    public ObservableCollection<LookupItem> ActiveBatches => BrewhouseView.ActiveBatches;
+    public ObservableCollection<ActiveBatchWpfModel> ActiveBatchesSummary => BrewhouseView.ActiveBatchesSummary;
+
+    public ObservableCollection<BatchReadyForAgingDto> CompletedBatches { get; } = [];
+    public ObservableCollection<LookupItem> AgingChambers { get; } = [];
+    public ObservableCollection<LookupItem> ActiveAgingLots { get; } = [];
+    public ObservableCollection<AgingLotSummaryDto> AgingLotsSummary { get; } = [];
+
+    private readonly DispatcherTimer _uiTimer = new();
+
+    public CheeseMakingPage() : this(null)
+    {
+    }
+
+    public CheeseMakingPage(object? dummy = null)
+    {
+        InitializeComponent();
+
+        BrewhouseView.StatusTextBlock = StatusTextBlock;
+        AgingView.StatusTextBlock = StatusTextBlock;
+        DiscardView.StatusTextBlock = StatusTextBlock;
+
+        BrewhouseView.ParentPage = this;
+        AgingView.ParentPage = this;
+        DiscardView.ParentPage = this;
+
+        AgingView.Warehouses = DestinationWarehouses;
+        AgingView.CompletedBatches = CompletedBatches;
+        AgingView.AgingChambers = AgingChambers;
+        AgingView.ActiveAgingLots = ActiveAgingLots;
+        AgingView.AgingLotsSummary = AgingLotsSummary;
+
+        DiscardView.ActiveBatches = ActiveBatches;
+        DiscardView.AgingLotsSummary = AgingLotsSummary;
+
+        _uiTimer.Interval = TimeSpan.FromSeconds(1);
+        _uiTimer.Tick += UiTimer_Tick;
+        _uiTimer.Start();
+
+        Loaded += async (s, e) => await LoadDataAsync();
+    }
+
+    private void UiTimer_Tick(object? sender, EventArgs e)
+    {
+        foreach (var batch in ActiveBatchesSummary)
+        {
+            batch.CurrentElapsed = batch.CurrentElapsed.Add(TimeSpan.FromSeconds(1));
+        }
+    }
+
+    public async Task LoadDataExternalAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        try
+        {
+            await BrewhouseView.LoadDataAsync();
+
+            var readyBatches = await ApiService.Instance.GetAsync<List<BatchReadyForAgingDto>>(ProductionConstants.BATCHES_READY_AGING);
+            CompletedBatches.Clear();
+            readyBatches?.ForEach(CompletedBatches.Add);
+
+            var chambers = await ApiService.Instance.GetAsync<List<LookupDto>>(AgingConstants.AGING_CHAMBERS);
+            AgingChambers.Clear();
+            chambers?.ForEach(c => AgingChambers.Add(new LookupItem(c.Id, c.Name)));
+
+            ActiveAgingLots.Clear();
+            AgingLotsSummary.Clear();
+
+            try
+            {
+                var activeSummary = await ApiService.Instance.GetAsync<List<AgingLotSummaryDto>>(AgingConstants.AGING_LOTS_ACTIVE);
+                if (activeSummary != null && activeSummary.Count > 0)
+                {
+                    foreach (var lot in activeSummary)
+                    {
+                        AgingLotsSummary.Add(lot);
+                        ActiveAgingLots.Add(new LookupItem(lot.LotId, lot.BatchNumber));
+                    }
+                }
+            }
+            catch { }
+
+            SetStatus("UI_MSG_DATA_LOADED_SUCCESS", Brushes.Green);
+        }
+        catch (Exception ex)
+        {
+            SetStatusFormatted("UI_ERR_DATA_LOAD_FMT", Brushes.Red, ex.Message);
+        }
+    }
+
+    private void SetStatus(string resourceKey, Brush color)
+    {
+        StatusTextBlock.Foreground = color;
+        StatusTextBlock.Text = Get(resourceKey);
+    }
+
+    private void SetStatusFormatted(string resourceKey, Brush color, params object[] args)
+    {
+        StatusTextBlock.Foreground = color;
+        var format = Get(resourceKey);
+        StatusTextBlock.Text = string.Format(format, args);
+    }
+}
