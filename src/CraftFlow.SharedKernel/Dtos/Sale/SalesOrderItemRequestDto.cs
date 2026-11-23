@@ -3,5 +3,6 @@
 public sealed record SalesOrderItemRequestDto(
     Guid StockLotId,
     decimal Quantity,
-    decimal UnitPrice
+    decimal UnitPrice,
+    List<Guid>? StockLotItemIds = null
 );

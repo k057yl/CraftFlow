@@ -20,6 +20,7 @@ public static class DbTables
     public const string WAREHOUSES = "warehouses";
     public const string STORAGE_LOCATIONS = "storage_locations";
     public const string STOCK_LOTS = "stock_lots";
+    public const string STOCK_LOT_ITEMS = "stock_lot_items";
     public const string STOCK_LOT_STORAGE_LOCATIONS = "stock_lot_storage_locations";
 
     // --- PRODUCTION (schema: production) ---

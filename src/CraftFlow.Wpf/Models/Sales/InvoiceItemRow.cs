@@ -8,6 +8,7 @@ public sealed class InvoiceItemRow : INotifyPropertyChanged
     public string BatchNumber { get; set; } = string.Empty;
     public string ProductName { get; set; } = string.Empty;
     public decimal AvailableQuantity { get; set; }
+    public List<Guid> SelectedItemIds { get; set; } = [];
 
     private decimal _quantity;
     public decimal Quantity

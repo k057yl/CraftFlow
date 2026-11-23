@@ -38,6 +38,7 @@ public class CreateAndShipSalesOrderHandler : IRequestHandler<CreateAndShipSales
 
         var stockLots = await _dbContext.StockLots
             .Include(s => s.StorageLocations)
+            .Include(s => s.Items)
             .Where(s => lotIds.Contains(s.Id) && s.IsActive)
             .ToDictionaryAsync(s => s.Id, cancellationToken);
 
@@ -58,17 +59,40 @@ public class CreateAndShipSalesOrderHandler : IRequestHandler<CreateAndShipSales
                 return Result.Failure<Guid>(Error.NotFound(ErrorCodes.Inventory.STOCK_LOT_NOT_FOUND));
             }
 
-            if (lot.Quantity < item.Quantity)
+            var unsoldItems = lot.Items.Where(i => !i.IsSold).ToList();
+            decimal shippedQuantity;
+
+            if (unsoldItems.Count > 0)
             {
-                return Result.Failure<Guid>(Error.Validation(ErrorCodes.Sales.INSUFFICIENT_PRODUCT_STOCK));
+                var targetItemIds = (item.StockLotItemIds != null && item.StockLotItemIds.Count > 0)
+                    ? item.StockLotItemIds
+                    : unsoldItems.Select(i => i.Id).ToList();
+
+                try
+                {
+                    shippedQuantity = lot.ShipSpecificItems(targetItemIds);
+                }
+                catch (InvalidOperationException)
+                {
+                    return Result.Failure<Guid>(Error.Validation(ErrorCodes.Sales.INSUFFICIENT_PRODUCT_STOCK));
+                }
+            }
+            else
+            {
+                if (lot.Quantity < item.Quantity)
+                {
+                    return Result.Failure<Guid>(Error.Validation(ErrorCodes.Sales.INSUFFICIENT_PRODUCT_STOCK));
+                }
+
+                shippedQuantity = item.Quantity;
+                lot.AdjustQuantity(-shippedQuantity);
             }
 
-            lot.AdjustQuantity(-item.Quantity);
-            order.AddItem(lot.Id, item.Quantity, item.UnitPrice);
+            order.AddItem(lot.Id, shippedQuantity, item.UnitPrice);
 
             if (lot.StorageLocations.Count > 0)
             {
-                decimal remainingToFree = item.Quantity;
+                decimal remainingToFree = shippedQuantity;
 
                 foreach (var stockLocation in lot.StorageLocations.ToList())
                 {
@@ -79,6 +103,7 @@ public class CreateAndShipSalesOrderHandler : IRequestHandler<CreateAndShipSales
                         decimal amountToFree = Math.Min(stockLocation.AllocatedQuantity, remainingToFree);
 
                         location.AddVolume(-amountToFree);
+                        stockLocation.UpdateQuantity(stockLocation.AllocatedQuantity - amountToFree);
 
                         if (location.CurrentVolume <= 0.001m)
                         {

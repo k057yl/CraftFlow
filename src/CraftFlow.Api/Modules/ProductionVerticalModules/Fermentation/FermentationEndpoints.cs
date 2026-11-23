@@ -16,7 +16,8 @@ public sealed record CompleteFermentationBatchRequest(
     decimal ActualOutputQuantity,
     int UnitsCount,
     decimal? OverheadPercentage,
-    string? BatchNumber
+    string? BatchNumber,
+    List<decimal>? ItemWeights = null
 );
 
 public sealed record DiscardFermentationBatchRequest(
@@ -71,7 +72,8 @@ public static class FermentationEndpoints
                 body.ActualOutputQuantity,
                 body.UnitsCount,
                 body.OverheadPercentage,
-                body.BatchNumber);
+                body.BatchNumber,
+                body.ItemWeights);
 
             return (await sender.Send(command, ct)).ToHttpResult(noContent: true);
         });

@@ -454,6 +454,37 @@ namespace CraftFlow.Api.Migrations
                     b.ToTable("stock_lots", "inventory");
                 });
 
+            modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain.StockLotItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<decimal>("CurrentWeight")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("numeric(18,4)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsSold")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("ItemNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<Guid>("StockLotId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StockLotId");
+
+                    b.ToTable("stock_lot_items", "inventory");
+                });
+
             modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain.StorageLocation", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1655,6 +1686,15 @@ namespace CraftFlow.Api.Migrations
                     b.Navigation("UnitOfMeasure");
                 });
 
+            modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain.StockLotItem", b =>
+                {
+                    b.HasOne("CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain.StockLot", null)
+                        .WithMany("Items")
+                        .HasForeignKey("StockLotId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain.StorageLocation", b =>
                 {
                     b.HasOne("CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain.Warehouse", null)
@@ -1727,6 +1767,11 @@ namespace CraftFlow.Api.Migrations
             modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Identity.Domain.Organization", b =>
                 {
                     b.Navigation("Members");
+                });
+
+            modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain.StockLot", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.CoreDomainServices.Procurement.Domain.PurchaseOrder", b =>

@@ -23,6 +23,9 @@ public sealed class StockLot : AggregateRoot, ITenantEntity
     private readonly List<StockLotStorageLocation> _storageLocations = [];
     public IReadOnlyCollection<StockLotStorageLocation> StorageLocations => _storageLocations.AsReadOnly();
 
+    private readonly List<StockLotItem> _items = [];
+    public IReadOnlyCollection<StockLotItem> Items => _items.AsReadOnly();
+
     private StockLot() { }
 
     public static StockLot Create(
@@ -63,6 +66,69 @@ public sealed class StockLot : AggregateRoot, ITenantEntity
             CreatedDate = DateTime.UtcNow,
             ExpirationDate = expirationDate
         };
+    }
+
+    public void PopulateItemsFromWeights(IReadOnlyList<decimal> itemWeights, string? baseCode = null)
+    {
+        _items.Clear();
+        if (itemWeights == null || itemWeights.Count == 0) return;
+
+        var prefix = !string.IsNullOrWhiteSpace(baseCode) ? baseCode : (BatchNumber ?? "SKU");
+        for (int i = 0; i < itemWeights.Count; i++)
+        {
+            if (itemWeights[i] <= 0)
+                throw new ArgumentException(ErrorCodes.General.VALUE_REQUIRED);
+
+            _items.Add(StockLotItem.Create(Id, $"{prefix}-{i + 1:D2}", itemWeights[i]));
+        }
+
+        UnitsCount = _items.Count;
+        Quantity = _items.Sum(i => i.CurrentWeight);
+    }
+
+    public void PopulateItemsEvenly(int unitsCount, decimal totalQuantity, string? baseCode = null)
+    {
+        _items.Clear();
+        if (unitsCount <= 0 || totalQuantity <= 0) return;
+
+        var prefix = !string.IsNullOrWhiteSpace(baseCode) ? baseCode : (BatchNumber ?? "SKU");
+        decimal avgWeight = Math.Round(totalQuantity / unitsCount, 3);
+        decimal distributed = 0m;
+
+        for (int i = 1; i <= unitsCount; i++)
+        {
+            decimal weight = (i == unitsCount)
+                ? Math.Round(totalQuantity - distributed, 3)
+                : avgWeight;
+
+            distributed += weight;
+            _items.Add(StockLotItem.Create(Id, $"{prefix}-{i:D2}", weight));
+        }
+
+        UnitsCount = _items.Count;
+        Quantity = totalQuantity;
+    }
+
+    public decimal ShipSpecificItems(IReadOnlyCollection<Guid> itemIds)
+    {
+        var activeItems = _items.Where(i => !i.IsSold).ToList();
+        var targetSet = itemIds.ToHashSet();
+
+        var selected = activeItems.Where(i => targetSet.Contains(i.Id)).ToList();
+        if (selected.Count != targetSet.Count || selected.Count == 0)
+            throw new InvalidOperationException(ErrorCodes.Sales.INSUFFICIENT_PRODUCT_STOCK);
+
+        decimal shippedWeight = 0m;
+        foreach (var item in selected)
+        {
+            item.MarkAsSold();
+            shippedWeight += item.CurrentWeight;
+        }
+
+        Quantity = Math.Max(0m, Quantity - shippedWeight);
+        UnitsCount = Math.Max(0, _items.Count(i => !i.IsSold));
+
+        return shippedWeight;
     }
 
     public void AssignStorageLocation(Guid storageLocationId, decimal allocatedQuantity)

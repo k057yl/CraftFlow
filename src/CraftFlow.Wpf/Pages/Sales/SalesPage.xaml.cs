@@ -115,17 +115,22 @@ public partial class SalesPage : Page
                     try
                     {
                         var details = await ApiService.Instance.GetAsync<StockLotDetailsDto>($"api/sales/stock-lots/{dto.Id}/details");
-                        if (details != null && details.Items.Count > 0)
+                        if (details != null)
                         {
-                            viewItem.Items = new ObservableCollection<SalesLotItemViewItem>(
-                                details.Items.Select(i => new SalesLotItemViewItem
-                                {
-                                    Id = i.Id,
-                                    ItemNumber = i.ItemNumber,
-                                    CurrentWeight = i.CurrentWeight
-                                })
-                            );
-                            viewItem.UnitsCount = viewItem.Items.Count;
+                            viewItem.UnitsCount = details.UnitsCount;
+
+                            if (details.Items.Count > 0)
+                            {
+                                viewItem.Items = new ObservableCollection<SalesLotItemViewItem>(
+                                    details.Items.Select(i => new SalesLotItemViewItem
+                                    {
+                                        Id = i.Id,
+                                        ItemNumber = i.ItemNumber,
+                                        CurrentWeight = i.CurrentWeight
+                                    })
+                                );
+                                viewItem.UnitsCount = viewItem.Items.Count;
+                            }
                         }
                     }
                     catch
@@ -149,7 +154,29 @@ public partial class SalesPage : Page
     {
         if (AvailableLotsDataGrid.SelectedItem is SalesStockLotViewItem selectedLot)
         {
-            AddLotToInvoice(selectedLot, selectedLot.Quantity, selectedLot.UnitsCount);
+            AddFullLotToInvoice(selectedLot);
+        }
+    }
+
+    private void AddLotButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is SalesStockLotViewItem selectedLot)
+        {
+            AddFullLotToInvoice(selectedLot);
+        }
+    }
+
+    private void AddFullLotToInvoice(SalesStockLotViewItem lot)
+    {
+        if (lot.Items.Count > 0)
+        {
+            var allIds = lot.Items.Select(i => i.Id).ToList();
+            decimal totalWeight = lot.Items.Sum(i => i.CurrentWeight);
+            AddLotToInvoice(lot, totalWeight, allIds.Count, allIds);
+        }
+        else
+        {
+            AddLotToInvoice(lot, lot.Quantity, lot.UnitsCount, []);
         }
     }
 
@@ -157,6 +184,12 @@ public partial class SalesPage : Page
     {
         if (sender is Button btn && btn.Tag is SalesStockLotViewItem lot)
         {
+            if (lot.Items.Count == 0)
+            {
+                AddFullLotToInvoice(lot);
+                return;
+            }
+
             var selectedUnits = lot.Items.Where(i => i.IsSelected).ToList();
 
             if (selectedUnits.Count == 0)
@@ -166,35 +199,57 @@ public partial class SalesPage : Page
             }
 
             decimal selectedWeight = selectedUnits.Sum(u => u.CurrentWeight);
-            int unitsCount = selectedUnits.Count;
+            var selectedIds = selectedUnits.Select(u => u.Id).ToList();
 
-            AddLotToInvoice(lot, selectedWeight, unitsCount);
+            AddLotToInvoice(lot, selectedWeight, selectedUnits.Count, selectedIds);
         }
     }
 
-    private void AddLotToInvoice(SalesStockLotViewItem lot, decimal weight, int unitsCount)
+    private void AddLotToInvoice(SalesStockLotViewItem lot, decimal weight, int unitsCount, List<Guid> selectedItemIds)
     {
-        if (InvoiceItems.Any(i => i.StockLotId == lot.Id))
+        string unitsSuffix = Get("UI_LABEL_PCS_SUFFIX");
+        string displayUnits = unitsCount > 0 ? $" ({unitsCount} {unitsSuffix})" : string.Empty;
+        string displayBatch = $"{lot.BatchNumber}{displayUnits}";
+
+        var existing = InvoiceItems.FirstOrDefault(i => i.StockLotId == lot.Id);
+        if (existing != null)
         {
+            existing.BatchNumber = displayBatch;
+            existing.Quantity = weight;
+            existing.SelectedItemIds = selectedItemIds;
+            InvoiceItemsDataGrid.Items.Refresh();
+            RecalculateOrderTotals();
             return;
         }
 
         decimal basePrice = lot.UnitPrice > 0 ? lot.UnitPrice * DEFAULT_MARKUP_MULTIPLIER : 450.00m;
-        string unitsSuffix = Get("UI_LABEL_PCS_SUFFIX");
-        string displayUnits = unitsCount > 0 ? $" ({unitsCount} {unitsSuffix})" : string.Empty;
 
         var row = new InvoiceItemRow
         {
             StockLotId = lot.Id,
-            BatchNumber = $"{lot.BatchNumber}{displayUnits}",
+            BatchNumber = displayBatch,
             ProductName = string.IsNullOrWhiteSpace(lot.ProductName) ? lot.BatchNumber : lot.ProductName,
             AvailableQuantity = lot.Quantity,
             Quantity = weight,
-            SellingPrice = Math.Round(basePrice, 2)
+            SellingPrice = Math.Round(basePrice, 2),
+            SelectedItemIds = selectedItemIds
         };
 
         row.PropertyChanged += (s, ev) => RecalculateOrderTotals();
         InvoiceItems.Add(row);
+    }
+
+    private void RemoveInvoiceItem_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is InvoiceItemRow row)
+        {
+            InvoiceItems.Remove(row);
+        }
+    }
+
+    private void InvoiceItemsDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
+    {
+        Dispatcher.BeginInvoke(RecalculateOrderTotals);
     }
 
     private void RecalculateOrderTotals()
@@ -250,11 +305,21 @@ public partial class SalesPage : Page
             return;
         }
 
+        foreach (var item in InvoiceItems)
+        {
+            if (item.Quantity <= 0 || item.Quantity > item.AvailableQuantity)
+            {
+                SetStatusRaw($"Партия «{item.BatchNumber}»: количество к отгрузке ({item.Quantity:F2}) должно быть больше 0 и не превышать остаток ({item.AvailableQuantity:F2}).", Brushes.Red);
+                return;
+            }
+        }
+
         var itemsPayload = InvoiceItems.Select(i => new
         {
             StockLotId = i.StockLotId,
             Quantity = i.Quantity,
-            UnitPrice = i.SellingPrice
+            UnitPrice = i.SellingPrice,
+            StockLotItemIds = i.SelectedItemIds.Count > 0 ? i.SelectedItemIds : null
         }).ToList();
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(SalesConstants.ORDERS_SHIP, new

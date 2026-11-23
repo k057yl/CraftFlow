@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.CoreDomainServices.Sales.Stock.GetStockLotDetails;
+
 public class GetStockLotDetailsQueryHandler : IRequestHandler<GetStockLotDetailsQuery, Result<StockLotDetailsDto>>
 {
     private readonly AppDbContext _dbContext;
@@ -19,6 +20,7 @@ public class GetStockLotDetailsQueryHandler : IRequestHandler<GetStockLotDetails
     {
         var stockLot = await _dbContext.StockLots
             .AsNoTracking()
+            .Include(s => s.Items)
             .FirstOrDefaultAsync(s => s.Id == request.StockLotId && s.IsActive, cancellationToken);
 
         if (stockLot == null)
@@ -30,29 +32,17 @@ public class GetStockLotDetailsQueryHandler : IRequestHandler<GetStockLotDetails
             .AsNoTracking()
             .Where(p => p.Id == stockLot.ItemId)
             .Select(p => p.Name)
-            .FirstOrDefaultAsync(cancellationToken) ?? stockLot.BatchNumber;
+            .FirstOrDefaultAsync(cancellationToken) ?? stockLot.BatchNumber ?? string.Empty;
 
-        var items = new List<LotItemDetailsDto>();
-
-        if (stockLot.ProductionBatchId.HasValue)
-        {
-            var agingLot = await _dbContext.AgingLots
-                .AsNoTracking()
-                .Include(a => a.Items)
-                .FirstOrDefaultAsync(a => a.ProductionBatchId == stockLot.ProductionBatchId.Value && a.IsActive, cancellationToken);
-
-            if (agingLot != null)
-            {
-                items = agingLot.Items
-                    .Where(i => i.CurrentWeight > 0)
-                    .Select(i => new LotItemDetailsDto(i.Id, i.ItemNumber, i.CurrentWeight))
-                    .ToList();
-            }
-        }
+        var items = stockLot.Items
+            .Where(i => !i.IsSold && i.CurrentWeight > 0)
+            .OrderBy(i => i.ItemNumber)
+            .Select(i => new LotItemDetailsDto(i.Id, i.ItemNumber, i.CurrentWeight))
+            .ToList();
 
         var result = new StockLotDetailsDto(
             stockLot.Id,
-            stockLot.BatchNumber,
+            stockLot.BatchNumber ?? string.Empty,
             productName,
             stockLot.Quantity,
             items.Count > 0 ? items.Count : stockLot.UnitsCount,

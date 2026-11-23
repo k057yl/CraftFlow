@@ -209,15 +209,15 @@
                             </GroupBox>
 
                             <!-- Панель завершения выбранной партии и оприходования -->
-                            <GroupBox Grid.Row="1" Header="Завершение брожения и выпуск на склад" Padding="10">
+                            <GroupBox Grid.Row="1" Header="Завершение брожения и фасовка SKU" Padding="10">
                                 <StackPanel>
                                     <Grid Margin="0,0,0,8">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="2*"/>
                                             <ColumnDefinition Width="8"/>
-                                            <ColumnDefinition Width="1*"/>
-                                            <ColumnDefinition Width="8"/>
                                             <ColumnDefinition Width="0.8*"/>
+                                            <ColumnDefinition Width="8"/>
+                                            <ColumnDefinition Width="1*"/>
                                         </Grid.ColumnDefinitions>
 
                                         <StackPanel Grid.Column="0">
@@ -226,15 +226,55 @@
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="2">
-                                            <TextBlock Text="Факт. выход (кг/л)" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-                                            <TextBox x:Name="ActualOutputQuantityTextBox" Height="26" Padding="4,2" TextChanged="CostInputs_Changed"/>
+                                            <TextBlock Text="Тар / мест" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                            <TextBox x:Name="ActualUnitsCountTextBox" Text="1" Height="26" Padding="4,2" TextChanged="UnitsCount_TextChanged"/>
                                         </StackPanel>
 
                                         <StackPanel Grid.Column="4">
-                                            <TextBlock Text="Тар / мест" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
-                                            <TextBox x:Name="ActualUnitsCountTextBox" Text="1" Height="26" Padding="4,2"/>
+                                            <TextBlock Text="Общий вес (кг/л)" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,3"/>
+                                            <TextBox x:Name="ActualOutputQuantityTextBox" Height="26" Padding="4,2" TextChanged="TotalWeightManual_TextChanged"/>
                                         </StackPanel>
                                     </Grid>
+
+                                    <!-- Взвешивание каждой единицы (SKU) -->
+                                    <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="6" Margin="0,0,0,8">
+                                        <StackPanel>
+                                            <Grid Margin="0,0,0,4">
+                                                <TextBlock Text="Вес каждой единицы / тары (кг):" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" VerticalAlignment="Center"/>
+                                                <Button Content="Раскидать поровну"
+                                                        Click="DistributeWeightEvenly_Click"
+                                                        HorizontalAlignment="Right"
+                                                        Height="22"
+                                                        Padding="8,0"
+                                                        FontSize="10"
+                                                        Style="{StaticResource SecondaryButtonStyle}"/>
+                                            </Grid>
+
+                                            <ItemsControl x:Name="PackagingUnitsItemsControl" MaxHeight="110">
+                                                <ItemsControl.Template>
+                                                    <ControlTemplate TargetType="ItemsControl">
+                                                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                            <ItemsPresenter/>
+                                                        </ScrollViewer>
+                                                    </ControlTemplate>
+                                                </ItemsControl.Template>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid Margin="0,2">
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition Width="*"/>
+                                                                <ColumnDefinition Width="95"/>
+                                                                <ColumnDefinition Width="30"/>
+                                                            </Grid.ColumnDefinitions>
+                                                            <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" VerticalAlignment="Center"/>
+                                                            <TextBox Grid.Column="1" Text="{Binding WeightText, UpdateSourceTrigger=PropertyChanged}" Height="24" Padding="4,1" TextChanged="UnitItemWeight_TextChanged"/>
+                                                            <TextBlock Grid.Column="2" Text="кг" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="5,0,0,0" VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Border>
 
                                     <Grid Margin="0,0,0,8">
                                         <Grid.ColumnDefinitions>

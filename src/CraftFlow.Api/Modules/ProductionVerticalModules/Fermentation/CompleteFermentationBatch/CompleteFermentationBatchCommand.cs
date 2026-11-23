@@ -10,7 +10,8 @@ public record CompleteFermentationBatchCommand(
     decimal ActualOutputQuantity,
     int UnitsCount,
     decimal? OverheadPercentage,
-    string? BatchNumber
+    string? BatchNumber,
+    List<decimal>? ItemWeights = null
 ) : IRequest<Result>, IRequirePermission
 {
     public AppPermission RequiredPermission => AppPermission.PRODUCTION_EXECUTE;

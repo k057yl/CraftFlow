@@ -31,5 +31,13 @@ public class StockLotConfiguration : IEntityTypeConfiguration<StockLot>
             locBuilder.HasKey(x => new { x.StockLotId, x.StorageLocationId });
             locBuilder.Property(x => x.AllocatedQuantity).HasPrecision(18, 4);
         });
+
+        builder.HasMany(sl => sl.Items)
+            .WithOne()
+            .HasForeignKey(x => x.StockLotId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Navigation(sl => sl.Items)
+            .UsePropertyAccessMode(PropertyAccessMode.Field);
     }
 }
