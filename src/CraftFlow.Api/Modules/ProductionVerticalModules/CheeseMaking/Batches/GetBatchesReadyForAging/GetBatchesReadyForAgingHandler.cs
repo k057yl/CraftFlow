@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Core.Persistence;
 using CraftFlow.SharedKernel.Dtos.Production;
+using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
@@ -31,12 +32,12 @@ public class GetBatchesReadyForAgingHandler : IRequestHandler<GetBatchesReadyFor
                   batch => batch.RecipeId,
                   recipe => recipe.Id,
                   (batch, recipe) => new { Batch = batch, Recipe = recipe })
-            .Where(br => br.Recipe.IsAgingRequired)
+            .Where(br => br.Recipe.IsAgingRequired && br.Recipe.TargetModule == AppModule.CHEESE_MAKING)
             .Select(br => new BatchReadyForAgingDto(
                 br.Batch.Id,
                 string.IsNullOrWhiteSpace(br.Batch.Name)
-                    ? $"Party #{br.Batch.Id.ToString().Substring(0, 8)} (Exit: {(br.Batch.ActualOutputQuantity > 0 ? br.Batch.ActualOutputQuantity : br.Batch.PlannedOutputQuantity)} кг)"
-                    : $"{br.Batch.Name} (Exit: {(br.Batch.ActualOutputQuantity > 0 ? br.Batch.ActualOutputQuantity : br.Batch.PlannedOutputQuantity)} kg)",
+                    ? $"BATCH-{br.Batch.Id.ToString().Substring(0, 8).ToUpper()}"
+                    : br.Batch.Name,
                 br.Recipe.DefaultMinAgingDays ?? 0,
                 br.Batch.UnitsCount
             ))

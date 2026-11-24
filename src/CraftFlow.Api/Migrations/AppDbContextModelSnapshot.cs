@@ -1340,6 +1340,9 @@ namespace CraftFlow.Api.Migrations
                     b.Property<Guid>("EquipmentLocationId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("HeadWeightsSerialized")
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 

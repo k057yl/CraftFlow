@@ -11,6 +11,8 @@ namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Batches.C
 
 public class CompleteProductionBatchHandler : IRequestHandler<CompleteProductionBatchCommand, Result<Guid>>
 {
+    private const int MaxBatchNumberLength = 85;
+
     private readonly AppDbContext _dbContext;
     private readonly IPublisher _publisher;
 
@@ -37,10 +39,23 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
 
         if (!string.IsNullOrWhiteSpace(request.BatchNumber))
         {
-            batch.UpdateName(request.BatchNumber);
+            var trimmedName = request.BatchNumber.Trim();
+            if (trimmedName.Length > MaxBatchNumberLength)
+            {
+                return Result.Failure<Guid>(Error.Validation(ErrorCodes.Aging.BATCH_NUMBER_MAX_LENGTH_EXCEEDED));
+            }
+
+            batch.UpdateName(trimmedName);
         }
 
-        int unitsCount = request.UnitsCount > 0 ? request.UnitsCount : 1;
+        var validWeights = request.HeadWeights?.Where(w => w > 0).ToList();
+        int unitsCount = validWeights != null && validWeights.Count > 0
+            ? validWeights.Count
+            : (request.UnitsCount > 0 ? request.UnitsCount : 1);
+
+        decimal actualOutput = validWeights != null && validWeights.Count > 0
+            ? validWeights.Sum()
+            : request.ActualOutputQuantity;
 
         if (batch.EquipmentLocationId != Guid.Empty)
         {
@@ -55,7 +70,7 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
 
         if (request.RequiresAging && request.AgingChamberId.HasValue)
         {
-            batch.MarkReadyForAging(request.ActualOutputQuantity, unitsCount);
+            batch.MarkReadyForAging(actualOutput, unitsCount, validWeights);
             batch.MarkAsTransferredToAging();
 
             var agingLot = AgingLot.Create(
@@ -63,10 +78,11 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
                 productId: batch.TargetProductId,
                 agingChamberId: request.AgingChamberId.Value,
                 batchNumber: batch.Name,
-                initialQuantity: request.ActualOutputQuantity,
+                initialQuantity: actualOutput,
                 unitsCount: unitsCount,
                 minAgingDays: request.MinAgingDays ?? 0,
-                storageLocationId: request.StorageLocationId
+                storageLocationId: request.StorageLocationId,
+                headWeights: validWeights
             );
 
             await _dbContext.Set<AgingLot>().AddAsync(agingLot, cancellationToken);
@@ -74,14 +90,15 @@ public class CompleteProductionBatchHandler : IRequestHandler<CompleteProduction
         else
         {
             batch.Complete(
-                actualOutputQuantity: request.ActualOutputQuantity,
+                actualOutputQuantity: actualOutput,
                 unitsCount: unitsCount,
-                overheadPercentage: request.OverheadPercentage
+                overheadPercentage: request.OverheadPercentage,
+                headWeights: validWeights
             );
         }
 
         await _publisher.Publish(
-            new ProductionBatchCompletedEvent(batch.Id, batch.RecipeId, batch.DestinationWarehouseId, batch.ActualOutputQuantity, unitsCount),
+            new ProductionBatchCompletedEvent(batch.Id, batch.RecipeId, batch.DestinationWarehouseId, batch.ActualOutputQuantity, unitsCount, validWeights),
             cancellationToken
         );
 

@@ -17,6 +17,8 @@ namespace CraftFlow.Wpf.Pages.CheeseMaking.Controls;
 
 public partial class AgingControl : UserControl
 {
+    private const int MaxBatchNameLength = 85;
+
     private ObservableCollection<LookupItem> _warehouses = [];
     public ObservableCollection<LookupItem> Warehouses
     {
@@ -92,7 +94,7 @@ public partial class AgingControl : UserControl
         if (CompletedBatchesComboBox.SelectedItem is BatchReadyForAgingDto selectedBatch)
         {
             MinAgingDaysTextBox.Text = selectedBatch.DefaultAgingDays.ToString();
-            AgingLotNameTextBox.Text = string.Concat(selectedBatch.Name, " (", Get("UI_TAB_AGING"), ")");
+            AgingLotNameTextBox.Text = selectedBatch.Name;
         }
         else
         {
@@ -112,14 +114,21 @@ public partial class AgingControl : UserControl
         }
 
         var customLotName = AgingLotNameTextBox.Text?.Trim();
+        if (!string.IsNullOrEmpty(customLotName) && customLotName.Length > MaxBatchNameLength)
+        {
+            SetStatusRaw($"Валера, заебал, {customLotName.Length} символов — это чрезмерно дохуя (максимум {MaxBatchNameLength}).", Brushes.Red);
+            return;
+        }
 
-        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_TRANSFER, new TransferToAgingRequest(
-            selectedBatch.Id,
-            chamberId,
-            minDays,
-            selectedBatch.UnitsCount,
-            string.IsNullOrWhiteSpace(customLotName) ? null : customLotName
-        ));
+        var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_TRANSFER, new
+        {
+            ProductionBatchId = selectedBatch.Id,
+            AgingChamberId = chamberId,
+            MinAgingDays = minDays,
+            UnitsCount = selectedBatch.UnitsCount,
+            CustomBatchNumber = string.IsNullOrWhiteSpace(customLotName) ? null : customLotName,
+            StorageLocationId = (Guid?)null
+        });
 
         if (isSuccess)
         {
@@ -163,7 +172,7 @@ public partial class AgingControl : UserControl
 
         if (ActiveAgingLotsComboBox.SelectedItem is LookupItem selectedLot)
         {
-            ReleaseLotNameTextBox.Text = string.Concat(selectedLot.Name, " (", Get("UI_AGING_GROUP_RELEASE"), ")");
+            ReleaseLotNameTextBox.Text = selectedLot.Name;
 
             try
             {
@@ -249,8 +258,17 @@ public partial class AgingControl : UserControl
             return;
         }
 
+        var customLotName = ReleaseLotNameTextBox.Text?.Trim();
+        if (!string.IsNullOrEmpty(customLotName) && customLotName.Length > MaxBatchNameLength)
+        {
+            SetStatusRaw($"Валера, заебал, {customLotName.Length} символов — это чрезмерно дохуя (максимум {MaxBatchNameLength}).", Brushes.Red);
+            return;
+        }
+
         var details = await ApiService.Instance.GetAsync<GetAgingLotDetailsDto>($"{AgingConstants.AGING_LOTS_ACTIVE}/{lotId}");
         if (details == null) return;
+
+        var items = await ApiService.Instance.GetAsync<List<GetAgingLotItemDto>>($"{AgingConstants.AGING_LOTS_ACTIVE}/{lotId}/items");
 
         var selectedLotName = (ActiveAgingLotsComboBox.SelectedItem as LookupItem)?.Name ?? string.Empty;
         var selectedChamberName = AgingLotsSummary.FirstOrDefault(l => l.LotId == lotId)?.ChamberName ?? string.Empty;
@@ -258,7 +276,8 @@ public partial class AgingControl : UserControl
             selectedLotName,
             selectedChamberName,
             details.TotalBatchCost,
-            details.UnitsCount
+            details.UnitsCount,
+            items
         )
         {
             Owner = Window.GetWindow(this)
@@ -271,17 +290,18 @@ public partial class AgingControl : UserControl
                 .Select(l => l.Id)
                 .ToList();
 
-            var customLotName = ReleaseLotNameTextBox.Text?.Trim();
-            var response = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_RELEASE, new ReleaseFromAgingRequest(
-                lotId,
-                warehouseId,
-                weighWindow.TotalWeight,
-                weighWindow.ValidUnitsCount,
-                weighWindow.UnitPrice,
-                string.IsNullOrWhiteSpace(customLotName) ? null : customLotName,
-                selectedStorageLocationIds.Count > 0 ? selectedStorageLocationIds : null,
-                weighWindow.ValidHeadWeights
-            ));
+            var response = await ApiService.Instance.PostAndReadAsync(AgingConstants.AGING_LOTS_RELEASE, new
+            {
+                AgingLotId = lotId,
+                TargetWarehouseId = warehouseId,
+                ActualFinalQuantity = weighWindow.TotalWeight,
+                UnitsCount = weighWindow.ValidUnitsCount,
+                UnitPrice = weighWindow.UnitPrice,
+                CustomBatchNumber = string.IsNullOrWhiteSpace(customLotName) ? null : customLotName,
+                StorageLocationIds = selectedStorageLocationIds.Count > 0 ? selectedStorageLocationIds : null,
+                HeadWeights = weighWindow.ValidHeadWeights,
+                DiscardedItemIds = weighWindow.DiscardedItemIds.Count > 0 ? weighWindow.DiscardedItemIds : null
+            });
 
             if (response.IsSuccess)
             {

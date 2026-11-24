@@ -7,5 +7,6 @@ public record ProductionBatchCompletedEvent(
     Guid RecipeId,
     Guid WarehouseId,
     decimal ActualOutputQuantity,
-    int UnitsCount
+    int UnitsCount,
+    IReadOnlyList<decimal>? HeadWeights = null
 ) : INotification;

@@ -57,8 +57,10 @@ public class ProductionBatchCompletedEventHandler : INotificationHandler<Product
             }
         }
 
+        decimal totalBatchCost = batch.CalculateTotalCost(totalRawCost);
+
         decimal calculatedUnitCost = notification.ActualOutputQuantity > 0
-            ? totalRawCost / notification.ActualOutputQuantity
+            ? totalBatchCost / notification.ActualOutputQuantity
             : 0m;
 
         var destWarehouseId = batch.DestinationWarehouseId != Guid.Empty
@@ -80,6 +82,15 @@ public class ProductionBatchCompletedEventHandler : INotificationHandler<Product
             tenantId: batch.TenantId,
             productionBatchId: batch.Id
         );
+
+        if (notification.HeadWeights != null && notification.HeadWeights.Count > 0)
+        {
+            finishedStockLot.PopulateItemsFromWeights(notification.HeadWeights);
+        }
+        else if (notification.UnitsCount > 0)
+        {
+            finishedStockLot.PopulateItemsEvenly(notification.UnitsCount, notification.ActualOutputQuantity);
+        }
 
         _dbContext.StockLots.Add(finishedStockLot);
     }

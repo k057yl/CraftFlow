@@ -128,6 +128,7 @@ public static class ErrorCodes
         public const string INSUFFICIENT_AGING_CAPACITY = "AGING.INSUFFICIENT_AGING_CAPACITY";
         public const string DISCARD_REASON_MANUAL_DISCARD = "AGING.DISCARD_REASON_MANUAL_DISCARD";
         public const string DISCARD_REASON_INVENTORY_LOSS = "AGING.DISCARD_REASON_INVENTORY_LOSS";
+        public const string BATCH_NUMBER_MAX_LENGTH_EXCEEDED = "AGING.BATCH_NUMBER_MAX_LENGTH_EXCEEDED";
     }
 
     public static class Saas

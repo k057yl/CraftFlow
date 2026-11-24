@@ -164,14 +164,47 @@
 
                             <StackPanel Grid.Column="0">
                                 <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_ACTUAL_OUTPUT}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                <TextBox x:Name="ActualOutputQuantityTextBox" Padding="4,2" Height="26" TextChanged="CostInputs_Changed"/>
+                                <TextBox x:Name="ActualOutputQuantityTextBox" Padding="4,2" Height="26" TextChanged="TotalWeightManual_TextChanged"/>
                             </StackPanel>
 
                             <StackPanel Grid.Column="2">
                                 <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_UNITS_COUNT}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                <TextBox x:Name="ActualUnitsCountTextBox" Text="1" Padding="4,2" Height="26"/>
+                                <TextBox x:Name="ActualUnitsCountTextBox" Text="1" Padding="4,2" Height="26" TextChanged="UnitsCount_TextChanged"/>
                             </StackPanel>
                         </Grid>
+
+                        <!-- Поштучное взвешивание головок после формования -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="6" Margin="0,0,0,8">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock Text="Взвешивание головок / SKU (кг):" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" VerticalAlignment="Center"/>
+                                    <Button Content="Раскидать поровну" Click="DistributeWeightEvenly_Click" HorizontalAlignment="Right" Padding="6,2" FontSize="10" Height="20" Style="{StaticResource SecondaryButtonStyle}"/>
+                                </Grid>
+                                <ItemsControl x:Name="PackagingUnitsItemsControl" MaxHeight="110">
+                                    <ItemsControl.Template>
+                                        <ControlTemplate TargetType="ItemsControl">
+                                            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                                <ItemsPresenter/>
+                                            </ScrollViewer>
+                                        </ControlTemplate>
+                                    </ItemsControl.Template>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,2">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="95"/>
+                                                    <ColumnDefinition Width="26"/>
+                                                </Grid.ColumnDefinitions>
+                                                <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                                <TextBox Grid.Column="1" Text="{Binding WeightText, UpdateSourceTrigger=PropertyChanged}" TextChanged="UnitItemWeight_TextChanged" Padding="4,1" Height="22" FontSize="11" HorizontalContentAlignment="Right"/>
+                                                <TextBlock Grid.Column="2" Text="кг" FontSize="11" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="#64748B"/>
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </StackPanel>
+                        </Border>
 
                         <Grid Margin="0,0,0,8">
                             <Grid.ColumnDefinitions>

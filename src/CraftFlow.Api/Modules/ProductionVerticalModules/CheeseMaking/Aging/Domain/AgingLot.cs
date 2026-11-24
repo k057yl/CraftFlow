@@ -39,7 +39,8 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
         decimal initialQuantity,
         int unitsCount,
         int minAgingDays,
-        Guid? storageLocationId = null)
+        Guid? storageLocationId = null,
+        IReadOnlyList<decimal>? headWeights = null)
     {
         if (initialQuantity <= 0 || unitsCount <= 0)
             throw new ArgumentException(ErrorCodes.General.VALUE_REQUIRED);
@@ -60,7 +61,15 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
             TargetReleaseDate = now.AddDays(minAgingDays)
         };
 
-        lot.PopulateItems(unitsCount, initialQuantity);
+        if (headWeights != null && headWeights.Count > 0)
+        {
+            lot.PopulateItemsWithWeights(headWeights);
+        }
+        else
+        {
+            lot.PopulateItems(unitsCount, initialQuantity);
+        }
+
         lot.InitStateMachine();
         return lot;
     }
@@ -77,6 +86,20 @@ public sealed class AgingLot : AggregateRoot, ITenantEntity
         {
             var itemCode = $"{BatchNumber}-{i:D2}";
             _items.Add(AgingLotItem.Create(Id, itemCode, avgWeight));
+        }
+    }
+
+    public void PopulateItemsWithWeights(IReadOnlyList<decimal> weights)
+    {
+        _items.Clear();
+
+        for (int i = 0; i < weights.Count; i++)
+        {
+            if (weights[i] > 0)
+            {
+                var itemCode = $"{BatchNumber}-{(i + 1):D2}";
+                _items.Add(AgingLotItem.Create(Id, itemCode, weights[i]));
+            }
         }
     }
 

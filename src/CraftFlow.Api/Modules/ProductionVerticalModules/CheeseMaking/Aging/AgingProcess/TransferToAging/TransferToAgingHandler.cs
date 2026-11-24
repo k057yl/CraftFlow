@@ -44,13 +44,17 @@ public sealed class TransferToAgingHandler : IRequestHandler<TransferToAgingComm
                 ? batch.Name
                 : string.Format(FormattingConstants.BATCH_NUMBER_FORMAT, DateTime.UtcNow, batch.Id.ToString()[..4].ToUpperInvariant()));
 
-        var initialQuantity = batch.ActualOutputQuantity > 0
-            ? batch.ActualOutputQuantity
-            : batch.PlannedOutputQuantity;
+        var savedWeights = batch.GetHeadWeights();
 
-        int unitsCount = request.UnitsCount > 0 ? request.UnitsCount : 1;
+        var initialQuantity = savedWeights.Count > 0
+            ? savedWeights.Sum()
+            : (batch.ActualOutputQuantity > 0 ? batch.ActualOutputQuantity : batch.PlannedOutputQuantity);
 
-        if (product.UnitOfMeasure.Type == UnitType.Piece)
+        int unitsCount = savedWeights.Count > 0
+            ? savedWeights.Count
+            : (request.UnitsCount > 0 ? request.UnitsCount : 1);
+
+        if (savedWeights.Count == 0 && product.UnitOfMeasure.Type == UnitType.Piece)
         {
             unitsCount = (int)Math.Max(1, Math.Round(initialQuantity));
         }
@@ -63,7 +67,8 @@ public sealed class TransferToAgingHandler : IRequestHandler<TransferToAgingComm
             initialQuantity,
             unitsCount,
             request.MinAgingDays,
-            request.StorageLocationId
+            request.StorageLocationId,
+            savedWeights.Count > 0 ? savedWeights : null
         );
 
         batch.MarkAsTransferredToAging();

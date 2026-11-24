@@ -14,7 +14,8 @@ public sealed record CompleteProductionBatchCommand(
     bool RequiresAging,
     Guid? AgingChamberId,
     int? MinAgingDays,
-    Guid? StorageLocationId
+    Guid? StorageLocationId,
+    List<decimal>? HeadWeights = null
 ) : IRequest<Result<Guid>>, IRequirePermission
 {
     public AppPermission RequiredPermission => AppPermission.PRODUCTION_EXECUTE;

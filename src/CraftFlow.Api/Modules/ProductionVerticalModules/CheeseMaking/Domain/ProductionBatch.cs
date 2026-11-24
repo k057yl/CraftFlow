@@ -2,6 +2,7 @@
 using CraftFlow.SharedKernel.Domain;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using Stateless;
+using System.Globalization;
 
 namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain;
 
@@ -31,6 +32,7 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
     public bool IsTelegramNotified { get; private set; }
     public string? DiscardReason { get; private set; }
     public int UnitsCount { get; private set; } = 1;
+    public string? HeadWeightsSerialized { get; private set; }
 
     private ProductionBatch() { }
 
@@ -72,17 +74,44 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         return batch;
     }
 
+    public IReadOnlyList<decimal> GetHeadWeights()
+    {
+        if (string.IsNullOrWhiteSpace(HeadWeightsSerialized))
+            return [];
+
+        return HeadWeightsSerialized
+            .Split(';', StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => decimal.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var d) ? d : 0m)
+            .Where(d => d > 0)
+            .ToList();
+    }
+
+    public void SetHeadWeights(IEnumerable<decimal>? weights)
+    {
+        if (weights == null)
+        {
+            HeadWeightsSerialized = null;
+            return;
+        }
+
+        var valid = weights.Where(w => w > 0).ToList();
+        HeadWeightsSerialized = valid.Count > 0
+            ? string.Join(";", valid.Select(w => w.ToString(CultureInfo.InvariantCulture)))
+            : null;
+    }
+
     public void Start()
     {
         EnsureMachine();
         _stateMachine!.Fire(BatchTrigger.START);
     }
 
-    public void Complete(decimal actualOutputQuantity, int unitsCount = 1, decimal? overheadPercentage = null)
+    public void Complete(decimal actualOutputQuantity, int unitsCount = 1, decimal? overheadPercentage = null, IEnumerable<decimal>? headWeights = null)
     {
         EnsureMachine();
         ActualOutputQuantity = actualOutputQuantity;
         UnitsCount = unitsCount > 0 ? unitsCount : 1;
+        SetHeadWeights(headWeights);
         SetOverheadPercentage(overheadPercentage);
         BrewingCompletedAt = DateTime.UtcNow;
         CompletedAt = DateTime.UtcNow;
@@ -108,11 +137,12 @@ public sealed class ProductionBatch : AggregateRoot, ITenantEntity
         return rawMaterialCost * multiplier;
     }
 
-    public void MarkReadyForAging(decimal actualOutputQuantity, int unitsCount = 1)
+    public void MarkReadyForAging(decimal actualOutputQuantity, int unitsCount = 1, IEnumerable<decimal>? headWeights = null)
     {
         EnsureMachine();
         ActualOutputQuantity = actualOutputQuantity;
         UnitsCount = unitsCount > 0 ? unitsCount : 1;
+        SetHeadWeights(headWeights);
         BrewingCompletedAt = DateTime.UtcNow;
         _stateMachine!.Fire(BatchTrigger.COMPLETE);
     }

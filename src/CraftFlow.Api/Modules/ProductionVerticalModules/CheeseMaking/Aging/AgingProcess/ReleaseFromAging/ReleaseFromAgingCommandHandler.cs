@@ -4,6 +4,7 @@ using CraftFlow.Api.Modules.CoreDomainServices.Catalog.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain;
 using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,8 @@ namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.Agi
 
 public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFromAgingCommand, Result>
 {
+    private const int MaxBatchNumberLength = 85;
+
     private readonly AppDbContext _dbContext;
     private readonly ITenantContext _tenantContext;
 
@@ -28,6 +31,15 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             return Result.Failure(Error.Validation(ErrorCodes.General.VALUE_REQUIRED));
         }
 
+        var finalBatchNumber = !string.IsNullOrWhiteSpace(request.CustomBatchNumber)
+            ? request.CustomBatchNumber.Trim()
+            : string.Empty;
+
+        if (finalBatchNumber.Length > MaxBatchNumberLength)
+        {
+            return Result.Failure(Error.Validation(ErrorCodes.Aging.BATCH_NUMBER_MAX_LENGTH_EXCEEDED));
+        }
+
         var lot = await _dbContext.AgingLots
             .Include(l => l.Items)
             .FirstOrDefaultAsync(l => l.Id == request.AgingLotId, cancellationToken);
@@ -35,6 +47,15 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
         if (lot is null)
         {
             return Result.Failure(Error.NotFound(ErrorCodes.General.NOT_FOUND));
+        }
+
+        if (string.IsNullOrWhiteSpace(finalBatchNumber))
+        {
+            finalBatchNumber = lot.BatchNumber.Trim();
+            if (finalBatchNumber.Length > MaxBatchNumberLength)
+            {
+                return Result.Failure(Error.Validation(ErrorCodes.Aging.BATCH_NUMBER_MAX_LENGTH_EXCEEDED));
+            }
         }
 
         var product = await _dbContext.Products
@@ -47,14 +68,23 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             return Result.Failure(Error.NotFound("PRODUCT_OR_UOM_NOT_FOUND"));
         }
 
+        if (request.DiscardedItemIds != null && request.DiscardedItemIds.Count > 0)
+        {
+            lot.DiscardSpecificItems(request.DiscardedItemIds, ErrorCodes.Aging.DISCARD_REASON_MANUAL_DISCARD);
+        }
+
         if (request.HeadWeights != null && request.HeadWeights.Count > 0)
         {
             lot.UpdateHeadWeights(request.HeadWeights);
         }
 
-        decimal calculatedTotalWeight = lot.CurrentQuantity > 0
-            ? lot.CurrentQuantity
-            : request.ActualFinalQuantity;
+        var releasedItems = lot.Items
+            .Where(i => i.State == AgingItemState.IN_CHAMBER)
+            .ToList();
+
+        decimal calculatedTotalWeight = releasedItems.Count > 0
+            ? releasedItems.Sum(i => i.CurrentWeight)
+            : (lot.CurrentQuantity > 0 ? lot.CurrentQuantity : request.ActualFinalQuantity);
 
         if (calculatedTotalWeight <= 0)
         {
@@ -68,7 +98,7 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
 
             if (oldLocation != null)
             {
-                oldLocation.AddVolume(-lot.CurrentQuantity);
+                oldLocation.AddVolume(-lot.InitialQuantity);
             }
         }
 
@@ -82,15 +112,9 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             batch.ReleaseFromAging(calculatedTotalWeight);
         }
 
-        var cleanBatchName = lot.BatchNumber.Contains("(Выход:")
-            ? lot.BatchNumber.Substring(0, lot.BatchNumber.IndexOf("(Выход:")).Trim()
-            : lot.BatchNumber;
-
-        var finalBatchNumber = $"{cleanBatchName} (Выход: {calculatedTotalWeight:N2} {product.UnitOfMeasure.Code})";
-
-        int finalUnitsCount = product.UnitOfMeasure.Type == UnitType.Piece
-            ? (int)Math.Round(calculatedTotalWeight)
-            : request.UnitsCount;
+        int finalUnitsCount = releasedItems.Count > 0
+            ? releasedItems.Count
+            : (product.UnitOfMeasure.Type == UnitType.Piece ? (int)Math.Round(calculatedTotalWeight) : request.UnitsCount);
 
         var stockLot = StockLot.Create(
             warehouseId: request.TargetWarehouseId,
@@ -103,6 +127,15 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             tenantId: _tenantContext.TenantId,
             productionBatchId: lot.ProductionBatchId
         );
+
+        if (releasedItems.Count > 0)
+        {
+            stockLot.PopulateItemsFromWeights(releasedItems.Select(i => i.CurrentWeight).ToList());
+        }
+        else if (request.HeadWeights != null && request.HeadWeights.Count > 0)
+        {
+            stockLot.PopulateItemsFromWeights(request.HeadWeights);
+        }
 
         if (request.StorageLocationIds != null && request.StorageLocationIds.Count > 0)
         {

@@ -11,8 +11,10 @@ public sealed record ReleaseFromAgingCommand(
     decimal ActualFinalQuantity,
     int UnitsCount,
     decimal UnitPrice,
+    string? CustomBatchNumber = null,
     List<Guid>? StorageLocationIds = null,
-    List<decimal>? HeadWeights = null
+    List<decimal>? HeadWeights = null,
+    List<Guid>? DiscardedItemIds = null
 ) : IRequest<Result>, IRequirePermission
 {
     public AppPermission RequiredPermission => AppPermission.PRODUCTION_EXECUTE;
