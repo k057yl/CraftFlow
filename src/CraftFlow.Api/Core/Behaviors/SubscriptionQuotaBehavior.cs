@@ -109,7 +109,7 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
 
             var startOfMonth = new DateTime(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1, 0, 0, 0, DateTimeKind.Utc);
 
-            return await _dbContext.Set<ProductionBatch>()
+            return await _dbContext.Set<CheeseBatch>()
                 .AsNoTracking()
                 .CountAsync(b => b.TenantId == tenantId && b.StartedAt >= startOfMonth, ct);
         });

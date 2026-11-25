@@ -47,8 +47,8 @@ public class AppDbContext : DbContext
     public DbSet<StorageLocation> StorageLocations => Set<StorageLocation>();
     public DbSet<StockLot> StockLots => Set<StockLot>();
     public DbSet<StockLotItem> StockLotItems => Set<StockLotItem>();
-    public DbSet<ProductionBatch> ProductionBatches => Set<ProductionBatch>();
-    public DbSet<ConsumedIngredient> ConsumedIngredients => Set<ConsumedIngredient>();
+    public DbSet<CheeseBatch> CheeseBatches => Set<CheeseBatch>();
+    public DbSet<CheeseConsumedIngredient> CheeseConsumedIngredients => Set<CheeseConsumedIngredient>();
     public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<SalesOrder> SalesOrders => Set<SalesOrder>();
     public DbSet<User> Users => Set<User>();

@@ -87,21 +87,42 @@
 
                     <Button Content="{loc:Loc Key=UI_RECIPES_BTN_ADD_INGREDIENT}" Click="AddIngredient_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Margin="0,0,0,8"/>
 
-                    <ListBox x:Name="AddedIngredientsListBox" Height="100" Margin="0,0,0,12">
+                    <ListBox x:Name="AddedIngredientsListBox" Height="100" Margin="0,0,0,12" HorizontalContentAlignment="Stretch">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
-                                <StackPanel Orientation="Horizontal" Margin="2,2">
-                                    <TextBlock Text="{Binding RawMaterialName}" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    <TextBlock Text=" — " Foreground="{DynamicResource AppForegroundBrush}"/>
-                                    <TextBlock Foreground="{DynamicResource AppForegroundBrush}">
-                                        <TextBlock.Text>
-                                            <MultiBinding Converter="{StaticResource UnitValueConverter}">
-                                                <Binding Path="Quantity"/>
-                                                <Binding Path="UnitOfMeasureCode"/>
-                                            </MultiBinding>
-                                        </TextBlock.Text>
-                                    </TextBlock>
-                                </StackPanel>
+                                <Grid Margin="2,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding RawMaterialName}" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}"/>
+                                        <TextBlock Text=" — " Foreground="{DynamicResource AppForegroundBrush}"/>
+                                        <TextBlock Foreground="{DynamicResource AppForegroundBrush}">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource UnitValueConverter}">
+                                                    <Binding Path="Quantity"/>
+                                                    <Binding Path="UnitOfMeasureCode"/>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <Button Grid.Column="1"
+                        Content="✕"
+                        Click="RemoveIngredient_Click"
+                        Tag="{Binding}"
+                        Width="20"
+                        Height="20"
+                        Padding="0"
+                        Margin="6,0,0,0"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Foreground="#EF4444"
+                        FontWeight="Bold"
+                        Cursor="Hand"/>
+                                </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
                     </ListBox>

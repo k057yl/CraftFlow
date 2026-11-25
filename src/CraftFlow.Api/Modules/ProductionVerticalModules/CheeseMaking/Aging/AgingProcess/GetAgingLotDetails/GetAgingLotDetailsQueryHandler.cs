@@ -31,10 +31,10 @@ public class GetAgingLotDetailsQueryHandler : IRequestHandler<GetAgingLotDetails
                 COALESCE((
                     SELECT 
                         (SUM(ci."Quantity" * sl."UnitPrice") * (1.00::numeric + COALESCE(MAX(pb."OverheadPercentage"), 0.00)::numeric / 100.00::numeric))::numeric(18, 4)
-                    FROM {DbSchemas.PRODUCTION}.{DbTables.CONSUMED_INGREDIENTS} ci
+                    FROM {DbSchemas.CHEESE_MAKING}.{DbTables.CHEESE_CONSUMED_INGREDIENTS} ci
                     JOIN {DbSchemas.INVENTORY}.{DbTables.STOCK_LOTS} sl ON sl."Id" = ci."StockLotId"
-                    LEFT JOIN {DbSchemas.PRODUCTION}.{DbTables.PRODUCTION_BATCHES} pb ON pb."Id" = ci."ProductionBatchId"
-                    WHERE ci."ProductionBatchId" = al."ProductionBatchId"
+                    LEFT JOIN {DbSchemas.CHEESE_MAKING}.{DbTables.CHEESE_BATCHES} pb ON pb."Id" = ci."CheeseBatchId"
+                    WHERE ci."CheeseBatchId" = al."ProductionBatchId"
                 ), 0.00)::numeric(18, 4) AS "TotalBatchCost",
                 COALESCE(SUM(CASE WHEN ali."State" = 1 THEN ali."CurrentWeight" ELSE 0 END), al."InitialQuantity") AS "InitialQuantity",
                 COALESCE(SUM(CASE WHEN ali."State" = 1 THEN 1 ELSE 0 END), 0)::integer AS "UnitsCount"

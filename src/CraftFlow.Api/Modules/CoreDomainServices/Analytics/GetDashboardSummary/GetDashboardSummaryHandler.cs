@@ -24,7 +24,7 @@ public class GetDashboardSummaryHandler : IRequestHandler<GetDashboardSummaryQue
         var totalProducts = await _dbContext.Products.AsNoTracking().CountAsync(cancellationToken);
         var totalRecipes = await _dbContext.Recipes.AsNoTracking().CountAsync(cancellationToken);
 
-        var activeBatches = await _dbContext.ProductionBatches
+        var activeBatches = await _dbContext.CheeseBatches
             .AsNoTracking()
             .CountAsync(b => b.State == BatchState.IN_PROGRESS, cancellationToken);
 

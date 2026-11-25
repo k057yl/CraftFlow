@@ -104,7 +104,7 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
 
         lot.Release();
 
-        var batch = await _dbContext.Set<ProductionBatch>()
+        var batch = await _dbContext.Set<CheeseBatch>()
             .FirstOrDefaultAsync(b => b.Id == lot.ProductionBatchId, cancellationToken);
 
         if (batch != null)

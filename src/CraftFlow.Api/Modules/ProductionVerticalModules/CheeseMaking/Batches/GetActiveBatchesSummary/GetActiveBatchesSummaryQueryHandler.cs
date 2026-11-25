@@ -1,4 +1,5 @@
-﻿using CraftFlow.Api.Core.MultiTenancy;
+﻿using CraftFlow.Api.Core.Constants;
+using CraftFlow.Api.Core.MultiTenancy;
 using CraftFlow.SharedKernel.Dtos.Production;
 using CraftFlow.SharedKernel.Result;
 using Dapper;
@@ -23,7 +24,7 @@ public sealed class GetActiveBatchesSummaryQueryHandler
         GetActiveBatchesSummaryQuery request,
         CancellationToken cancellationToken)
     {
-        const string sql = """
+        const string sql = $"""
             SELECT 
                 pb."Id" AS Id,
                 pb."Name" AS BatchName,
@@ -47,8 +48,8 @@ public sealed class GetActiveBatchesSummaryQueryHandler
                     WHEN '2' THEN 'IN_PROGRESS'
                     ELSE UPPER(pb."State"::text)
                 END AS State
-            FROM production.production_batches pb
-            JOIN catalog.recipes r ON r."Id" = pb."RecipeId"
+            FROM {DbSchemas.CHEESE_MAKING}.{DbTables.CHEESE_BATCHES} pb
+            JOIN {DbSchemas.CATALOG}.{DbTables.RECIPES} r ON r."Id" = pb."RecipeId"
             WHERE pb."State"::text IN ('1', '2', 'DRAFT', 'IN_PROGRESS', 'Draft', 'InProgress')
               AND pb."TenantId" = @TenantId
             ORDER BY pb."StartedAt" DESC;

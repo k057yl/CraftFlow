@@ -6,7 +6,7 @@ using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Production.Batches.GetBatchesReadyForAging;
+namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Batches.GetBatchesReadyForAging;
 
 public class GetBatchesReadyForAgingHandler : IRequestHandler<GetBatchesReadyForAgingQuery, Result<List<BatchReadyForAgingDto>>>
 {
@@ -24,7 +24,7 @@ public class GetBatchesReadyForAgingHandler : IRequestHandler<GetBatchesReadyFor
             .Select(l => l.ProductionBatchId)
             .ToListAsync(cancellationToken);
 
-        var batches = await _dbContext.ProductionBatches
+        var batches = await _dbContext.CheeseBatches
             .AsNoTracking()
             .Where(b => (b.State == BatchState.COMPLETED || b.State == BatchState.READY_FOR_AGING)
                      && !existingAgingBatchIds.Contains(b.Id))

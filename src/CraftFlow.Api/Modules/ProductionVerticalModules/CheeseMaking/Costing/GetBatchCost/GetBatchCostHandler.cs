@@ -1,5 +1,4 @@
 ﻿using CraftFlow.Api.Core.Persistence;
-using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Production;
 using CraftFlow.SharedKernel.Result;
@@ -19,7 +18,7 @@ public class GetBatchCostHandler : IRequestHandler<GetBatchCostQuery, Result<Bat
 
     public async Task<Result<BatchCostDto>> Handle(GetBatchCostQuery request, CancellationToken cancellationToken)
     {
-        var batch = await _dbContext.ProductionBatches
+        var batch = await _dbContext.CheeseBatches
             .AsNoTracking()
             .FirstOrDefaultAsync(b => b.Id == request.BatchId, cancellationToken);
 
@@ -37,9 +36,9 @@ public class GetBatchCostHandler : IRequestHandler<GetBatchCostQuery, Result<Bat
             return Result.Failure<BatchCostDto>(Error.NotFound(ErrorCodes.General.NOT_FOUND));
         }
 
-        var consumedIngredients = await _dbContext.Set<ConsumedIngredient>()
+        var consumedIngredients = await _dbContext.CheeseConsumedIngredients
             .AsNoTracking()
-            .Where(ci => ci.ProductionBatchId == batch.Id)
+            .Where(ci => ci.CheeseBatchId == batch.Id)
             .ToListAsync(cancellationToken);
 
         decimal totalRawMaterialCost = 0m;

@@ -50,10 +50,28 @@ public static class TraceabilityConstants
             pb."CompletedAt" AS CompletedAt,
             COALESCE(pb."PlannedOutputQuantity", 0) AS PlannedQuantity,
             COALESCE(pb."ActualOutputQuantity", 0) AS ActualQuantity
-        FROM {DbSchemas.PRODUCTION}.{DbTables.CONSUMED_INGREDIENTS} ci
-        JOIN {DbSchemas.PRODUCTION}.{DbTables.PRODUCTION_BATCHES} pb ON pb."Id" = ci."ProductionBatchId"
+        FROM {DbSchemas.CHEESE_MAKING}.{DbTables.CHEESE_CONSUMED_INGREDIENTS} ci
+        JOIN {DbSchemas.CHEESE_MAKING}.{DbTables.CHEESE_BATCHES} pb ON pb."Id" = ci."CheeseBatchId"
         WHERE (ci."StockLotId" = @StockLotId OR ci."RawMaterialId" = @StockLotId) 
-          AND pb."TenantId" = @TenantId;
+          AND pb."TenantId" = @TenantId
+
+        UNION ALL
+
+        SELECT DISTINCT
+            fb."Id" AS ProductionBatchId,
+            CASE fb."Stage"
+                WHEN 'COMPLETED' THEN 2
+                WHEN 'DISCARDED' THEN 5
+                ELSE 1
+            END AS BatchStatusInt,
+            fb."StartedAt" AS StartedAt,
+            fb."CompletedAt" AS CompletedAt,
+            COALESCE(fb."SubstrateWeightKg", 0) AS PlannedQuantity,
+            COALESCE(fb."ActualOutputQuantity", 0) AS ActualQuantity
+        FROM {DbSchemas.FERMENTATION}.{DbTables.FERMENTATION_CONSUMED_INGREDIENTS} fci
+        JOIN {DbSchemas.FERMENTATION}.{DbTables.FERMENTATION_BATCHES} fb ON fb."Id" = fci."FermentationBatchId"
+        WHERE (fci."StockLotId" = @StockLotId OR fci."RawMaterialId" = @StockLotId)
+          AND fb."TenantId" = @TenantId;
         """;
 
     public const string SQL_GET_BACKWARD_HEADER = $"""
@@ -82,20 +100,28 @@ public static class TraceabilityConstants
         )
         SELECT 
             tl."Id" AS ProductStockLotId,
-            COALESCE(tl."BatchNumber", pb."Name", '{FormattingConstants.CONST_DEFAULT_BATCH_NUMBER}') AS ProductBatchNumber,
+            COALESCE(tl."BatchNumber", pb."Name", fb."BatchNumber", '{FormattingConstants.CONST_DEFAULT_BATCH_NUMBER}') AS ProductBatchNumber,
             COALESCE(p."Name", '{FormattingConstants.CONST_DEFAULT_MATERIAL_NAME}') AS ProductName,
             tl."Quantity" AS CurrentStockQuantity,
             CASE 
                 WHEN COALESCE(lit.InitialReceivedWeight, 0) > 0 THEN lit.InitialReceivedWeight
                 WHEN tl."Quantity" > 0 THEN tl."Quantity"
-                ELSE COALESCE(pb."ActualOutputQuantity", 0)
+                ELSE COALESCE(pb."ActualOutputQuantity", fb."ActualOutputQuantity", 0)
             END AS ReceivedQuantity,
-            pb."Id" AS ProductionBatchId,
-            COALESCE(pb."State", 0) AS BatchStatusInt,
-            pb."StartedAt" AS StartedAt,
-            pb."CompletedAt" AS CompletedAt,
-            COALESCE(pb."PlannedOutputQuantity", 0) AS PlannedQuantity,
-            COALESCE(pb."ActualOutputQuantity", 0) AS BrewOutputQuantity,
+            COALESCE(pb."Id", fb."Id") AS ProductionBatchId,
+            COALESCE(
+                pb."State",
+                CASE fb."Stage"
+                    WHEN 'COMPLETED' THEN 2
+                    WHEN 'DISCARDED' THEN 5
+                    ELSE 1
+                END,
+                0
+            ) AS BatchStatusInt,
+            COALESCE(pb."StartedAt", fb."StartedAt") AS StartedAt,
+            COALESCE(pb."CompletedAt", fb."CompletedAt") AS CompletedAt,
+            COALESCE(pb."PlannedOutputQuantity", fb."SubstrateWeightKg", 0) AS PlannedQuantity,
+            COALESCE(pb."ActualOutputQuantity", fb."ActualOutputQuantity", 0) AS BrewOutputQuantity,
             COALESCE(EXTRACT(DAY FROM (COALESCE(al."ActualReleaseDate", NOW()) - al."PlacedAt"))::integer, 0) AS AgingDays,
             ach."Name" AS ChamberName,
             sloc."Name" AS LocationName,
@@ -105,8 +131,10 @@ public static class TraceabilityConstants
         FROM target_lot tl
         LEFT JOIN lot_items_total lit ON lit."StockLotId" = tl."Id"
         LEFT JOIN lot_sales ls ON ls."StockLotId" = tl."Id"
-        LEFT JOIN {DbSchemas.PRODUCTION}.{DbTables.PRODUCTION_BATCHES} pb 
+        LEFT JOIN {DbSchemas.CHEESE_MAKING}.{DbTables.CHEESE_BATCHES} pb 
             ON pb."Id" = tl."ProductionBatchId"
+        LEFT JOIN {DbSchemas.FERMENTATION}.{DbTables.FERMENTATION_BATCHES} fb
+            ON fb."Id" = tl."ProductionBatchId"
         LEFT JOIN {DbSchemas.CATALOG}.{DbTables.PRODUCTS} p ON p."Id" = tl."ItemId"
         LEFT JOIN {DbSchemas.CHEESE_MAKING}.{DbTables.AGING_LOTS} al 
             ON al."ProductionBatchId" = pb."Id"
@@ -125,11 +153,28 @@ public static class TraceabilityConstants
             COALESCE(uom."Code", '') AS UnitOfMeasure,
             sup."Id" AS SupplierId,
             COALESCE(sup."Name", '{FormattingConstants.NOT_AVAILABLE}') AS SupplierName
-        FROM {DbSchemas.PRODUCTION}.{DbTables.CONSUMED_INGREDIENTS} ci
+        FROM {DbSchemas.CHEESE_MAKING}.{DbTables.CHEESE_CONSUMED_INGREDIENTS} ci
         LEFT JOIN {DbSchemas.INVENTORY}.{DbTables.STOCK_LOTS} rm_sl ON rm_sl."Id" = ci."StockLotId"
         LEFT JOIN {DbSchemas.CATALOG}.{DbTables.RAW_MATERIALS} rm ON rm."Id" = ci."RawMaterialId"
         LEFT JOIN {DbSchemas.CATALOG}.{DbTables.UNITS_OF_MEASURE} uom ON uom."Id" = rm."UnitOfMeasureId"
         LEFT JOIN {DbSchemas.PROCUREMENT}.{DbTables.SUPPLIERS} sup ON sup."Id" = rm_sl."SupplierId"
-        WHERE ci."ProductionBatchId" = @BatchId AND ci."TenantId" = @TenantId;
+        WHERE ci."CheeseBatchId" = @BatchId AND ci."TenantId" = @TenantId
+
+        UNION ALL
+
+        SELECT 
+            COALESCE(rm_sl."Id", fci."StockLotId", fci."RawMaterialId") AS RawMaterialStockLotId,
+            COALESCE(rm."Name", '{FormattingConstants.CONST_DEFAULT_MATERIAL_NAME}') AS RawMaterialName,
+            COALESCE(rm_sl."BatchNumber", '{FormattingConstants.CONST_DEFAULT_BATCH_NUMBER}') AS BatchNumber,
+            fci."Quantity" AS QuantityUsed,
+            COALESCE(uom."Code", '') AS UnitOfMeasure,
+            sup."Id" AS SupplierId,
+            COALESCE(sup."Name", '{FormattingConstants.NOT_AVAILABLE}') AS SupplierName
+        FROM {DbSchemas.FERMENTATION}.{DbTables.FERMENTATION_CONSUMED_INGREDIENTS} fci
+        LEFT JOIN {DbSchemas.INVENTORY}.{DbTables.STOCK_LOTS} rm_sl ON rm_sl."Id" = fci."StockLotId"
+        LEFT JOIN {DbSchemas.CATALOG}.{DbTables.RAW_MATERIALS} rm ON rm."Id" = fci."RawMaterialId"
+        LEFT JOIN {DbSchemas.CATALOG}.{DbTables.UNITS_OF_MEASURE} uom ON uom."Id" = rm."UnitOfMeasureId"
+        LEFT JOIN {DbSchemas.PROCUREMENT}.{DbTables.SUPPLIERS} sup ON sup."Id" = rm_sl."SupplierId"
+        WHERE fci."FermentationBatchId" = @BatchId AND fci."TenantId" = @TenantId;
         """;
 }

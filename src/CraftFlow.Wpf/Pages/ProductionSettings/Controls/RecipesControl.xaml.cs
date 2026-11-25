@@ -227,7 +227,18 @@ public partial class RecipesControl : UserControl
             TryParseDecimal(RecipeIngredientQuantityTextBox.Text, out var qty) && qty > 0)
         {
             var uomCode = rawItem.Code ?? string.Empty;
-            _selectedIngredients.Add(new IngredientItemDto(rawItem.Id, rawItem.Name, uomCode, qty));
+            var existing = _selectedIngredients.FirstOrDefault(i => i.RawMaterialId == rawItem.Id);
+
+            if (existing != null)
+            {
+                var index = _selectedIngredients.IndexOf(existing);
+                _selectedIngredients[index] = existing with { Quantity = existing.Quantity + qty };
+            }
+            else
+            {
+                _selectedIngredients.Add(new IngredientItemDto(rawItem.Id, rawItem.Name, uomCode, qty));
+            }
+
             RecipeIngredientQuantityTextBox.Text = "1";
 
             var formattedQty = UnitFormatter.Format(qty, uomCode);
@@ -236,6 +247,14 @@ public partial class RecipesControl : UserControl
         else
         {
             SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
+        }
+    }
+
+    private void RemoveIngredient_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is IngredientItemDto ingredient)
+        {
+            _selectedIngredients.Remove(ingredient);
         }
     }
 

@@ -1280,39 +1280,7 @@ namespace CraftFlow.Api.Migrations
                     b.ToTable("aging_lot_items", "cheese_making");
                 });
 
-            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain.ConsumedIngredient", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("boolean");
-
-                    b.Property<Guid>("ProductionBatchId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("Quantity")
-                        .HasColumnType("numeric");
-
-                    b.Property<Guid>("RawMaterialId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("StockLotId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("TenantId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductionBatchId")
-                        .HasDatabaseName("IX_CONSUMED_INGREDIENTS_BATCH");
-
-                    b.ToTable("consumed_ingredients", "production");
-                });
-
-            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain.ProductionBatch", b =>
+            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain.CheeseBatch", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -1388,9 +1356,41 @@ namespace CraftFlow.Api.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("TenantId", "State", "IsTelegramNotified", "StartedAt")
-                        .HasDatabaseName("IX_PRODUCTION_BATCHES_TIMER_MONITORING");
+                        .HasDatabaseName("IX_CHEESE_BATCHES_TIMER_MONITORING");
 
-                    b.ToTable("production_batches", "production");
+                    b.ToTable("cheese_batches", "cheese_making");
+                });
+
+            modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain.CheeseConsumedIngredient", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CheeseBatchId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("boolean");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("numeric");
+
+                    b.Property<Guid>("RawMaterialId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("StockLotId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CheeseBatchId")
+                        .HasDatabaseName("IX_CHEESE_CONSUMED_INGREDIENTS_BATCH");
+
+                    b.ToTable("cheese_consumed_ingredients", "cheese_making");
                 });
 
             modelBuilder.Entity("CraftFlow.Api.Modules.ProductionVerticalModules.Fermentation.Domain.FermentationBatch", b =>

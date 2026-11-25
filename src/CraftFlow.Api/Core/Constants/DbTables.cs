@@ -23,10 +23,6 @@ public static class DbTables
     public const string STOCK_LOT_ITEMS = "stock_lot_items";
     public const string STOCK_LOT_STORAGE_LOCATIONS = "stock_lot_storage_locations";
 
-    // --- PRODUCTION (schema: production) ---
-    public const string PRODUCTION_BATCHES = "production_batches";
-    public const string CONSUMED_INGREDIENTS = "consumed_ingredients";
-
     // --- PROCUREMENT (schema: procurement) ---
     public const string SUPPLIERS = "suppliers";
     public const string PURCHASE_ORDERS = "purchase_orders";
@@ -49,6 +45,8 @@ public static class DbTables
     public const string SANITATION_LOGS = "sanitation_logs";
 
     // --- VERTICAL MODULE: CHEESE MAKING (schema: cheese_making) ---
+    public const string CHEESE_BATCHES = "cheese_batches";
+    public const string CHEESE_CONSUMED_INGREDIENTS = "cheese_consumed_ingredients";
     public const string AGING_CHAMBERS = "aging_chambers";
     public const string AGING_LOTS = "aging_lots";
     public const string AGING_LOT_ITEMS = "aging_lot_items";

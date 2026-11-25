@@ -2,12 +2,6 @@
 
 public static class DbIndexes
 {
-    public static class Production
-    {
-        public const string IX_PRODUCTION_BATCHES_TIMER_MONITORING = "IX_PRODUCTION_BATCHES_TIMER_MONITORING";
-        public const string IX_CONSUMED_INGREDIENTS_BATCH = "IX_CONSUMED_INGREDIENTS_BATCH";
-    }
-
     public static class Identity
     {
         public const string IX_USERS_TENANT_EMAIL = "IX_USERS_TENANT_EMAIL";
@@ -76,5 +70,11 @@ public static class DbIndexes
         public const string IX_FERMENTATION_READINGS_BATCH_RECORDED_AT = "IX_FERMENTATION_READINGS_BATCH_RECORDED_AT";
         public const string IX_FERMENTATION_CONSUMED_INGREDIENTS_TENANT = "IX_FERMENTATION_CONSUMED_INGREDIENTS_TENANT_ID";
         public const string IX_FERMENTATION_CONSUMED_INGREDIENTS_BATCH = "IX_FERMENTATION_CONSUMED_INGREDIENTS_BATCH_ID";
+    }
+
+    public static class CheeseMaking
+    {
+        public const string IX_CHEESE_BATCHES_TIMER_MONITORING = "IX_CHEESE_BATCHES_TIMER_MONITORING";
+        public const string IX_CHEESE_CONSUMED_INGREDIENTS_BATCH = "IX_CHEESE_CONSUMED_INGREDIENTS_BATCH";
     }
 }

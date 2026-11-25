@@ -6,7 +6,7 @@ using MediatR;
 namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Costing.ConsumeIngredient;
 
 public sealed record ConsumeIngredientCommand(
-    Guid ProductionBatchId,
+    Guid CheeseBatchId,
     Guid StockLotId,
     Guid RawMaterialId,
     decimal Quantity

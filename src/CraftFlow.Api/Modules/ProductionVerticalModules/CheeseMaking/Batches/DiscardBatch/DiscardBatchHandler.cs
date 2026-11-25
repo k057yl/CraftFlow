@@ -1,5 +1,4 @@
 ﻿using CraftFlow.Api.Core.Persistence;
-using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.SharedKernel.Result;
@@ -19,7 +18,7 @@ public class DiscardBatchHandler : IRequestHandler<DiscardBatchCommand, Result>
 
     public async Task<Result> Handle(DiscardBatchCommand request, CancellationToken cancellationToken)
     {
-        var batch = await _dbContext.Set<ProductionBatch>()
+        var batch = await _dbContext.CheeseBatches
             .FirstOrDefaultAsync(b => b.Id == request.BatchId, cancellationToken);
 
         if (batch is null)

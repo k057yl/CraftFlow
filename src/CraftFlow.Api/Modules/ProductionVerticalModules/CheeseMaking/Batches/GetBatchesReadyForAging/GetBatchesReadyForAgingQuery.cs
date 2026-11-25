@@ -4,7 +4,7 @@ using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 
-namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Production.Batches.GetBatchesReadyForAging;
+namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Batches.GetBatchesReadyForAging;
 
 public record GetBatchesReadyForAgingQuery : IRequest<Result<List<BatchReadyForAgingDto>>>, IRequirePermission
 {

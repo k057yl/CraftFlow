@@ -1,0 +1,96 @@
+﻿using CraftFlow.Api.Core.Persistence;
+using CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain;
+using CraftFlow.SharedKernel.Constants;
+using MediatR;
+using Microsoft.EntityFrameworkCore;
+
+namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Events;
+
+public class CheeseBatchCompletedEventHandler : INotificationHandler<CheeseBatchCompletedEvent>
+{
+    private readonly AppDbContext _dbContext;
+
+    public CheeseBatchCompletedEventHandler(AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+
+    public async Task Handle(CheeseBatchCompletedEvent notification, CancellationToken cancellationToken)
+    {
+        var batch = await _dbContext.CheeseBatches
+            .AsNoTracking()
+            .FirstOrDefaultAsync(b => b.Id == notification.BatchId, cancellationToken);
+
+        if (batch == null) return;
+
+        var recipe = await _dbContext.Recipes
+            .AsNoTracking()
+            .FirstOrDefaultAsync(r => r.Id == batch.RecipeId, cancellationToken);
+
+        if (recipe != null && recipe.IsAgingRequired)
+        {
+            return;
+        }
+
+        var product = await _dbContext.Products
+            .AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == batch.TargetProductId, cancellationToken);
+
+        if (product == null) return;
+
+        var consumedIngredients = await _dbContext.CheeseConsumedIngredients
+            .Where(ci => ci.CheeseBatchId == batch.Id)
+            .ToListAsync(cancellationToken);
+
+        decimal totalRawCost = 0m;
+
+        foreach (var consumed in consumedIngredients)
+        {
+            var lot = await _dbContext.StockLots
+                .AsNoTracking()
+                .FirstOrDefaultAsync(sl => sl.Id == consumed.StockLotId, cancellationToken);
+
+            if (lot != null)
+            {
+                totalRawCost += consumed.Quantity * lot.UnitPrice;
+            }
+        }
+
+        decimal totalBatchCost = batch.CalculateTotalCost(totalRawCost);
+
+        decimal calculatedUnitCost = notification.ActualOutputQuantity > 0
+            ? totalBatchCost / notification.ActualOutputQuantity
+            : 0m;
+
+        var destWarehouseId = batch.DestinationWarehouseId != Guid.Empty
+            ? batch.DestinationWarehouseId
+            : batch.WarehouseId;
+
+        var lotNumber = !string.IsNullOrWhiteSpace(batch.Name)
+            ? batch.Name
+            : string.Concat(FormattingConstants.BATCH_PREFIX, batch.Id.ToString()[..8].ToUpperInvariant());
+
+        var finishedStockLot = StockLot.Create(
+            warehouseId: destWarehouseId,
+            itemId: batch.TargetProductId,
+            unitOfMeasureId: product.UnitOfMeasureId,
+            initialQuantity: notification.ActualOutputQuantity,
+            unitsCount: notification.UnitsCount,
+            unitPrice: calculatedUnitCost,
+            batchNumber: lotNumber,
+            tenantId: batch.TenantId,
+            productionBatchId: batch.Id
+        );
+
+        if (notification.HeadWeights != null && notification.HeadWeights.Count > 0)
+        {
+            finishedStockLot.PopulateItemsFromWeights(notification.HeadWeights);
+        }
+        else if (notification.UnitsCount > 0)
+        {
+            finishedStockLot.PopulateItemsEvenly(notification.UnitsCount, notification.ActualOutputQuantity);
+        }
+
+        _dbContext.StockLots.Add(finishedStockLot);
+    }
+}

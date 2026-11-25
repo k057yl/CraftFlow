@@ -4,12 +4,13 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.AgingProcess.TransferToAging;
+
 public class TransferToAgingValidator : AbstractValidator<TransferToAgingCommand>
 {
     public TransferToAgingValidator(AppDbContext dbContext)
     {
         RuleFor(x => x.ProductionBatchId)
-            .MustAsync(async (batchId, ct) => await dbContext.ProductionBatches.AnyAsync(b => b.Id == batchId, ct))
+            .MustAsync(async (batchId, ct) => await dbContext.CheeseBatches.AnyAsync(b => b.Id == batchId, ct))
             .WithErrorCode(ErrorCodes.Production.BATCH_NOT_FOUND);
 
         RuleFor(x => x.AgingChamberId)

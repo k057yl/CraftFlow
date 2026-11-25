@@ -20,15 +20,15 @@ public sealed class ConsumeIngredientCommandHandler : IRequestHandler<ConsumeIng
 
     public async Task<Result<Guid>> Handle(ConsumeIngredientCommand request, CancellationToken cancellationToken)
     {
-        var consumed = ConsumedIngredient.Create(
-            request.ProductionBatchId,
+        var consumed = CheeseConsumedIngredient.Create(
+            request.CheeseBatchId,
             request.StockLotId,
             request.RawMaterialId,
             request.Quantity,
             _tenantContext.TenantId
         );
 
-        await _context.Set<ConsumedIngredient>().AddAsync(consumed, cancellationToken);
+        await _context.CheeseConsumedIngredients.AddAsync(consumed, cancellationToken);
 
         var stockLot = await _context.Set<StockLot>().FindAsync(new object[] { request.StockLotId }, cancellationToken);
         stockLot?.AdjustQuantity(-request.Quantity);

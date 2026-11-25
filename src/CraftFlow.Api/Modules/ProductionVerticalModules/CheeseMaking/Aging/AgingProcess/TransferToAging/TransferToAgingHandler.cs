@@ -20,7 +20,7 @@ public sealed class TransferToAgingHandler : IRequestHandler<TransferToAgingComm
 
     public async Task<Result<Guid>> Handle(TransferToAgingCommand request, CancellationToken cancellationToken)
     {
-        var batch = await _dbContext.Set<ProductionBatch>()
+        var batch = await _dbContext.Set<CheeseBatch>()
             .FirstOrDefaultAsync(b => b.Id == request.ProductionBatchId, cancellationToken);
 
         if (batch is null)

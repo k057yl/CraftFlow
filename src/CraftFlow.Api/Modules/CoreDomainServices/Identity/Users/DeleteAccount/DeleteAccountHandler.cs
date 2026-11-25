@@ -34,7 +34,7 @@ public class DeleteAccountHandler : IRequestHandler<DeleteAccountCommand, Result
 
         if (user == null || !string.Equals(user.Email.Trim(), request.ConfirmationEmail?.Trim(), StringComparison.OrdinalIgnoreCase))
         {
-            return Result.Failure<bool>(Error.Validation("CONFIRMATION_EMAIL_MISMATCH"));
+            return Result.Failure<bool>(Error.Validation("CONFIRMATION_EMAIL_MATCH"));
         }
 
         await HardDeleteTenantDataAsync(tenantId, _dbContext, cancellationToken);
@@ -61,7 +61,7 @@ public class DeleteAccountHandler : IRequestHandler<DeleteAccountCommand, Result
         await dbContext.AgingLots.IgnoreQueryFilters().Where(a => a.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
         await dbContext.AgingChambers.IgnoreQueryFilters().Where(a => a.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
 
-        await dbContext.ProductionBatches.IgnoreQueryFilters().Where(b => b.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
+        await dbContext.CheeseBatches.IgnoreQueryFilters().Where(b => b.TenantId == tenantId).ExecuteDeleteAsync(cancellationToken);
         await dbContext.PurchaseOrderItems.IgnoreQueryFilters()
             .Where(i => dbContext.PurchaseOrders.IgnoreQueryFilters().Any(o => o.Id == i.PurchaseOrderId && o.TenantId == tenantId))
             .ExecuteDeleteAsync(cancellationToken);

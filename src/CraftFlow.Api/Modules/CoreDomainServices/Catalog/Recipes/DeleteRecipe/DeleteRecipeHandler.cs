@@ -27,7 +27,7 @@ public class DeleteRecipeHandler : IRequestHandler<DeleteRecipeCommand, Result>
             return Result.Failure(Error.Forbidden(ErrorCodes.Auth.ACCESS_DENIED));
         }
 
-        var hasActiveBatches = await _dbContext.ProductionBatches
+        var hasActiveBatches = await _dbContext.CheeseBatches
             .AnyAsync(b => b.RecipeId == request.Id &&
                           (b.State == BatchState.DRAFT || b.State == BatchState.IN_PROGRESS || b.State == BatchState.IN_AGING),
                       cancellationToken);

@@ -1,8 +1,9 @@
 ﻿using CraftFlow.Api.Core.Extensions;
-using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Batches.CompleteProductionBatch;
+using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Batches.CompleteCheeseBatch;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Batches.DeleteDraftBatch;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Batches.DiscardBatch;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Batches.GetActiveBatchesSummary;
+using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Batches.GetBatchesReadyForAging;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Batches.StartDraftBatch;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Batches.StartProductionBatch;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Costing.ConsumeIngredient;
@@ -11,7 +12,6 @@ using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Costing.GetBa
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Planning.CalculateMaxOutput;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Planning.CalculateRequirements;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Planning.PlanProductionBatch;
-using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Production.Batches.GetBatchesReadyForAging;
 using CraftFlow.SharedKernel.Constants.Endpoints;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -38,10 +38,10 @@ public static class CheeseMakingEndpoints
         group.MapGet(ProductionConstants.BATCHES_READY_AGING, async (ISender sender, CancellationToken ct) =>
             (await sender.Send(new GetBatchesReadyForAgingQuery(), ct)).ToHttpResult());
 
-        group.MapPost(ProductionConstants.BATCHES_START, async (StartProductionBatchCommand command, ISender sender, CancellationToken ct) =>
+        group.MapPost(ProductionConstants.BATCHES_START, async (StartCheeseBatchCommand command, ISender sender, CancellationToken ct) =>
             (await sender.Send(command, ct)).ToHttpResult());
 
-        group.MapPost(ProductionConstants.BATCHES_COMPLETE, async (CompleteProductionBatchCommand command, ISender sender, CancellationToken ct) =>
+        group.MapPost(ProductionConstants.BATCHES_COMPLETE, async (CompleteCheeseBatchCommand command, ISender sender, CancellationToken ct) =>
             (await sender.Send(command, ct)).ToHttpResult());
 
         group.MapPost(ProductionConstants.BATCHES_CONSUME, async (ConsumeIngredientCommand command, ISender sender, CancellationToken ct) =>
@@ -65,7 +65,7 @@ public static class CheeseMakingEndpoints
         group.MapGet(ProductionConstants.CALCULATE_MAX_OUTPUT, async (Guid recipeId, Guid warehouseId, ISender sender, CancellationToken ct) =>
             (await sender.Send(new CalculateMaxOutputQuery(recipeId, warehouseId), ct)).ToHttpResult());
 
-        group.MapPost(ProductionConstants.BATCHES_PLAN, async (PlanProductionBatchCommand command, ISender sender, CancellationToken ct) =>
+        group.MapPost(ProductionConstants.BATCHES_PLAN, async (PlanCheeseBatchCommand command, ISender sender, CancellationToken ct) =>
             (await sender.Send(command, ct)).ToHttpResult());
 
         group.MapDelete($"{ProductionConstants.BATCHES_DELETE_DRAFT}/{{id:guid}}", async (Guid id, ISender sender, CancellationToken ct) =>
