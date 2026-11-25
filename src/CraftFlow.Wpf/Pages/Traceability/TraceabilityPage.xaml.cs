@@ -57,6 +57,7 @@ public partial class TraceabilityPage : Page
     private async void RadioButton_Checked(object sender, RoutedEventArgs e)
     {
         if (!IsLoaded) return;
+        TreeNodes.Clear();
         await LoadStockLotsAsync();
     }
 
@@ -69,8 +70,8 @@ public partial class TraceabilityPage : Page
             bool isForward = ForwardRadioButton?.IsChecked ?? true;
 
             string endpoint = isForward
-                ? InventoryConstants.STOCK_LOTS_RAW
-                : InventoryConstants.STOCK_LOTS_PRODUCTS;
+                ? TraceabilityConstants.TRACEABILITY_FORWARD_LOTS
+                : TraceabilityConstants.TRACEABILITY_BACKWARD_LOTS;
 
             var stockLots = await ApiService.Instance.GetAsync<List<LookupDto>>(endpoint);
             stockLots?.ForEach(l => StockLots.Add(new LookupItem(l.Id, l.Name)));
@@ -171,7 +172,9 @@ public partial class TraceabilityPage : Page
                     Title = traceData.ProductName,
                     PrefixDetails = $"{Get("UI_LABEL_LOT")}: {traceData.ProductBatchNumber} | {Get("UI_LABEL_STOCK_REMAIN")}: {traceData.CurrentStockQuantity:N2} {Get("UI_UNIT_KG")} | {Get("UI_LABEL_CUSTOMER")}: ",
                     LinkText = hasCustomer ? traceData.CustomerName : defaultCustomerText,
-                    LinkType = hasCustomer && traceData.CustomerId.HasValue ? TraceLinkType.Customer : TraceLinkType.None,
+                    LinkType = hasCustomer && traceData.CustomerId.HasValue && !traceData.CustomerName.Contains(',')
+                        ? TraceLinkType.Customer
+                        : TraceLinkType.None,
                     TargetId = traceData.CustomerId ?? Guid.Empty
                 };
 

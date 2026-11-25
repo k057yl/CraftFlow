@@ -1,4 +1,5 @@
 ﻿using CraftFlow.Api.Core.Extensions;
+using CraftFlow.Api.Core.MultiTenancy;
 using CraftFlow.Api.Modules.CoreDomainServices.Traceability.GetBackwardTraceability;
 using CraftFlow.Api.Modules.CoreDomainServices.Traceability.GetForwardTraceability;
 using CraftFlow.SharedKernel.Constants.Endpoints;
@@ -13,6 +14,12 @@ public static class TraceabilityEndpoints
         var group = app.MapGroup(string.Empty)
             .WithTags("Traceability")
             .RequireAuthorization();
+
+        group.MapGet(TraceabilityConstants.TRACEABILITY_FORWARD_LOTS, async (TraceabilityRead.TraceabilityReadService readService, ITenantContext tenantContext) =>
+            Results.Ok(await readService.GetRawMaterialLotsHistoryAsync(tenantContext.TenantId)));
+
+        group.MapGet(TraceabilityConstants.TRACEABILITY_BACKWARD_LOTS, async (TraceabilityRead.TraceabilityReadService readService, ITenantContext tenantContext) =>
+            Results.Ok(await readService.GetProductLotsHistoryAsync(tenantContext.TenantId)));
 
         group.MapGet($"{TraceabilityConstants.TRACEABILITY_FORWARD}/{{stockLotId:guid}}", async (Guid stockLotId, ISender sender, CancellationToken ct) =>
             (await sender.Send(new GetForwardTraceabilityQuery(stockLotId), ct)).ToHttpResult());

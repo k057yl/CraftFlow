@@ -1,5 +1,6 @@
-﻿using CraftFlow.SharedKernel.Dtos.Traceability;
-using CraftFlow.SharedKernel.Constants;
+﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Dtos.Common;
+using CraftFlow.SharedKernel.Dtos.Traceability;
 using Dapper;
 using System.Data;
 
@@ -12,6 +13,24 @@ public sealed class TraceabilityReadService
     public TraceabilityReadService(IDbConnection dbConnection)
     {
         _dbConnection = dbConnection;
+    }
+
+    public async Task<List<LookupDto>> GetRawMaterialLotsHistoryAsync(Guid tenantId)
+    {
+        var rows = await _dbConnection.QueryAsync<LotLookupRow>(
+            TraceabilityConstants.SQL_GET_TRACEABILITY_RAW_LOTS,
+            new { TenantId = tenantId });
+
+        return rows.Select(r => new LookupDto(r.Id, r.Name)).ToList();
+    }
+
+    public async Task<List<LookupDto>> GetProductLotsHistoryAsync(Guid tenantId)
+    {
+        var rows = await _dbConnection.QueryAsync<LotLookupRow>(
+            TraceabilityConstants.SQL_GET_TRACEABILITY_PRODUCT_LOTS,
+            new { TenantId = tenantId });
+
+        return rows.Select(r => new LookupDto(r.Id, r.Name)).ToList();
     }
 
     public async Task<ForwardTraceabilityDto?> GetForwardTraceabilityAsync(Guid stockLotId, Guid tenantId)
@@ -121,14 +140,15 @@ public sealed class TraceabilityReadService
             );
         }
 
-        decimal currentStockQty = header.ActualQuantity;
+        decimal currentStockQty = header.CurrentStockQuantity;
+        decimal receivedQty = header.ReceivedQuantity;
         decimal brewOutput = header.BrewOutputQuantity;
         int agingDays = header.AgingDays;
         decimal agingLossPercentage = 0m;
 
-        if (agingDays > 0 && brewOutput > 0 && currentStockQty > 0 && currentStockQty < brewOutput)
+        if (agingDays > 0 && brewOutput > 0 && receivedQty > 0 && receivedQty < brewOutput)
         {
-            agingLossPercentage = Math.Round(((brewOutput - currentStockQty) / brewOutput) * 100m, 2);
+            agingLossPercentage = Math.Round(((brewOutput - receivedQty) / brewOutput) * 100m, 2);
         }
 
         string chamberName = header.ChamberName ?? string.Empty;
@@ -158,6 +178,12 @@ public sealed class TraceabilityReadService
         );
     }
 
+    private sealed class LotLookupRow
+    {
+        public Guid Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+    }
+
     private sealed class ForwardTraceabilityHeader
     {
         public Guid RawMaterialStockLotId { get; set; }
@@ -180,7 +206,8 @@ public sealed class TraceabilityReadService
         public Guid ProductStockLotId { get; set; }
         public string? ProductBatchNumber { get; set; }
         public string? ProductName { get; set; }
-        public decimal ActualQuantity { get; set; }
+        public decimal CurrentStockQuantity { get; set; }
+        public decimal ReceivedQuantity { get; set; }
         public Guid? ProductionBatchId { get; set; }
         public int BatchStatusInt { get; set; }
         public DateTime? StartedAt { get; set; }
