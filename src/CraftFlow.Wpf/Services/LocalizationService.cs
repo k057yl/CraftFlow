@@ -17,6 +17,11 @@ public static class LocalizationService
 
     public static event Action? LanguageChanged;
 
+    public static void Initialize()
+    {
+        ApplyCulture(UserSettingsService.Language, notify: false);
+    }
+
     public static string Get(string key)
     {
         if (string.IsNullOrWhiteSpace(key)) return string.Empty;
@@ -36,12 +41,22 @@ public static class LocalizationService
 
     public static void SetCulture(string cultureName)
     {
+        UserSettingsService.SaveLanguage(cultureName);
+        ApplyCulture(cultureName, notify: true);
+    }
+
+    private static void ApplyCulture(string cultureName, bool notify)
+    {
         var culture = new CultureInfo(cultureName);
 
         CultureInfo.CurrentCulture = culture;
         CultureInfo.CurrentUICulture = culture;
         CultureInfo.DefaultThreadCurrentCulture = culture;
         CultureInfo.DefaultThreadCurrentUICulture = culture;
-        LanguageChanged?.Invoke();
+
+        if (notify)
+        {
+            LanguageChanged?.Invoke();
+        }
     }
-}
+}   

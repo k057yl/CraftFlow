@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain;
 using CraftFlow.SharedKernel.Enums;
+using CraftFlow.SharedKernel.Enums.Subscription;
 using Microsoft.EntityFrameworkCore;
 
 namespace CraftFlow.Api.Core.Persistence;
@@ -30,14 +31,19 @@ public static class DatabaseInitializer
                 ? parsedModule
                 : AppModule.NONE;
 
+            var features = ParseFeatures(config.Features);
+
             if (existingPlan != null)
             {
                 existingPlan.UpdateLimits(
                     targetModule,
+                    features,
                     config.MaxMonthlyBatches,
                     config.MaxWarehouses,
                     config.MaxChambers,
-                    config.MaxUsers
+                    config.MaxUsers,
+                    config.AuditRetentionDays,
+                    config.Name
                 );
             }
             else
@@ -46,10 +52,12 @@ public static class DatabaseInitializer
                     config.Code,
                     config.Name,
                     targetModule,
+                    features,
                     config.MaxMonthlyBatches,
                     config.MaxWarehouses,
                     config.MaxChambers,
-                    config.MaxUsers
+                    config.MaxUsers,
+                    config.AuditRetentionDays
                 );
 
                 await dbContext.SubscriptionPlans.AddAsync(newPlan);
@@ -59,13 +67,35 @@ public static class DatabaseInitializer
         await dbContext.SaveChangesAsync();
     }
 
-    private record PlanConfigDto(
-        string Code,
-        string Name,
-        string TargetModule,
-        int MaxMonthlyBatches,
-        int MaxWarehouses,
-        int MaxChambers,
-        int MaxUsers
-    );
+    private static PlanFeatures ParseFeatures(List<string>? featureNames)
+    {
+        if (featureNames == null || featureNames.Count == 0)
+        {
+            return PlanFeatures.NONE;
+        }
+
+        var result = PlanFeatures.NONE;
+        foreach (var name in featureNames)
+        {
+            if (Enum.TryParse<PlanFeatures>(name, true, out var parsed))
+            {
+                result |= parsed;
+            }
+        }
+
+        return result;
+    }
+
+    private sealed class PlanConfigDto
+    {
+        public string Code { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public string TargetModule { get; set; } = string.Empty;
+        public List<string>? Features { get; set; }
+        public int MaxMonthlyBatches { get; set; }
+        public int MaxWarehouses { get; set; }
+        public int MaxChambers { get; set; }
+        public int MaxUsers { get; set; }
+        public int AuditRetentionDays { get; set; } = 7;
+    }
 }

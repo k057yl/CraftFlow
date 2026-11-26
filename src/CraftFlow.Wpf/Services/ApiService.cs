@@ -7,6 +7,7 @@ using CraftFlow.SharedKernel.Dtos.MRP;
 using CraftFlow.SharedKernel.Dtos.Supplier;
 using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Identity;
+using CraftFlow.SharedKernel.Enums.Subscription;
 using CraftFlow.SharedKernel.Result;
 using System.IO;
 using System.Net.Http;
@@ -31,6 +32,7 @@ public class ApiService
     public UserProfileDto? CurrentUser { get; private set; }
     public Guid? CurrentTenantId { get; private set; }
     public AppModule ActiveModules { get; set; } = AppModule.NONE;
+    public PlanFeatures ActiveFeatures { get; set; } = PlanFeatures.NONE;
 
     public bool IsAuthenticated => !string.IsNullOrEmpty(JwtToken);
 
@@ -118,6 +120,7 @@ public class ApiService
         JwtToken = null;
         CurrentUser = null;
         ActiveModules = AppModule.NONE;
+        ActiveFeatures = PlanFeatures.NONE;
         _client.DefaultRequestHeaders.Authorization = null;
         ClearTenantHeader();
         DeleteTokenFromDisk();

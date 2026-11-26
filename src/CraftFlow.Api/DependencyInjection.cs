@@ -83,6 +83,7 @@ public static class DependencyInjection
 
         services.AddScoped<TraceabilityReadService>();
         services.AddScoped<SubscriptionLifecycleService>();
+        services.AddScoped<ITenantEntitlementService, TenantEntitlementService>();
 
         return services;
     }
@@ -125,6 +126,7 @@ public static class DependencyInjection
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PermissionBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ModuleAccessBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PlanFeatureBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(SubscriptionQuotaBehavior<,>));
             cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>));
         });

@@ -26,47 +26,96 @@
 
                         <!-- ОСНОВНОЕ МЕНЮ СТРОГО ПО ЦЕПОЧКЕ ПРОЦЕССА -->
                         <StackPanel x:Name="MainMenuPanel" Visibility="Collapsed">
-                            <!-- 1. Обзор и Сводка (Дашборд) -->
                             <Button x:Name="NavDashboardButton" Content="{loc:Loc Key=NAV_DASHBOARD}" Click="NavDashboard_Click" Style="{StaticResource NavButtonStyle}"/>
-
-                            <!-- 2. Настройки производства (Справочники и Оборудование) -->
                             <Button x:Name="NavProductionSettingsButton" Content="{loc:Loc Key=NAV_PRODUCTION_SETTINGS}" Click="NavProductionSettings_Click" Style="{StaticResource NavButtonStyle}"/>
-
-                            <!-- 3. Склад и Поставщики -->
                             <Button x:Name="NavWarehouseAndSuppliersButton" Content="{loc:Loc Key=NAV_WAREHOUSE_AND_SUPPLIERS}" Click="NavWarehouseAndSuppliers_Click" Style="{StaticResource NavButtonStyle}"/>
-
-                            <!-- 4. Расчёт сырья (MRP) -->
                             <Button x:Name="NavMrpButton" Content="{loc:Loc Key=NAV_MRP}" Click="NavMrp_Click" Style="{StaticResource NavButtonStyle}"/>
 
-                            <!-- 5. Цеха по подписке -->
-                            <Button x:Name="NavCheeseMakingButton" Content="{loc:Loc Key=NAV_CHEESE_MAKING}" Click="NavCheeseMaking_Click" Style="{StaticResource NavButtonStyle}"/>
-                            <Button x:Name="NavBreweryButton" Content="{loc:Loc Key=NAV_BREWERY}" Click="NavBrewery_Click" Style="{StaticResource NavButtonStyle}"/>
-                            <Button x:Name="NavMeatProcessingButton" Content="{loc:Loc Key=NAV_MEAT_PROCESSING}" Click="NavMeatProcessing_Click" Style="{StaticResource NavButtonStyle}"/>
-                            <Button x:Name="NavFermentationButton" Content="{loc:Loc Key=NAV_FERMENTATION}" Click="NavFermentation_Click" Style="{StaticResource NavButtonStyle}"/>
+                            <Separator Background="{DynamicResource BorderBrush}" Margin="0,6,0,6" Opacity="0.6"/>
 
-                            <!-- 6. Продажи и Клиенты -->
+                            <!-- Цеха (активные + витрина неподключённых) -->
+                            <Button x:Name="NavCheeseMakingButton" Click="NavCheeseMaking_Click" Style="{StaticResource NavButtonStyle}" HorizontalContentAlignment="Stretch">
+                                <Grid>
+                                    <TextBlock Text="{loc:Loc Key=NAV_CHEESE_MAKING}" VerticalAlignment="Center"/>
+                                    <Border x:Name="BadgeCheese" Visibility="Collapsed" HorizontalAlignment="Right" Background="#E2E8F0" CornerRadius="4" Padding="5,1" VerticalAlignment="Center">
+                                        <TextBlock Text="{loc:Loc Key=UI_SUB_BADGE_MODULE}" FontSize="9" Foreground="#475569" FontWeight="SemiBold"/>
+                                    </Border>
+                                </Grid>
+                            </Button>
+
+                            <Button x:Name="NavBreweryButton" Click="NavBrewery_Click" Style="{StaticResource NavButtonStyle}" HorizontalContentAlignment="Stretch">
+                                <Grid>
+                                    <TextBlock Text="{loc:Loc Key=NAV_BREWERY}" VerticalAlignment="Center"/>
+                                    <Border x:Name="BadgeBrewery" Visibility="Collapsed" HorizontalAlignment="Right" Background="#E2E8F0" CornerRadius="4" Padding="5,1" VerticalAlignment="Center">
+                                        <TextBlock Text="{loc:Loc Key=UI_SUB_BADGE_MODULE}" FontSize="9" Foreground="#475569" FontWeight="SemiBold"/>
+                                    </Border>
+                                </Grid>
+                            </Button>
+
+                            <Button x:Name="NavMeatProcessingButton" Click="NavMeatProcessing_Click" Style="{StaticResource NavButtonStyle}" HorizontalContentAlignment="Stretch">
+                                <Grid>
+                                    <TextBlock Text="{loc:Loc Key=NAV_MEAT_PROCESSING}" VerticalAlignment="Center"/>
+                                    <Border x:Name="BadgeMeat" Visibility="Collapsed" HorizontalAlignment="Right" Background="#E2E8F0" CornerRadius="4" Padding="5,1" VerticalAlignment="Center">
+                                        <TextBlock Text="{loc:Loc Key=UI_SUB_BADGE_MODULE}" FontSize="9" Foreground="#475569" FontWeight="SemiBold"/>
+                                    </Border>
+                                </Grid>
+                            </Button>
+
+                            <Button x:Name="NavFermentationButton" Click="NavFermentation_Click" Style="{StaticResource NavButtonStyle}" HorizontalContentAlignment="Stretch">
+                                <Grid>
+                                    <TextBlock Text="{loc:Loc Key=NAV_FERMENTATION}" VerticalAlignment="Center"/>
+                                    <Border x:Name="BadgeFermentation" Visibility="Collapsed" HorizontalAlignment="Right" Background="#E2E8F0" CornerRadius="4" Padding="5,1" VerticalAlignment="Center">
+                                        <TextBlock Text="{loc:Loc Key=UI_SUB_BADGE_MODULE}" FontSize="9" Foreground="#475569" FontWeight="SemiBold"/>
+                                    </Border>
+                                </Grid>
+                            </Button>
+
+                            <Separator Background="{DynamicResource BorderBrush}" Margin="0,6,0,6" Opacity="0.6"/>
+
                             <Button x:Name="NavSalesButton" Content="{loc:Loc Key=NAV_SALES}" Click="NavSales_Click" Style="{StaticResource NavButtonStyle}"/>
-
-                            <!-- 7. История партий (Трассировка) -->
                             <Button x:Name="NavTraceabilityButton" Content="{loc:Loc Key=NAV_TRACEABILITY}" Click="NavTraceability_Click" Style="{StaticResource NavButtonStyle}"/>
-
-                            <!-- 8. Журнал событий -->
                             <Button x:Name="NavAuditButton" Content="{loc:Loc Key=NAV_AUDIT}" Click="NavAudit_Click" Style="{StaticResource NavButtonStyle}"/>
                         </StackPanel>
 
-                        <!-- 10. Админка (Строго для суперадмина) -->
                         <Button x:Name="NavAdminButton" Content="{loc:Loc Key=NAV_ADMIN_KEYS}" Click="NavAdmin_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed" Margin="0,10,0,10"/>
-
-                        <!-- Кнопка входа -->
                         <Button x:Name="NavAuthButton" Content="{loc:Loc Key=NAV_AUTH}" Click="NavAuth_Click" Style="{StaticResource NavButtonStyle}" Visibility="Visible"/>
-
-                        <!-- 9. Мой профиль -->
                         <Button x:Name="NavProfileButton" Content="{loc:Loc Key=NAV_PROFILE}" Click="NavProfile_Click" Style="{StaticResource NavButtonStyle}" Visibility="Collapsed"/>
                     </StackPanel>
                 </ScrollViewer>
 
-                <!-- Профиль пользователя -->
-                <StackPanel Grid.Row="1" Margin="0,10,0,10">
+                <!-- Плашка тарифа + Профиль пользователя -->
+                <StackPanel Grid.Row="1" Margin="0,8,0,10">
+                    <!-- Компактная карточка активного тарифа -->
+                    <Border x:Name="SidebarPlanBorder"
+                            Visibility="Collapsed"
+                            Background="{DynamicResource AppBackgroundBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="10,8"
+                            Margin="0,0,0,10"
+                            Cursor="Hand"
+                            MouseLeftButtonUp="SidebarPlan_Click"
+                            ToolTip="{loc:Loc Key=UI_SUB_SIDEBAR_TOOLTIP}">
+                        <StackPanel>
+                            <Grid>
+                                <TextBlock Text="{loc:Loc Key=UI_SUB_SIDEBAR_HEADER}" FontSize="9" FontWeight="Bold" Foreground="#64748B"/>
+                                <TextBlock x:Name="SidebarPlanBadgeText" Text="FREE" FontSize="9" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" HorizontalAlignment="Right"/>
+                            </Grid>
+                            <TextBlock x:Name="SidebarPlanTitleText"
+                                       Text="{loc:Loc Key=UI_SUB_PROFILE_LOADING}"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AppForegroundBrush}"
+                                       TextTrimming="CharacterEllipsis"
+                                       Margin="0,2,0,2"/>
+                            <TextBlock x:Name="SidebarPlanDetailsText"
+                                       Text="{loc:Loc Key=UI_SUB_SIDEBAR_CLICK_HINT}"
+                                       FontSize="10"
+                                       Foreground="#64748B"/>
+                        </StackPanel>
+                    </Border>
+
                     <Separator Background="{DynamicResource BorderBrush}" Margin="0,0,0,10"/>
 
                     <StackPanel x:Name="UserProfilePanel" Visibility="Collapsed">

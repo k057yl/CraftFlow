@@ -6,8 +6,6 @@ using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,139 +13,122 @@ using static CraftFlow.Wpf.Services.LocalizationService;
 
 namespace CraftFlow.Wpf.Pages.Profile;
 
-public class ModuleSubscriptionItemVm : INotifyPropertyChanged
+public class ModuleTabVm
 {
-    private string? _selectedTier;
-
     public AppModule Module { get; init; }
     public string Prefix { get; init; } = string.Empty;
-    public string Title { get; init; } = string.Empty;
+    public string ShortTitle { get; init; } = string.Empty;
+    public string FullTitle { get; init; } = string.Empty;
     public bool IsConnected { get; init; }
     public string CurrentTier { get; init; } = string.Empty;
     public DateTime? ExpiresAtUtc { get; init; }
-
-    public string? SelectedTier
-    {
-        get => _selectedTier;
-        set
-        {
-            _selectedTier = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(StarterBg));
-            OnPropertyChanged(nameof(StarterBorder));
-            OnPropertyChanged(nameof(StarterFg));
-            OnPropertyChanged(nameof(StandardBg));
-            OnPropertyChanged(nameof(StandardBorder));
-            OnPropertyChanged(nameof(StandardFg));
-            OnPropertyChanged(nameof(ProBg));
-            OnPropertyChanged(nameof(ProBorder));
-            OnPropertyChanged(nameof(ProFg));
-            OnPropertyChanged(nameof(ActionButtonText));
-            OnPropertyChanged(nameof(IsActionEnabled));
-        }
-    }
+    public bool IsSelected { get; set; }
 
     public Brush StatusDotBrush => IsConnected
         ? new SolidColorBrush(Color.FromRgb(22, 163, 74))
-        : new SolidColorBrush(Color.FromRgb(220, 38, 38));
+        : new SolidColorBrush(Color.FromRgb(148, 163, 184));
 
-    public Brush StatusTextBrush => IsConnected
+    public Brush TabBackground => IsSelected
+        ? new SolidColorBrush(Color.FromArgb(25, 37, 99, 235))
+        : Brushes.Transparent;
+
+    public Brush TabBorder => IsSelected
+        ? new SolidColorBrush(Color.FromRgb(37, 99, 235))
+        : (Application.Current.TryFindResource("BorderBrush") as Brush ?? Brushes.Gray);
+
+    public Brush TabForeground => IsSelected
+        ? new SolidColorBrush(Color.FromRgb(37, 99, 235))
+        : (Application.Current.TryFindResource("AppForegroundBrush") as Brush ?? Brushes.Black);
+}
+
+public class TierCardVm
+{
+    public string TierCode { get; init; } = string.Empty;
+    public string PlanCode { get; init; } = string.Empty;
+    public string TierTitle { get; init; } = string.Empty;
+    public string Subtitle { get; init; } = string.Empty;
+
+    public string BatchesText { get; init; } = string.Empty;
+    public string WarehousesText { get; init; } = string.Empty;
+    public string ChambersText { get; init; } = string.Empty;
+    public string UsersText { get; init; } = string.Empty;
+    public string AuditText { get; init; } = string.Empty;
+
+    public bool HasPdfExport { get; init; }
+    public bool HasExcelExport { get; init; }
+    public bool HasAnalytics { get; init; }
+    public bool HasMrp { get; init; }
+
+    public bool IsCurrent { get; init; }
+    public bool IsFreeTier { get; init; }
+    public bool IsModuleConnected { get; init; }
+
+    private static Brush ActiveFeatureBrush =>
+        Application.Current.TryFindResource("AppForegroundBrush") as Brush ?? Brushes.Black;
+
+    private static Brush InactiveFeatureBrush =>
+        new SolidColorBrush(Color.FromRgb(148, 163, 184));
+
+    public string PdfExportText => HasPdfExport ? Get("UI_SUB_FEAT_PDF_YES") : Get("UI_SUB_FEAT_PDF_NO");
+    public Brush PdfExportBrush => HasPdfExport ? ActiveFeatureBrush : InactiveFeatureBrush;
+
+    public string ExcelExportText => HasExcelExport ? Get("UI_SUB_FEAT_EXCEL_YES") : Get("UI_SUB_FEAT_EXCEL_NO");
+    public Brush ExcelExportBrush => HasExcelExport ? ActiveFeatureBrush : InactiveFeatureBrush;
+
+    public string AnalyticsText => HasAnalytics ? Get("UI_SUB_FEAT_ANALYTICS_YES") : Get("UI_SUB_FEAT_ANALYTICS_NO");
+    public Brush AnalyticsBrush => HasAnalytics ? ActiveFeatureBrush : InactiveFeatureBrush;
+
+    public string MrpText => HasMrp ? Get("UI_SUB_FEAT_MRP_YES") : Get("UI_SUB_FEAT_MRP_NO");
+    public Brush MrpBrush => HasMrp ? ActiveFeatureBrush : InactiveFeatureBrush;
+
+    public Visibility CurrentBadgeVisibility => IsCurrent ? Visibility.Visible : Visibility.Collapsed;
+
+    public Brush CardBackground => IsCurrent
+        ? new SolidColorBrush(Color.FromArgb(18, 22, 163, 74))
+        : (Application.Current.TryFindResource("AppBackgroundBrush") as Brush ?? Brushes.White);
+
+    public Brush CardBorder => IsCurrent
         ? new SolidColorBrush(Color.FromRgb(22, 163, 74))
-        : new SolidColorBrush(Color.FromRgb(156, 163, 175));
+        : (Application.Current.TryFindResource("BorderBrush") as Brush ?? Brushes.LightGray);
 
-    public string StatusText
-    {
-        get
-        {
-            if (!IsConnected) return "Не подключен";
-
-            string tierName = CurrentTier switch
-            {
-                "FREE" => "Базовый (Free)",
-                "STARTER" => "Старт",
-                "STANDARD" => "Стандарт",
-                "PRO" => "Профи",
-                _ => "Активен"
-            };
-
-            return ExpiresAtUtc.HasValue
-                ? $"{tierName} • до {ExpiresAtUtc.Value.ToLocalTime():dd.MM.yyyy}"
-                : $"{tierName} • бессрочно";
-        }
-    }
-
-    public string StarterLabel => CurrentTier == "STARTER" ? "✓ Старт" : "Старт";
-    public string StandardLabel => CurrentTier == "STANDARD" ? "✓ Стандарт" : "Стандарт";
-    public string ProLabel => CurrentTier == "PRO" ? "✓ Профи" : "Профи";
-
-    public Brush StarterBg => GetTierBg("STARTER");
-    public Brush StarterBorder => GetTierBorder("STARTER");
-    public Brush StarterFg => GetTierFg("STARTER");
-
-    public Brush StandardBg => GetTierBg("STANDARD");
-    public Brush StandardBorder => GetTierBorder("STANDARD");
-    public Brush StandardFg => GetTierFg("STANDARD");
-
-    public Brush ProBg => GetTierBg("PRO");
-    public Brush ProBorder => GetTierBorder("PRO");
-    public Brush ProFg => GetTierFg("PRO");
-
-    private Brush GetTierBg(string tier)
-    {
-        if (SelectedTier == tier) return new SolidColorBrush(Color.FromRgb(37, 99, 235));
-        if (CurrentTier == tier) return new SolidColorBrush(Color.FromArgb(35, 22, 163, 74));
-        return Brushes.Transparent;
-    }
-
-    private Brush GetTierBorder(string tier)
-    {
-        if (SelectedTier == tier) return new SolidColorBrush(Color.FromRgb(37, 99, 235));
-        if (CurrentTier == tier) return new SolidColorBrush(Color.FromRgb(22, 163, 74));
-        return new SolidColorBrush(Color.FromRgb(107, 114, 128));
-    }
-
-    private Brush GetTierFg(string tier)
-    {
-        if (SelectedTier == tier) return Brushes.White;
-        if (CurrentTier == tier) return new SolidColorBrush(Color.FromRgb(22, 163, 74));
-        return Application.Current.TryFindResource("AppForegroundBrush") as Brush ?? Brushes.Gray;
-    }
-
-    public bool IsActionEnabled => !string.IsNullOrEmpty(SelectedTier);
+    public bool IsActionEnabled => !IsFreeTier;
 
     public string ActionButtonText
     {
         get
         {
-            if (string.IsNullOrEmpty(SelectedTier))
-                return IsConnected ? "Подключен" : "Выберите тариф";
+            if (IsFreeTier)
+                return IsCurrent ? Get("UI_SUB_BTN_ACTIVE") : Get("UI_SUB_BTN_BASIC");
 
-            if (IsConnected && SelectedTier == CurrentTier)
-                return "Продлить (+30 дн.)";
+            if (IsCurrent)
+                return Get("UI_SUB_BTN_RENEW");
 
-            if (IsConnected && CurrentTier != "FREE")
-                return "Сменить тариф";
+            if (IsModuleConnected)
+                return Get("UI_SUB_BTN_SWITCH");
 
-            return "Запросить счет";
+            return Get("UI_SUB_BTN_CONNECT");
         }
     }
-
-    public string TargetPlanCode => $"{Prefix}_{SelectedTier}";
-
-    public event PropertyChangedEventHandler? PropertyChanged;
-    private void OnPropertyChanged([CallerMemberName] string? name = null)
-        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
 }
 
 public partial class ProfilePage : Page
 {
+    private List<ModuleTabVm> _moduleTabs = [];
+    private AppModule _selectedModule = AppModule.NONE;
+
     public ProfilePage() : this(null)
     {
     }
 
-    public ProfilePage(object? dummy = null)
+    public ProfilePage(object? initialModule = null)
     {
         InitializeComponent();
+
+        if (initialModule is AppModule mod && mod != AppModule.NONE)
+        {
+            _selectedModule = mod;
+        }
+
         InitRoleComboBox();
         _ = LoadUserDataAsync();
     }
@@ -209,7 +190,7 @@ public partial class ProfilePage : Page
         var overview = await ApiService.Instance.GetAsync<MySubscriptionOverviewDto>(SubscriptionsConstants.MY_SUBSCRIPTIONS);
         if (overview == null)
         {
-            CurrentPlanTitleText.Text = "Не удалось загрузить";
+            CurrentPlanTitleText.Text = Get("UI_SUB_PROFILE_LOAD_FAILED");
             return;
         }
 
@@ -217,7 +198,7 @@ public partial class ProfilePage : Page
         CurrentPlanTitleText.Text = overview.ActivePlansSummary;
         SubscriptionExpiresText.Text = overview.NearestExpirationUtc.HasValue
             ? overview.NearestExpirationUtc.Value.ToLocalTime().ToString("dd.MM.yyyy HH:mm")
-            : "Бессрочно";
+            : Get("UI_SUB_PROFILE_PERPETUAL");
 
         PaymentsDataGrid.ItemsSource = overview.Payments;
 
@@ -225,65 +206,185 @@ public partial class ProfilePage : Page
         if (Application.Current.MainWindow is MainWindow mainWindow)
         {
             mainWindow.UpdateNavigationPermissions();
+            _ = mainWindow.LoadSidebarSubscriptionAsync();
         }
 
-        var items = new ObservableCollection<ModuleSubscriptionItemVm>();
-        foreach (var mod in overview.Modules)
+        _moduleTabs = overview.Modules.Select(mod =>
         {
-            var (prefix, title) = mod.Module switch
+            var (prefix, shortTitle, fullTitle) = mod.Module switch
             {
-                AppModule.CHEESE_MAKING => ("CHEESE", "🧀 Варочный цех: Сыроварение"),
-                AppModule.BREWERY => ("BEER", "🍺 Варочный цех: Пивоварение"),
-                AppModule.MEAT_PROCESSING => ("MEAT", "🥩 Мясной цех: Сыровяление и Бастурма"),
-                AppModule.FERMENTATION => ("FERMENTATION", "🫙 Цех Ферментации и Солений"),
-                _ => ("", mod.Module.ToString())
+                AppModule.CHEESE_MAKING => ("CHEESE", Get("UI_SUB_TAB_CHEESE_SHORT"), Get("UI_SUB_TAB_CHEESE_FULL")),
+                AppModule.BREWERY => ("BEER", Get("UI_SUB_TAB_BREWERY_SHORT"), Get("UI_SUB_TAB_BREWERY_FULL")),
+                AppModule.MEAT_PROCESSING => ("MEAT", Get("UI_SUB_TAB_MEAT_SHORT"), Get("UI_SUB_TAB_MEAT_FULL")),
+                AppModule.FERMENTATION => ("FERMENTATION", Get("UI_SUB_TAB_FERM_SHORT"), Get("UI_SUB_TAB_FERM_FULL")),
+                _ => ("", mod.Module.ToString(), mod.Module.ToString())
             };
 
-            items.Add(new ModuleSubscriptionItemVm
+            return new ModuleTabVm
             {
                 Module = mod.Module,
                 Prefix = prefix,
-                Title = title,
+                ShortTitle = shortTitle,
+                FullTitle = fullTitle,
                 IsConnected = mod.IsConnected,
                 CurrentTier = mod.TierSuffix,
-                ExpiresAtUtc = mod.ExpiresAtUtc,
-                SelectedTier = mod.IsConnected ? null : "STARTER"
-            });
-        }
+                ExpiresAtUtc = mod.ExpiresAtUtc
+            };
+        }).ToList();
 
-        ModulesItemsControl.ItemsSource = items;
-    }
-
-    private void SelectTier_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.DataContext is ModuleSubscriptionItemVm vm && btn.Tag is string tier)
+        if (_selectedModule == AppModule.NONE)
         {
-            if (vm.IsConnected && vm.SelectedTier == tier)
-            {
-                vm.SelectedTier = null;
-            }
-            else
-            {
-                vm.SelectedTier = tier;
-            }
+            var firstConnected = _moduleTabs.FirstOrDefault(m => m.IsConnected);
+            _selectedModule = firstConnected?.Module ?? _moduleTabs.FirstOrDefault()?.Module ?? AppModule.CHEESE_MAKING;
+        }
+
+        RenderModuleShowcase();
+    }
+
+    private void SelectModuleTab_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button btn && btn.Tag is AppModule module)
+        {
+            _selectedModule = module;
+            RenderModuleShowcase();
         }
     }
 
-    private async void ModuleAction_Click(object sender, RoutedEventArgs e)
+    private void RenderModuleShowcase()
     {
-        if (sender is Button button && button.DataContext is ModuleSubscriptionItemVm vm && !string.IsNullOrEmpty(vm.SelectedTier))
+        foreach (var tab in _moduleTabs)
+        {
+            tab.IsSelected = tab.Module == _selectedModule;
+        }
+
+        ModuleTabsControl.ItemsSource = null;
+        ModuleTabsControl.ItemsSource = _moduleTabs;
+
+        var activeTab = _moduleTabs.FirstOrDefault(t => t.Module == _selectedModule);
+        if (activeTab == null) return;
+
+        SelectedModuleTitleText.Text = activeTab.FullTitle;
+
+        if (!activeTab.IsConnected)
+        {
+            SelectedModuleStatusText.Text = Get("UI_SUB_STATUS_NOT_CONNECTED");
+            SelectedModuleStatusText.Foreground = new SolidColorBrush(Color.FromRgb(100, 116, 139));
+        }
+        else
+        {
+            var tierLabel = activeTab.CurrentTier switch
+            {
+                "FREE" => Get("UI_SUB_TIER_FREE_FULL"),
+                "STARTER" => Get("UI_SUB_TIER_STARTER_NAME"),
+                "STANDARD" => Get("UI_SUB_TIER_STANDARD_NAME"),
+                "PRO" => Get("UI_SUB_TIER_PRO_NAME"),
+                _ => Get("UI_SUB_TIER_ACTIVE_DEFAULT")
+            };
+            var expiry = activeTab.ExpiresAtUtc.HasValue
+                ? string.Format(Get("UI_SUB_STATUS_UNTIL_FMT"), activeTab.ExpiresAtUtc.Value.ToLocalTime().ToString("dd.MM.yyyy"))
+                : Get("UI_SUB_STATUS_PERPETUAL_LOWER");
+
+            SelectedModuleStatusText.Text = string.Format(Get("UI_SUB_STATUS_CONNECTED_FMT"), tierLabel, expiry);
+            SelectedModuleStatusText.Foreground = new SolidColorBrush(Color.FromRgb(22, 163, 74));
+        }
+
+        var cards = new ObservableCollection<TierCardVm>
+        {
+            new()
+            {
+                TierCode = "FREE",
+                PlanCode = $"{activeTab.Prefix}_FREE",
+                TierTitle = Get("UI_SUB_TIER_FREE_NAME"),
+                Subtitle = Get("UI_SUB_TIER_FREE_SUB"),
+                BatchesText = string.Format(Get("UI_SUB_LIMIT_BATCHES_FMT"), 8),
+                WarehousesText = string.Format(Get("UI_SUB_LIMIT_WAREHOUSES_FMT"), 2),
+                ChambersText = Get("UI_SUB_LIMIT_CHAMBERS_ONE"),
+                UsersText = Get("UI_SUB_LIMIT_USERS_ONE"),
+                AuditText = string.Format(Get("UI_SUB_LIMIT_AUDIT_DAYS_FMT"), 7),
+                HasPdfExport = false,
+                HasExcelExport = false,
+                HasAnalytics = false,
+                HasMrp = false,
+                IsFreeTier = true,
+                IsModuleConnected = activeTab.IsConnected,
+                IsCurrent = activeTab.IsConnected && activeTab.CurrentTier == "FREE"
+            },
+            new()
+            {
+                TierCode = "STARTER",
+                PlanCode = $"{activeTab.Prefix}_STARTER",
+                TierTitle = Get("UI_SUB_TIER_STARTER_NAME"),
+                Subtitle = Get("UI_SUB_TIER_STARTER_SUB"),
+                BatchesText = string.Format(Get("UI_SUB_LIMIT_BATCHES_FMT"), 20),
+                WarehousesText = string.Format(Get("UI_SUB_LIMIT_WAREHOUSES_FMT"), 3),
+                ChambersText = string.Format(Get("UI_SUB_LIMIT_CHAMBERS_FMT"), 2),
+                UsersText = string.Format(Get("UI_SUB_LIMIT_USERS_FMT"), 2),
+                AuditText = string.Format(Get("UI_SUB_LIMIT_AUDIT_DAYS_FMT"), 30),
+                HasPdfExport = true,
+                HasExcelExport = false,
+                HasAnalytics = false,
+                HasMrp = false,
+                IsFreeTier = false,
+                IsModuleConnected = activeTab.IsConnected,
+                IsCurrent = activeTab.IsConnected && activeTab.CurrentTier == "STARTER"
+            },
+            new()
+            {
+                TierCode = "STANDARD",
+                PlanCode = $"{activeTab.Prefix}_STANDARD",
+                TierTitle = Get("UI_SUB_TIER_STANDARD_NAME"),
+                Subtitle = Get("UI_SUB_TIER_STANDARD_SUB"),
+                BatchesText = string.Format(Get("UI_SUB_LIMIT_BATCHES_FMT"), 60),
+                WarehousesText = string.Format(Get("UI_SUB_LIMIT_WAREHOUSES_FMT"), 5),
+                ChambersText = string.Format(Get("UI_SUB_LIMIT_CHAMBERS_FMT"), 5),
+                UsersText = string.Format(Get("UI_SUB_LIMIT_USERS_FMT"), 5),
+                AuditText = string.Format(Get("UI_SUB_LIMIT_AUDIT_DAYS_FMT"), 180),
+                HasPdfExport = true,
+                HasExcelExport = true,
+                HasAnalytics = true,
+                HasMrp = true,
+                IsFreeTier = false,
+                IsModuleConnected = activeTab.IsConnected,
+                IsCurrent = activeTab.IsConnected && activeTab.CurrentTier == "STANDARD"
+            },
+            new()
+            {
+                TierCode = "PRO",
+                PlanCode = $"{activeTab.Prefix}_PRO",
+                TierTitle = Get("UI_SUB_TIER_PRO_NAME"),
+                Subtitle = Get("UI_SUB_TIER_PRO_SUB"),
+                BatchesText = string.Format(Get("UI_SUB_LIMIT_BATCHES_FMT"), 200),
+                WarehousesText = string.Format(Get("UI_SUB_LIMIT_WAREHOUSES_FMT"), 10),
+                ChambersText = string.Format(Get("UI_SUB_LIMIT_CHAMBERS_FMT"), 12),
+                UsersText = string.Format(Get("UI_SUB_LIMIT_USERS_FMT"), 10),
+                AuditText = string.Format(Get("UI_SUB_LIMIT_AUDIT_YEARS_FMT"), 10),
+                HasPdfExport = true,
+                HasExcelExport = true,
+                HasAnalytics = true,
+                HasMrp = true,
+                IsFreeTier = false,
+                IsModuleConnected = activeTab.IsConnected,
+                IsCurrent = activeTab.IsConnected && activeTab.CurrentTier == "PRO"
+            }
+        };
+
+        TierCardsControl.ItemsSource = cards;
+    }
+
+    private async void TierCardAction_Click(object sender, RoutedEventArgs e)
+    {
+        if (sender is Button button && button.Tag is string planCode && !string.IsNullOrWhiteSpace(planCode))
         {
             button.IsEnabled = false;
 
             try
             {
-                var planCode = vm.TargetPlanCode;
                 var payload = new { PlanCode = planCode, Days = 30 };
                 var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(SubscriptionsConstants.REQUEST_INVOICE, payload);
 
                 if (isSuccess)
                 {
-                    var userOrgName = ApiService.Instance.CurrentUser?.FullName ?? "Крафтовик";
+                    var userOrgName = ApiService.Instance.CurrentUser?.FullName ?? Get("UI_SUB_DEFAULT_USER_NAME");
                     var requisitesWin = new PaymentRequisitesWindow(planCode, userOrgName)
                     {
                         Owner = Window.GetWindow(this)
@@ -297,7 +398,7 @@ public partial class ProfilePage : Page
             }
             finally
             {
-                button.IsEnabled = vm.IsActionEnabled;
+                button.IsEnabled = true;
             }
         }
     }

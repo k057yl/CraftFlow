@@ -25,9 +25,18 @@ public class SubscriptionPlanConfiguration : IEntityTypeConfiguration<Subscripti
             .IsRequired()
             .HasMaxLength(100);
 
+        builder.Property(p => p.TargetModule)
+            .HasConversion<int>()
+            .IsRequired();
+
+        builder.Property(p => p.Features)
+            .HasConversion<int>()
+            .IsRequired();
+
         builder.Property(p => p.MaxMonthlyBatches).IsRequired();
         builder.Property(p => p.MaxWarehouses).IsRequired();
         builder.Property(p => p.MaxChambers).IsRequired();
         builder.Property(p => p.MaxUsers).IsRequired();
+        builder.Property(p => p.AuditRetentionDays).IsRequired();
     }
 }

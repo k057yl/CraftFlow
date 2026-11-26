@@ -1,10 +1,14 @@
-﻿using System.Data;
+﻿using CraftFlow.Api.Core.Behaviors;
 using CraftFlow.Api.Core.MultiTenancy;
+using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Services;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.MRP;
+using CraftFlow.SharedKernel.Enums;
+using CraftFlow.SharedKernel.Enums.Subscription;
 using CraftFlow.SharedKernel.Result;
 using Dapper;
 using MediatR;
+using System.Data;
 
 namespace CraftFlow.Api.Modules.CoreDomainServices.MRP.CalculateRequirements;
 
@@ -23,13 +27,26 @@ public sealed class FlatMrpRequirementRow
 
 public sealed class CalculateRequirementsQueryHandler : IRequestHandler<CalculateRequirementsQuery, Result<MrpReportDto>>
 {
+    private static readonly AppModule[] AllModules =
+    [
+        AppModule.CHEESE_MAKING,
+        AppModule.BREWERY,
+        AppModule.MEAT_PROCESSING,
+        AppModule.FERMENTATION
+    ];
+
     private readonly IDbConnection _dbConnection;
     private readonly ITenantContext _tenantContext;
+    private readonly ITenantEntitlementService _entitlementService;
 
-    public CalculateRequirementsQueryHandler(IDbConnection dbConnection, ITenantContext tenantContext)
+    public CalculateRequirementsQueryHandler(
+        IDbConnection dbConnection,
+        ITenantContext tenantContext,
+        ITenantEntitlementService entitlementService)
     {
         _dbConnection = dbConnection;
         _tenantContext = tenantContext;
+        _entitlementService = entitlementService;
     }
 
     public async Task<Result<MrpReportDto>> Handle(CalculateRequirementsQuery request, CancellationToken cancellationToken)
@@ -37,6 +54,20 @@ public sealed class CalculateRequirementsQueryHandler : IRequestHandler<Calculat
         if (request.BatchIds != null && request.BatchIds.Count == 0)
         {
             return Result.Success(new MrpReportDto(DateTime.UtcNow, [], []));
+        }
+
+        var allowedModules = new List<int>();
+        foreach (var module in AllModules)
+        {
+            if (await _entitlementService.HasModuleFeatureAsync(module, PlanFeatures.MRP_PLANNING, cancellationToken))
+            {
+                allowedModules.Add((int)module);
+            }
+        }
+
+        if (allowedModules.Count == 0)
+        {
+            return Result.Failure<MrpReportDto>(Error.Forbidden(ErrorCodes.Saas.FEATURE_NOT_AVAILABLE));
         }
 
         const string sql = """
@@ -96,7 +127,8 @@ public sealed class CalculateRequirementsQueryHandler : IRequestHandler<Calculat
                 TenantId = _tenantContext.TenantId,
                 UnknownMaterialName = CoreConstants.Catalog.UNKNOWN_MATERIAL_NAME,
                 FilterByBatches = request.BatchIds != null && request.BatchIds.Count > 0,
-                BatchIds = request.BatchIds?.ToArray() ?? Array.Empty<Guid>()
+                BatchIds = request.BatchIds?.ToArray() ?? Array.Empty<Guid>(),
+                AllowedModules = allowedModules.ToArray()
             },
             cancellationToken: cancellationToken
         );

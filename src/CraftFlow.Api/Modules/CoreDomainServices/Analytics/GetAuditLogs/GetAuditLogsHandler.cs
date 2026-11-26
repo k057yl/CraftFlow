@@ -1,5 +1,6 @@
 ﻿using CraftFlow.Api.Core.MultiTenancy;
 using CraftFlow.Api.Core.Persistence;
+using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Services;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Dtos.Analytics;
 using CraftFlow.SharedKernel.Enums.Identity;
@@ -13,11 +14,16 @@ public sealed class GetAuditLogsQueryHandler : IRequestHandler<GetAuditLogsQuery
 {
     private readonly AppDbContext _dbContext;
     private readonly ITenantContext _tenantContext;
+    private readonly ITenantEntitlementService _entitlementService;
 
-    public GetAuditLogsQueryHandler(AppDbContext dbContext, ITenantContext tenantContext)
+    public GetAuditLogsQueryHandler(
+        AppDbContext dbContext,
+        ITenantContext tenantContext,
+        ITenantEntitlementService entitlementService)
     {
         _dbContext = dbContext;
         _tenantContext = tenantContext;
+        _entitlementService = entitlementService;
     }
 
     public async Task<Result<List<AuditLogDto>>> Handle(GetAuditLogsQuery request, CancellationToken cancellationToken)
@@ -27,6 +33,23 @@ public sealed class GetAuditLogsQueryHandler : IRequestHandler<GetAuditLogsQuery
             return Result.Failure<List<AuditLogDto>>(Error.Validation(ErrorCodes.Auth.ACCESS_DENIED));
         }
 
+        var retentionDays = await _entitlementService.GetAuditRetentionDaysAsync(cancellationToken);
+        if (retentionDays == 0)
+        {
+            return Result.Failure<List<AuditLogDto>>(Error.Forbidden(ErrorCodes.Saas.SUBSCRIPTION_EXPIRED));
+        }
+
+        DateTime? effectiveFromUtc = request.FromDate?.ToUniversalTime();
+
+        if (retentionDays > 0)
+        {
+            var minAllowedUtc = DateTime.UtcNow.AddDays(-retentionDays);
+            if (!effectiveFromUtc.HasValue || effectiveFromUtc.Value < minAllowedUtc)
+            {
+                effectiveFromUtc = minAllowedUtc;
+            }
+        }
+
         var query = _dbContext.AuditLogs.AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(request.SearchTerm))
@@ -34,6 +57,11 @@ public sealed class GetAuditLogsQueryHandler : IRequestHandler<GetAuditLogsQuery
             var term = request.SearchTerm.Trim().ToLower();
             query = query.Where(x => x.UserEmail.ToLower().Contains(term) ||
                                      x.Details.ToLower().Contains(term));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.EntityName))
+        {
+            query = query.Where(x => x.EntityName == request.EntityName);
         }
 
         if (!string.IsNullOrWhiteSpace(request.Action))
@@ -46,9 +74,9 @@ public sealed class GetAuditLogsQueryHandler : IRequestHandler<GetAuditLogsQuery
             query = query.Where(x => x.UserId == request.UserId.Value);
         }
 
-        if (request.FromDate.HasValue)
+        if (effectiveFromUtc.HasValue)
         {
-            query = query.Where(x => x.CreatedAtUtc >= request.FromDate.Value.ToUniversalTime());
+            query = query.Where(x => x.CreatedAtUtc >= effectiveFromUtc.Value);
         }
 
         if (request.ToDate.HasValue)

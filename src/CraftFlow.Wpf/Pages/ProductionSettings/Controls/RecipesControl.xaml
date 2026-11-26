@@ -25,18 +25,21 @@
                 </Grid.RowDefinitions>
 
                 <StackPanel Grid.Row="0" Margin="0,0,0,10">
-                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_RAW_NAME}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
-                    <TextBox x:Name="RawMaterialNameTextBox" Height="28" Margin="0,0,0,8"/>
+                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_RAW_NAME}" Style="{StaticResource InputCaptionTextStyle}"/>
+                    <TextBox x:Name="RawMaterialNameTextBox" Margin="0,0,0,8"/>
 
-                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_SELECT_UOM}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
-                    <ComboBox x:Name="RawUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Margin="0,0,0,12"/>
+                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_SELECT_UOM}" Style="{StaticResource InputCaptionTextStyle}"/>
+                    <ComboBox x:Name="RawUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,12"/>
 
                     <Button Content="{loc:Loc Key=UI_RECIPES_BTN_CREATE_RAW}" Click="CreateRawMaterial_Click" Style="{StaticResource PrimaryButtonStyle}" Height="30"/>
                 </StackPanel>
 
-                <CheckBox x:Name="ShowArchivedRawCheckBox" Grid.Row="1" Content="{loc:Loc Key=UI_RECIPES_CHECKBOX_SHOW_ARCHIVED}" 
-                          FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,8" 
-                          Checked="ShowArchived_Changed" Unchecked="ShowArchived_Changed"/>
+                <CheckBox x:Name="ShowArchivedRawCheckBox"
+                          Grid.Row="1"
+                          Content="{loc:Loc Key=UI_RECIPES_CHECKBOX_SHOW_ARCHIVED}"
+                          Margin="0,0,0,8"
+                          Checked="ShowArchived_Changed"
+                          Unchecked="ShowArchived_Changed"/>
 
                 <DataGrid Grid.Row="2" x:Name="RawMaterialsDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                     <DataGrid.Columns>
@@ -44,7 +47,7 @@
                         <DataGridTemplateColumn x:Name="RawMaterialDeleteColumn" Width="45">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="•••" Click="OpenRawMaterialMenu_Click" Tag="{Binding}" Style="{StaticResource ActionButtonStyle}" Width="28" Height="24" Padding="0"/>
+                                    <Button Click="OpenRawMaterialMenu_Click" Tag="{Binding}" Style="{StaticResource ActionButtonStyle}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
@@ -57,32 +60,34 @@
         <GroupBox Grid.Column="1" Header="{loc:Loc Key=UI_RECIPES_HEADER_NEW_RECIPE}" Margin="0,0,10,0" Padding="10">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_RECIPE_NAME}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
-                    <TextBox x:Name="ProductNameTextBox" Height="28" Margin="0,0,0,8"/>
+                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_RECIPE_NAME}" Style="{StaticResource InputCaptionTextStyle}"/>
+                    <TextBox x:Name="ProductNameTextBox" Margin="0,0,0,8"/>
 
-                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_MODULE}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
-                    <ComboBox x:Name="RecipeModuleComboBox" DisplayMemberPath="Name" SelectedValuePath="Code" Height="28" Margin="0,0,0,8"/>
+                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_MODULE}" Style="{StaticResource InputCaptionTextStyle}"/>
+                    <ComboBox x:Name="RecipeModuleComboBox" DisplayMemberPath="Name" SelectedValuePath="Code" Margin="0,0,0,8"/>
 
-                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_SELECT_UOM}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
-                    <ComboBox x:Name="ProductUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Margin="0,0,0,8"/>
+                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_SELECT_UOM}" Style="{StaticResource InputCaptionTextStyle}"/>
+                    <ComboBox x:Name="ProductUomComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,8"/>
 
-                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_TARGET_OUTPUT}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,4"/>
-                    <TextBox x:Name="RecipeOutputQuantityTextBox" Text="1" Height="28" Margin="0,0,0,8"/>
+                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_TARGET_OUTPUT}" Style="{StaticResource InputCaptionTextStyle}"/>
+                    <TextBox x:Name="RecipeOutputQuantityTextBox" Text="1" Margin="0,0,0,8"/>
 
-                    <CheckBox x:Name="IsAgingRequiredCheckBox" Content="{loc:Loc Key=UI_RECIPES_LABEL_IS_AGING_REQUIRED}" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,4,0,4"/>
-                    <TextBox x:Name="DefaultMinAgingDaysTextBox" Text="30" Height="28" Margin="0,0,0,12"/>
+                    <CheckBox x:Name="IsAgingRequiredCheckBox"
+                              Content="{loc:Loc Key=UI_RECIPES_LABEL_IS_AGING_REQUIRED}"
+                              Margin="0,4,0,6"/>
+                    <TextBox x:Name="DefaultMinAgingDaysTextBox" Text="30" Margin="0,0,0,12"/>
 
-                    <Separator Margin="0,0,0,12"/>
+                    <Separator Background="{DynamicResource BorderBrush}" Margin="0,0,0,12"/>
 
-                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_INGREDIENTS_SECTION}" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,6"/>
+                    <TextBlock Text="{loc:Loc Key=UI_RECIPES_LABEL_INGREDIENTS_SECTION}" Style="{StaticResource FieldLabelTextStyle}" FontSize="11" Margin="0,0,0,6"/>
 
                     <Grid Margin="0,0,0,8">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="60"/>
                         </Grid.ColumnDefinitions>
-                        <ComboBox Grid.Column="0" x:Name="RecipeRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28" Margin="0,0,6,0"/>
-                        <TextBox Grid.Column="1" x:Name="RecipeIngredientQuantityTextBox" Text="1" Height="28"/>
+                        <ComboBox Grid.Column="0" x:Name="RecipeRawMaterialComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,6,0"/>
+                        <TextBox Grid.Column="1" x:Name="RecipeIngredientQuantityTextBox" Text="1"/>
                     </Grid>
 
                     <Button Content="{loc:Loc Key=UI_RECIPES_BTN_ADD_INGREDIENT}" Click="AddIngredient_Click" Style="{StaticResource PrimaryButtonStyle}" Height="28" Margin="0,0,0,8"/>
@@ -97,9 +102,9 @@
                                     </Grid.ColumnDefinitions>
 
                                     <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding RawMaterialName}" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                        <TextBlock Text=" — " Foreground="{DynamicResource AppForegroundBrush}"/>
-                                        <TextBlock Foreground="{DynamicResource AppForegroundBrush}">
+                                        <TextBlock Text="{Binding RawMaterialName}" FontWeight="SemiBold"/>
+                                        <TextBlock Text=" — "/>
+                                        <TextBlock>
                                             <TextBlock.Text>
                                                 <MultiBinding Converter="{StaticResource UnitValueConverter}">
                                                     <Binding Path="Quantity"/>
@@ -110,18 +115,13 @@
                                     </StackPanel>
 
                                     <Button Grid.Column="1"
-                        Content="✕"
-                        Click="RemoveIngredient_Click"
-                        Tag="{Binding}"
-                        Width="20"
-                        Height="20"
-                        Padding="0"
-                        Margin="6,0,0,0"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Foreground="#EF4444"
-                        FontWeight="Bold"
-                        Cursor="Hand"/>
+                                            Content="✕"
+                                            Click="RemoveIngredient_Click"
+                                            Tag="{Binding}"
+                                            Style="{StaticResource DangerButtonStyle}"
+                                            Width="20"
+                                            Height="20"
+                                            Margin="6,0,0,0"/>
                                 </Grid>
                             </DataTemplate>
                         </ListBox.ItemTemplate>
@@ -140,9 +140,12 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <CheckBox x:Name="ShowArchivedRecipesCheckBox" Grid.Row="0" Content="{loc:Loc Key=UI_RECIPES_CHECKBOX_SHOW_ARCHIVED}" 
-                          FontSize="11" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,0,8" 
-                          Checked="ShowArchived_Changed" Unchecked="ShowArchived_Changed"/>
+                <CheckBox x:Name="ShowArchivedRecipesCheckBox"
+                          Grid.Row="0"
+                          Content="{loc:Loc Key=UI_RECIPES_CHECKBOX_SHOW_ARCHIVED}"
+                          Margin="0,0,0,8"
+                          Checked="ShowArchived_Changed"
+                          Unchecked="ShowArchived_Changed"/>
 
                 <DataGrid Grid.Row="1" x:Name="RecipesDataGrid" AutoGenerateColumns="False" IsReadOnly="True" CanUserAddRows="False">
                     <DataGrid.Columns>
@@ -150,7 +153,7 @@
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
                                     <TextBlock VerticalAlignment="Center" Margin="5,0">
-                                        <Hyperlink Click="OpenRecipeDetails_Click">
+                                        <Hyperlink Click="OpenRecipeDetails_Click" Foreground="{DynamicResource AccentBrush}">
                                             <Run Text="{Binding Name}"/>
                                         </Hyperlink>
                                     </TextBlock>
@@ -163,7 +166,7 @@
                         <DataGridTemplateColumn x:Name="RecipeDeleteColumn" Width="45">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
-                                    <Button Content="•••" Click="OpenRecipeMenu_Click" Tag="{Binding}" Style="{StaticResource ActionButtonStyle}" Width="28" Height="24" Padding="0"/>
+                                    <Button Click="OpenRecipeMenu_Click" Tag="{Binding}" Style="{StaticResource ActionButtonStyle}"/>
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>

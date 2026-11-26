@@ -3,11 +3,12 @@ using CraftFlow.Api.Core.MultiTenancy;
 using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Identity.Domain;
 using CraftFlow.Api.Modules.CoreDomainServices.Inventory.Domain;
-using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain;
+using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Services;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Aging.Domain;
 using CraftFlow.Api.Modules.ProductionVerticalModules.CheeseMaking.Domain;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Domain;
+using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -24,15 +25,18 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
 
     private readonly AppDbContext _dbContext;
     private readonly ITenantContext _tenantContext;
+    private readonly ITenantEntitlementService _entitlementService;
     private readonly IMemoryCache _cache;
 
     public SubscriptionQuotaBehavior(
         AppDbContext dbContext,
         ITenantContext tenantContext,
+        ITenantEntitlementService entitlementService,
         IMemoryCache cache)
     {
         _dbContext = dbContext;
         _tenantContext = tenantContext;
+        _entitlementService = entitlementService;
         _cache = cache;
     }
 
@@ -44,34 +48,37 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
         }
 
         var tenantId = _tenantContext.TenantId;
-
         if (tenantId == Guid.Empty || _tenantContext.IsSuperAdmin)
         {
             return await next();
         }
 
-        var subscriptions = await _dbContext.Set<TenantSubscription>()
-            .Include(s => s.Plan)
-            .AsNoTracking()
-            .Where(s => s.TenantId == tenantId)
-            .ToListAsync(cancellationToken);
-
-        var activePlans = subscriptions
-            .Where(s => IsSubscriptionValid(s) && s.Plan != null)
-            .Select(s => s.Plan)
-            .ToList();
-
-        if (activePlans.Count == 0)
-        {
-            return ResultFactory.CreateFailure<TResponse>(Error.Validation(ErrorCodes.Saas.SUBSCRIPTION_EXPIRED));
-        }
+        var targetModule = request is IRequireModule moduleRequest
+            ? moduleRequest.RequiredModule
+            : AppModule.NONE;
 
         var isQuotaExceeded = quotaRequest.QuotaType switch
         {
-            QuotaType.MONTHLY_BATCHES => await CheckMonthlyBatchesQuotaAsync(tenantId, GetEffectiveLimit(activePlans, p => p.MaxMonthlyBatches), cancellationToken),
-            QuotaType.WAREHOUSES_COUNT => await CheckCountQuotaAsync<Warehouse>(tenantId, GetEffectiveLimit(activePlans, p => p.MaxWarehouses), cancellationToken),
-            QuotaType.CHAMBER_COUNT => await CheckCountQuotaAsync<AgingChamber>(tenantId, GetEffectiveLimit(activePlans, p => p.MaxChambers), cancellationToken),
-            QuotaType.USERS_COUNT => await CheckCountQuotaAsync<OrganizationMember>(tenantId, GetEffectiveLimit(activePlans, p => p.MaxUsers), cancellationToken),
+            QuotaType.MONTHLY_BATCHES => await CheckMonthlyBatchesQuotaAsync(
+                tenantId,
+                await _entitlementService.GetMaxMonthlyBatchesAsync(targetModule, cancellationToken),
+                cancellationToken),
+
+            QuotaType.CHAMBER_COUNT => await CheckCountQuotaAsync<AgingChamber>(
+                tenantId,
+                await _entitlementService.GetMaxChambersAsync(targetModule, cancellationToken),
+                cancellationToken),
+
+            QuotaType.WAREHOUSES_COUNT => await CheckCountQuotaAsync<Warehouse>(
+                tenantId,
+                await _entitlementService.GetMaxWarehousesAsync(cancellationToken),
+                cancellationToken),
+
+            QuotaType.USERS_COUNT => await CheckCountQuotaAsync<OrganizationMember>(
+                tenantId,
+                await _entitlementService.GetMaxUsersAsync(cancellationToken),
+                cancellationToken),
+
             _ => false
         };
 
@@ -83,23 +90,10 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
         return await next();
     }
 
-    private static int GetEffectiveLimit(IEnumerable<SubscriptionPlan> plans, Func<SubscriptionPlan, int> selector)
-    {
-        var limits = plans.Select(selector).ToList();
-        return limits.Contains(UNLIMITED_QUOTA) ? UNLIMITED_QUOTA : limits.Max();
-    }
-
-    private static bool IsSubscriptionValid(TenantSubscription subscription)
-    {
-        var isStateActive = subscription.State == SubscriptionState.Active || subscription.State == SubscriptionState.Trial;
-        var isNotExpired = !subscription.ExpiresAtUtc.HasValue || subscription.ExpiresAtUtc.Value > DateTime.UtcNow;
-
-        return isStateActive && isNotExpired;
-    }
-
     private async Task<bool> CheckMonthlyBatchesQuotaAsync(Guid tenantId, int maxAllowed, CancellationToken ct)
     {
         if (maxAllowed == UNLIMITED_QUOTA) return false;
+        if (maxAllowed <= 0) return true;
 
         var cacheKey = $"quota:batches:{tenantId}:{DateTime.UtcNow:yyyyMM}";
 
@@ -121,6 +115,7 @@ public sealed class SubscriptionQuotaBehavior<TRequest, TResponse> : IPipelineBe
         where TEntity : class, ITenantEntity
     {
         if (maxAllowed == UNLIMITED_QUOTA) return false;
+        if (maxAllowed <= 0) return true;
 
         var cacheKey = $"quota:count:{typeof(TEntity).Name}:{tenantId}";
 

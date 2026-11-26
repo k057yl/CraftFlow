@@ -138,6 +138,7 @@ public static class ErrorCodes
         public const string TENANT_MISMATCH = "SAAS.TENANT_MISMATCH";
         public const string MODULE_NOT_PURCHASED = "SAAS.MODULE_NOT_PURCHASED";
         public const string PLAN_NOT_FOUND = "SAAS.PLAN_NOT_FOUND";
+        public const string FEATURE_NOT_AVAILABLE = "SAAS.FEATURE_NOT_AVAILABLE";
     }
 
     public static class Supplier

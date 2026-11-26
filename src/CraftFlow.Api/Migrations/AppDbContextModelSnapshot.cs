@@ -1076,10 +1076,16 @@ namespace CraftFlow.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<int>("AuditRetentionDays")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)");
+
+                    b.Property<int>("Features")
+                        .HasColumnType("integer");
 
                     b.Property<int>("MaxChambers")
                         .HasColumnType("integer");

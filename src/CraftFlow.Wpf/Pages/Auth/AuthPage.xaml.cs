@@ -35,7 +35,7 @@ public partial class AuthPage : Page
                 var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
                 if (result != null)
                 {
-                    ProcessSuccessfulAuth(result, rememberMe);
+                    await ProcessSuccessfulAuthAsync(result, rememberMe);
                 }
             }
             else
@@ -96,7 +96,7 @@ public partial class AuthPage : Page
                 var result = await response.Content.ReadFromJsonAsync<LoginResponseDto>();
                 if (result != null && !string.IsNullOrEmpty(result.Token))
                 {
-                    ProcessSuccessfulAuth(result, true);
+                    await ProcessSuccessfulAuthAsync(result, true);
                 }
                 else
                 {
@@ -144,12 +144,20 @@ public partial class AuthPage : Page
         StatusTextBlock.Text = string.Empty;
     }
 
-    private void ProcessSuccessfulAuth(LoginResponseDto result, bool rememberMe)
+    private async Task ProcessSuccessfulAuthAsync(LoginResponseDto result, bool rememberMe)
     {
         ApiService.Instance.SetTenantHeader(result.TenantId);
         ApiService.Instance.SetAuthToken(result.Token, rememberMe);
 
-        NavigationService?.Navigate(new DashboardPage());
+        if (Application.Current.MainWindow is MainWindow mainWindow)
+        {
+            await mainWindow.LoadSidebarSubscriptionAsync();
+            mainWindow.NavigateToDefaultAvailablePage();
+        }
+        else
+        {
+            NavigationService?.Navigate(new DashboardPage());
+        }
     }
 
     private void SetStatus(string msg, Brush color)

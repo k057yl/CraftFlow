@@ -1,5 +1,8 @@
 ﻿using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Dashboard;
+using CraftFlow.SharedKernel.Dtos.Subscription;
+using CraftFlow.SharedKernel.Enums.Identity;
+using CraftFlow.SharedKernel.Enums.Subscription;
 
 namespace CraftFlow.Wpf.Services.Startup;
 
@@ -61,27 +64,34 @@ public class AppStartupService
                 return new StartupResult { ResultType = StartupResultType.AuthFailed };
             }
 
-            // --- ЭТАП 4: 60% -> 75% (Загрузка справочников / конфигурации) ---
+            // --- ЭТАП 4: 60% -> 75% (Загрузка модулей и прав тарифа) ---
             await RunStepWithPingsAsync(progress, 60, 75, MSG_LOAD_DICTIONARIES, async () =>
             {
-                await Task.Delay(200);
+                if (!PermissionService.Instance.IsSuperAdmin)
+                {
+                    var overview = await ApiService.Instance.GetAsync<MySubscriptionOverviewDto>(SubscriptionsConstants.MY_SUBSCRIPTIONS);
+                    if (overview != null)
+                    {
+                        ApiService.Instance.ActiveModules = overview.ActiveModules;
+                        ApiService.Instance.ActiveFeatures = overview.EffectiveFeatures;
+                    }
+                }
             });
 
-            // --- ЭТАП 5: 75% -> 95% (Загрузка сводки дашборда) ---
+            // --- ЭТАП 5: 75% -> 95% (Загрузка сводки дашборда, если доступно по тарифу) ---
             DashboardSummaryDto? summary = null;
+            var ps = PermissionService.Instance;
+            var canLoadDashboard = ps.IsSuperAdmin ||
+                                   (ps.HasPermission(AppPermission.DASHBOARD_VIEW) &&
+                                    ApiService.Instance.ActiveFeatures.HasFlag(PlanFeatures.ADVANCED_ANALYTICS));
+
             await RunStepWithPingsAsync(progress, 75, 95, MSG_LOAD_DASHBOARD, async () =>
             {
-                summary = await ApiService.Instance.GetAsync<DashboardSummaryDto>(AnalyticConstants.DASHBOARD);
-            });
-
-            if (summary == null)
-            {
-                return new StartupResult
+                if (canLoadDashboard)
                 {
-                    ResultType = StartupResultType.CriticalError,
-                    ErrorMessage = LocalizationService.Get(ERR_DASHBOARD_EMPTY)
-                };
-            }
+                    summary = await ApiService.Instance.GetAsync<DashboardSummaryDto>(AnalyticConstants.DASHBOARD);
+                }
+            });
 
             // --- ФИНАЛ: 100% ---
             progress?.Report(new StartupProgress(100, LocalizationService.Get(MSG_COMPLETE)));
@@ -106,7 +116,6 @@ public class AppStartupService
     {
         for (int i = 0; i < maxRetries; i++)
         {
-            // Плавный тикер от 0% до 20% по пыткам подключения
             int stepPercent = (int)((i / (double)maxRetries) * 20);
             progress?.Report(new StartupProgress(stepPercent, LocalizationService.Get(MSG_WAIT_API)));
 

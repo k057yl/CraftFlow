@@ -6,10 +6,14 @@ namespace CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Services;
 public class SubscriptionLifecycleService
 {
     private readonly AppDbContext _dbContext;
+    private readonly ITenantEntitlementService _entitlementService;
 
-    public SubscriptionLifecycleService(AppDbContext dbContext)
+    public SubscriptionLifecycleService(
+        AppDbContext dbContext,
+        ITenantEntitlementService entitlementService)
     {
         _dbContext = dbContext;
+        _entitlementService = entitlementService;
     }
 
     public async Task<bool> DowngradeExpiredModulesAsync(Guid? tenantId = null, CancellationToken ct = default)
@@ -42,7 +46,7 @@ public class SubscriptionLifecycleService
             .Where(s => targetTenantIds.Contains(s.TenantId))
             .ToListAsync(ct);
 
-        bool hasChanges = false;
+        var affectedTenantIds = new HashSet<Guid>();
 
         foreach (var item in expiredCandidateModules)
         {
@@ -69,14 +73,19 @@ public class SubscriptionLifecycleService
                 _dbContext.TenantSubscriptions.RemoveRange(duplicates);
             }
 
-            hasChanges = true;
+            affectedTenantIds.Add(item.TenantId);
         }
 
-        if (hasChanges)
+        if (affectedTenantIds.Count > 0)
         {
             await _dbContext.SaveChangesAsync(ct);
+
+            foreach (var affectedTenantId in affectedTenantIds)
+            {
+                _entitlementService.InvalidateCache(affectedTenantId);
+            }
         }
 
-        return hasChanges;
+        return affectedTenantIds.Count > 0;
     }
 }

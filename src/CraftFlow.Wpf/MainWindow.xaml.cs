@@ -1,7 +1,10 @@
 ﻿using CraftFlow.SharedKernel.Constants;
+using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Dashboard;
+using CraftFlow.SharedKernel.Dtos.Subscription;
 using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Identity;
+using CraftFlow.SharedKernel.Enums.Subscription;
 using CraftFlow.Wpf.Pages.Admin;
 using CraftFlow.Wpf.Pages.Audit;
 using CraftFlow.Wpf.Pages.Auth;
@@ -12,11 +15,13 @@ using CraftFlow.Wpf.Pages.Mrp;
 using CraftFlow.Wpf.Pages.ProductionSettings;
 using CraftFlow.Wpf.Pages.Profile;
 using CraftFlow.Wpf.Pages.Sales;
+using CraftFlow.Wpf.Pages.Subscriptions;
 using CraftFlow.Wpf.Pages.Traceability;
 using CraftFlow.Wpf.Pages.WarehouseAndSuppliers;
 using CraftFlow.Wpf.Services;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace CraftFlow.Wpf;
 
@@ -37,7 +42,14 @@ public partial class MainWindow : Window
 
         ApiService.Instance.OnAuthStateChanged += () =>
         {
-            Dispatcher.Invoke(UpdateNavigationPermissions);
+            Dispatcher.Invoke(() =>
+            {
+                UpdateNavigationPermissions();
+                if (ApiService.Instance.IsAuthenticated)
+                {
+                    _ = LoadSidebarSubscriptionAsync();
+                }
+            });
         };
 
         _isInitializing = false;
@@ -45,11 +57,58 @@ public partial class MainWindow : Window
         if (ApiService.Instance.IsAuthenticated)
         {
             UpdateNavigationPermissions();
-            MainFrame.Navigate(new DashboardPage(initialSummary));
+            _ = LoadSidebarSubscriptionAsync();
+
+            if (initialSummary != null || HasFeatureAccess(PlanFeatures.ADVANCED_ANALYTICS))
+            {
+                MainFrame.Navigate(new DashboardPage(initialSummary));
+            }
+            else
+            {
+                NavigateToDefaultAvailablePage();
+            }
         }
         else
         {
             NavigateToAuth();
+        }
+    }
+
+    public async Task LoadSidebarSubscriptionAsync()
+    {
+        if (!ApiService.Instance.IsAuthenticated || PermissionService.Instance.IsSuperAdmin)
+        {
+            SidebarPlanBorder.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        var overview = await ApiService.Instance.GetAsync<MySubscriptionOverviewDto>(SubscriptionsConstants.MY_SUBSCRIPTIONS);
+        if (overview == null) return;
+
+        SidebarPlanBorder.Visibility = Visibility.Visible;
+        SidebarPlanBadgeText.Text = overview.StatusBadge;
+        SidebarPlanTitleText.Text = overview.ActivePlansSummary;
+        SidebarPlanDetailsText.Text = overview.NearestExpirationUtc.HasValue
+            ? string.Format(LocalizationService.Get("UI_SUB_SIDEBAR_EXPIRES_FMT"), overview.NearestExpirationUtc.Value.ToLocalTime().ToString("dd.MM.yyyy"))
+            : LocalizationService.Get("UI_SUB_SIDEBAR_FREE_PERPETUAL");
+
+        var modulesChanged = ApiService.Instance.ActiveModules != overview.ActiveModules;
+        var featuresChanged = ApiService.Instance.ActiveFeatures != overview.EffectiveFeatures;
+
+        if (modulesChanged || featuresChanged)
+        {
+            ApiService.Instance.ActiveModules = overview.ActiveModules;
+            ApiService.Instance.ActiveFeatures = overview.EffectiveFeatures;
+            UpdateNavigationPermissions();
+
+            if (MainFrame.Content is DashboardPage && !HasFeatureAccess(PlanFeatures.ADVANCED_ANALYTICS))
+            {
+                NavigateToDefaultAvailablePage();
+            }
+            else if (MainFrame.Content is MrpPage && !HasFeatureAccess(PlanFeatures.MRP_PLANNING))
+            {
+                NavigateToDefaultAvailablePage();
+            }
         }
     }
 
@@ -71,6 +130,7 @@ public partial class MainWindow : Window
             if (NavAuditButton != null) NavAuditButton.Visibility = Visibility.Collapsed;
             NavAuthButton.Visibility = Visibility.Visible;
 
+            SidebarPlanBorder.Visibility = Visibility.Collapsed;
             UserProfilePanel.Visibility = Visibility.Collapsed;
             GuestPanel.Visibility = Visibility.Visible;
             return;
@@ -84,6 +144,7 @@ public partial class MainWindow : Window
 
         GuestPanel.Visibility = Visibility.Collapsed;
         UserProfilePanel.Visibility = Visibility.Visible;
+        SidebarPlanBorder.Visibility = ps.IsSuperAdmin ? Visibility.Collapsed : Visibility.Visible;
 
         UserNameTextBlock.Text = currentUser?.FullName ?? string.Empty;
         UserRoleTextBlock.Text = currentUser?.Role switch
@@ -98,43 +159,82 @@ public partial class MainWindow : Window
 
         NavAuthButton.Visibility = Visibility.Collapsed;
 
-        // --- 1. Обзор и Сводка (Дашборд) ---
-        SetButtonVisibility(NavDashboardButton, ps.HasPermission(AppPermission.DASHBOARD_VIEW));
+        var canViewDashboard = ps.HasPermission(AppPermission.DASHBOARD_VIEW) && HasFeatureAccess(PlanFeatures.ADVANCED_ANALYTICS);
+        var canViewMrp = (ps.HasPermission(AppPermission.PROCUREMENT_VIEW) || ps.HasPermission(AppPermission.PRODUCTION_VIEW))
+                         && HasFeatureAccess(PlanFeatures.MRP_PLANNING);
 
-        // --- 2. Настройки производства ---
+        SetButtonVisibility(NavDashboardButton, canViewDashboard);
         SetButtonVisibility(NavProductionSettingsButton, ps.HasPermission(AppPermission.RECIPES_MANAGE) || ps.HasPermission(AppPermission.RAW_MATERIALS_MANAGE));
-
-        // --- 3. Склад и Поставщики ---
         SetButtonVisibility(NavWarehouseAndSuppliersButton, ps.HasPermission(AppPermission.PROCUREMENT_VIEW) || ps.HasPermission(AppPermission.SUPPLIERS_MANAGE));
+        SetButtonVisibility(NavMrpButton, canViewMrp);
 
-        // --- 4. Расчёт сырья (MRP) ---
-        SetButtonVisibility(NavMrpButton, ps.HasPermission(AppPermission.PROCUREMENT_VIEW) || ps.HasPermission(AppPermission.PRODUCTION_VIEW));
-
-        // --- 5. Цеха по подписке ---
         var canViewProduction = ps.HasPermission(AppPermission.PRODUCTION_VIEW) || ps.HasPermission(AppPermission.PRODUCTION_EXECUTE);
 
-        bool isCheeseActive = canViewProduction && (ps.IsSuperAdmin || activeModules.HasFlag(AppModule.CHEESE_MAKING));
-        bool isBreweryActive = canViewProduction && (ps.IsSuperAdmin || activeModules.HasFlag(AppModule.BREWERY));
-        bool isMeatActive = canViewProduction && (ps.IsSuperAdmin || activeModules.HasFlag(AppModule.MEAT_PROCESSING));
-        bool isFermentationActive = canViewProduction && (ps.IsSuperAdmin || activeModules.HasFlag(AppModule.FERMENTATION));
+        ConfigureModuleButton(NavCheeseMakingButton, BadgeCheese, canViewProduction, ps.IsSuperAdmin || activeModules.HasFlag(AppModule.CHEESE_MAKING));
+        ConfigureModuleButton(NavBreweryButton, BadgeBrewery, canViewProduction, ps.IsSuperAdmin || activeModules.HasFlag(AppModule.BREWERY));
+        ConfigureModuleButton(NavMeatProcessingButton, BadgeMeat, canViewProduction, ps.IsSuperAdmin || activeModules.HasFlag(AppModule.MEAT_PROCESSING));
+        ConfigureModuleButton(NavFermentationButton, BadgeFermentation, canViewProduction, ps.IsSuperAdmin || activeModules.HasFlag(AppModule.FERMENTATION));
 
-        SetButtonVisibility(NavCheeseMakingButton, isCheeseActive);
-        SetButtonVisibility(NavBreweryButton, isBreweryActive);
-        SetButtonVisibility(NavMeatProcessingButton, isMeatActive);
-        SetButtonVisibility(NavFermentationButton, isFermentationActive);
-
-        // --- 6. Продажи и Клиенты ---
         SetButtonVisibility(NavSalesButton, ps.HasPermission(AppPermission.SALES_VIEW) || ps.HasPermission(AppPermission.SALES_MANAGE));
-
-        // --- 7. История партий (Трассировка) ---
         SetButtonVisibility(NavTraceabilityButton, ps.HasPermission(AppPermission.PRODUCTION_VIEW) || ps.HasPermission(AppPermission.PROCUREMENT_VIEW));
-
-        // --- 8. Журнал событий ---
         SetButtonVisibility(NavAuditButton, ps.HasPermission(AppPermission.SETTINGS_MANAGE));
 
-        // --- 9. Профиль и Админка ---
         SetButtonVisibility(NavProfileButton, ps.IsOwner || ps.IsSuperAdmin);
         SetButtonVisibility(NavAdminButton, ps.IsSuperAdmin);
+    }
+
+    public void NavigateToDefaultAvailablePage()
+    {
+        var ps = PermissionService.Instance;
+
+        if (ps.HasPermission(AppPermission.DASHBOARD_VIEW) && HasFeatureAccess(PlanFeatures.ADVANCED_ANALYTICS))
+        {
+            MainFrame.Navigate(new DashboardPage());
+            return;
+        }
+
+        if (ps.HasPermission(AppPermission.PRODUCTION_VIEW) || ps.HasPermission(AppPermission.PRODUCTION_EXECUTE))
+        {
+            if (HasModuleAccess(AppModule.CHEESE_MAKING))
+            {
+                MainFrame.Navigate(new CheeseMakingPage());
+                return;
+            }
+            if (HasModuleAccess(AppModule.FERMENTATION))
+            {
+                MainFrame.Navigate(new FermentationPage());
+                return;
+            }
+        }
+
+        if (ps.HasPermission(AppPermission.RECIPES_MANAGE) || ps.HasPermission(AppPermission.RAW_MATERIALS_MANAGE))
+        {
+            MainFrame.Navigate(new ProductionSettingsPage());
+            return;
+        }
+
+        if (ps.IsOwner || ps.IsSuperAdmin)
+        {
+            MainFrame.Navigate(new ProfilePage());
+        }
+    }
+
+    private static void ConfigureModuleButton(Button? button, Border? badge, bool canViewProduction, bool isConnected)
+    {
+        if (button == null) return;
+
+        if (!canViewProduction)
+        {
+            button.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        button.Visibility = Visibility.Visible;
+        button.Opacity = isConnected ? 1.0 : 0.65;
+        if (badge != null)
+        {
+            badge.Visibility = isConnected ? Visibility.Collapsed : Visibility.Visible;
+        }
     }
 
     private static void SetButtonVisibility(Button? button, bool isVisible)
@@ -142,6 +242,20 @@ public partial class MainWindow : Window
         if (button != null)
         {
             button.Visibility = isVisible ? Visibility.Visible : Visibility.Collapsed;
+        }
+    }
+
+    private bool HasModuleAccess(AppModule module) =>
+        PermissionService.Instance.IsSuperAdmin || ApiService.Instance.ActiveModules.HasFlag(module);
+
+    private bool HasFeatureAccess(PlanFeatures feature) =>
+        PermissionService.Instance.IsSuperAdmin || ApiService.Instance.ActiveFeatures.HasFlag(feature);
+
+    private void SidebarPlan_Click(object sender, MouseButtonEventArgs e)
+    {
+        if (PermissionService.Instance.IsOwner || PermissionService.Instance.IsSuperAdmin)
+        {
+            MainFrame.Navigate(new ProfilePage());
         }
     }
 
@@ -171,20 +285,18 @@ public partial class MainWindow : Window
         };
         ThemeComboBox.DisplayMemberPath = "Display";
         ThemeComboBox.SelectedValuePath = "Code";
-        ThemeComboBox.SelectedValue = UiConstants.Themes.LIGHT;
+        ThemeComboBox.SelectedValue = ThemeService.CurrentTheme;
     }
 
     private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_isInitializing || LanguageComboBox.SelectedValue is not string cultureCode) return;
-
         LocalizationService.SetCulture(cultureCode);
     }
 
     private void ThemeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (_isInitializing || ThemeComboBox.SelectedValue is not string themeName) return;
-
         ThemeService.SetTheme(themeName);
         RefreshUiContent();
     }
@@ -194,8 +306,11 @@ public partial class MainWindow : Window
         _isInitializing = true;
         InitSettingsControls();
         UpdateNavigationPermissions();
+        if (ApiService.Instance.IsAuthenticated)
+        {
+            _ = LoadSidebarSubscriptionAsync();
+        }
         _isInitializing = false;
-
         RefreshUiContent();
     }
 
@@ -204,7 +319,6 @@ public partial class MainWindow : Window
         if (MainFrame.Content is object currentContent)
         {
             var contentType = currentContent.GetType();
-
             var defaultConstructor = contentType.GetConstructor(Type.EmptyTypes);
             if (defaultConstructor != null)
             {
@@ -222,16 +336,30 @@ public partial class MainWindow : Window
         }
     }
 
-    // --- ОБРАБОТЧИКИ НАВИГАЦИИ ---
     private void NavDashboard_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new DashboardPage());
     private void NavProductionSettings_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new ProductionSettingsPage());
     private void NavWarehouseAndSuppliers_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new WarehouseAndSuppliersPage());
     private void NavMrp_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new MrpPage());
 
-    private void NavCheeseMaking_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new CheeseMakingPage());
-    private void NavBrewery_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new CheeseMakingPage());
-    private void NavMeatProcessing_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new CheeseMakingPage());
-    private void NavFermentation_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new FermentationPage());
+    private void NavCheeseMaking_Click(object sender, RoutedEventArgs e) =>
+        MainFrame.Navigate(HasModuleAccess(AppModule.CHEESE_MAKING)
+            ? new CheeseMakingPage()
+            : new ModulePreviewPage(AppModule.CHEESE_MAKING));
+
+    private void NavBrewery_Click(object sender, RoutedEventArgs e) =>
+        MainFrame.Navigate(HasModuleAccess(AppModule.BREWERY)
+            ? new CheeseMakingPage()
+            : new ModulePreviewPage(AppModule.BREWERY));
+
+    private void NavMeatProcessing_Click(object sender, RoutedEventArgs e) =>
+        MainFrame.Navigate(HasModuleAccess(AppModule.MEAT_PROCESSING)
+            ? new CheeseMakingPage()
+            : new ModulePreviewPage(AppModule.MEAT_PROCESSING));
+
+    private void NavFermentation_Click(object sender, RoutedEventArgs e) =>
+        MainFrame.Navigate(HasModuleAccess(AppModule.FERMENTATION)
+            ? new FermentationPage()
+            : new ModulePreviewPage(AppModule.FERMENTATION));
 
     private void NavSales_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new SalesPage());
     private void NavTraceability_Click(object sender, RoutedEventArgs e) => MainFrame.Navigate(new TraceabilityPage());

@@ -3,6 +3,7 @@ using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Services;
 using CraftFlow.SharedKernel.Dtos.Subscription;
 using CraftFlow.SharedKernel.Enums;
+using CraftFlow.SharedKernel.Enums.Subscription;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -44,9 +45,12 @@ public class GetMySubscriptionOverviewHandler : IRequestHandler<GetMySubscriptio
             .ToList();
 
         var activeModules = AppModule.NONE;
+        var effectiveFeatures = PlanFeatures.NONE;
+
         foreach (var sub in activeSubs)
         {
             activeModules |= sub.Plan.TargetModule;
+            effectiveFeatures |= sub.Plan.Features;
         }
 
         var allModules = new[]
@@ -102,6 +106,7 @@ public class GetMySubscriptionOverviewHandler : IRequestHandler<GetMySubscriptio
             plansSummary,
             maxExpiration,
             activeModules,
+            effectiveFeatures,
             moduleStatuses,
             payments
         ));

@@ -76,6 +76,119 @@
 	<data name="ERR_API_UNAVAILABLE" xml:space="preserve"><value>Сервер недоступен. Проверьте сетевое подключение</value></data>
 	<data name="ERR_LOAD_FAILED" xml:space="preserve"><value>Ошибка загрузки</value></data>
 	<data name="ERR_UNEXPECTED" xml:space="preserve"><value>Непредвиденная ошибка</value></data>
+
+	<!-- ========================================== -->
+	<!-- Подписки, модули и тарифы                  -->
+	<!-- ========================================== -->
+	<data name="UI_SUB_BADGE_MODULE" xml:space="preserve"><value>Модуль</value></data>
+	<data name="UI_SUB_SIDEBAR_HEADER" xml:space="preserve"><value>ТАРИФ</value></data>
+	<data name="UI_SUB_SIDEBAR_TOOLTIP" xml:space="preserve"><value>Нажмите, чтобы управлять подпиской и модулями</value></data>
+	<data name="UI_SUB_SIDEBAR_CLICK_HINT" xml:space="preserve"><value>Нажмите для настройки →</value></data>
+	<data name="UI_SUB_SIDEBAR_EXPIRES_FMT" xml:space="preserve"><value>Действует до {0}</value></data>
+	<data name="UI_SUB_SIDEBAR_FREE_PERPETUAL" xml:space="preserve"><value>Базовый доступ • бессрочно</value></data>
+
+	<data name="UI_SUB_PREVIEW_PAGE_TITLE" xml:space="preserve"><value>Обзор модуля</value></data>
+	<data name="UI_SUB_PREVIEW_BADGE" xml:space="preserve"><value>ПРОИЗВОДСТВЕННЫЙ МОДУЛЬ</value></data>
+	<data name="UI_SUB_PREVIEW_WHAT_AUTOMATES" xml:space="preserve"><value>Что автоматизирует этот модуль</value></data>
+	<data name="UI_SUB_PREVIEW_BTN_CONNECT" xml:space="preserve"><value>Выбрать тариф и подключить →</value></data>
+
+	<data name="UI_SUB_MOD_CHEESE_TITLE" xml:space="preserve"><value>🧀 Сыроварение и аффинаж</value></data>
+	<data name="UI_SUB_MOD_CHEESE_SUBTITLE" xml:space="preserve"><value>Полный цикл производства сыра: от приёмки молока и варки в сыроварне до контроля усушки головок в камерах созревания.</value></data>
+	<data name="UI_SUB_MOD_CHEESE_FEAT_1" xml:space="preserve"><value>Технологические карты с автоматическим расчётом заквасок, ферментов и себестоимости 1 кг сыра</value></data>
+	<data name="UI_SUB_MOD_CHEESE_FEAT_2" xml:space="preserve"><value>Журнал варок, контроль кислотности (pH), температурных пауз и фактического выхода продукта</value></data>
+	<data name="UI_SUB_MOD_CHEESE_FEAT_3" xml:space="preserve"><value>Учёт камер созревания: партионный и поштучный контроль усушки головок на стеллажах</value></data>
+	<data name="UI_SUB_MOD_CHEESE_FEAT_4" xml:space="preserve"><value>Сквозная прослеживаемость от партии фермерского молока до накладной покупателю</value></data>
+
+	<data name="UI_SUB_MOD_BREWERY_TITLE" xml:space="preserve"><value>🍺 Пивоварение и дображивание</value></data>
+	<data name="UI_SUB_MOD_BREWERY_SUBTITLE" xml:space="preserve"><value>Управление варочным порядком, ЦКТ и колдрумами для крафтовых пивоварен.</value></data>
+	<data name="UI_SUB_MOD_BREWERY_FEAT_1" xml:space="preserve"><value>Рецептуры засыпи солода, хмеля и дрожжей с расчётом себестоимости литра</value></data>
+	<data name="UI_SUB_MOD_BREWERY_FEAT_2" xml:space="preserve"><value>Контроль варок, брожения в танках/ЦКТ и созревания в камерах выдержки</value></data>
+	<data name="UI_SUB_MOD_BREWERY_FEAT_3" xml:space="preserve"><value>График CIP-мойки варочных котлов, танков и линий розлива</value></data>
+	<data name="UI_SUB_MOD_BREWERY_FEAT_4" xml:space="preserve"><value>Расчёт потребности в сырье (MRP) под план варок и отгрузка в кегах/таре</value></data>
+
+	<data name="UI_SUB_MOD_MEAT_TITLE" xml:space="preserve"><value>🥩 Мясной цех, сыровял и дегидратация</value></data>
+	<data name="UI_SUB_MOD_MEAT_SUBTITLE" xml:space="preserve"><value>Учёт переработки мяса, термообработки и климатического вяления (бастурма, суджук, колбасы).</value></data>
+	<data name="UI_SUB_MOD_MEAT_FEAT_1" xml:space="preserve"><value>Калькуляция фаршей, специй, посолочных смесей и оболочек по рецептурам</value></data>
+	<data name="UI_SUB_MOD_MEAT_FEAT_2" xml:space="preserve"><value>Двухэтапный цикл: термообработка/варка → климатическая камера вяления и дегидратации</value></data>
+	<data name="UI_SUB_MOD_MEAT_FEAT_3" xml:space="preserve"><value>Контроль потери влаги и динамики веса партии в камерах с заданной Т° и влажностью</value></data>
+	<data name="UI_SUB_MOD_MEAT_FEAT_4" xml:space="preserve"><value>Санитарный контроль оборудования и полная история каждой партии</value></data>
+
+	<data name="UI_SUB_MOD_FERM_TITLE" xml:space="preserve"><value>🫙 Ферментация, соусы и квашение</value></data>
+	<data name="UI_SUB_MOD_FERM_SUBTITLE" xml:space="preserve"><value>Контроль длительного брожения в бочках и кадках с регулярными замерами показателей.</value></data>
+	<data name="UI_SUB_MOD_FERM_FEAT_1" xml:space="preserve"><value>Учёт закладок в бочки, кадки и ёмкости с контролем занятости тары</value></data>
+	<data name="UI_SUB_MOD_FERM_FEAT_2" xml:space="preserve"><value>Дневник ферментации: фиксация pH, температуры, плотности и органолептики</value></data>
+	<data name="UI_SUB_MOD_FERM_FEAT_3" xml:space="preserve"><value>Учёт технологических потерь при переливах, фильтрации и фасовке</value></data>
+	<data name="UI_SUB_MOD_FERM_FEAT_4" xml:space="preserve"><value>Планирование закупок сырья и расчёт себестоимости готовой партии</value></data>
+
+	<data name="UI_SUB_MOD_DEFAULT_TITLE" xml:space="preserve"><value>Производственный модуль</value></data>
+	<data name="UI_SUB_MOD_DEFAULT_SUBTITLE" xml:space="preserve"><value>Автоматизация крафтового производства.</value></data>
+
+	<data name="UI_SUB_PROFILE_CARD_TITLE" xml:space="preserve"><value>💳 Текущий тариф и подписка</value></data>
+	<data name="UI_SUB_PROFILE_ACTIVE_PLAN" xml:space="preserve"><value>Активный план:</value></data>
+	<data name="UI_SUB_PROFILE_EXPIRES_AT" xml:space="preserve"><value>Срок действия до:</value></data>
+	<data name="UI_SUB_PROFILE_LOADING" xml:space="preserve"><value>Загрузка...</value></data>
+	<data name="UI_SUB_PROFILE_LOAD_FAILED" xml:space="preserve"><value>Не удалось загрузить</value></data>
+	<data name="UI_SUB_PROFILE_PERPETUAL" xml:space="preserve"><value>Бессрочно</value></data>
+
+	<data name="UI_SUB_SHOWCASE_TITLE" xml:space="preserve"><value>🧩 Цеха и сравнение тарифов</value></data>
+	<data name="UI_SUB_SHOWCASE_SUBTITLE" xml:space="preserve"><value>Выберите направление производства, чтобы сравнить лимиты, подключить новый цех или расширить текущий тариф.</value></data>
+	<data name="UI_SUB_BADGE_CURRENT" xml:space="preserve"><value>Текущий</value></data>
+
+	<data name="UI_SUB_TAB_CHEESE_SHORT" xml:space="preserve"><value>🧀 Сыроварня</value></data>
+	<data name="UI_SUB_TAB_CHEESE_FULL" xml:space="preserve"><value>🧀 Варочный цех: Сыроварение</value></data>
+	<data name="UI_SUB_TAB_BREWERY_SHORT" xml:space="preserve"><value>🍺 Пивоварня</value></data>
+	<data name="UI_SUB_TAB_BREWERY_FULL" xml:space="preserve"><value>🍺 Варочный цех: Пивоварение</value></data>
+	<data name="UI_SUB_TAB_MEAT_SHORT" xml:space="preserve"><value>🥩 Мясной цех</value></data>
+	<data name="UI_SUB_TAB_MEAT_FULL" xml:space="preserve"><value>🥩 Мясной цех: Сыровяление и Бастурма</value></data>
+	<data name="UI_SUB_TAB_FERM_SHORT" xml:space="preserve"><value>🫙 Ферментация</value></data>
+	<data name="UI_SUB_TAB_FERM_FULL" xml:space="preserve"><value>🫙 Цех Ферментации и Солений</value></data>
+
+	<data name="UI_SUB_STATUS_NOT_CONNECTED" xml:space="preserve"><value>● Модуль не подключен</value></data>
+	<data name="UI_SUB_STATUS_CONNECTED_FMT" xml:space="preserve"><value>● {0} ({1})</value></data>
+	<data name="UI_SUB_STATUS_UNTIL_FMT" xml:space="preserve"><value>до {0}</value></data>
+	<data name="UI_SUB_STATUS_PERPETUAL_LOWER" xml:space="preserve"><value>бессрочно</value></data>
+
+	<data name="UI_SUB_TIER_FREE_NAME" xml:space="preserve"><value>Free</value></data>
+	<data name="UI_SUB_TIER_FREE_FULL" xml:space="preserve"><value>Базовый (Free)</value></data>
+	<data name="UI_SUB_TIER_FREE_SUB" xml:space="preserve"><value>Знакомство и тесты</value></data>
+	<data name="UI_SUB_TIER_STARTER_NAME" xml:space="preserve"><value>Старт</value></data>
+	<data name="UI_SUB_TIER_STARTER_SUB" xml:space="preserve"><value>Домашний крафт</value></data>
+	<data name="UI_SUB_TIER_STANDARD_NAME" xml:space="preserve"><value>Стандарт</value></data>
+	<data name="UI_SUB_TIER_STANDARD_SUB" xml:space="preserve"><value>Малое производство</value></data>
+	<data name="UI_SUB_TIER_PRO_NAME" xml:space="preserve"><value>Профи</value></data>
+	<data name="UI_SUB_TIER_PRO_SUB" xml:space="preserve"><value>Поточный цех</value></data>
+	<data name="UI_SUB_TIER_ACTIVE_DEFAULT" xml:space="preserve"><value>Активен</value></data>
+
+	<data name="UI_SUB_LIMIT_BATCHES_FMT" xml:space="preserve"><value>• До {0} партий / мес</value></data>
+	<data name="UI_SUB_LIMIT_WAREHOUSES_FMT" xml:space="preserve"><value>• До {0} помещений</value></data>
+	<data name="UI_SUB_LIMIT_CHAMBERS_ONE" xml:space="preserve"><value>• 1 камера созревания</value></data>
+	<data name="UI_SUB_LIMIT_CHAMBERS_FMT" xml:space="preserve"><value>• До {0} камер созревания</value></data>
+	<data name="UI_SUB_LIMIT_USERS_ONE" xml:space="preserve"><value>• 1 пользователь</value></data>
+	<data name="UI_SUB_LIMIT_USERS_FMT" xml:space="preserve"><value>• До {0} сотрудников</value></data>
+	<data name="UI_SUB_LIMIT_AUDIT_DAYS_FMT" xml:space="preserve"><value>• Журнал событий: {0} дн.</value></data>
+	<data name="UI_SUB_LIMIT_AUDIT_YEARS_FMT" xml:space="preserve"><value>• Журнал событий: {0} лет</value></data>
+
+	<data name="UI_SUB_FEAT_PDF_YES" xml:space="preserve"><value>✓ Экспорт в PDF</value></data>
+	<data name="UI_SUB_FEAT_PDF_NO" xml:space="preserve"><value>— Экспорт в PDF</value></data>
+	<data name="UI_SUB_FEAT_EXCEL_YES" xml:space="preserve"><value>✓ Экспорт в Excel</value></data>
+	<data name="UI_SUB_FEAT_EXCEL_NO" xml:space="preserve"><value>— Экспорт в Excel</value></data>
+	<data name="UI_SUB_FEAT_ANALYTICS_YES" xml:space="preserve"><value>✓ Аналитика и графики</value></data>
+	<data name="UI_SUB_FEAT_ANALYTICS_NO" xml:space="preserve"><value>— Аналитика и графики</value></data>
+	<data name="UI_SUB_FEAT_MRP_YES" xml:space="preserve"><value>✓ Расчёт сырья (MRP)</value></data>
+	<data name="UI_SUB_FEAT_MRP_NO" xml:space="preserve"><value>— Расчёт сырья (MRP)</value></data>
+
+	<data name="UI_SUB_BTN_ACTIVE" xml:space="preserve"><value>Активен</value></data>
+	<data name="UI_SUB_BTN_BASIC" xml:space="preserve"><value>Базовый</value></data>
+	<data name="UI_SUB_BTN_RENEW" xml:space="preserve"><value>Продлить (+30 дн.)</value></data>
+	<data name="UI_SUB_BTN_SWITCH" xml:space="preserve"><value>Перейти на тариф</value></data>
+	<data name="UI_SUB_BTN_CONNECT" xml:space="preserve"><value>Подключить</value></data>
+
+	<data name="UI_SUB_PAYMENTS_TITLE" xml:space="preserve"><value>📜 История платежей и операций</value></data>
+	<data name="UI_SUB_PAYMENTS_COL_DATE" xml:space="preserve"><value>Дата</value></data>
+	<data name="UI_SUB_PAYMENTS_COL_PLAN" xml:space="preserve"><value>Тариф/Модуль</value></data>
+	<data name="UI_SUB_PAYMENTS_COL_DAYS" xml:space="preserve"><value>Дней</value></data>
+	<data name="UI_SUB_PAYMENTS_COL_DESC" xml:space="preserve"><value>Описание</value></data>
+	<data name="UI_SUB_DEFAULT_USER_NAME" xml:space="preserve"><value>Крафтовик</value></data>
 	
 	<!-- ========================================== -->
 	<!-- 0: Диалоги									-->
@@ -112,7 +225,7 @@
 	<data name="NAV_MRP" xml:space="preserve"><value>Расчет сырья</value></data>
 	<data name="NAV_CHEESE_MAKING" xml:space="preserve"><value>🧀 Варочный: Сыр</value></data>
 	<data name="NAV_BREWERY" xml:space="preserve"><value>🍺 Варочный: Пиво</value></data>
-	<data name="NAV_MEAT" xml:space="preserve"><value>🥩 Цех: Мясо</value></data>
+	<data name="NAV_MEAT_PROCESSING" xml:space="preserve"><value>🥩 Мясной цех</value></data>
 	<data name="NAV_FERMENTATION" xml:space="preserve"><value>🫙 Цех: Ферментация</value></data>
 	<data name="NAV_SALES" xml:space="preserve"><value>Продажи и Заказы</value></data>
 	<data name="NAV_TRACEABILITY" xml:space="preserve"><value>История партий</value></data>
@@ -163,9 +276,12 @@
 	<data name="UI_RECIPES_LABEL_RAW_NAME" xml:space="preserve"><value>Название сырья:</value></data>
 	<data name="UI_RECIPES_LABEL_SELECT_UOM" xml:space="preserve"><value>Выберите ед. изм.:</value></data>
 	<data name="UI_RECIPES_LABEL_RECIPE_NAME" xml:space="preserve"><value>Название рецепта:</value></data>
+	<data name="UI_RECIPES_LABEL_MODULE" xml:space="preserve"><value>Цех / Направление:</value></data>
 	<data name="UI_RECIPES_LABEL_TARGET_OUTPUT" xml:space="preserve"><value>Базовый выход рецепта (кг/л):</value></data>
 	<data name="UI_RECIPES_LABEL_IS_AGING_REQUIRED" xml:space="preserve"><value>Требуется созревание</value></data>
 	<data name="UI_RECIPES_LABEL_INGREDIENTS_SECTION" xml:space="preserve"><value>СОСТАВ РЕЦЕПТА</value></data>
+
+	<data name="UI_RECIPES_COL_MODULE" xml:space="preserve"><value>Цех</value></data>
 
 	<data name="UI_RECIPES_BTN_CREATE_RAW" xml:space="preserve"><value>Добавить сырьё</value></data>
 	<data name="UI_RECIPES_BTN_ADD_INGREDIENT" xml:space="preserve"><value>Добавить</value></data>
@@ -176,7 +292,7 @@
 	<data name="UI_RECIPES_MSG_INGREDIENT_ADDED_FMT" xml:space="preserve"><value>Добавлено: {0} — {1}</value></data>
 	<data name="UI_RECIPES_CONFIRM_ARCHIVE_RAW" xml:space="preserve"><value>Вы уверены, что хотите скрыть данное сырьё?</value></data>
 	<data name="UI_RECIPES_CONFIRM_ARCHIVE_RECIPE" xml:space="preserve"><value>Вы уверены, что хотите скрыть этот рецепт?</value></data>
-	
+
 	<data name="UI_RECIPES_MENU_HIDE" xml:space="preserve"><value>Скрыть</value></data>
 	<data name="UI_RECIPES_MENU_RESTORE" xml:space="preserve"><value>Отобразить</value></data>
 	<data name="UI_RECIPES_CONFIRM_RESTORE_RAW" xml:space="preserve"><value>Вы уверены, что хотите восстановить отображение данного сырья?</value></data>
