@@ -21,6 +21,7 @@ public partial class StorageControl : UserControl
     public event Action<string, Brush>? StatusUpdated;
 
     private List<StorageLocationViewItem> _allStorageLocations = [];
+    private bool _isGuideManuallyToggled;
 
     public ObservableCollection<LookupItem> Warehouses { get; } = [];
     public ObservableCollection<LookupItem> Chambers { get; } = [];
@@ -35,6 +36,19 @@ public partial class StorageControl : UserControl
         StorageLocationsDataGrid.ItemsSource = StorageLocations;
 
         Loaded += async (s, e) => await LoadDataAsync();
+    }
+
+    private void ToggleGuideBanner_Click(object sender, RoutedEventArgs e)
+    {
+        _isGuideManuallyToggled = true;
+        bool isCurrentlyVisible = GuideBannerBorder.Visibility == Visibility.Visible;
+        SetGuideVisibility(!isCurrentlyVisible);
+    }
+
+    private void SetGuideVisibility(bool isExpanded)
+    {
+        GuideBannerBorder.Visibility = isExpanded ? Visibility.Visible : Visibility.Collapsed;
+        ShowGuideButton.Visibility = isExpanded ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private static bool TryParseDecimal(string text, out decimal result)
@@ -92,21 +106,21 @@ public partial class StorageControl : UserControl
 
                 if (l.Status == StorageLocationStatus.UNDER_SANITATION)
                 {
-                    statusText = "🧼 Идёт мойка (ожидает приёмки)";
+                    statusText = Get("UI_STORAGE_STATUS_UNDER_SANITATION");
                     statusBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1565C0"));
                     backgroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#E3F2FD"));
                     code = "IN_PROGRESS";
                 }
                 else if (l.Status == StorageLocationStatus.SANITATION_REQUIRED)
                 {
-                    statusText = "⚠ Требуется мойка";
+                    statusText = Get("UI_STORAGE_STATUS_SANITATION_REQUIRED");
                     statusBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#EF6C00"));
                     backgroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#FFF3E0"));
                     code = "WARNING";
                 }
                 else if (l.IsOccupied)
                 {
-                    statusText = "🔒 Занята";
+                    statusText = Get("UI_STORAGE_STATUS_OCCUPIED");
                     statusBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#6A1B9A"));
                     backgroundBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F3E5F5"));
                     code = "OCCUPIED";
@@ -148,6 +162,15 @@ public partial class StorageControl : UserControl
                     StatusBackground = backgroundBrush
                 });
             });
+
+            if (!_isGuideManuallyToggled)
+            {
+                SetGuideVisibility(_allStorageLocations.Count == 0);
+            }
+
+            EmptyEquipmentOverlay.Visibility = _allStorageLocations.Count == 0
+                ? Visibility.Visible
+                : Visibility.Collapsed;
 
             ApplyFilters();
             UpdateSanitationCounters();
@@ -229,7 +252,7 @@ public partial class StorageControl : UserControl
             var executeItem = new MenuItem
             {
                 Header = item.LocationStatus == StorageLocationStatus.UNDER_SANITATION
-                    ? "✔ Принять / Завершить мойку"
+                    ? Get("UI_STORAGE_MENU_SANITATION_APPROVE")
                     : Get("UI_STORAGE_MENU_SANITATION_EXECUTE"),
                 IsEnabled = !isBlockedByOccupancy
             };

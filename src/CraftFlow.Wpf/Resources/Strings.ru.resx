@@ -183,11 +183,23 @@
 	<data name="UI_RECIPES_CONFIRM_RESTORE_RECIPE" xml:space="preserve"><value>Вы уверены, что хотите восстановить отображение этого рецепта?</value></data>
 
 	<!-- ========================================== -->
-	<!-- 22. Контрол: Склады и Емкости (StorageControl) -->
+	<!-- Контрол: Склады и Емкости (StorageControl) -->
 	<!-- ========================================== -->
 	<data name="UI_STORAGE_HEADER_WAREHOUSES" xml:space="preserve"><value>Помещения</value></data>
 	<data name="UI_STORAGE_HEADER_CHAMBERS" xml:space="preserve"><value>Камеры созревания</value></data>
 	<data name="UI_STORAGE_HEADER_EQUIPMENT" xml:space="preserve"><value>Емкости, танки и стеллажи</value></data>
+
+	<data name="UI_STORAGE_GUIDE_TITLE" xml:space="preserve"><value>Порядок настройки производства и хранения</value></data>
+	<data name="UI_STORAGE_GUIDE_STEPS" xml:space="preserve"><value>1. Создайте Помещение или Камеру созревания слева → 2. Добавьте внутрь Ёмкости и Стеллажи справа → 3. Запускайте партии и приёмку сырья.</value></data>
+	<data name="UI_STORAGE_GUIDE_DETAILS" xml:space="preserve"><value>• Чан / варочный котёл / бочка нужны для запуска варки или ферментации.   • Стеллаж на складе нужен для приёмки сырья и продукции.   • Стеллаж в камере нужен для отправки сыра на выдержку.</value></data>
+	<data name="UI_STORAGE_GUIDE_HIDE_TOOLTIP" xml:space="preserve"><value>Свернуть подсказку</value></data>
+	<data name="UI_STORAGE_GUIDE_SHOW_BTN" xml:space="preserve"><value>Как настроить цех</value></data>
+
+	<data name="UI_STORAGE_TOOLTIP_WAREHOUSES_HELP" xml:space="preserve"><value>Физические зоны предприятия: склад сырья, варочный цех или склад готовой продукции. После создания добавьте внутрь стеллажи или варочные ёмкости в таблице справа.</value></data>
+	<data name="UI_STORAGE_TOOLTIP_CHAMBERS_HELP" xml:space="preserve"><value>Помещения с контролем температуры и влажности для созревания и вяления (сыр, мясные деликатесы). Чтобы размещать там партии, привяжите к камере стеллажи в таблице справа.</value></data>
+
+	<data name="UI_STORAGE_EMPTY_TITLE" xml:space="preserve"><value>Ёмкости и места хранения ещё не добавлены</value></data>
+	<data name="UI_STORAGE_EMPTY_DESCRIPTION" xml:space="preserve"><value>Привяжите к помещениям и камерам рабочие ёмкости (сыроварни, танки, бочки) и места хранения (стеллажи, полки). Без них система не даст принять сырьё на склад и запустить партию.</value></data>
 
 	<data name="UI_STORAGE_LABEL_WAREHOUSE_NAME" xml:space="preserve"><value>Название склада</value></data>
 	<data name="UI_STORAGE_LABEL_CHAMBER_NAME" xml:space="preserve"><value>Название камеры</value></data>
@@ -202,6 +214,10 @@
 	<data name="UI_STORAGE_LABEL_TOTAL_EQUIPMENT" xml:space="preserve"><value>Всего ёмкостей: </value></data>
 	<data name="UI_STORAGE_LABEL_WASH_SOON" xml:space="preserve"><value>⚠️ Скоро мойка: </value></data>
 	<data name="UI_STORAGE_LABEL_WASH_OVERDUE" xml:space="preserve"><value>🚨 Просрочено: </value></data>
+	<data name="UI_STORAGE_STATUS_OCCUPIED" xml:space="preserve"><value>🔒 Занята</value></data>
+	<data name="UI_STORAGE_STATUS_UNDER_SANITATION" xml:space="preserve"><value>🧼 Идёт мойка (ожидает приёмки)</value></data>
+	<data name="UI_STORAGE_STATUS_SANITATION_REQUIRED" xml:space="preserve"><value>⚠ Требуется мойка</value></data>
+	<data name="UI_STORAGE_MENU_SANITATION_APPROVE" xml:space="preserve"><value>✔ Принять / Завершить мойку</value></data>
 
 	<data name="UI_STORAGE_TOOLTIP_SEARCH" xml:space="preserve"><value>Поиск по названию, типу или локации</value></data>
 
