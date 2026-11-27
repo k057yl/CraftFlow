@@ -5,10 +5,8 @@ using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Identity;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
-using CraftFlow.Wpf.Services.Converters;
 using CraftFlow.Wpf.Windows;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -25,18 +23,12 @@ public partial class RecipesControl : UserControl
     public ObservableCollection<LookupItem> RawMaterials { get; } = [];
     public ObservableCollection<RecipeDto> Recipes { get; } = [];
     public ObservableCollection<LookupItem> AvailableModules { get; } = [];
-    private readonly ObservableCollection<IngredientItemDto> _selectedIngredients = [];
 
     public RecipesControl()
     {
         InitializeComponent();
 
         RawUomComboBox.ItemsSource = UnitsOfMeasure;
-        ProductUomComboBox.ItemsSource = UnitsOfMeasure;
-        RecipeRawMaterialComboBox.ItemsSource = RawMaterials;
-        RecipeModuleComboBox.ItemsSource = AvailableModules;
-        AddedIngredientsListBox.ItemsSource = _selectedIngredients;
-
         RawMaterialsDataGrid.ItemsSource = RawMaterials;
         RecipesDataGrid.ItemsSource = Recipes;
 
@@ -66,9 +58,6 @@ public partial class RecipesControl : UserControl
 
         if (isSuperAdmin || activeModules.HasFlag(AppModule.MEAT_PROCESSING))
             AvailableModules.Add(new LookupItem(Guid.Empty, Get("UI_MODULE_MEAT_PROCESSING"), nameof(AppModule.MEAT_PROCESSING)));
-
-        if (AvailableModules.Count > 0)
-            RecipeModuleComboBox.SelectedIndex = 0;
     }
 
     private void ApplyRolePermissions()
@@ -90,21 +79,6 @@ public partial class RecipesControl : UserControl
         {
             await LoadDataAsync();
         }
-    }
-
-    private static bool TryParseDecimal(string text, out decimal result)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            result = 0;
-            return false;
-        }
-
-        var normalized = text.Trim().Replace('.', ',');
-        if (decimal.TryParse(normalized, out result)) return true;
-
-        normalized = text.Trim().Replace(',', '.');
-        return decimal.TryParse(normalized, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
     }
 
     private async Task LoadDataAsync()
@@ -148,6 +122,19 @@ public partial class RecipesControl : UserControl
         catch (Exception ex)
         {
             SetStatusFormatted("UI_ERR_DATA_LOAD_FMT", Brushes.Red, ex.Message);
+        }
+    }
+
+    private async void OpenCreateRecipeModal_Click(object sender, RoutedEventArgs e)
+    {
+        var dialog = new CreateRecipeWindow(UnitsOfMeasure, RawMaterials, AvailableModules)
+        {
+            Owner = Window.GetWindow(this)
+        };
+
+        if (dialog.ShowDialog() == true)
+        {
+            await LoadDataAsync();
         }
     }
 
@@ -221,43 +208,6 @@ public partial class RecipesControl : UserControl
 
     #endregion
 
-    private void AddIngredient_Click(object sender, RoutedEventArgs e)
-    {
-        if (RecipeRawMaterialComboBox.SelectedItem is LookupItem rawItem &&
-            TryParseDecimal(RecipeIngredientQuantityTextBox.Text, out var qty) && qty > 0)
-        {
-            var uomCode = rawItem.Code ?? string.Empty;
-            var existing = _selectedIngredients.FirstOrDefault(i => i.RawMaterialId == rawItem.Id);
-
-            if (existing != null)
-            {
-                var index = _selectedIngredients.IndexOf(existing);
-                _selectedIngredients[index] = existing with { Quantity = existing.Quantity + qty };
-            }
-            else
-            {
-                _selectedIngredients.Add(new IngredientItemDto(rawItem.Id, rawItem.Name, uomCode, qty));
-            }
-
-            RecipeIngredientQuantityTextBox.Text = "1";
-
-            var formattedQty = UnitFormatter.Format(qty, uomCode);
-            SetStatusFormatted("UI_RECIPES_MSG_INGREDIENT_ADDED_FMT", Brushes.Green, rawItem.Name, formattedQty);
-        }
-        else
-        {
-            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
-        }
-    }
-
-    private void RemoveIngredient_Click(object sender, RoutedEventArgs e)
-    {
-        if (sender is Button btn && btn.Tag is IngredientItemDto ingredient)
-        {
-            _selectedIngredients.Remove(ingredient);
-        }
-    }
-
     private void OpenRecipeDetails_Click(object sender, RoutedEventArgs e)
     {
         if (sender is Hyperlink link && link.DataContext is RecipeDto recipe)
@@ -292,68 +242,6 @@ public partial class RecipesControl : UserControl
         else
         {
             SetStatusRaw(contentOrError, Brushes.Red);
-        }
-    }
-
-    private async void CreateRecipe_Click(object sender, RoutedEventArgs e)
-    {
-        var productName = ProductNameTextBox.Text?.Trim();
-        if (string.IsNullOrWhiteSpace(productName) ||
-            ProductUomComboBox.SelectedValue is not Guid productUomId ||
-            RecipeModuleComboBox.SelectedValue is not string moduleCode ||
-            !Enum.TryParse<AppModule>(moduleCode, out var targetModule) ||
-            !TryParseDecimal(RecipeOutputQuantityTextBox.Text, out var targetOutput) ||
-            _selectedIngredients.Count == 0)
-        {
-            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
-            return;
-        }
-
-        var (isProdSuccess, prodContentOrError) = await ApiService.Instance.PostAndReadAsync(CatalogConstants.PRODUCTS, new
-        {
-            Name = productName,
-            UnitOfMeasureId = productUomId
-        });
-
-        if (!isProdSuccess)
-        {
-            SetStatusRaw(prodContentOrError, Brushes.Red);
-            return;
-        }
-
-        if (!Guid.TryParse(prodContentOrError.Replace("\"", "").Trim(), out var productId))
-        {
-            await LoadDataAsync();
-            return;
-        }
-
-        var isAgingRequired = IsAgingRequiredCheckBox.IsChecked ?? false;
-        int? defaultMinAgingDays = isAgingRequired && int.TryParse(DefaultMinAgingDaysTextBox.Text.Trim(), out var days) ? days : null;
-
-        var ingredientsPayload = _selectedIngredients
-            .Select(i => new { RawMaterialId = i.RawMaterialId, Quantity = i.Quantity })
-            .ToArray();
-
-        var (isRecipeSuccess, recipeContentOrError) = await ApiService.Instance.PostAndReadAsync(CatalogConstants.RECIPES, new
-        {
-            ProductId = productId,
-            Name = productName,
-            TargetModule = targetModule,
-            TargetOutputQuantity = targetOutput,
-            IsAgingRequired = isAgingRequired,
-            DefaultMinAgingDays = defaultMinAgingDays,
-            Ingredients = ingredientsPayload
-        });
-
-        if (isRecipeSuccess)
-        {
-            ProductNameTextBox.Clear();
-            _selectedIngredients.Clear();
-            await LoadDataAsync();
-        }
-        else
-        {
-            SetStatusRaw(recipeContentOrError, Brushes.Red);
         }
     }
 

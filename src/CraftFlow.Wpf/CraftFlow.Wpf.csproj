@@ -40,7 +40,6 @@
 
   <ItemGroup>
     <Folder Include="Pages\CheeseMaking\Controls\" />
-    <Folder Include="Pages\ProductionSettings\Controls\" />
     <Folder Include="Pages\Fermentation\" />
     <Folder Include="Pages\Windows\" />
   </ItemGroup>

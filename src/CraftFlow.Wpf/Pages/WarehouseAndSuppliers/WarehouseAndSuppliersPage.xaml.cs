@@ -36,16 +36,13 @@ public partial class WarehouseAndSuppliersPage : Page
         InitializeComponent();
 
         ReceiptControl.BindSources(FormSuppliers, FilterSuppliers, FormWarehouses, FilterWarehouses, RawMaterials, StockLots);
-        WriteOffControl.BindSources(StockLots);
         SuppliersViewControl.BindSources(SuppliersList);
 
         ReceiptControl.StatusUpdated += SetStatusRaw;
-        WriteOffControl.StatusUpdated += SetStatusRaw;
         SuppliersViewControl.StatusUpdated += SetStatusRaw;
 
         ReceiptControl.FilterChangedRequested += LoadStockLotsAsync;
-        ReceiptControl.StockReceived += RefreshCurrentStockAsync;
-        WriteOffControl.WriteOffCompleted += RefreshCurrentStockAsync;
+        ReceiptControl.StockChanged += RefreshCurrentStockAsync;
         SuppliersViewControl.SuppliersChanged += LoadDataAsync;
 
         Loaded += async (s, e) => await LoadDataAsync();

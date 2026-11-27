@@ -283,6 +283,11 @@
 
 	<data name="UI_RECIPES_COL_MODULE" xml:space="preserve"><value>Цех</value></data>
 
+	<data name="UI_MODULE_CHEESE_MAKING" xml:space="preserve"><value>Сыроварение</value></data>
+	<data name="UI_MODULE_FERMENTATION" xml:space="preserve"><value>Ферментация</value></data>
+	<data name="UI_MODULE_BREWERY" xml:space="preserve"><value>Пивоварение</value></data>
+	<data name="UI_MODULE_MEAT_PROCESSING" xml:space="preserve"><value>Мясопереработка</value></data>
+
 	<data name="UI_RECIPES_BTN_CREATE_RAW" xml:space="preserve"><value>Добавить сырьё</value></data>
 	<data name="UI_RECIPES_BTN_ADD_INGREDIENT" xml:space="preserve"><value>Добавить</value></data>
 	<data name="UI_RECIPES_BTN_CREATE_RECIPE" xml:space="preserve"><value>Сохранить рецепт</value></data>

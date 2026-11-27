@@ -10,53 +10,53 @@
         <converters:SupplierStatusStyleConverter x:Key="SupplierStatusStyleConverter"/>
     </UserControl.Resources>
 
-    <Grid Margin="10">
+    <Grid Margin="0,16,0,0">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="420"/>
-            <ColumnDefinition Width="15"/>
+            <ColumnDefinition Width="380"/>
+            <ColumnDefinition Width="{StaticResource ColumnGap}"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
         <!-- СЕКЦИЯ A: ФОРМА -->
-        <GroupBox Grid.Column="0" x:Name="SupplierFormGroupBox" Header="{loc:Loc Key=HEADER_SUPPLIERS}" Padding="12">
+        <GroupBox Grid.Column="0" x:Name="SupplierFormGroupBox" Header="{loc:Loc Key=HEADER_SUPPLIERS}">
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
-                    <TextBlock Text="{loc:Loc Key=SUPPLIER_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                    <TextBox x:Name="NameTextBox" Height="28" Margin="0,0,0,8"/>
+                    <TextBlock Text="{loc:Loc Key=SUPPLIER_NAME}" Style="{StaticResource InputCaptionTextStyle}"/>
+                    <TextBox x:Name="NameTextBox" Margin="{StaticResource FieldRowMargin}"/>
 
-                    <TextBlock Text="{loc:Loc Key=UI_SUPPLIER_LEGAL_NAME}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                    <TextBox x:Name="LegalNameTextBox" Height="28" Margin="0,0,0,8"/>
+                    <TextBlock Text="{loc:Loc Key=UI_SUPPLIER_LEGAL_NAME}" Style="{StaticResource InputCaptionTextStyle}"/>
+                    <TextBox x:Name="LegalNameTextBox" Margin="{StaticResource FieldRowMargin}"/>
 
-                    <Grid Margin="0,0,0,8">
+                    <Grid Margin="{StaticResource FieldRowMargin}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="8"/>
+                            <ColumnDefinition Width="10"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0">
-                            <TextBlock Text="{loc:Loc Key=UI_SUPPLIER_TAX_ID}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                            <TextBox x:Name="TaxIdTextBox" Height="28"/>
+                            <TextBlock Text="{loc:Loc Key=UI_SUPPLIER_TAX_ID}" Style="{StaticResource InputCaptionTextStyle}"/>
+                            <TextBox x:Name="TaxIdTextBox"/>
                         </StackPanel>
                         <StackPanel Grid.Column="2">
-                            <TextBlock Text="{loc:Loc Key=SUPPLIER_PHONE}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                            <TextBox x:Name="PhoneTextBox" Height="28"/>
+                            <TextBlock Text="{loc:Loc Key=SUPPLIER_PHONE}" Style="{StaticResource InputCaptionTextStyle}"/>
+                            <TextBox x:Name="PhoneTextBox"/>
                         </StackPanel>
                     </Grid>
 
-                    <TextBlock Text="{loc:Loc Key=SUPPLIER_EMAIL}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                    <TextBox x:Name="EmailTextBox" Height="28" Margin="0,0,0,8"/>
+                    <TextBlock Text="{loc:Loc Key=SUPPLIER_EMAIL}" Style="{StaticResource InputCaptionTextStyle}"/>
+                    <TextBox x:Name="EmailTextBox" Margin="{StaticResource FieldRowMargin}"/>
 
-                    <TextBlock Text="{loc:Loc Key=UI_SUPPLIER_ADDRESS}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                    <TextBox x:Name="AddressTextBox" Height="28" Margin="0,0,0,8"/>
+                    <TextBlock Text="{loc:Loc Key=UI_SUPPLIER_ADDRESS}" Style="{StaticResource InputCaptionTextStyle}"/>
+                    <TextBox x:Name="AddressTextBox" Margin="{StaticResource FieldRowMargin}"/>
 
-                    <TextBlock Text="{loc:Loc Key=UI_SUPPLIER_NOTES}" Margin="0,0,0,3" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                    <TextBox x:Name="NotesTextBox" Height="60" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Margin="0,0,0,12"/>
+                    <TextBlock Text="{loc:Loc Key=UI_SUPPLIER_NOTES}" Style="{StaticResource InputCaptionTextStyle}"/>
+                    <TextBox x:Name="NotesTextBox" Height="64" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Margin="0,0,0,14"/>
 
                     <StackPanel Orientation="Horizontal">
                         <Button x:Name="SaveSupplierButton" 
                                 Content="{loc:Loc Key=CREATE_SUPPLIER}" 
                                 Style="{StaticResource PrimaryButtonStyle}"
-                                Height="32"
+                                Height="{StaticResource ButtonHeight}"
                                 Padding="16,0"
                                 Click="SaveSupplier_Click"/>
 
@@ -64,7 +64,7 @@
                                 Content="{loc:Loc Key=UI_BTN_RESET}" 
                                 Visibility="Collapsed"
                                 Style="{StaticResource SecondaryButtonStyle}"
-                                Height="32"
+                                Height="{StaticResource ButtonHeight}"
                                 Margin="8,0,0,0"
                                 Padding="12,0"
                                 Click="ResetSupplierForm_Click"/>
@@ -74,26 +74,25 @@
         </GroupBox>
 
         <!-- СЕКЦИЯ B: ТАБЛИЦА С ПОСТАВЩИКАМИ -->
-        <GroupBox Grid.Column="2" Header="{loc:Loc Key=UI_HEADER_SUPPLIERS_REGISTRY}" Padding="10">
+        <GroupBox Grid.Column="2" Header="{loc:Loc Key=UI_HEADER_SUPPLIERS_REGISTRY}">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <CheckBox x:Name="ShowInactiveSuppliersCheckBox" 
+                <CheckBox Grid.Row="0"
+                          x:Name="ShowInactiveSuppliersCheckBox" 
                           Content="{loc:Loc Key=UI_CHECK_SHOW_INACTIVE_SUPPLIERS}" 
                           Visibility="{auth:HasPermission Permission=SUPPLIERS_MANAGE}"
-                          Margin="0,0,0,10" 
-                          Foreground="{DynamicResource AppForegroundBrush}"
+                          Margin="{StaticResource FieldRowMargin}" 
                           Click="ShowInactiveSuppliers_Click"/>
 
                 <DataGrid Grid.Row="1"
                           x:Name="SuppliersDataGrid" 
                           AutoGenerateColumns="False" 
                           IsReadOnly="True" 
-                          GridLinesVisibility="Horizontal" 
-                          HeadersVisibility="Column"
+                          CanUserAddRows="False"
                           MouseDoubleClick="SuppliersDataGrid_MouseDoubleClick">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="{loc:Loc Key=UI_COL_NAME}" Binding="{Binding Name}" Width="140"/>

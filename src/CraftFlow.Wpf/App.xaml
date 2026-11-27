@@ -30,6 +30,9 @@
             <sys:Double x:Key="ControlHeight">28</sys:Double>
             <sys:Double x:Key="ButtonHeight">32</sys:Double>
 
+            <GridLength x:Key="ColumnGap">20</GridLength>
+            <GridLength x:Key="HalfColumnGap">10</GridLength>
+
             <!-- ========================================== -->
             <!-- 1. БАЗОВЫЕ КОНТЕЙНЕРЫ И КАРТОЧКИ           -->
             <!-- ========================================== -->
@@ -385,30 +388,36 @@
                 </Setter>
             </Style>
 
-            <!-- 3. КАРТОЧНЫЙ GROUPBOX -->
+            <!-- 3. КАРТОЧНЫЙ GROUPBOX (СИНХРОНИЗИРОВАН С CardBorderStyle) -->
             <Style TargetType="GroupBox">
                 <Setter Property="Foreground" Value="{DynamicResource AppForegroundBrush}"/>
                 <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}"/>
                 <Setter Property="BorderThickness" Value="1"/>
                 <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+                <Setter Property="Padding" Value="{StaticResource CardPadding}"/>
+                <Setter Property="SnapsToDevicePixels" Value="True"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="GroupBox">
-                            <Grid SnapsToDevicePixels="True">
-                                <Border Background="{TemplateBinding Background}" 
-                                        BorderBrush="{TemplateBinding BorderBrush}" 
-                                        BorderThickness="{TemplateBinding BorderThickness}" 
-                                        CornerRadius="{StaticResource CardCornerRadius}"/>
-                                <DockPanel Margin="{TemplateBinding Padding}">
-                                    <Border DockPanel.Dock="Top" Margin="0,0,0,8" Padding="0,0,0,6" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1">
+                            <Border Background="{TemplateBinding Background}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                    CornerRadius="{StaticResource CardCornerRadius}"
+                                    Padding="{TemplateBinding Padding}">
+                                <DockPanel>
+                                    <Border DockPanel.Dock="Top" 
+                                            Margin="{StaticResource SectionTitleMargin}" 
+                                            Padding="0,0,0,8" 
+                                            BorderBrush="{DynamicResource BorderBrush}" 
+                                            BorderThickness="0,0,0,1">
                                         <ContentPresenter ContentSource="Header" 
                                                           RecognizesAccessKey="True" 
                                                           TextBlock.FontWeight="Bold" 
-                                                          TextBlock.FontSize="13"/>
+                                                          TextBlock.FontSize="16"/>
                                     </Border>
                                     <ContentPresenter/>
                                 </DockPanel>
-                            </Grid>
+                            </Border>
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>

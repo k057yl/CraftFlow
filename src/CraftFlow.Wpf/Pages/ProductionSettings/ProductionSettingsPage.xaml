@@ -17,11 +17,10 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Заголовок страницы -->
+            <!-- Заголовок страницы (ровно 20px снизу, как в ProfilePage) -->
             <TextBlock Grid.Row="0"
                        Text="{loc:Loc Key=UI_SETTINGS_HEADER}"
-                       Style="{StaticResource PageTitleTextStyle}"
-                       Margin="0,0,0,16"/>
+                       Style="{StaticResource PageTitleTextStyle}"/>
 
             <!-- 2 Основные Вкладки -->
             <TabControl Grid.Row="1">
@@ -39,7 +38,7 @@
                        Text="{loc:Loc Key=UI_STATUS_READY}"
                        Foreground="{DynamicResource AccentBrush}"
                        FontWeight="SemiBold"
-                       Margin="0,12,0,0"/>
+                       Margin="0,14,0,0"/>
         </Grid>
     </Border>
 </Page>

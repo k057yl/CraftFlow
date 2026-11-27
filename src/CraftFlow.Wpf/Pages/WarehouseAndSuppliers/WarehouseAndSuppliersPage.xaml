@@ -6,34 +6,38 @@
       xmlns:controls="clr-namespace:CraftFlow.Wpf.Pages.WarehouseAndSuppliers.Controls"
       Title="{loc:Loc Key=TITLE_PROCUREMENT}">
 
-    <Grid Margin="15">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
+    <Border Style="{StaticResource PageRootBorderStyle}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-        <TextBlock Text="{loc:Loc Key=TITLE_PROCUREMENT}" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" Foreground="{DynamicResource AppForegroundBrush}"/>
+            <TextBlock Grid.Row="0"
+                       Text="{loc:Loc Key=TITLE_PROCUREMENT}"
+                       Style="{StaticResource PageTitleTextStyle}"/>
 
-        <TabControl Grid.Row="1">
-            <!-- 1. Приход и Остатки Сырья -->
-            <TabItem Header="{loc:Loc Key=TAB_STOCK_RECEIPT}">
-                <controls:StockReceiptControl x:Name="ReceiptControl"/>
-            </TabItem>
+            <TabControl Grid.Row="1">
+                <!-- 1. Приход, Остатки и Списание Сырья -->
+                <TabItem Header="{loc:Loc Key=TAB_STOCK_RECEIPT}">
+                    <controls:StockReceiptControl x:Name="ReceiptControl"/>
+                </TabItem>
 
-            <!-- 2. Списание / Акты Потерь -->
-            <TabItem Header="{loc:Loc Key=TAB_WRITE_OFF}">
-                <controls:StockWriteOffControl x:Name="WriteOffControl"/>
-            </TabItem>
+                <!-- 2. Поставщики -->
+                <TabItem x:Name="SuppliersTabItem"
+                         Header="{loc:Loc Key=TAB_SUPPLIERS}"
+                         Visibility="{auth:HasPermission Permission=SUPPLIERS_MANAGE}">
+                    <controls:SuppliersControl x:Name="SuppliersViewControl"/>
+                </TabItem>
+            </TabControl>
 
-            <!-- 3. Поставщики -->
-            <TabItem x:Name="SuppliersTabItem"
-                     Header="{loc:Loc Key=TAB_SUPPLIERS}"
-                     Visibility="{auth:HasPermission Permission=SUPPLIERS_MANAGE}">
-                <controls:SuppliersControl x:Name="SuppliersViewControl"/>
-            </TabItem>
-        </TabControl>
-
-        <TextBlock x:Name="StatusTextBlock" Grid.Row="2" Text="{loc:Loc Key=UI_STATUS_READY}" Foreground="{DynamicResource AccentBrush}" FontWeight="Bold" Margin="0,10,0,0"/>
-    </Grid>
+            <TextBlock x:Name="StatusTextBlock"
+                       Grid.Row="2"
+                       Text="{loc:Loc Key=UI_STATUS_READY}"
+                       Foreground="{DynamicResource AccentBrush}"
+                       FontWeight="SemiBold"
+                       Margin="0,14,0,0"/>
+        </Grid>
+    </Border>
 </Page>
