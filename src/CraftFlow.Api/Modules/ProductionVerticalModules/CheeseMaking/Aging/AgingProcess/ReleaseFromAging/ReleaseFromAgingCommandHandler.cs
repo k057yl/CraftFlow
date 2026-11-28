@@ -116,7 +116,12 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             ? releasedItems.Count
             : (product.UnitOfMeasure.Type == UnitType.Piece ? (int)Math.Round(calculatedTotalWeight) : request.UnitsCount);
 
+        DateTime? finalExpirationDate = request.ExpirationDate.HasValue
+            ? DateTime.SpecifyKind(request.ExpirationDate.Value, DateTimeKind.Utc)
+            : null;
+
         var stockLot = StockLot.Create(
+            tenantId: _tenantContext.TenantId,
             warehouseId: request.TargetWarehouseId,
             itemId: lot.ProductId,
             unitOfMeasureId: product.UnitOfMeasureId,
@@ -124,8 +129,8 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
             unitsCount: finalUnitsCount,
             unitPrice: request.UnitPrice,
             batchNumber: finalBatchNumber,
-            tenantId: _tenantContext.TenantId,
-            productionBatchId: lot.ProductionBatchId
+            productionBatchId: lot.ProductionBatchId,
+            expirationDate: finalExpirationDate
         );
 
         if (releasedItems.Count > 0)
@@ -143,11 +148,21 @@ public sealed class ReleaseFromAgingCommandHandler : IRequestHandler<ReleaseFrom
                 .Where(s => request.StorageLocationIds.Contains(s.Id))
                 .ToListAsync(cancellationToken);
 
-            decimal qtyPerLocation = calculatedTotalWeight / targetLocations.Count;
-
-            foreach (var loc in targetLocations)
+            if (targetLocations.Count > 0)
             {
-                loc.AddVolume(qtyPerLocation);
+                decimal qtyPerLocation = Math.Round(stockLot.Quantity / targetLocations.Count, 3);
+                decimal allocatedSum = 0m;
+
+                for (int i = 0; i < targetLocations.Count; i++)
+                {
+                    decimal qty = (i == targetLocations.Count - 1)
+                        ? Math.Round(stockLot.Quantity - allocatedSum, 3)
+                        : qtyPerLocation;
+
+                    allocatedSum += qty;
+                    targetLocations[i].AddVolume(qty);
+                    stockLot.AssignStorageLocation(targetLocations[i].Id, qty);
+                }
             }
         }
 

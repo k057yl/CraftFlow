@@ -35,7 +35,7 @@ public partial class SalesPage : Page
 
         OrderCustomerComboBox.ItemsSource = Customers;
         OrderWarehouseComboBox.ItemsSource = Warehouses;
-        CustomersListBox.ItemsSource = Customers;
+        CustomersDataGrid.ItemsSource = Customers;
         AvailableLotsDataGrid.ItemsSource = AvailableLots;
         InvoiceItemsDataGrid.ItemsSource = InvoiceItems;
 
@@ -52,7 +52,7 @@ public partial class SalesPage : Page
 
             var customers = await ApiService.Instance.GetAsync<List<LookupDto>>(SalesConstants.CUSTOMERS);
             Customers.Clear();
-            customers?.ForEach(c => Customers.Add(new LookupItem(c.Id, c.Name)));
+            customers?.ForEach(c => Customers.Add(new LookupItem(c.Id, c.Name, c.Code)));
 
             var warehouses = await ApiService.Instance.GetAsync<List<LookupDto>>(InventoryConstants.WAREHOUSES);
             Warehouses.Clear();
@@ -247,6 +247,11 @@ public partial class SalesPage : Page
         }
     }
 
+    private void ClearInvoice_Click(object sender, RoutedEventArgs e)
+    {
+        InvoiceItems.Clear();
+    }
+
     private void InvoiceItemsDataGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
     {
         Dispatcher.BeginInvoke(RecalculateOrderTotals);
@@ -259,6 +264,9 @@ public partial class SalesPage : Page
 
         decimal totalSum = InvoiceItems.Sum(i => i.TotalSum);
         TotalOrderSumTextBlock.Text = $"${totalSum:F2}";
+
+        if (ShipOrderButton != null)
+            ShipOrderButton.IsEnabled = InvoiceItems.Count > 0;
     }
 
     private async void CreateCustomer_Click(object sender, RoutedEventArgs e)

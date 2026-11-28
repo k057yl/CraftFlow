@@ -8,250 +8,179 @@
                 <ColumnDefinition Width="4*"/>
                 <ColumnDefinition Width="6*"/>
             </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
 
-            <!-- 1. Параметры запуска варки -->
-            <GroupBox Grid.Row="0" Grid.Column="0" Header="{loc:Loc Key=UI_BREWHOUSE_GROUP_START_BATCH}" Margin="0,0,6,6" Padding="10">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_BATCH_CODE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                        <TextBox x:Name="BatchNameTextBox" Padding="4,2" Height="26" Margin="0,0,0,8"/>
+            <!-- ЛЕВАЯ КОЛОНКА: Запуск варки + Расчет потребности в сырье -->
+            <Grid Grid.Column="0" Margin="0,0,6,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="1.35*"/>
+                    <RowDefinition Height="1*"/>
+                </Grid.RowDefinitions>
 
-                        <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_SELECT_RECIPE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                        <ComboBox x:Name="BatchRecipeComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="BatchInputs_Changed"/>
+                <!-- 1. Параметры запуска варки -->
+                <GroupBox Grid.Row="0" Header="{loc:Loc Key=UI_BREWHOUSE_GROUP_START_BATCH}" Margin="0,0,0,6" Padding="10">
+                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                        <StackPanel>
+                            <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_BATCH_CODE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                            <TextBox x:Name="BatchNameTextBox" Padding="4,2" Height="26" Margin="0,0,0,8"/>
 
-                        <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_RAW_WAREHOUSE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                        <ComboBox x:Name="RawWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="BatchInputs_Changed"/>
+                            <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_SELECT_RECIPE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                            <ComboBox x:Name="BatchRecipeComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="BatchInputs_Changed"/>
 
-                        <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_BREWERY_ROOM}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                        <ComboBox x:Name="BreweryWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="BreweryWarehouseComboBox_SelectionChanged"/>
+                            <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_RAW_WAREHOUSE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                            <ComboBox x:Name="RawWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="BatchInputs_Changed"/>
 
-                        <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_BREWING_VESSEL}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                        <Grid Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <ComboBox x:Name="EquipmentLocationComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26"/>
-                            <Button Grid.Column="1" 
-                                    Content="+" 
-                                    Click="QuickCreateEquipment_Click" 
-                                    Style="{StaticResource PrimaryButtonStyle}" 
-                                    Width="26" 
-                                    Height="26" 
-                                    Margin="4,0,0,0" 
-                                    ToolTip="{loc:Loc Key=UI_BREWHOUSE_TOOLTIP_ADD_VESSEL}"/>
-                        </Grid>
+                            <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_BREWERY_ROOM}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                            <ComboBox x:Name="BreweryWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8" SelectionChanged="BreweryWarehouseComboBox_SelectionChanged"/>
 
-                        <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_DEST_WAREHOUSE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                        <ComboBox x:Name="DestinationWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8"/>
+                            <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_BREWING_VESSEL}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                            <Grid Margin="0,0,0,8">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <ComboBox x:Name="EquipmentLocationComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26"/>
+                                <Button Grid.Column="1" 
+                                        Content="+" 
+                                        Click="QuickCreateEquipment_Click" 
+                                        Style="{StaticResource PrimaryButtonStyle}" 
+                                        Width="26" 
+                                        Height="26" 
+                                        Margin="4,0,0,0" 
+                                        ToolTip="{loc:Loc Key=UI_BREWHOUSE_TOOLTIP_ADD_VESSEL}"/>
+                            </Grid>
 
-                        <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_PLANNED_OUTPUT}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                        <Grid Margin="0,0,0,12">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBox x:Name="BatchQuantityTextBox" Text="10" TextChanged="BatchInputs_Changed" Padding="4,2" Height="26"/>
-                            <Button Grid.Column="1" 
-                                    Content="{loc:Loc Key=UI_BREWHOUSE_BTN_CALC_MAX}" 
-                                    Click="CalculateMaxQuantity_Click" 
-                                    Margin="6,0,0,0" 
-                                    Padding="8,0" 
-                                    Height="26"
-                                    Style="{StaticResource SecondaryButtonStyle}"/>
-                        </Grid>
+                            <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_DEST_WAREHOUSE}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                            <ComboBox x:Name="DestinationWarehouseComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="26" Margin="0,0,0,8"/>
 
-                        <Button Content="{loc:Loc Key=UI_BREWHOUSE_BTN_START_BATCH}" 
-                                Click="StartBatch_Click" 
-                                Height="28" 
-                                Padding="16,0" 
-                                HorizontalAlignment="Left"
-                                Style="{StaticResource PrimaryButtonStyle}"/>
-                    </StackPanel>
-                </ScrollViewer>
-            </GroupBox>
+                            <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_PLANNED_OUTPUT}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                            <Grid Margin="0,0,0,12">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox x:Name="BatchQuantityTextBox" Text="10" TextChanged="BatchInputs_Changed" Padding="4,2" Height="26"/>
+                                <Button Grid.Column="1" 
+                                        Content="{loc:Loc Key=UI_BREWHOUSE_BTN_CALC_MAX}" 
+                                        Click="CalculateMaxQuantity_Click" 
+                                        Margin="6,0,0,0" 
+                                        Padding="8,0" 
+                                        Height="26"
+                                        Style="{StaticResource SecondaryButtonStyle}"/>
+                            </Grid>
 
-            <!-- 2. Варки в процессе -->
-            <GroupBox Grid.Row="0" Grid.Column="1" Header="{loc:Loc Key=UI_BREWHOUSE_GROUP_ACTIVE_BATCHES}" Margin="6,0,0,6" Padding="8">
-                <DataGrid x:Name="ActiveBatchesDataGrid" 
-                          ItemsSource="{Binding ActiveBatchesSummary, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                          AutoGenerateColumns="False" 
-                          IsReadOnly="True" 
-                          GridLinesVisibility="Horizontal"
-                          Background="Transparent"
-                          SelectionMode="Single"
-                          SelectionChanged="ActiveBatchesDataGrid_SelectionChanged">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="{loc:Loc Key=UI_BREWHOUSE_COL_BATCH_NAME}" Binding="{Binding BatchName}" Width="1.2*"/>
-                        <DataGridTextColumn Header="{loc:Loc Key=UI_BREWHOUSE_COL_RECIPE}" Binding="{Binding RecipeName}" Width="1.3*"/>
-                        <DataGridTextColumn Header="{loc:Loc Key=UI_BREWHOUSE_COL_PLANNED_QTY}" Binding="{Binding PlannedOutputQuantity, StringFormat={}{0:F2}}" Width="0.8*"/>
-                        <DataGridTextColumn Header="{loc:Loc Key=UI_BREWHOUSE_COL_STARTED_AT}" Binding="{Binding StartedAt, StringFormat={}{0:HH:mm}}" Width="0.8*"/>
-                        <DataGridTemplateColumn Header="{loc:Loc Key=UI_BREWHOUSE_COL_ELAPSED}" Width="1*">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding FormattedElapsed}" FontWeight="Bold" HorizontalAlignment="Center">
-                                        <TextBlock.Style>
-                                            <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="#0369A1"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding IsOverdueStatus}" Value="True">
-                                                        <Setter Property="Foreground" Value="#DC2626"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </TextBlock.Style>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="{loc:Loc Key=UI_BREWHOUSE_COL_TARGET_DURATION}" Binding="{Binding TargetDurationMinutes}" Width="0.8*"/>
-                    </DataGrid.Columns>
-                </DataGrid>
-            </GroupBox>
+                            <Button Content="{loc:Loc Key=UI_BREWHOUSE_BTN_START_BATCH}" 
+                                    Click="StartBatch_Click" 
+                                    Height="28" 
+                                    Padding="16,0" 
+                                    HorizontalAlignment="Left"
+                                    Style="{StaticResource PrimaryButtonStyle}"/>
+                        </StackPanel>
+                    </ScrollViewer>
+                </GroupBox>
 
-            <!-- 3. Расчет потребности в сырье -->
-            <GroupBox Grid.Row="1" Grid.Column="0" Header="{loc:Loc Key=UI_BREWHOUSE_GROUP_RAW_REQUIREMENTS}" Margin="0,6,6,0" Padding="10">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="Auto"/>
-                    </Grid.RowDefinitions>
-
-                    <ListBox Grid.Row="0" x:Name="RequirementsListBox" DisplayMemberPath="FormattedInfo" BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}" Background="Transparent"/>
-
-                    <Grid Grid.Row="1" Margin="0,8,0,0">
+                <!-- 2. Расчет потребности в сырье -->
+                <GroupBox Grid.Row="1" Header="{loc:Loc Key=UI_BREWHOUSE_GROUP_RAW_REQUIREMENTS}" Margin="0,6,0,0" Padding="10">
+                    <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
-                            <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_ESTIMATED_RAW_COST}" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,6,0" FontSize="11"/>
-                            <TextBlock x:Name="EstimatedCostTextBlock" Text="$ 0.00" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" FontSize="12"/>
+                        <ListBox Grid.Row="0" x:Name="RequirementsListBox" DisplayMemberPath="FormattedInfo" BorderThickness="1" BorderBrush="{DynamicResource BorderBrush}" Background="Transparent"/>
+
+                        <Grid Grid.Row="1" Margin="0,8,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,6">
+                                <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_ESTIMATED_RAW_COST}" Foreground="{DynamicResource AppForegroundBrush}" Margin="0,0,6,0" FontSize="11"/>
+                                <TextBlock x:Name="EstimatedCostTextBlock" Text="$ 0.00" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" FontSize="12"/>
+                            </StackPanel>
+
+                            <Button Grid.Row="1" 
+                                    Content="{loc:Loc Key=UI_BREWHOUSE_BTN_PRINT_CARD}" 
+                                    Click="PrintRecipeCard_Click" 
+                                    Padding="12,0" 
+                                    Height="26"
+                                    HorizontalAlignment="Left"
+                                    Style="{StaticResource SecondaryButtonStyle}"/>
+                        </Grid>
+                    </Grid>
+                </GroupBox>
+            </Grid>
+
+            <!-- ПРАВАЯ КОЛОНКА: Варки в процессе + Компактное завершение -->
+            <Grid Grid.Column="1" Margin="6,0,0,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 3. Варки в процессе -->
+                <GroupBox Grid.Row="0" Header="{loc:Loc Key=UI_BREWHOUSE_GROUP_ACTIVE_BATCHES}" Margin="0,0,0,6" Padding="8">
+                    <DataGrid x:Name="ActiveBatchesDataGrid" 
+                              ItemsSource="{Binding ActiveBatchesSummary, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                              AutoGenerateColumns="False" 
+                              IsReadOnly="True" 
+                              GridLinesVisibility="Horizontal"
+                              Background="Transparent"
+                              SelectionMode="Single"
+                              SelectionChanged="ActiveBatchesDataGrid_SelectionChanged">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="{loc:Loc Key=UI_BREWHOUSE_COL_BATCH_NAME}" Binding="{Binding BatchName}" Width="1.2*"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=UI_BREWHOUSE_COL_RECIPE}" Binding="{Binding RecipeName}" Width="1.3*"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=UI_BREWHOUSE_COL_PLANNED_QTY}" Binding="{Binding PlannedOutputQuantity, StringFormat={}{0:F2}}" Width="0.8*"/>
+                            <DataGridTextColumn Header="{loc:Loc Key=UI_BREWHOUSE_COL_STARTED_AT}" Binding="{Binding StartedAt, StringFormat={}{0:HH:mm}}" Width="0.8*"/>
+                            <DataGridTemplateColumn Header="{loc:Loc Key=UI_BREWHOUSE_COL_ELAPSED}" Width="1*">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding FormattedElapsed}" FontWeight="Bold" HorizontalAlignment="Center">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#0369A1"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsOverdueStatus}" Value="True">
+                                                            <Setter Property="Foreground" Value="#DC2626"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridTextColumn Header="{loc:Loc Key=UI_BREWHOUSE_COL_TARGET_DURATION}" Binding="{Binding TargetDurationMinutes}" Width="0.8*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </GroupBox>
+
+                <!-- 4. Завершение варки (открывает модальное окно взвешивания и срока годности) -->
+                <GroupBox Grid.Row="1" Header="{loc:Loc Key=UI_BREWHOUSE_GROUP_COMPLETE_BATCH}" Margin="0,6,0,0" Padding="10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="12"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <StackPanel Grid.Column="0">
+                            <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_ACTIVE_BATCH}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
+                            <ComboBox x:Name="ActiveBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Height="28"/>
                         </StackPanel>
 
-                        <Button Grid.Row="1" 
-                                Content="{loc:Loc Key=UI_BREWHOUSE_BTN_PRINT_CARD}" 
-                                Click="PrintRecipeCard_Click" 
-                                Padding="12,0" 
-                                Height="26"
-                                HorizontalAlignment="Left"
-                                Style="{StaticResource SecondaryButtonStyle}"/>
-                    </Grid>
-                </Grid>
-            </GroupBox>
-
-            <!-- 4. Завершение варки -->
-            <GroupBox Grid.Row="1" Grid.Column="1" Header="{loc:Loc Key=UI_BREWHOUSE_GROUP_COMPLETE_BATCH}" Margin="6,6,0,0" Padding="10">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
-                        <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_ACTIVE_BATCH}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                        <ComboBox x:Name="ActiveBatchComboBox" DisplayMemberPath="Name" SelectedValuePath="Id" Margin="0,0,0,8" Height="26" SelectionChanged="ActiveBatchComboBox_SelectionChanged"/>
-
-                        <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_COMPLETE_BATCH_NAME}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                        <TextBox x:Name="CompleteBatchNameTextBox" Margin="0,0,0,8" Padding="4,2" Height="26"/>
-
-                        <Grid Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="8"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-
-                            <StackPanel Grid.Column="0">
-                                <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_ACTUAL_OUTPUT}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                <TextBox x:Name="ActualOutputQuantityTextBox" Padding="4,2" Height="26" TextChanged="TotalWeightManual_TextChanged"/>
-                            </StackPanel>
-
-                            <StackPanel Grid.Column="2">
-                                <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_UNITS_COUNT}" Margin="0,0,0,2" FontSize="11" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                <TextBox x:Name="ActualUnitsCountTextBox" Text="1" Padding="4,2" Height="26" TextChanged="UnitsCount_TextChanged"/>
-                            </StackPanel>
-                        </Grid>
-
-                        <!-- Поштучное взвешивание головок после формования -->
-                        <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4" Padding="6" Margin="0,0,0,8">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,4">
-                                    <TextBlock Text="Взвешивание головок / SKU (кг):" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource AppForegroundBrush}" VerticalAlignment="Center"/>
-                                    <Button Content="Раскидать поровну" Click="DistributeWeightEvenly_Click" HorizontalAlignment="Right" Padding="6,2" FontSize="10" Height="20" Style="{StaticResource SecondaryButtonStyle}"/>
-                                </Grid>
-                                <ItemsControl x:Name="PackagingUnitsItemsControl" MaxHeight="110">
-                                    <ItemsControl.Template>
-                                        <ControlTemplate TargetType="ItemsControl">
-                                            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                                                <ItemsPresenter/>
-                                            </ScrollViewer>
-                                        </ControlTemplate>
-                                    </ItemsControl.Template>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <Grid Margin="0,2">
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="*"/>
-                                                    <ColumnDefinition Width="95"/>
-                                                    <ColumnDefinition Width="26"/>
-                                                </Grid.ColumnDefinitions>
-                                                <TextBlock Grid.Column="0" Text="{Binding Label}" FontSize="11" VerticalAlignment="Center" Foreground="{DynamicResource AppForegroundBrush}"/>
-                                                <TextBox Grid.Column="1" Text="{Binding WeightText, UpdateSourceTrigger=PropertyChanged}" TextChanged="UnitItemWeight_TextChanged" Padding="4,1" Height="22" FontSize="11" HorizontalContentAlignment="Right"/>
-                                                <TextBlock Grid.Column="2" Text="кг" FontSize="11" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="#64748B"/>
-                                            </Grid>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </StackPanel>
-                        </Border>
-
-                        <Grid Margin="0,0,0,8">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/>
-                                <ColumnDefinition Width="65"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox x:Name="UseOverheadCheckBox" Grid.Column="0" Content="{loc:Loc Key=UI_BREWHOUSE_CHECKBOX_OVERHEAD}" VerticalAlignment="Center" Margin="0,0,6,0" Click="CostInputs_Changed"/>
-                            <TextBox x:Name="OverheadPercentageTextBox" Grid.Column="1" Text="15" Padding="4,2" Height="24" IsEnabled="{Binding IsChecked, ElementName=UseOverheadCheckBox}" TextChanged="CostInputs_Changed"/>
-                            <TextBlock Grid.Column="2" Text="%" VerticalAlignment="Center" Margin="4,0,0,0" Foreground="{DynamicResource AppForegroundBrush}" FontWeight="Bold"/>
-                        </Grid>
-
-                        <Border Background="{DynamicResource CardBackgroundBrush}" BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Padding="8" CornerRadius="4" Margin="0,0,0,10">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,2">
-                                    <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_RAW_COST}" Foreground="{DynamicResource AppForegroundBrush}" FontSize="11"/>
-                                    <TextBlock x:Name="RawMaterialCostTextBlock" Text="$0.00" HorizontalAlignment="Right" FontWeight="SemiBold"/>
-                                </Grid>
-
-                                <Grid Margin="0,0,0,2">
-                                    <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_OVERHEAD_COST}" Foreground="{DynamicResource AppForegroundBrush}" FontSize="11"/>
-                                    <TextBlock x:Name="OverheadCostTextBlock" Text="+$0.00 (0%)" HorizontalAlignment="Right" Foreground="#D97706" FontWeight="SemiBold"/>
-                                </Grid>
-
-                                <Separator Margin="0,2,0,3" Background="{DynamicResource BorderBrush}"/>
-
-                                <Grid Margin="0,0,0,3">
-                                    <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_TOTAL_COST}" Foreground="{DynamicResource AppForegroundBrush}" FontWeight="Bold" FontSize="11"/>
-                                    <TextBlock x:Name="TotalBatchCostTextBlock" Text="$0.00" HorizontalAlignment="Right" FontWeight="Bold" Foreground="#059669" FontSize="12"/>
-                                </Grid>
-
-                                <Grid Margin="0,1,0,0">
-                                    <TextBlock Text="{loc:Loc Key=UI_BREWHOUSE_LABEL_UNIT_COST}" Foreground="{DynamicResource AccentBrush}" FontSize="11" FontWeight="Bold"/>
-                                    <TextBlock x:Name="UnitCostTextBlock" Text="$0.00 / кг" HorizontalAlignment="Right" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource AccentBrush}"/>
-                                </Grid>
-                            </StackPanel>
-                        </Border>
-
-                        <Button x:Name="CompleteBatchButton" 
-                                Content="{loc:Loc Key=UI_BREWHOUSE_BTN_COMPLETE_BATCH}" 
-                                Click="CompleteBatch_Click" 
-                                Height="28" 
-                                Padding="16,0" 
+                        <Button Grid.Column="2"
+                                x:Name="CompleteBatchButton"
+                                Content="{loc:Loc Key=UI_BREWHOUSE_BTN_OPEN_COMPLETE_WINDOW}"
+                                Click="CompleteBatch_Click"
+                                Height="28"
+                                Padding="16,0"
+                                VerticalAlignment="Bottom"
                                 Style="{StaticResource PrimaryButtonStyle}"/>
-                    </StackPanel>
-                </ScrollViewer>
-            </GroupBox>
+                    </Grid>
+                </GroupBox>
+            </Grid>
         </Grid>
     </Border>
 </UserControl>

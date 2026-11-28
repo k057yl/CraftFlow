@@ -671,6 +671,7 @@
 	<data name="UI_BREWHOUSE_BTN_START_BATCH" xml:space="preserve"><value>Запустить Варку</value></data>
 	<data name="UI_BREWHOUSE_BTN_PRINT_CARD" xml:space="preserve"><value>Печать тех. карты</value></data>
 	<data name="UI_BREWHOUSE_BTN_COMPLETE_BATCH" xml:space="preserve"><value>Завершить Варку</value></data>
+	<data name="UI_BREWHOUSE_BTN_OPEN_COMPLETE_WINDOW" xml:space="preserve"><value>⚖ Взвесить и завершить варку...</value></data>
 	<data name="UI_BREWHOUSE_TOOLTIP_ADD_VESSEL" xml:space="preserve"><value>Быстро добавить емкость/котел</value></data>
 
 	<data name="UI_BREWHOUSE_COL_BATCH_NAME" xml:space="preserve"><value>Партия</value></data>
@@ -713,22 +714,80 @@
 	<data name="UI_AGING_LABEL_TARGET_WAREHOUSE" xml:space="preserve"><value>Склад зачисления сыра:</value></data>
 	<data name="UI_AGING_LABEL_TARGET_LOCATIONS" xml:space="preserve"><value>Ячейки хранения на складе:</value></data>
 	<data name="UI_AGING_LABEL_RELEASE_LOT_NAME" xml:space="preserve"><value>Маркировка готовой партии / Лота:</value></data>
-	<data name="UI_AGING_LABEL_FINAL_WEIGHT" xml:space="preserve"><value>Фактический вес после усушки (кг):</value></data>
-	<data name="UI_AGING_LABEL_UNITS_COUNT" xml:space="preserve"><value>Кол-во тар / мест (шт.):</value></data>
-	<data name="UI_AGING_LABEL_UNIT_COST_KG" xml:space="preserve"><value>Расчетная себестоимость за 1 кг:</value></data>
-	<data name="UI_AGING_LABEL_SELLING_PRICE_KG" xml:space="preserve"><value>Цена продажи за 1 кг:</value></data>
-	<data name="UI_AGING_BTN_RELEASE" xml:space="preserve"><value>Выпустить в Продажу</value></data>
+	<data name="UI_AGING_BTN_RELEASE" xml:space="preserve"><value>⚖ Взвесить и выпустить в продажу...</value></data>
 
 	<data name="UI_AGING_LABEL_FREE_CAPACITY_PREFIX" xml:space="preserve"><value>(Свободно: </value></data>
 	<data name="UI_AGING_LABEL_FREE_CAPACITY_SUFFIX" xml:space="preserve"><value>)</value></data>
-
-	<data name="UI_AGING_LABEL_CALCULATED_UNIT_COST_FMT" xml:space="preserve"><value>Расчетная себестоимость за 1 {0}:</value></data>
-	<data name="UI_AGING_LABEL_SELLING_PRICE_PER_UNIT_FMT" xml:space="preserve"><value>Цена продажи за 1 {0}:</value></data>
 
 	<data name="UI_AGING_ERR_SELECT_LOT" xml:space="preserve"><value>Выберите партию из камеры!</value></data>
 	<data name="UI_AGING_ERR_SELECT_WAREHOUSE" xml:space="preserve"><value>Выберите склад зачисления!</value></data>
 	<data name="UI_AGING_MSG_TRANSFER_SUCCESS" xml:space="preserve"><value>Партия успешно размещена на созревание!</value></data>
 	<data name="UI_AGING_MSG_RELEASE_SUCCESS" xml:space="preserve"><value>Партия успешно выпущена в продажу!</value></data>
+	
+	<!-- ========================================== -->
+	<!-- 19. Общие элементы срока годности          -->
+	<!-- ========================================== -->
+	<data name="UI_COMMON_LABEL_EXPIRATION_DATE" xml:space="preserve"><value>Годен до (срок годности):</value></data>
+	<data name="UI_COMMON_BTN_ADD_7_DAYS" xml:space="preserve"><value>+7 дн.</value></data>
+	<data name="UI_COMMON_BTN_ADD_14_DAYS" xml:space="preserve"><value>+14 дн.</value></data>
+	<data name="UI_COMMON_BTN_ADD_30_DAYS" xml:space="preserve"><value>+30 дн.</value></data>
+	<data name="UI_COMMON_BTN_ADD_90_DAYS" xml:space="preserve"><value>+90 дн.</value></data>
+	<data name="UI_COMMON_BTN_CLEAR" xml:space="preserve"><value>Сброс</value></data>
+
+	<!-- ========================================== -->
+	<!-- 20. Окно взвешивания из аффинажа           -->
+	<!-- ========================================== -->
+	<data name="UI_WEIGH_WIN_TITLE" xml:space="preserve"><value>Взвешивание и приходование готовой продукции</value></data>
+	<data name="UI_WEIGH_WIN_BADGE" xml:space="preserve"><value>📥 ПРИХОД ГОТОВОЙ ПРОДУКЦИИ НА СКЛАД</value></data>
+	<data name="UI_WEIGH_WIN_LOT_FMT" xml:space="preserve"><value>Партия: {0}</value></data>
+	<data name="UI_WEIGH_WIN_CHAMBER_FMT" xml:space="preserve"><value>Камера: {0}</value></data>
+	<data name="UI_WEIGH_WIN_HINT_TITLE" xml:space="preserve"><value>Подсказка по вводу:</value></data>
+	<data name="UI_WEIGH_WIN_HINT_LINE1" xml:space="preserve"><value>Введите фактический вес в колонку «Факт после».</value></data>
+	<data name="UI_WEIGH_WIN_HINT_LINE2" xml:space="preserve"><value>Отметьте «Брак?», если головка не приходуется.</value></data>
+	<data name="UI_WEIGH_WIN_GRID_TITLE" xml:space="preserve"><value>Поштучное взвешивание единиц партии</value></data>
+	<data name="UI_WEIGH_WIN_GRID_SUBTITLE" xml:space="preserve"><value>Кликните на ячейку «Факт после» для ввода веса</value></data>
+	<data name="UI_WEIGH_WIN_COL_ITEM_CODE" xml:space="preserve"><value>№ / Маркировка единицы</value></data>
+	<data name="UI_WEIGH_WIN_COL_INITIAL_WEIGHT" xml:space="preserve"><value>Вес до (кг)</value></data>
+	<data name="UI_WEIGH_WIN_COL_FINAL_WEIGHT" xml:space="preserve"><value>✎ Факт после (кг)</value></data>
+	<data name="UI_WEIGH_WIN_COL_SHRINKAGE" xml:space="preserve"><value>Усушка</value></data>
+	<data name="UI_WEIGH_WIN_COL_DISCARDED" xml:space="preserve"><value>Брак?</value></data>
+	<data name="UI_WEIGH_WIN_SUMMARY_TITLE" xml:space="preserve"><value>Итог приходования</value></data>
+	<data name="UI_WEIGH_WIN_LABEL_VALID_WEIGHT" xml:space="preserve"><value>Будет оприходовано (годный вес):</value></data>
+	<data name="UI_WEIGH_WIN_SHRINKAGE_FMT" xml:space="preserve"><value>Усушка: {0:F1}% (-{1:N3} {2})</value></data>
+	<data name="UI_WEIGH_WIN_SHRINKAGE_EMPTY" xml:space="preserve"><value>Усушка: —</value></data>
+	<data name="UI_WEIGH_WIN_LABEL_VALID_UNITS" xml:space="preserve"><value>Годных единиц:</value></data>
+	<data name="UI_WEIGH_WIN_LABEL_INITIAL_TOTAL" xml:space="preserve"><value>Начальный вес (до):</value></data>
+	<data name="UI_WEIGH_WIN_LABEL_UNIT_COST" xml:space="preserve"><value>Себестоимость (1 кг):</value></data>
+	<data name="UI_WEIGH_WIN_RELEASE_PARAMS_TITLE" xml:space="preserve"><value>Параметры выпуска</value></data>
+	<data name="UI_WEIGH_WIN_LABEL_SELLING_PRICE" xml:space="preserve"><value>Цена продажи за 1 кг ($):</value></data>
+	<data name="UI_WEIGH_WIN_CHECK_PRINT_LABELS" xml:space="preserve"><value>Печать этикетки на каждую единицу</value></data>
+	<data name="UI_WEIGH_WIN_FOOTER_NOTE" xml:space="preserve"><value>После подтверждения партия переместится из камеры на склад готовой продукции.</value></data>
+	<data name="UI_WEIGH_WIN_BTN_CONFIRM" xml:space="preserve"><value>✔ Подтвердить и Оприходовать</value></data>
+	<data name="UI_WEIGH_WIN_ERR_TITLE" xml:space="preserve"><value>Ошибка ввода</value></data>
+	<data name="UI_WEIGH_WIN_ERR_NO_VALID_HEADS" xml:space="preserve"><value>Внесите вес хотя бы одной годной головки сыра!</value></data>
+
+	<!-- ========================================== -->
+	<!-- 21. Окно завершения варки                  -->
+	<!-- ========================================== -->
+	<data name="UI_COMPLETE_WIN_TITLE" xml:space="preserve"><value>Завершение варки и взвешивание выхода</value></data>
+	<data name="UI_COMPLETE_WIN_BADGE" xml:space="preserve"><value>🧀 ЗАВЕРШЕНИЕ ВАРКИ</value></data>
+	<data name="UI_COMPLETE_WIN_RECIPE_FMT" xml:space="preserve"><value>Рецепт: {0}</value></data>
+	<data name="UI_COMPLETE_WIN_PLANNED_FMT" xml:space="preserve"><value>План: {0:0.##} {1}</value></data>
+	<data name="UI_COMPLETE_WIN_GRID_TITLE" xml:space="preserve"><value>Взвешивание головок / SKU после формования</value></data>
+	<data name="UI_COMPLETE_WIN_LABEL_UNITS_COUNT" xml:space="preserve"><value>Кол-во единиц:</value></data>
+	<data name="UI_COMPLETE_WIN_LABEL_TOTAL_WEIGHT" xml:space="preserve"><value>Общий вес (кг):</value></data>
+	<data name="UI_COMPLETE_WIN_BTN_DISTRIBUTE_EVENLY" xml:space="preserve"><value>⚖ Раскидать вес поровну</value></data>
+	<data name="UI_COMPLETE_WIN_COL_UNIT_CODE" xml:space="preserve"><value>№ / Единица партии</value></data>
+	<data name="UI_COMPLETE_WIN_COL_WEIGHT" xml:space="preserve"><value>✎ Фактический вес (кг)</value></data>
+	<data name="UI_COMPLETE_WIN_COST_TITLE" xml:space="preserve"><value>Выход и себестоимость</value></data>
+	<data name="UI_COMPLETE_WIN_LABEL_FINAL_TOTAL_WEIGHT" xml:space="preserve"><value>Итоговый вес партии:</value></data>
+	<data name="UI_COMPLETE_WIN_EXPIRATION_TITLE" xml:space="preserve"><value>Срок годности на складе</value></data>
+	<data name="UI_COMPLETE_WIN_EXPIRATION_SUBTITLE" xml:space="preserve"><value>Для свежих сыров без выдержки (если сыр уходит в аффинаж — срок задаётся при снятии).</value></data>
+	<data name="UI_COMPLETE_WIN_FOOTER_NOTE" xml:space="preserve"><value>После подтверждения оборудование освободится, а партия перейдёт на склад или в аффинаж.</value></data>
+	<data name="UI_COMPLETE_WIN_BTN_CONFIRM" xml:space="preserve"><value>✔ Завершить варку</value></data>
+	<data name="UI_COMPLETE_WIN_ERR_INVALID_TOTAL_WEIGHT" xml:space="preserve"><value>Введите корректный общий вес партии для распределения.</value></data>
+	<data name="UI_COMPLETE_WIN_ERR_NO_WEIGHT" xml:space="preserve"><value>Укажите положительный вес хотя бы для одной единицы партии.</value></data>
+	<data name="UI_COMPLETE_WIN_ERR_INVALID_OVERHEAD" xml:space="preserve"><value>Укажите корректный процент накладных расходов.</value></data>
 
 	<!-- ========================================== -->
 	<!-- 19. Брак и Списания (DiscardActsControl)   -->

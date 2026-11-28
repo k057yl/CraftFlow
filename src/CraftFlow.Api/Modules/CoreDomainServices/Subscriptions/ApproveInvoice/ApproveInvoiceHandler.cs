@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Core.MultiTenancy;
 using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain;
+using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Services;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Enums.Subscription;
 using CraftFlow.SharedKernel.Result;
@@ -13,11 +14,16 @@ public class ApproveInvoiceHandler : IRequestHandler<ApproveInvoiceCommand, Resu
 {
     private readonly AppDbContext _dbContext;
     private readonly ITenantContext _tenantContext;
+    private readonly ITenantEntitlementService _entitlementService;
 
-    public ApproveInvoiceHandler(AppDbContext dbContext, ITenantContext tenantContext)
+    public ApproveInvoiceHandler(
+        AppDbContext dbContext,
+        ITenantContext tenantContext,
+        ITenantEntitlementService entitlementService)
     {
         _dbContext = dbContext;
         _tenantContext = tenantContext;
+        _entitlementService = entitlementService;
     }
 
     public async Task<Result<bool>> Handle(ApproveInvoiceCommand request, CancellationToken cancellationToken)
@@ -103,6 +109,9 @@ public class ApproveInvoiceHandler : IRequestHandler<ApproveInvoiceCommand, Resu
         invoice.Approve();
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        _entitlementService.InvalidateCache(invoice.TenantId);
+
         return Result.Success(true);
     }
 }

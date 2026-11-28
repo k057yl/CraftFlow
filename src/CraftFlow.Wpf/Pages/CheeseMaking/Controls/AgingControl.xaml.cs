@@ -1,13 +1,10 @@
-﻿using CraftFlow.SharedKernel.Constants;
-using CraftFlow.SharedKernel.Constants.Endpoints;
+﻿using CraftFlow.SharedKernel.Constants.Endpoints;
 using CraftFlow.SharedKernel.Dtos.Aging;
 using CraftFlow.SharedKernel.Dtos.Catalog.Inventory;
 using CraftFlow.SharedKernel.Dtos.Production;
 using CraftFlow.Wpf.Models;
-using CraftFlow.Wpf.Pages.Production.Windows;
 using CraftFlow.Wpf.Services;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -56,9 +53,6 @@ public partial class AgingControl : UserControl
 
     public ObservableCollection<StorageLocationDto> TargetStorageLocations { get; set; } = [];
 
-    private decimal _selectedLotTotalCost;
-    private string _selectedLotUnitName = FormattingConstants.DEFAULT_WEIGHT_UNIT;
-
     public TextBlock? StatusTextBlock { get; set; }
     public CheeseMakingPage? ParentPage { get; set; }
 
@@ -72,21 +66,6 @@ public partial class AgingControl : UserControl
         ActiveAgingLotsComboBox.ItemsSource = ActiveAgingLots;
         TargetWarehousesComboBox.ItemsSource = Warehouses;
         TargetStorageLocationsListBox.ItemsSource = TargetStorageLocations;
-    }
-
-    private static bool TryParseDecimal(string text, out decimal result)
-    {
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            result = 0;
-            return false;
-        }
-
-        var normalized = text.Trim().Replace('.', ',');
-        if (decimal.TryParse(normalized, out result)) return true;
-
-        normalized = text.Trim().Replace(',', '.');
-        return decimal.TryParse(normalized, NumberStyles.Any, CultureInfo.InvariantCulture, out result);
     }
 
     private void CompletedBatchesComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -116,7 +95,7 @@ public partial class AgingControl : UserControl
         var customLotName = AgingLotNameTextBox.Text?.Trim();
         if (!string.IsNullOrEmpty(customLotName) && customLotName.Length > MaxBatchNameLength)
         {
-            SetStatusRaw($"Валера, заебал, {customLotName.Length} символов — это чрезмерно дохуя (максимум {MaxBatchNameLength}).", Brushes.Red);
+            SetStatusRaw($"Максимальная длина маркировки — {MaxBatchNameLength} символов.", Brushes.Red);
             return;
         }
 
@@ -157,48 +136,15 @@ public partial class AgingControl : UserControl
         }
     }
 
-    private async void ActiveAgingLotsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void ActiveAgingLotsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (ActiveAgingLotsComboBox.SelectedValue is not Guid lotId || lotId == Guid.Empty)
-        {
-            ReleaseLotNameTextBox.Clear();
-            ActualFinalQuantityTextBox.Clear();
-            ReleaseUnitsCountTextBox.Text = "1";
-            UnitPriceTextBox.Clear();
-            CalculatedUnitCostTextBlock.Text = "$ 0.00";
-            _selectedLotTotalCost = 0;
-            return;
-        }
-
         if (ActiveAgingLotsComboBox.SelectedItem is LookupItem selectedLot)
         {
             ReleaseLotNameTextBox.Text = selectedLot.Name;
-
-            try
-            {
-                var details = await ApiService.Instance.GetAsync<GetAgingLotDetailsDto>($"{AgingConstants.AGING_LOTS_ACTIVE}/{lotId}");
-                if (details != null)
-                {
-                    _selectedLotTotalCost = details.TotalBatchCost;
-                    _selectedLotUnitName = string.IsNullOrWhiteSpace(details.UnitName) ? FormattingConstants.DEFAULT_WEIGHT_UNIT : details.UnitName;
-
-                    var costFormat = Get("UI_AGING_LABEL_CALCULATED_UNIT_COST_FMT");
-                    CalculatedCostLabelTextBlock.Text = string.Format(costFormat, _selectedLotUnitName);
-
-                    var priceFormat = Get("UI_AGING_LABEL_SELLING_PRICE_PER_UNIT_FMT");
-                    UnitPriceLabelTextBlock.Text = string.Format(priceFormat, _selectedLotUnitName);
-
-                    ActualFinalQuantityTextBox.TextChanged -= ActualFinalQuantityTextBox_TextChanged;
-
-                    ActualFinalQuantityTextBox.Text = details.InitialQuantity.ToString("F2", CultureInfo.InvariantCulture);
-                    ReleaseUnitsCountTextBox.Text = details.UnitsCount > 0 ? details.UnitsCount.ToString() : "1";
-
-                    ActualFinalQuantityTextBox.TextChanged += ActualFinalQuantityTextBox_TextChanged;
-
-                    RecalculateUnitPrice();
-                }
-            }
-            catch { }
+        }
+        else
+        {
+            ReleaseLotNameTextBox.Clear();
         }
     }
 
@@ -213,34 +159,6 @@ public partial class AgingControl : UserControl
                 locations?.ForEach(TargetStorageLocations.Add);
             }
             catch { }
-        }
-    }
-
-    private void ActualFinalQuantityTextBox_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        RecalculateUnitPrice();
-    }
-
-    private void RecalculateUnitPrice()
-    {
-        if (CalculatedUnitCostTextBlock == null || UnitPriceTextBox == null) return;
-
-        if (TryParseDecimal(ActualFinalQuantityTextBox.Text, out var actualQty) && actualQty > 0)
-        {
-            var calculatedUnitCost = _selectedLotTotalCost > 0
-                ? _selectedLotTotalCost / actualQty
-                : 0m;
-
-            CalculatedUnitCostTextBlock.Text = $"${calculatedUnitCost:F2}";
-
-            if (string.IsNullOrWhiteSpace(UnitPriceTextBox.Text) || UnitPriceTextBox.Text == "0.00" || UnitPriceTextBox.Text == "0")
-            {
-                UnitPriceTextBox.Text = calculatedUnitCost.ToString("F2", CultureInfo.InvariantCulture);
-            }
-        }
-        else
-        {
-            CalculatedUnitCostTextBlock.Text = "$ 0.00";
         }
     }
 
@@ -261,7 +179,7 @@ public partial class AgingControl : UserControl
         var customLotName = ReleaseLotNameTextBox.Text?.Trim();
         if (!string.IsNullOrEmpty(customLotName) && customLotName.Length > MaxBatchNameLength)
         {
-            SetStatusRaw($"Валера, заебал, {customLotName.Length} символов — это чрезмерно дохуя (максимум {MaxBatchNameLength}).", Brushes.Red);
+            SetStatusRaw($"Максимальная длина маркировки — {MaxBatchNameLength} символов.", Brushes.Red);
             return;
         }
 
@@ -300,7 +218,8 @@ public partial class AgingControl : UserControl
                 CustomBatchNumber = string.IsNullOrWhiteSpace(customLotName) ? null : customLotName,
                 StorageLocationIds = selectedStorageLocationIds.Count > 0 ? selectedStorageLocationIds : null,
                 HeadWeights = weighWindow.ValidHeadWeights,
-                DiscardedItemIds = weighWindow.DiscardedItemIds.Count > 0 ? weighWindow.DiscardedItemIds : null
+                DiscardedItemIds = weighWindow.DiscardedItemIds.Count > 0 ? weighWindow.DiscardedItemIds : null,
+                ExpirationDate = weighWindow.ExpirationDate
             });
 
             if (response.IsSuccess)

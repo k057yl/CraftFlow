@@ -14,7 +14,8 @@ public sealed record ReleaseFromAgingCommand(
     string? CustomBatchNumber = null,
     List<Guid>? StorageLocationIds = null,
     List<decimal>? HeadWeights = null,
-    List<Guid>? DiscardedItemIds = null
+    List<Guid>? DiscardedItemIds = null,
+    DateTime? ExpirationDate = null
 ) : IRequest<Result>, IRequirePermission
 {
     public AppPermission RequiredPermission => AppPermission.PRODUCTION_EXECUTE;

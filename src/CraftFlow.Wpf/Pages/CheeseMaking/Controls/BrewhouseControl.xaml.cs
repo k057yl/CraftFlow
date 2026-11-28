@@ -5,7 +5,6 @@ using CraftFlow.SharedKernel.Dtos.Production;
 using CraftFlow.SharedKernel.Enums;
 using CraftFlow.SharedKernel.Enums.Inventory;
 using CraftFlow.Wpf.Models;
-using CraftFlow.Wpf.Pages.Fermentation;
 using CraftFlow.Wpf.Services;
 using CraftFlow.Wpf.Windows;
 using System.Collections.ObjectModel;
@@ -29,7 +28,6 @@ public partial class BrewhouseControl : UserControl
     public ObservableCollection<LookupItem> Recipes { get; } = [];
     public ObservableCollection<LookupItem> ActiveBatches { get; } = [];
     public ObservableCollection<ActiveBatchWpfModel> ActiveBatchesSummary { get; } = [];
-    public ObservableCollection<PackagingUnitRow> PackagingUnits { get; } = [];
 
     public class RequirementItemUiModel
     {
@@ -46,9 +44,7 @@ public partial class BrewhouseControl : UserControl
     private readonly List<RequirementCalculationDto> _rawRequirements = [];
     private readonly DispatcherTimer _uiTimer = new();
 
-    private decimal _currentRawCost = 0m;
     private bool _isInitializing = true;
-    private bool _isSyncingWeights = false;
 
     public AppModule TargetModule { get; set; } = AppModule.CHEESE_MAKING;
     public TextBlock? StatusTextBlock { get; set; }
@@ -67,9 +63,6 @@ public partial class BrewhouseControl : UserControl
         ActiveBatchComboBox.ItemsSource = ActiveBatches;
         RequirementsListBox.ItemsSource = _uiRequirements;
         ActiveBatchesDataGrid.ItemsSource = ActiveBatchesSummary;
-        PackagingUnitsItemsControl.ItemsSource = PackagingUnits;
-
-        RebuildPackagingUnits(1, 0m);
 
         _uiTimer.Interval = TimeSpan.FromSeconds(1);
         _uiTimer.Tick += UiTimer_Tick;
@@ -401,227 +394,62 @@ public partial class BrewhouseControl : UserControl
         }
     }
 
-    private async void ActiveBatchComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void CompleteBatch_Click(object sender, RoutedEventArgs e)
     {
-        if (ActiveBatchComboBox.SelectedValue is not Guid batchId || batchId == Guid.Empty) return;
-
-        if (ActiveBatchComboBox.SelectedItem is LookupItem selectedItem)
+        if (ActiveBatchComboBox.SelectedValue is not Guid batchId || batchId == Guid.Empty)
         {
-            CompleteBatchNameTextBox.Text = selectedItem.Name;
+            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
+            return;
         }
+
+        var selectedSummary = ActiveBatchesSummary.FirstOrDefault(b => b.Id == batchId);
+        var batchName = selectedSummary?.BatchName ?? (ActiveBatchComboBox.SelectedItem as LookupItem)?.Name ?? string.Empty;
+        var recipeName = selectedSummary?.RecipeName ?? string.Empty;
+        var plannedQty = selectedSummary?.PlannedOutputQuantity ?? 0m;
+
+        decimal rawCost = 0m;
+        decimal? overheadPct = null;
 
         try
         {
-            var endpoint = $"{ProductionConstants.PRODUCTION_COSTING}/{batchId}";
-            var costData = await ApiService.Instance.GetAsync<BatchCostDto>(endpoint);
-
+            var costData = await ApiService.Instance.GetAsync<BatchCostDto>($"{ProductionConstants.PRODUCTION_COSTING}/{batchId}");
             if (costData != null)
             {
-                _currentRawCost = costData.TotalRawMaterialCost;
-
-                if (costData.OverheadPercentage.HasValue)
+                rawCost = costData.TotalRawMaterialCost;
+                overheadPct = costData.OverheadPercentage;
+                if (costData.ActualOutputQuantity > 0)
                 {
-                    UseOverheadCheckBox.IsChecked = true;
-                    OverheadPercentageTextBox.Text = costData.OverheadPercentage.Value.ToString("F2", CultureInfo.InvariantCulture);
+                    plannedQty = costData.ActualOutputQuantity;
                 }
-
-                decimal initialWeight = costData.ActualOutputQuantity > 0 ? costData.ActualOutputQuantity : 0m;
-
-                _isSyncingWeights = true;
-                ActualOutputQuantityTextBox.Text = initialWeight > 0
-                    ? initialWeight.ToString("F2", CultureInfo.InvariantCulture)
-                    : string.Empty;
-                ActualUnitsCountTextBox.Text = "1";
-                _isSyncingWeights = false;
-
-                RebuildPackagingUnits(1, initialWeight);
-                RecalculateBatchCostUI();
             }
         }
         catch { }
-    }
 
-    private void RebuildPackagingUnits(int count, decimal totalWeight)
-    {
-        if (PackagingUnits == null) return;
-        _isSyncingWeights = true;
-        try
+        var dialog = new CompleteBatchWindow(batchName, recipeName, plannedQty, rawCost, overheadPct)
         {
-            PackagingUnits.Clear();
-            if (count <= 0) return;
+            Owner = Window.GetWindow(this)
+        };
 
-            decimal avg = count > 0 ? Math.Round(totalWeight / count, 3) : 0m;
-            decimal distributed = 0m;
-
-            for (int i = 1; i <= count; i++)
-            {
-                decimal w = (i == count) ? Math.Max(0m, Math.Round(totalWeight - distributed, 3)) : avg;
-                distributed += w;
-
-                PackagingUnits.Add(new PackagingUnitRow
-                {
-                    Index = i,
-                    WeightText = w > 0 ? w.ToString("0.###", CultureInfo.InvariantCulture) : string.Empty
-                });
-            }
-        }
-        finally
-        {
-            _isSyncingWeights = false;
-        }
-    }
-
-    private void UnitsCount_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        if (_isSyncingWeights || ActualUnitsCountTextBox == null) return;
-        if (int.TryParse(ActualUnitsCountTextBox.Text.Trim(), out var count) && count > 0 && count <= 200)
-        {
-            TryParseDecimal(ActualOutputQuantityTextBox?.Text ?? string.Empty, out var totalWeight);
-            RebuildPackagingUnits(count, totalWeight);
-            RecalculateBatchCostUI();
-        }
-    }
-
-    private void TotalWeightManual_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        if (_isSyncingWeights || ActualOutputQuantityTextBox == null) return;
-        if (TryParseDecimal(ActualOutputQuantityTextBox.Text, out var totalWeight) && totalWeight >= 0)
-        {
-            int count = PackagingUnits.Count > 0 ? PackagingUnits.Count : 1;
-            RebuildPackagingUnits(count, totalWeight);
-        }
-        RecalculateBatchCostUI();
-    }
-
-    private void DistributeWeightEvenly_Click(object sender, RoutedEventArgs e)
-    {
-        if (TryParseDecimal(ActualOutputQuantityTextBox.Text, out var totalWeight) && totalWeight > 0 && PackagingUnits.Count > 0)
-        {
-            RebuildPackagingUnits(PackagingUnits.Count, totalWeight);
-            RecalculateBatchCostUI();
-        }
-    }
-
-    private void UnitItemWeight_TextChanged(object sender, TextChangedEventArgs e)
-    {
-        if (_isSyncingWeights || ActualOutputQuantityTextBox == null) return;
-
-        decimal sum = 0m;
-        foreach (var unit in PackagingUnits)
-        {
-            if (TryParseDecimal(unit.WeightText, out var w) && w > 0)
-                sum += w;
-        }
-
-        _isSyncingWeights = true;
-        ActualOutputQuantityTextBox.Text = sum.ToString("0.###", CultureInfo.InvariantCulture);
-        _isSyncingWeights = false;
-
-        RecalculateBatchCostUI();
-    }
-
-    private void CostInputs_Changed(object sender, RoutedEventArgs e)
-    {
-        RecalculateBatchCostUI();
-    }
-
-    private void RecalculateBatchCostUI()
-    {
-        if (RawMaterialCostTextBlock == null || TotalBatchCostTextBlock == null || UnitCostTextBlock == null) return;
-
-        decimal rawCost = _currentRawCost;
-        decimal overheadPercent = 0m;
-
-        if (UseOverheadCheckBox.IsChecked == true && TryParseDecimal(OverheadPercentageTextBox.Text, out var parsedOverhead))
-        {
-            overheadPercent = parsedOverhead;
-        }
-
-        decimal overheadAmount = rawCost * (overheadPercent / 100m);
-        decimal totalBatchCost = rawCost + overheadAmount;
-
-        if (!TryParseDecimal(ActualOutputQuantityTextBox.Text, out var actualWeight) || actualWeight <= 0)
-        {
-            actualWeight = 1m;
-        }
-
-        decimal unitCostPerKg = totalBatchCost / actualWeight;
-
-        RawMaterialCostTextBlock.Text = $"${rawCost:F2}";
-        OverheadCostTextBlock.Text = $"+${overheadAmount:F2} ({overheadPercent:0.##}%)";
-        TotalBatchCostTextBlock.Text = $"${totalBatchCost:F2}";
-        UnitCostTextBlock.Text = $"${unitCostPerKg:F2} / {Get("UI_UNIT_KG")}";
-    }
-
-    private async void CompleteBatch_Click(object sender, RoutedEventArgs e)
-    {
-        if (ActiveBatchComboBox.SelectedValue is not Guid batchId)
-        {
-            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
-            return;
-        }
-
-        var headWeights = new List<decimal>();
-        foreach (var unit in PackagingUnits)
-        {
-            if (!TryParseDecimal(unit.WeightText, out var w) || w <= 0)
-            {
-                SetStatusRaw($"Укажите корректный вес для {unit.Label}.", Brushes.Red);
-                return;
-            }
-            headWeights.Add(w);
-        }
-
-        if (headWeights.Count == 0)
-        {
-            SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
-            return;
-        }
-
-        decimal? overheadPercentage = null;
-        if (UseOverheadCheckBox.IsChecked == true)
-        {
-            if (TryParseDecimal(OverheadPercentageTextBox.Text, out var parsedOverhead) && parsedOverhead >= 0)
-            {
-                overheadPercentage = parsedOverhead;
-            }
-            else
-            {
-                SetStatus("UI_ERR_INVALID_INPUT_FIELDS", Brushes.Red);
-                return;
-            }
-        }
-
-        decimal totalActualOutput = headWeights.Sum();
-        var customBatchName = CompleteBatchNameTextBox.Text?.Trim();
+        if (dialog.ShowDialog() != true) return;
 
         var (isSuccess, contentOrError) = await ApiService.Instance.PostAndReadAsync(ProductionConstants.BATCHES_COMPLETE, new
         {
             BatchId = batchId,
-            ActualOutputQuantity = totalActualOutput,
-            UnitsCount = headWeights.Count,
-            BatchNumber = string.IsNullOrWhiteSpace(customBatchName) ? null : customBatchName,
-            OverheadPercentage = overheadPercentage,
+            ActualOutputQuantity = dialog.TotalWeight,
+            UnitsCount = dialog.UnitsCount,
+            BatchNumber = string.IsNullOrWhiteSpace(dialog.CustomBatchNumber) ? null : dialog.CustomBatchNumber,
+            OverheadPercentage = dialog.OverheadPercentage,
             RequiresAging = false,
             AgingChamberId = (Guid?)null,
             MinAgingDays = (int?)null,
             StorageLocationId = (Guid?)null,
-            HeadWeights = headWeights
+            HeadWeights = dialog.HeadWeights,
+            ExpirationDate = dialog.ExpirationDate
         });
 
         if (isSuccess)
         {
             SetStatus("UI_BREWHOUSE_MSG_BATCH_COMPLETED_SUCCESS", Brushes.Green);
-
-            _isSyncingWeights = true;
-            ActualOutputQuantityTextBox.Clear();
-            ActualUnitsCountTextBox.Text = "1";
-            CompleteBatchNameTextBox.Clear();
-            UseOverheadCheckBox.IsChecked = false;
-            OverheadPercentageTextBox.Text = "15";
-            _isSyncingWeights = false;
-
-            RebuildPackagingUnits(1, 0m);
 
             await LoadDataAsync();
 

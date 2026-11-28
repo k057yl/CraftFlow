@@ -97,8 +97,19 @@ public class CompleteCheeseBatchHandler : IRequestHandler<CompleteCheeseBatchCom
             );
         }
 
+        DateTime? finalExpirationDate = request.ExpirationDate.HasValue
+            ? DateTime.SpecifyKind(request.ExpirationDate.Value, DateTimeKind.Utc)
+            : null;
+
         await _publisher.Publish(
-            new CheeseBatchCompletedEvent(batch.Id, batch.RecipeId, batch.DestinationWarehouseId, batch.ActualOutputQuantity, unitsCount, validWeights),
+            new CheeseBatchCompletedEvent(
+                batch.Id,
+                batch.RecipeId,
+                batch.DestinationWarehouseId,
+                batch.ActualOutputQuantity,
+                unitsCount,
+                validWeights,
+                finalExpirationDate),
             cancellationToken
         );
 

@@ -32,5 +32,9 @@ public class ReleaseFromAgingValidator : AbstractValidator<ReleaseFromAgingComma
         RuleFor(x => x.UnitPrice)
             .GreaterThanOrEqualTo(0)
             .WithErrorCode(ErrorCodes.General.INVALID_FORMAT);
+
+        RuleFor(x => x.ExpirationDate)
+            .Must(d => !d.HasValue || d.Value.Date >= DateTime.UtcNow.Date)
+            .WithErrorCode(ErrorCodes.General.INVALID_FORMAT);
     }
 }

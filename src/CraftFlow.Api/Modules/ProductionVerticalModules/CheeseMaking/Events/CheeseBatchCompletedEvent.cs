@@ -8,5 +8,6 @@ public record CheeseBatchCompletedEvent(
     Guid WarehouseId,
     decimal ActualOutputQuantity,
     int UnitsCount,
-    IReadOnlyList<decimal>? HeadWeights = null
+    IReadOnlyList<decimal>? HeadWeights = null,
+    DateTime? ExpirationDate = null
 ) : INotification;

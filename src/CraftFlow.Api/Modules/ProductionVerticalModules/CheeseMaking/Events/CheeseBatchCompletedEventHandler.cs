@@ -71,6 +71,7 @@ public class CheeseBatchCompletedEventHandler : INotificationHandler<CheeseBatch
             : string.Concat(FormattingConstants.BATCH_PREFIX, batch.Id.ToString()[..8].ToUpperInvariant());
 
         var finishedStockLot = StockLot.Create(
+            tenantId: batch.TenantId,
             warehouseId: destWarehouseId,
             itemId: batch.TargetProductId,
             unitOfMeasureId: product.UnitOfMeasureId,
@@ -78,8 +79,8 @@ public class CheeseBatchCompletedEventHandler : INotificationHandler<CheeseBatch
             unitsCount: notification.UnitsCount,
             unitPrice: calculatedUnitCost,
             batchNumber: lotNumber,
-            tenantId: batch.TenantId,
-            productionBatchId: batch.Id
+            productionBatchId: batch.Id,
+            expirationDate: notification.ExpirationDate
         );
 
         if (notification.HeadWeights != null && notification.HeadWeights.Count > 0)

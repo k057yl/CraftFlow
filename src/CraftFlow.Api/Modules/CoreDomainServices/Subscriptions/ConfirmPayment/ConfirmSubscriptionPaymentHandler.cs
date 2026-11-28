@@ -1,6 +1,7 @@
 ﻿using CraftFlow.Api.Core.MultiTenancy;
 using CraftFlow.Api.Core.Persistence;
 using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Domain;
+using CraftFlow.Api.Modules.CoreDomainServices.Subscriptions.Services;
 using CraftFlow.SharedKernel.Constants;
 using CraftFlow.SharedKernel.Result;
 using MediatR;
@@ -12,11 +13,16 @@ public class ConfirmSubscriptionPaymentHandler : IRequestHandler<ConfirmSubscrip
 {
     private readonly AppDbContext _dbContext;
     private readonly ITenantContext _tenantContext;
+    private readonly ITenantEntitlementService _entitlementService;
 
-    public ConfirmSubscriptionPaymentHandler(AppDbContext dbContext, ITenantContext tenantContext)
+    public ConfirmSubscriptionPaymentHandler(
+        AppDbContext dbContext,
+        ITenantContext tenantContext,
+        ITenantEntitlementService entitlementService)
     {
         _dbContext = dbContext;
         _tenantContext = tenantContext;
+        _entitlementService = entitlementService;
     }
 
     public async Task<Result> Handle(ConfirmSubscriptionPaymentCommand request, CancellationToken cancellationToken)
@@ -39,6 +45,7 @@ public class ConfirmSubscriptionPaymentHandler : IRequestHandler<ConfirmSubscrip
         }
 
         var subscription = await _dbContext.Set<TenantSubscription>()
+            .IgnoreQueryFilters()
             .Include(s => s.Plan)
             .FirstOrDefaultAsync(s => s.TenantId == targetTenantId && s.Plan.TargetModule == plan.TargetModule, cancellationToken);
 
@@ -72,6 +79,8 @@ public class ConfirmSubscriptionPaymentHandler : IRequestHandler<ConfirmSubscrip
         _dbContext.Set<SubscriptionPayment>().Add(payment);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        _entitlementService.InvalidateCache(targetTenantId);
 
         return Result.Success();
     }

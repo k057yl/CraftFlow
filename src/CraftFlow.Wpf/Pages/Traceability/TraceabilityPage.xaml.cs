@@ -4,6 +4,7 @@ using CraftFlow.SharedKernel.Dtos.Common;
 using CraftFlow.SharedKernel.Dtos.Traceability;
 using CraftFlow.Wpf.Models;
 using CraftFlow.Wpf.Services;
+using CraftFlow.Wpf.Windows;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -83,7 +84,7 @@ public partial class TraceabilityPage : Page
         }
         catch (Exception ex)
         {
-            SetStatus($"{Get("UI_ERR_DATA_LOAD")}: {ex.Message}", Brushes.Red);
+            SetStatusRaw($"{Get("UI_ERR_DATA_LOAD")}: {ex.Message}", Brushes.Red);
         }
     }
 
@@ -148,7 +149,7 @@ public partial class TraceabilityPage : Page
         }
         catch (Exception ex)
         {
-            SetStatus($"{Get("UI_ERR_DATA_LOAD")}: {ex.Message}", Brushes.Red);
+            SetStatusRaw($"{Get("UI_ERR_DATA_LOAD")}: {ex.Message}", Brushes.Red);
         }
     }
 
@@ -247,7 +248,7 @@ public partial class TraceabilityPage : Page
         }
         catch (Exception ex)
         {
-            SetStatus($"{Get("UI_ERR_DATA_LOAD")}: {ex.Message}", Brushes.Red);
+            SetStatusRaw($"{Get("UI_ERR_DATA_LOAD")}: {ex.Message}", Brushes.Red);
         }
     }
 
@@ -257,13 +258,19 @@ public partial class TraceabilityPage : Page
         {
             string entityType = node.LinkType == TraceLinkType.Customer ? Get("UI_ENTITY_CUSTOMER") : Get("UI_ENTITY_SUPPLIER");
             var msgFormat = Get("UI_MSG_CARD_IN_DEVELOPMENT_FMT");
-            MessageBox.Show(string.Format(msgFormat, entityType, node.LinkText, node.TargetId), Get("UI_CAPTION_NAVIGATION"), MessageBoxButton.OK, MessageBoxImage.Information);
+            AlertWindow.ShowSuccess(Window.GetWindow(this), string.Format(msgFormat, entityType, node.LinkText, node.TargetId));
         }
     }
 
-    private void SetStatus(string msgKeyOrText, Brush color)
+    private void SetStatus(string msgKey, Brush color)
     {
         StatusTextBlock.Foreground = color;
-        StatusTextBlock.Text = Get(msgKeyOrText);
+        StatusTextBlock.Text = Get(msgKey);
+    }
+
+    private void SetStatusRaw(string text, Brush color)
+    {
+        StatusTextBlock.Foreground = color;
+        StatusTextBlock.Text = text;
     }
 }

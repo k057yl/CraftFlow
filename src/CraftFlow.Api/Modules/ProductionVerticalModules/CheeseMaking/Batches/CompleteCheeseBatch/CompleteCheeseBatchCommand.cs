@@ -15,7 +15,8 @@ public sealed record CompleteCheeseBatchCommand(
     Guid? AgingChamberId,
     int? MinAgingDays,
     Guid? StorageLocationId,
-    List<decimal>? HeadWeights = null
+    List<decimal>? HeadWeights = null,
+    DateTime? ExpirationDate = null
 ) : IRequest<Result<Guid>>, IRequirePermission
 {
     public AppPermission RequiredPermission => AppPermission.PRODUCTION_EXECUTE;
